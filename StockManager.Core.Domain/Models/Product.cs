@@ -5,7 +5,8 @@
         public int Id { get; set; } 
         public string Name { get; set; } = string.Empty;
         public Genre Genre { get; set; }
-        public string Unit { get; set; } = string.Empty;
+        public string? Unit { get; set; } 
+        public int Quantity {  get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime DeliveredAt { get; set; }
         public Warehouse Section { get; set; }

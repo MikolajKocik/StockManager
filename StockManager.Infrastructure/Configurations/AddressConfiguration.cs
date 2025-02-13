@@ -10,7 +10,7 @@ namespace StockManager.Infrastructure.Configurations
         {
             builder.HasOne(a => a.Supplier)
                 .WithOne(s => s.Address)
-                .HasConstraintName("FK_Supplier_Address")
+                .HasConstraintName("FK_Address_Supplier")
                 .HasForeignKey<Address>(a => a.SupplierId)
                 .OnDelete(DeleteBehavior.Cascade);
         }

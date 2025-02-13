@@ -1,6 +1,8 @@
-@StockManager_HostAddress = http://localhost:5286
+@Host = https://localhost
+@Port = 7210
+@StockManager_HostAddress = {{Port}}:{{Host}}
 
-GET {{StockManager_HostAddress}}/weatherforecast/
+GET {{StockManager_HostAddress}}
 Accept: application/json
 
 ###

@@ -9,13 +9,12 @@
         public int Quantity {  get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime DeliveredAt { get; set; }
-        public Warehouse Section { get; set; }
+        public Warehouse Type { get; set; }
         public string BatchNumber { get; set; } = string.Empty;
 
         // relation 1-* with supplier
         public Supplier Supplier { get; set; } = new Supplier();
         public Guid SupplierId { get; set; }
 
-        
     }
 }

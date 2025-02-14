@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Extensions;
 
@@ -27,7 +26,12 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider
         .GetRequiredService<StockManagerDbContext>();
 
-    dbContext.Database.Migrate();
+    var pendingMigrations = dbContext.Database.GetPendingMigrations();
+
+    if (!pendingMigrations.Any())
+    {
+        dbContext.Database.Migrate();
+    }
 }
 
 app.UseHttpsRedirection();

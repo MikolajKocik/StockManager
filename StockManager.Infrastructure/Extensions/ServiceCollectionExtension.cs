@@ -15,7 +15,7 @@ namespace StockManager.Infrastructure.Extensions
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddDefaultIdentity<IdentityUser>()
-                .AddRoles<IdentityRole>()
+                .AddRoles<IdentityRole>() // Employee + Manager
                 .AddEntityFrameworkStores<StockManagerDbContext>()
                 .AddDefaultTokenProviders();
         }

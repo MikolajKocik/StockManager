@@ -1,8 +1,8 @@
 @Host = https://localhost
 @Port = 7210
-@StockManager_HostAddress = {{Port}}:{{Host}}
+@StockManager_HostAddress = {{Host}}:{{Port}}
 
-GET {{StockManager_HostAddress}}
+GET {{StockManager_HostAddress}}/api/products
 Accept: application/json
 
 ###

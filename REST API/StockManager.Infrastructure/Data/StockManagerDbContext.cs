@@ -7,9 +7,8 @@ namespace StockManager.Infrastructure.Data
 {
     public class StockManagerDbContext : IdentityDbContext<IdentityUser>
     {
-        public StockManagerDbContext(DbContextOptions<StockManagerDbContext> options) : base(options)
+        public StockManagerDbContext(DbContextOptions<StockManagerDbContext> options) : base(options) 
         {
-           Database.EnsureCreated();
         }
 
         public DbSet<Product> Products { get; set; }

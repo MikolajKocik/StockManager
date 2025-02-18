@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockManager.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using StockManager.Infrastructure.Data;
 namespace StockManager.Infrastructure.Migrations
 {
     [DbContext(typeof(StockManagerDbContext))]
-    partial class StockManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250218125922_ChangeColumnName")]
+    partial class ChangeColumnName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -250,7 +253,7 @@ namespace StockManager.Infrastructure.Migrations
                     b.HasIndex("SupplierId")
                         .IsUnique();
 
-                    b.ToTable("Address", (string)null);
+                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("StockManager.Models.Product", b =>
@@ -294,7 +297,7 @@ namespace StockManager.Infrastructure.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("StockManager.Models.Supplier", b =>
@@ -309,7 +312,7 @@ namespace StockManager.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

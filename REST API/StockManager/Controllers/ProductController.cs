@@ -18,8 +18,8 @@ namespace StockManager.Controllers
             _logger = logger;   
         }
 
-        [Authorize(Roles = "Employee")]
-        [Authorize(Roles = "Manager")]
+        //[Authorize(Roles = "Employee")]
+        //[Authorize(Roles = "Manager")]
         [HttpGet]
         public async Task<IActionResult> GetProdcuts(CancellationToken cancellationToken)
         {

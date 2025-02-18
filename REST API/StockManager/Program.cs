@@ -30,7 +30,7 @@ using (var scope = app.Services.CreateScope())
 
     var pendingMigrations = dbContext.Database.GetPendingMigrations();
 
-    if (!pendingMigrations.Any())
+    if (pendingMigrations.Any())
     {
         dbContext.Database.Migrate();
     }

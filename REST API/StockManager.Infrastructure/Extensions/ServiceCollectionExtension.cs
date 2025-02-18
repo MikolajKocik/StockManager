@@ -3,6 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StockManager.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
+using StockManager.Core.Domain.Interfaces;
+using StockManager.Infrastructure.Repositories;
 
 
 namespace StockManager.Infrastructure.Extensions
@@ -18,6 +20,8 @@ namespace StockManager.Infrastructure.Extensions
                 .AddRoles<IdentityRole>() // Employee + Manager
                 .AddEntityFrameworkStores<StockManagerDbContext>()
                 .AddDefaultTokenProviders();
+
+            services.AddScoped<IProductRepository, ProductRepository>();
         }
     }
 }

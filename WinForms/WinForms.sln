@@ -5,7 +5,7 @@ VisualStudioVersion = 17.12.35707.178
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StockManager", "StockManager\StockManager.csproj", "{9D5B74A2-ABF1-4F73-8E16-312135C355BC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsernameTextBox", "UsernameTextBox\UsernameTextBox.csproj", "{7D46415E-5402-42F2-BD6F-C76EBDF67575}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoginTextBox", "UsernameTextBox\LoginTextBox.csproj", "{7D46415E-5402-42F2-BD6F-C76EBDF67575}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

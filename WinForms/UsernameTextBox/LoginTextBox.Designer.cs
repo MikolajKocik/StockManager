@@ -1,6 +1,6 @@
 ﻿namespace UsernameTextBox
 {
-    partial class UsernameTextBox
+    partial class LoginTextBox
     {
         /// <summary>
         /// Required designer variable.

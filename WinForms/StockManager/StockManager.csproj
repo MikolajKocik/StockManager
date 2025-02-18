@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\UsernameTextBox\UsernameTextBox.csproj" />
+    <ProjectReference Include="..\UsernameTextBox\LoginTextBox.csproj" />
   </ItemGroup>
 
   <ItemGroup>

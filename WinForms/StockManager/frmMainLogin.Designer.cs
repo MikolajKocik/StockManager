@@ -37,8 +37,8 @@
             label1 = new Label();
             panel1 = new Panel();
             panel2 = new Panel();
-            usernameTextBox1 = new UsernameTextBox.UsernameTextBox();
-            usernameTextBox2 = new UsernameTextBox.UsernameTextBox();
+            txtUsername = new UsernameTextBox.LoginTextBox();
+            txtPassword = new UsernameTextBox.LoginTextBox();
             ((System.ComponentModel.ISupportInitialize)picLogin).BeginInit();
             panel2.SuspendLayout();
             SuspendLayout();
@@ -64,7 +64,7 @@
             btnLogin.TabIndex = 1;
             btnLogin.Text = "Login";
             btnLogin.UseVisualStyleBackColor = true;
-            btnLogin.Click += btnLogin_Click;
+            btnLogin.Click += btnLogin_ClickAsync;
             // 
             // lnkRegister
             // 
@@ -77,7 +77,7 @@
             lnkRegister.TabIndex = 3;
             lnkRegister.TabStop = true;
             lnkRegister.Text = "Are you a manager? Click here\r\n\r\n";
-            lnkRegister.LinkClicked += lnkRegister_LinkClicked;
+            lnkRegister.LinkClicked += lnkRegister_LinkClickedAsync;
             // 
             // lblUsername
             // 
@@ -132,21 +132,23 @@
             panel2.Size = new Size(251, 46);
             panel2.TabIndex = 10;
             // 
-            // usernameTextBox1
+            // txtUsername
             // 
-            usernameTextBox1.Location = new Point(333, 82);
-            usernameTextBox1.Margin = new Padding(2);
-            usernameTextBox1.Name = "usernameTextBox1";
-            usernameTextBox1.Size = new Size(172, 23);
-            usernameTextBox1.TabIndex = 11;
+            txtUsername.Location = new Point(333, 82);
+            txtUsername.Margin = new Padding(2);
+            txtUsername.Name = "txtUsername";
+            txtUsername.Size = new Size(172, 23);
+            txtUsername.TabIndex = 11;
+            txtUsername.KeyPress += txtUsername_KeyPress;
             // 
-            // usernameTextBox2
+            // txtPassword
             // 
-            usernameTextBox2.Location = new Point(333, 166);
-            usernameTextBox2.Margin = new Padding(2);
-            usernameTextBox2.Name = "usernameTextBox2";
-            usernameTextBox2.Size = new Size(172, 23);
-            usernameTextBox2.TabIndex = 12;
+            txtPassword.Location = new Point(333, 166);
+            txtPassword.Margin = new Padding(2);
+            txtPassword.Name = "txtPassword";
+            txtPassword.Size = new Size(172, 23);
+            txtPassword.TabIndex = 12;
+            txtPassword.KeyPress += txtPassword_KeyPress;
             // 
             // frmMainLogin
             // 
@@ -155,8 +157,8 @@
             BackColor = Color.Goldenrod;
             BackgroundImageLayout = ImageLayout.Center;
             ClientSize = new Size(582, 309);
-            Controls.Add(usernameTextBox2);
-            Controls.Add(usernameTextBox1);
+            Controls.Add(txtPassword);
+            Controls.Add(txtUsername);
             Controls.Add(panel2);
             Controls.Add(panel1);
             Controls.Add(label1);
@@ -187,7 +189,7 @@
         private Label label1;
         private Panel panel1;
         private Panel panel2;
-        private UsernameTextBox.UsernameTextBox usernameTextBox1;
-        private UsernameTextBox.UsernameTextBox usernameTextBox2;
+        private UsernameTextBox.LoginTextBox txtUsername;
+        private UsernameTextBox.LoginTextBox txtPassword;
     }
 }

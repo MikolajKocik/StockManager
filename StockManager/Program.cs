@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using StockManager.Application.Extensions;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Extensions;
 
@@ -7,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+builder.Services.AddApplication(builder.Configuration);
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="CQRS\Commands\ProductCommands\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

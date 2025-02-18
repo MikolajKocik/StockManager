@@ -22,15 +22,15 @@ namespace StockManager
 
         private void txtUsername_KeyPress(object sender, KeyPressEventArgs e)
         {
-            RedirectToNextTexBox(sender, e);
+            RedirectToNextControl(sender, e);
         }
 
         private void txtPassword_KeyPress(object sender, KeyPressEventArgs e)
         {
-            RedirectToNextTexBox(sender, e);
+            RedirectToNextControl(sender, e);
         }
 
-        private void RedirectToNextTexBox(object sender, KeyPressEventArgs e)
+        private void RedirectToNextControl(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar == (char)Keys.Enter && sender is Control currentControl)
             {

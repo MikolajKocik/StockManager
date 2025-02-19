@@ -19,6 +19,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 
         public async Task<IEnumerable<ProductDto>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
 
             var products = _repository.GetProducts(); // product with IQueryable
 

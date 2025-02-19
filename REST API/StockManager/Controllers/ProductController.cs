@@ -48,6 +48,13 @@ namespace StockManager.Controllers
             return Ok(products);
         }
 
+        /// <summary>
+        /// Represents HttpGet action by searching product by id
+        /// </summary>
+        /// <param name="id">product id, represents which id we are looking for</param>
+        /// <param name="cancellationToken">operation can be cancelled</param>
+        /// <returns>Return the product with the provided id</returns>
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
         {

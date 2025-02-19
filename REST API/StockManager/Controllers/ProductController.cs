@@ -44,7 +44,7 @@ namespace StockManager.Controllers
 
             var products = await _mediator.Send(query, cancellationToken);
 
-            _logger.LogInformation($"Succesfully returns a list of products: {products}");
+            _logger.LogInformation("Succesfully returns a list of products: {products}", products);
             return Ok(products);
         }
 
@@ -63,11 +63,11 @@ namespace StockManager.Controllers
 
             if (product is null)
             {
-                _logger.LogWarning($"Product with id:{id} not found");
+                _logger.LogWarning("Product with id:{id} not found", id);
                 return NotFound();
             }
 
-            _logger.LogInformation($"Succesfully found the product with id:{id}");
+            _logger.LogInformation("Succesfully found the product with id:{id}", id);
             return Ok(product);
         }
     }

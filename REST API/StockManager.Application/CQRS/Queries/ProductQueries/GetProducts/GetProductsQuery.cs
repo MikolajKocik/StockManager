@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using StockManager.Application.Dtos;
 
-namespace StockManager.Application.CQRS.Queries.ProductQueries
+namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
     public record GetProductsQuery(
         string? Name,

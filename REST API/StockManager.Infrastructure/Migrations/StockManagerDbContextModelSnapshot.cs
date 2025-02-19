@@ -250,7 +250,7 @@ namespace StockManager.Infrastructure.Migrations
                     b.HasIndex("SupplierId")
                         .IsUnique();
 
-                    b.ToTable("Address", (string)null);
+                    b.ToTable("Address");
                 });
 
             modelBuilder.Entity("StockManager.Models.Product", b =>
@@ -294,7 +294,7 @@ namespace StockManager.Infrastructure.Migrations
 
                     b.HasIndex("SupplierId");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("StockManager.Models.Supplier", b =>
@@ -309,7 +309,7 @@ namespace StockManager.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

@@ -16,5 +16,8 @@ namespace StockManager.Infrastructure.Repositories
 
         public IQueryable<Product> GetProducts()
             => _dbContext.Products;
+
+        public async Task<Product?> GetProductById(int id, CancellationToken cancellationToken)
+            => await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using StockManager.Application.CQRS.Queries.ProductQueries;
+using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
+using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 
 namespace StockManager.Controllers
 {
@@ -45,6 +46,22 @@ namespace StockManager.Controllers
 
             _logger.LogInformation($"Succesfully returns a list of products: {products}");
             return Ok(products);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
+        {
+
+            var product = await _mediator.Send(new GetProductByIdQuery(id), cancellationToken);
+
+            if (product is null)
+            {
+                _logger.LogWarning($"Product with id:{id} not found");
+                return NotFound();
+            }
+
+            _logger.LogInformation($"Succesfully found the product with id:{id}");
+            return Ok(product);
         }
     }
 }

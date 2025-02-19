@@ -12,8 +12,8 @@ using StockManager.Infrastructure.Data;
 namespace StockManager.Infrastructure.Migrations
 {
     [DbContext(typeof(StockManagerDbContext))]
-    [Migration("20250213231827_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250219153752_InitialCreateAndRecovery")]
+    partial class InitialCreateAndRecovery
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -284,11 +284,11 @@ namespace StockManager.Infrastructure.Migrations
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
 
-                    b.Property<int>("Section")
-                        .HasColumnType("int");
-
                     b.Property<Guid>("SupplierId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.Property<string>("Unit")
                         .HasColumnType("nvarchar(max)");
@@ -372,7 +372,8 @@ namespace StockManager.Infrastructure.Migrations
                         .WithOne("Address")
                         .HasForeignKey("StockManager.Models.Address", "SupplierId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("FK_Address_Supplier");
 
                     b.Navigation("Supplier");
                 });
@@ -382,8 +383,9 @@ namespace StockManager.Infrastructure.Migrations
                     b.HasOne("StockManager.Models.Supplier", "Supplier")
                         .WithMany("Products")
                         .HasForeignKey("SupplierId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("FK_Product_Supplier");
 
                     b.Navigation("Supplier");
                 });

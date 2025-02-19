@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StockManager.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialCreateAndRecovery : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -182,7 +182,7 @@ namespace StockManager.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Address", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Address_Suppliers_SupplierId",
+                        name: "FK_Address_Supplier",
                         column: x => x.SupplierId,
                         principalTable: "Suppliers",
                         principalColumn: "Id",
@@ -201,7 +201,7 @@ namespace StockManager.Infrastructure.Migrations
                     Quantity = table.Column<int>(type: "int", nullable: false),
                     ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DeliveredAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Section = table.Column<int>(type: "int", nullable: false),
+                    Type = table.Column<int>(type: "int", nullable: false),
                     BatchNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SupplierId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -209,11 +209,11 @@ namespace StockManager.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Products_Suppliers_SupplierId",
+                        name: "FK_Product_Supplier",
                         column: x => x.SupplierId,
                         principalTable: "Suppliers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(

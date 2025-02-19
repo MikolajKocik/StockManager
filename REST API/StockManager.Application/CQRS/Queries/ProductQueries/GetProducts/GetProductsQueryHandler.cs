@@ -4,7 +4,7 @@ using StockManager.Application.Dtos;
 using StockManager.Core.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace StockManager.Application.CQRS.Queries.ProductQueries
+namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
     public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, IEnumerable<ProductDto>>
     {

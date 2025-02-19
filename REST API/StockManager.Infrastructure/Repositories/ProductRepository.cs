@@ -3,7 +3,6 @@ using StockManager.Core.Domain.Interfaces;
 using StockManager.Infrastructure.Data;
 using StockManager.Models;
 
-
 namespace StockManager.Infrastructure.Repositories
 {
     public class ProductRepository : IProductRepository
@@ -15,8 +14,7 @@ namespace StockManager.Infrastructure.Repositories
             _dbContext = dbcontext;
         }
 
-        public async Task<IEnumerable<Product>> GetProducts(CancellationToken cancellationToken)
-            => await _dbContext.Products
-            .ToListAsync(cancellationToken);
+        public IQueryable<Product> GetProducts()
+            => _dbContext.Products;
     }
 }

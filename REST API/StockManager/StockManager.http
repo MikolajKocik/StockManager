@@ -2,7 +2,7 @@
 @Port = 7210
 @StockManager_HostAddress = {{Host}}:{{Port}}
 
-GET {{StockManager_HostAddress}}/api/products
+GET {{StockManager_HostAddress}}/api/products?name=milk&genre=dairy
 Accept: application/json
 
 ###

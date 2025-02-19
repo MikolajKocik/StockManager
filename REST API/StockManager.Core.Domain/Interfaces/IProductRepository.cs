@@ -9,6 +9,6 @@ namespace StockManager.Core.Domain.Interfaces
 {
     public interface IProductRepository
     {
-        Task<IEnumerable<Product>> GetProducts(CancellationToken cancellationToken);
+        IQueryable<Product> GetProducts();
     }
 }

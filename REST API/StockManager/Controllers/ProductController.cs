@@ -2,6 +2,9 @@
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
+using StockManager.Application.Dtos;
+using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
+using System.ComponentModel.DataAnnotations;
 
 namespace StockManager.Controllers
 {
@@ -69,6 +72,42 @@ namespace StockManager.Controllers
 
             _logger.LogInformation("Succesfully found the product with id:{id}", id);
             return Ok(product);
+        }
+
+        /// <summary>
+        /// Add product action with HttpPost header.
+        /// </summary>
+        /// <param name="productDto">Data transfer object returned for client in WinForms</param>
+        /// <param name="cancellationToken">Cancel current action on database</param>
+        /// <returns>ProductDto</returns>
+
+        [HttpPost]
+        public async Task<IActionResult> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var product = await _mediator.Send(new AddProductCommand(productDto), cancellationToken);
+
+                _logger.LogInformation("Succesfully added a new product:{productDto.Id}", productDto.Id);
+                return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+            }
+            catch (ValidationException ex)
+            {
+
+                _logger.LogError(ex, "Validation failed for product");
+                return BadRequest(new { errors = ex.Message });
+            }
+            catch (Exception ex) 
+            {
+                _logger.LogError(ex, "Unexpected error while adding a product");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Status = 500,
+                    Title = "Internal Server Error",
+                    Detail = ex.Message
+                });
+            }
+            
         }
     }
 }

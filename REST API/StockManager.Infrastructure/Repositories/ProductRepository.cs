@@ -18,17 +18,31 @@ namespace StockManager.Infrastructure.Repositories
         public IQueryable<Product> GetProducts()
             => _dbContext.Products;
 
-        public async Task<Product?> GetProductById(int id, CancellationToken cancellationToken)
+        public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
             => await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
 
-        public async Task<Product> AddProduct(Product product, CancellationToken cancellationToken)
+        public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
         {
             await _dbContext.Products.AddAsync(product, cancellationToken);
             _dbContext.SaveChanges();
             return product;
         }
 
-        public async Task<IDbContextTransaction> BeginTransaction()
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
             => await _dbContext.Database.BeginTransactionAsync();
+
+        public async Task<Product?> UpdateProductAsync(Product product, CancellationToken cancellationToken)
+        {
+            var existingProduct = await _dbContext.Products.FindAsync(new object[] {product.Id}, cancellationToken);
+
+            if (existingProduct == null)
+            {
+                throw new KeyNotFoundException("Product with id:{product.Id} not found");
+            }
+
+            _dbContext.Entry(existingProduct).CurrentValues.SetValues(product);
+            await _dbContext.SaveChangesAsync(cancellationToken); 
+            return existingProduct;
+        }
     }
 }

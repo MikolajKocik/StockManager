@@ -29,7 +29,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                await using (var transaction = await _repository.BeginTransaction())
+                await using (var transaction = await _repository.BeginTransactionAsync())
                 {
 
                     var validate = new ProductValidator();       
@@ -40,7 +40,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
 
                         var product = _mapper.Map<Product>(request.Product);
 
-                        var newProduct = await _repository.AddProduct(product, cancellationToken);
+                        var newProduct = await _repository.AddProductAsync(product, cancellationToken);
 
                         await transaction.CommitAsync();
 

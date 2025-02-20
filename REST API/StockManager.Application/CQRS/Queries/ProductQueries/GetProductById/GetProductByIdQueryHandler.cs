@@ -19,7 +19,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var product = await _repository.GetProductById(request.Id, cancellationToken);
+            var product = await _repository.GetProductByIdAsync(request.Id, cancellationToken);
 
             var dto = _mapper.Map<ProductDto?>(product);
 

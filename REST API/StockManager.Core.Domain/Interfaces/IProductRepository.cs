@@ -7,10 +7,12 @@ namespace StockManager.Core.Domain.Interfaces
     {
         IQueryable<Product> GetProducts();
 
-        Task <Product?> GetProductById(int id, CancellationToken cancellationToken);
+        Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken);
 
-        Task<Product> AddProduct(Product product, CancellationToken cancellationToken);
+        Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken);
 
-        Task<IDbContextTransaction> BeginTransaction();
+        Task<IDbContextTransaction> BeginTransactionAsync();
+
+        Task<Product?> UpdateProductAsync(Product product, CancellationToken cancellationToken);
     }
 }

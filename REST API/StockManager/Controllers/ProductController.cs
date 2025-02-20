@@ -5,6 +5,7 @@ using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.Dtos;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using System.ComponentModel.DataAnnotations;
+using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 
 namespace StockManager.Controllers
 {
@@ -67,7 +68,7 @@ namespace StockManager.Controllers
             if (product is null)
             {
                 _logger.LogWarning("Product with id:{id} not found", id);
-                return NotFound();
+                return NotFound("Product does not exists");
             }
 
             _logger.LogInformation("Succesfully found the product with id:{id}", id);
@@ -93,7 +94,47 @@ namespace StockManager.Controllers
             }
             catch (ValidationException ex)
             {
+                _logger.LogError(ex, "Validation failed for product");
+                return BadRequest(new { errors = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error while adding a product");
+                return StatusCode(500, new ProblemDetails
+                {
+                    Status = 500,
+                    Title = "Internal Server Error",
+                    Detail = ex.Message
+                });
+            }   
+        }
 
+        /// <summary>
+        /// Represents edit product action with HttpPut header.
+        /// </summary>
+        /// <param name="productDto"></param>
+        /// <param name="id"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> EditProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var product = await _mediator.Send(new EditProductCommand(id, productDto), cancellationToken);
+
+                if (product is null)
+                {
+                    _logger.LogWarning("Product with id:{id} not found", id);
+                    return NotFound("Product does not exists");
+                }
+
+                _logger.LogInformation("Product with id:{id} succesfully modified", id);
+                return Ok(product);
+            }
+            catch (ValidationException ex)
+            {
                 _logger.LogError(ex, "Validation failed for product");
                 return BadRequest(new { errors = ex.Message });
             }
@@ -107,7 +148,6 @@ namespace StockManager.Controllers
                     Detail = ex.Message
                 });
             }
-            
         }
     }
 }

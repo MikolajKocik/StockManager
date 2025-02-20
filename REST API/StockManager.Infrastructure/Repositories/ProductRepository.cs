@@ -37,12 +37,26 @@ namespace StockManager.Infrastructure.Repositories
 
             if (existingProduct == null)
             {
-                throw new KeyNotFoundException("Product with id:{product.Id} not found");
+                throw new KeyNotFoundException("Product with provided id not found");
             }
 
             _dbContext.Entry(existingProduct).CurrentValues.SetValues(product);
             await _dbContext.SaveChangesAsync(cancellationToken); 
             return existingProduct;
+        }
+
+        public async Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken)
+        {
+            var productExist = await _dbContext.Products.FindAsync(new object[] { product.Id }, cancellationToken);
+
+            if(productExist == null)
+            {
+                throw new KeyNotFoundException("Product with provided id not found");
+            }
+
+            _dbContext.Products.Remove(productExist);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return productExist;
         }
     }
 }

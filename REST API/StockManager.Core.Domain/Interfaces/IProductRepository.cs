@@ -14,5 +14,6 @@ namespace StockManager.Core.Domain.Interfaces
         Task<IDbContextTransaction> BeginTransactionAsync();
 
         Task<Product?> UpdateProductAsync(Product product, CancellationToken cancellationToken);
+        Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken);
     }
 }

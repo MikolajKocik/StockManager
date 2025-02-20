@@ -6,6 +6,7 @@ using StockManager.Application.Dtos;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using System.ComponentModel.DataAnnotations;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
+using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 
 namespace StockManager.Controllers
 {
@@ -122,7 +123,7 @@ namespace StockManager.Controllers
         {
             try
             {
-                var product = await _mediator.Send(new EditProductCommand(id, productDto), cancellationToken);
+                var product = await _mediator.Send(new EditProductCommand(id), cancellationToken);
 
                 if (product is null)
                 {
@@ -148,6 +149,43 @@ namespace StockManager.Controllers
                     Detail = ex.Message
                 });
             }
+        }
+
+        /// <summary>
+        /// Removes existing product by action.
+        /// </summary>
+        /// <param name="productDto">Existing product to remove</param>
+        /// <param name="id">Product id</param>
+        /// <param name="cancellationToken">A token that allows the connection to the database to be broken in case of an abandoned action</param>
+        /// <returns>Returns a success status if product removed succesfully</returns>
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
+        {
+            try
+            {
+                var product = await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
+
+                if (product is null)
+                {
+                    _logger.LogWarning("Product with id:{id} not found", id);
+                    return NotFound("Product does not exists");
+                }
+
+                _logger.LogInformation("Provided product with id:{id} deleted succesfully", id);
+                return Ok(product);
+
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new ProblemDetails
+                {
+                    Status = 500,
+                    Title = "Internal Server Error",
+                    Detail = ex.Message
+                });
+            }
+
         }
     }
 }

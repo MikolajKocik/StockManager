@@ -11,7 +11,7 @@ namespace StockManager.Application.Dtos
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public AddressDto Address { get; set; } = default!; // address object
-        public List<ProductDto> Products { get; set; } = new List<ProductDto>();
+        public AddressDto? Address { get; set; } = default!; 
+        public Guid? AddressId { get; set; }
     }
 }

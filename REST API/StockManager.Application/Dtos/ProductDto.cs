@@ -12,8 +12,7 @@
         public DateTime DeliveredAt { get; set; }
         public string Type { get; set; } = default!; // enum as string 
         public string BatchNumber { get; set; } = string.Empty;
-        public SupplierDto Supplier { get; set; } = default!; 
-        public Guid SupplierId { get; set; }
-
+        public SupplierDto? Supplier { get; set; }
+        public Guid? SupplierId { get; set; }
     }
 }

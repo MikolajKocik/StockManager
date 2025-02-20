@@ -5,15 +5,13 @@ namespace StockManager.Application.Validations
 {
     public class ProductValidator : AbstractValidator<ProductDto>
     {
-        public ProductValidator()
+        public ProductValidator() // TODO validation fields on winforms
         {
             RuleFor(n => n.Name)
                 .NotEmpty()
+                .WithMessage("Field 'Name' is required")
                 .MaximumLength(50)
-                .Matches(@"^[A-Za-ząęćźżłńóśĄĘĆŹŻŁŃÓŚ ]+$")
-                .WithMessage("Field 'Name' is required," +
-                " maximum length of this type is equal to 50 signs," +
-                "it allows only aplhabetical characters.");
+                .WithMessage("Maximum length of field 'Name' is 50 characters");
 
             RuleFor(g => g.Genre)
                 .NotEmpty()
@@ -21,6 +19,7 @@ namespace StockManager.Application.Validations
 
             RuleFor(u => u.Unit)
                 .MaximumLength(15)
+                .When(u => u.Unit != null)
                 .WithMessage("Field 'Unit' has maximum length of 15 characters.");
 
             RuleFor(ed => ed.ExpirationDate)
@@ -33,18 +32,19 @@ namespace StockManager.Application.Validations
                 .GreaterThanOrEqualTo(DateTime.Now)
                 .WithMessage("Field 'Delivered At' is required.");
 
-            RuleFor(s => s.Type)
+            RuleFor(t => t.Type)
                 .NotEmpty()
                 .WithMessage("Field 'Section' is required.");
 
             RuleFor(bn => bn.BatchNumber)
                 .NotEmpty()
+                .WithMessage("Field 'BatchNumber' is required")
                 .MaximumLength(200)
-                .WithMessage("Field 'BatchNumber' is required, maximum length is equal to 200 characters.");
+                .WithMessage("Maximum length of field 'BatchNumber' is 200 characters.");
 
-            RuleFor(sup => sup.Supplier)
-                .NotEmpty()
-                .WithMessage("Field 'Supplier' is required.");
+            RuleFor(s => s.Supplier!)
+                .SetValidator(new SupplierValidator())
+                .When(s => s.Supplier != null);
         }
     }
 }

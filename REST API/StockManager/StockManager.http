@@ -1,8 +1,34 @@
 @Host = https://localhost
 @Port = 7210
-@StockManager_HostAddress = {{Host}}:{{Port}}
+@StockManager_HostAddress = https://localhost:7210
 
 GET {{StockManager_HostAddress}}/api/products?name=milk&genre=dairy
 Accept: application/json
+
+###
+
+POST {{StockManager_HostAddress}}/api/products
+Content-Type: application/json
+
+{
+ 
+}
+
+###
+
+DELETE {{StockManager_HostAddress}}/api/products/{id}
+
+###
+
+GET {{StockManager_HostAddress}}/api/products/{id}
+
+###
+
+PUT {{StockManager_HostAddress}}/api/products/{id}
+Content-Type: application/json
+
+{
+  
+}
 
 ###

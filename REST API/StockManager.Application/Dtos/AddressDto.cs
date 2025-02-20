@@ -14,6 +14,5 @@ namespace StockManager.Application.Dtos
         public string Country { get; set; } = string.Empty;
         public string PostalCode { get; set; } = string.Empty;
         public Guid SupplierId { get; set; }
-        public SupplierDto Supplier { get; set; } = new SupplierDto();
     }
 }

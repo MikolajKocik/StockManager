@@ -11,27 +11,24 @@ namespace StockManager.Application.Mappings
             // Address
 
             CreateMap<Address, AddressDto>()
-                .ForMember(dest => dest.Supplier, opt => opt.MapFrom(src => src.Supplier));
+                .ForMember(dest => dest.SupplierId, opt => opt.MapFrom(src => src.SupplierId));
 
             CreateMap<AddressDto, Address>()
-                .ForMember(dest => dest.Supplier, opt => opt.MapFrom(src => src.Supplier));
+                .ForMember(dest => dest.SupplierId, opt => opt.MapFrom(src => src.SupplierId));
 
             //Supplier
 
             CreateMap<Supplier, SupplierDto>()
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products));
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
 
             CreateMap<SupplierDto, Supplier>()
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.Products, opt => opt.MapFrom(src => src.Products));
-
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
+       
             // Product
             CreateMap<Product, ProductDto>()
                 .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => src.Genre.ToString()))
                 .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()))
                 .ForMember(dest => dest.Supplier, opt => opt.MapFrom(src => src.Supplier));
-
 
             CreateMap<ProductDto, Product>()
                 .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => Enum.Parse<Genre>(src.Genre)))

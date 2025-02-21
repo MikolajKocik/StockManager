@@ -16,14 +16,22 @@ namespace StockManager.Infrastructure.Repositories
         }
 
         public IQueryable<Product> GetProducts()
-            => _dbContext.Products;
+            => _dbContext.Products
+                    .AsNoTracking()
+                    .Include(s => s.Supplier)
+                    .ThenInclude(a => a.Address);  
 
         public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
-            => await _dbContext.Products.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
+            => await _dbContext.Products
+                .AsNoTracking()
+                .Include(s => s.Supplier)
+                .ThenInclude(a => a.Address) 
+                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
 
         public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
         {
-            await _dbContext.Products.AddAsync(product, cancellationToken);
+            await _dbContext.Products
+                .AddAsync(product, cancellationToken);
             _dbContext.SaveChanges();
             return product;
         }

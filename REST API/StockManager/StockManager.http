@@ -11,13 +11,30 @@ POST {{StockManager_HostAddress}}/api/products
 Content-Type: application/json
 
 {
-  "Name": "Chocolate",
-  "Type": "Regular Storage",
-  "Genre": "DryProducts",
-  "BatchNumber": "232",
-  "DeliveredAt": "2024-03-08",
-  "ExpirationDate": "2024-04-08"
+  "id": 1,
+  "name": "Chocolate",
+  "genre": "DryProducts",
+  "unit": "kg",
+  "quantity": 100,
+  "expirationDate": "2025-06-01",
+  "deliveredAt": "2025-02-21",
+  "type": "Regular Storage",
+  "batchNumber": "232",
+  "supplier": {
+    "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+    "name": "Supplier XYZ",
+    "address": {
+      "id": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "city": "Warsaw",
+      "country": "Poland",
+      "postalCode": "00-001",
+      "supplierId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+    },
+    "addressId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+  },
+  "supplierId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
 }
+
 
 ###
 

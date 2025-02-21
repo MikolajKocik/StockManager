@@ -24,12 +24,12 @@ namespace StockManager.Application.Validations
 
             RuleFor(ed => ed.ExpirationDate)
                 .NotEmpty()
-                .GreaterThan(DateTime.Now)
+                .GreaterThan(DateTime.Today)
                 .WithMessage("Field 'Expiration Date' is required.");
 
             RuleFor(ed => ed.DeliveredAt)
                 .NotEmpty()
-                .GreaterThanOrEqualTo(DateTime.Now)
+                .GreaterThanOrEqualTo(DateTime.Today)
                 .WithMessage("Field 'Delivered At' is required.");
 
             RuleFor(t => t.Type)

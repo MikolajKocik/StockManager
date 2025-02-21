@@ -9,6 +9,6 @@
 
         // relation 1-1 with supplier
         public Guid SupplierId { get; set; }
-        public Supplier Supplier { get; set; } = new Supplier();
+        public Supplier Supplier { get; set; } = default!;
     }
 }

@@ -3,6 +3,7 @@ using MediatR;
 using StockManager.Application.Dtos;
 using StockManager.Core.Domain.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using StockManager.Models;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
@@ -11,7 +12,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
         private readonly IMapper _mapper;
         private readonly IProductRepository _repository;
 
-        public GetProductsQueryHandler(IMapper mapper, IProductRepository repository)   
+        public GetProductsQueryHandler(IMapper mapper, IProductRepository repository)
         {
             _mapper = mapper;
             _repository = repository;
@@ -30,12 +31,15 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 
             if (!string.IsNullOrWhiteSpace(request.Genre))
             {
-                products = products.Where(p => p.Genre.ToString().ToLower() == request.Genre.ToLower());
+                if (Enum.TryParse<Genre>(request.Genre, true, out var genre))
+                {
+                    products = products.Where(p => p.Genre == genre);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(request.Unit))
             {
-                products = products.Where(p => p.Unit != null && EF.Functions.Like(p.Unit, $"%{request.Name}%"));
+                products = products.Where(p => p.Unit != null && EF.Functions.Like(p.Unit, $"%{request.Unit}%"));
             }
 
             if (request.ExpirationDate.HasValue)
@@ -44,20 +48,18 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
             }
             else
             {
-                DateTime soon = DateTime.Today.AddDays(14); 
+                DateTime soon = DateTime.Today.AddDays(14);
                 products = products.Where(p => p.ExpirationDate >= DateTime.Today && p.ExpirationDate <= soon);
-
             }
 
             if (request.DeliveredAt.HasValue)
             {
-                products = products.Where(p => p.DeliveredAt == request.DeliveredAt.Value.Date);
+                products = products.Where(p => p.DeliveredAt.Date == request.DeliveredAt.Value.Date);
             }
 
             var dtos = _mapper.Map<IEnumerable<ProductDto>>(await products.ToListAsync(cancellationToken));
 
             return dtos.Any() ? dtos : Enumerable.Empty<ProductDto>();
-
         }
     }
 }

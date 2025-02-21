@@ -6,7 +6,7 @@
         public string Name { get; set; } = string.Empty;
 
         // relation 1-1 with supplier
-        public Address Address { get; set; } = new Address();
+        public Address Address { get; set; } = default!;
 
         // relation 1-* with product
         public List<Product> Products { get; set; } = new List<Product>();

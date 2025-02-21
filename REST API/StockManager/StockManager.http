@@ -11,7 +11,12 @@ POST {{StockManager_HostAddress}}/api/products
 Content-Type: application/json
 
 {
- 
+  "Name": "Chocolate",
+  "Type": "Regular Storage",
+  "Genre": "DryProducts",
+  "BatchNumber": "232",
+  "DeliveredAt": "2024-03-08",
+  "ExpirationDate": "2024-04-08"
 }
 
 ###

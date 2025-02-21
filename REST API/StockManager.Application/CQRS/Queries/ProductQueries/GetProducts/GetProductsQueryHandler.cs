@@ -25,7 +25,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 
             if (!string.IsNullOrWhiteSpace(request.Name))
             {
-                products = products.Where(p => p.Name.Contains(request.Name, StringComparison.OrdinalIgnoreCase));
+                products = products.Where(p => EF.Functions.Like(p.Name, $"%{request.Name}%"));
             }
 
             if (!string.IsNullOrWhiteSpace(request.Genre))
@@ -35,7 +35,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 
             if (!string.IsNullOrWhiteSpace(request.Unit))
             {
-                products = products.Where(p => p.Unit != null && p.Unit.Contains(request.Unit, StringComparison.OrdinalIgnoreCase));
+                products = products.Where(p => p.Unit != null && EF.Functions.Like(p.Unit, $"%{request.Name}%"));
             }
 
             if (request.ExpirationDate.HasValue)

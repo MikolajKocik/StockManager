@@ -34,6 +34,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
 
                 if (product != null)
                 {
+                    _logger.LogInformation("Modifying the provided product:{request.Id} with {@ModifiedProduct}", request.Id, request);
                     var update = await _repository.UpdateProductAsync(product, cancellationToken);
 
                     var productModified = _mapper.Map<ProductDto>(update);

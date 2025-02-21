@@ -30,6 +30,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
 
             if (product != null)
             {
+                _logger.LogInformation("Removing the provided product:{@Product}", request);
                 var remove = await _repository.DeleteProductAsync(product, cancellationToken);
   
                 var dto = _mapper.Map<ProductDto>(remove);

@@ -30,12 +30,13 @@ namespace StockManager.Application.Mappings
                 .ForMember(dest => dest.Supplier, opt => opt.MapFrom(src => src.Supplier));
 
             CreateMap<ProductDto, Product>()
-                .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => Enum.Parse<Genre>(src.Genre)))
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => Enum.Parse<Warehouse>(src.Type)))
+                .ForMember(dest => dest.Genre, opt => opt.MapFrom(src => 
+                    Enum.IsDefined(typeof(Genre), src.Genre) ? (Genre)Enum.Parse(typeof(Genre), src.Genre) : default))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => 
+                    Enum.IsDefined(typeof(Warehouse), src.Type) ? (Warehouse)Enum.Parse(typeof(Warehouse), src.Type) : default))
                 .ForMember(dest => dest.Supplier, opt => opt.Condition(src => src.Supplier != null))
                 .ForMember(dest => dest.Supplier, opt => opt.MapFrom(src => src.Supplier!))
                 .ForMember(dest => dest.SupplierId, opt => opt.MapFrom(src => src.SupplierId ?? Guid.Empty));
         }
     }
-
 }

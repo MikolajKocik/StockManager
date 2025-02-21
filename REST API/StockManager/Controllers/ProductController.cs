@@ -105,7 +105,7 @@ namespace StockManager.Controllers
                 {
                     Status = 500,
                     Title = "Internal Server Error",
-                    Detail = ex.Message
+                    Detail = $"Error detail: {ex.InnerException?.Message ?? ex.Message}",
                 });
             }   
         }

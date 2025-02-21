@@ -24,6 +24,7 @@ namespace StockManager.Infrastructure.Extensions
                 .AddDefaultTokenProviders();
 
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<ISupplierRepository, SupplierRepository>();
         }
     }
 }

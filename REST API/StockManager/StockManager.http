@@ -38,7 +38,7 @@ Content-Type: application/json
 
 ###
 
-DELETE {{StockManager_HostAddress}}/api/products/{id}
+DELETE {{StockManager_HostAddress}}/api/products/{1}
 
 ###
 

@@ -17,6 +17,7 @@ namespace StockManager.Infrastructure.Repositories
 
         public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
             => await _dbContext.Suppliers
+                .AsNoTracking()
                 .Include(s => s.Address)
                 .FirstOrDefaultAsync(s => s.Id == supplierId, cancellationToken);
 

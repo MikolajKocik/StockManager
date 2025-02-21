@@ -14,7 +14,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
         private readonly IProductRepository _repository;
         private readonly ILogger<EditProductCommandHandler> _logger;
 
-        public EditProductCommandHandler(IMapper mapper, IProductRepository repository,
+        public EditProductCommandHandler(IMapper mapper, IProductRepository repository, 
             ILogger<EditProductCommandHandler> logger)
         {
             _mapper = mapper;
@@ -33,11 +33,11 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
                 var product = await _repository.GetProductByIdAsync(request.Id, cancellationToken);
 
                 if (product != null)
-                {
+                { 
                     _logger.LogInformation("Modifying the provided product:{request.Id} with {@ModifiedProduct}", request.Id, request);
-                    var update = await _repository.UpdateProductAsync(product, cancellationToken);
+                    var updateProduct = await _repository.UpdateProductAsync(product, cancellationToken);
 
-                    var productModified = _mapper.Map<ProductDto>(update);
+                    var productModified = _mapper.Map<ProductDto>(updateProduct);
 
                     var validate = new ProductValidator();
                     var validationResult = validate.Validate(productModified);
@@ -49,8 +49,9 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
                     }
                     else
                     {
-                        _logger.LogWarning("Validation failed for product:{product}. Rolling back transaction", product);
-                        throw new ValidationException("Validation failed for product");
+                        _logger.LogWarning("Validation failed for product:{product}. Errors: {Errors}. Rolling back transaction",
+                            product, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                        throw new ValidationException(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
                     }
                 }
                 else

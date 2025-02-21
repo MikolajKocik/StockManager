@@ -7,7 +7,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
     {
         public int Id { get; set; }
 
-        public EditProductCommand(int id)
+        public EditProductCommand(int id) 
         {
             Id = id;
         }

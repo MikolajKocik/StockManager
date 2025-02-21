@@ -14,7 +14,9 @@ namespace StockManager.Infrastructure.Extensions
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddDbContext<StockManagerDbContext>(options => 
-                options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+                options
+                    .UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+                    .EnableSensitiveDataLogging());
 
             services.AddDefaultIdentity<IdentityUser>()
                 .AddRoles<IdentityRole>() // Employee + Manager

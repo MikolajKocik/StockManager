@@ -1,4 +1,5 @@
-﻿
+﻿using StockManager.Core.Domain.Exceptions;
+
 namespace StockManager.Middlewares
 {
     public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
@@ -9,12 +10,26 @@ namespace StockManager.Middlewares
             {
                 await next.Invoke(context);
             }
-            catch (Exception ex)
+            catch (BadRequestException ex)
             {
                 logger.LogError(ex, ex.Message);
 
+                context.Response.StatusCode = 400;
+                await context.Response.WriteAsync("Validation failed");
+            }
+            catch (NotFoundException ex)
+            {
+                logger.LogError(ex, ex.Message);
+
+                context.Response.StatusCode = 404;
+                await context.Response.WriteAsync("Provided object doesnt exist");
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex.InnerException?.Message ?? ex.Message);
+
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync("Something went wrong");
+                await context.Response.WriteAsync("Internal error, something went wrong");
             }
         }
     }

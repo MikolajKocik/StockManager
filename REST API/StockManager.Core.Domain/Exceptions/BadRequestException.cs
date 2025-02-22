@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace StockManager.Core.Domain.Exceptions
 {
-    internal class BadRequestException
-    {
-    }
+    public class BadRequestException(string resourceType, string resourceIdentifier)
+        : Exception($"{resourceType} with id: {resourceIdentifier} doesn't exist");
 }

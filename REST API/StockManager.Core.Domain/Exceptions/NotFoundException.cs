@@ -7,5 +7,5 @@ using System.Threading.Tasks;
 namespace StockManager.Core.Domain.Exceptions
 {
     public class NotFoundException(string resourceType, string resourceIdentifier) 
-        : Exception("{resourceType} with id: {resourceIdentifier} doesn't exist");
+        : Exception($"{resourceType} with id: {resourceIdentifier} doesn't exist");
 }

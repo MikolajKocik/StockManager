@@ -1,6 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Serilog;
-using Serilog.Events;
 using StockManager.Application.Extensions;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Extensions;
@@ -14,10 +13,7 @@ builder.Services.AddApplication(builder.Configuration);
 
 //serilog
 builder.Host.UseSerilog((context, configuration) =>
-    configuration
-        .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
-        .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Information)
-        .WriteTo.Console(outputTemplate: "[{Timestamp:dd-MM HH:mm:ss} |{SourceContext}| {NewLine}{Level:u3}] {Message:lj}{NewLine}{Exception}")
+     configuration.ReadFrom.Configuration(context.Configuration)
 );
 
 builder.Services.AddEndpointsApiExplorer();

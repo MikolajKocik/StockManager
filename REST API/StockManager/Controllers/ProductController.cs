@@ -36,6 +36,7 @@ namespace StockManager.Controllers
         /// <returns>Query or all products</returns>
 
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProducts(
             [FromQuery] string? name = null,
             [FromQuery] string? genre = null,
@@ -61,6 +62,8 @@ namespace StockManager.Controllers
         /// <returns>Return the product with the provided id</returns>
 
         [HttpGet("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
         {
 
@@ -84,6 +87,9 @@ namespace StockManager.Controllers
         /// <returns>ProductDto</returns>
 
         [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
         {
             try
@@ -119,6 +125,10 @@ namespace StockManager.Controllers
         /// <returns></returns>
 
         [HttpPut("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> EditProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
         {
             try
@@ -160,6 +170,9 @@ namespace StockManager.Controllers
         /// <returns>Returns a success status if product removed succesfully</returns>
 
         [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
         {
             try

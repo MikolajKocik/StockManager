@@ -3,9 +3,9 @@ using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Dtos;
 using StockManager.Application.Validations;
+using StockManager.Core.Domain.Exceptions;
 using StockManager.Core.Domain.Interfaces;
 using StockManager.Models;
-using System.ComponentModel.DataAnnotations;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
 {
@@ -14,7 +14,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
         private readonly ISupplierRepository _supplierRepository;
-        public readonly ILogger<AddProductCommandHandler> _logger;
+        private readonly ILogger<AddProductCommandHandler> _logger;
 
         public AddProductCommandHandler(IMapper mapper, IProductRepository productRepository,
             ISupplierRepository supplierRepository, ILogger<AddProductCommandHandler> logger)
@@ -44,6 +44,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
                     if (supplier != null)
                     {
                         _logger.LogInformation("Supplier {SupplierId} already exists. Assigning the product to the existing supplier.", supplier.Id);
+                        _supplierRepository.AttachSupplier(supplier);
                     }
                     else
                     {
@@ -68,8 +69,8 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
                 {
                     _logger.LogError("Validation failed for product. Rolling back transaction");
                     await transaction.RollbackAsync();
-                    throw new ValidationException(
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                    throw new BadRequestException(
+                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), request.Product.Id.ToString());
                 }
 
             }

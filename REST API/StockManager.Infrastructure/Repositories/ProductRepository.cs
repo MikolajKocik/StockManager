@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.Extensions.Logging;
+using StockManager.Core.Domain.Exceptions;
 using StockManager.Core.Domain.Interfaces;
 using StockManager.Infrastructure.Data;
 using StockManager.Models;
@@ -19,13 +21,13 @@ namespace StockManager.Infrastructure.Repositories
             => _dbContext.Products
                     .AsNoTracking()
                     .Include(s => s.Supplier)
-                    .ThenInclude(a => a.Address);  
+                    .ThenInclude(a => a.Address);
 
         public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
             => await _dbContext.Products
                 .AsNoTracking()
                 .Include(s => s.Supplier)
-                .ThenInclude(a => a.Address) 
+                .ThenInclude(a => a.Address)
                 .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
 
         public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
@@ -41,7 +43,10 @@ namespace StockManager.Infrastructure.Repositories
 
         public async Task<Product?> UpdateProductAsync(Product product, CancellationToken cancellationToken)
         {
-            var existingProduct = await _dbContext.Products.FindAsync(new object[] {product.Id}, cancellationToken);
+            var existingProduct = await _dbContext.Products
+                .Include(s => s.Supplier)
+                .ThenInclude(a => a.Address)
+                .FirstOrDefaultAsync(p => p.Id == product.Id, cancellationToken);
 
             if (existingProduct == null)
             {
@@ -49,7 +54,33 @@ namespace StockManager.Infrastructure.Repositories
             }
 
             _dbContext.Entry(existingProduct).CurrentValues.SetValues(product);
-            await _dbContext.SaveChangesAsync(cancellationToken); 
+
+            if (product.SupplierId != existingProduct.SupplierId)
+            {
+                var newSupplier = await _dbContext.Suppliers
+                    .Include(a => a.Address)
+                    .FirstOrDefaultAsync(s => s.Id == product.SupplierId);
+
+                if (newSupplier == null)
+                {
+                    newSupplier = existingProduct.Supplier;
+                }
+
+                existingProduct.Supplier = newSupplier;
+
+                if (product.Supplier?.Name != null)
+                {
+                    newSupplier.Name = product.Supplier.Name;
+                }
+
+                if (product.Supplier?.Address != null)
+                {
+                    _dbContext.Entry(existingProduct.Supplier.Address).CurrentValues.SetValues(product.Supplier.Address);
+                }
+
+            }
+
+            await _dbContext.SaveChangesAsync(cancellationToken);
             return existingProduct;
         }
 
@@ -57,7 +88,7 @@ namespace StockManager.Infrastructure.Repositories
         {
             var productExist = await _dbContext.Products.FindAsync(new object[] { product.Id }, cancellationToken);
 
-            if(productExist == null)
+            if (productExist == null)
             {
                 throw new KeyNotFoundException("Product with provided id not found");
             }

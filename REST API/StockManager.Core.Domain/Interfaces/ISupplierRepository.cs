@@ -6,5 +6,6 @@ namespace StockManager.Core.Domain.Interfaces
     {
         Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken);
         Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken);
+        void AttachSupplier(Supplier supplier);
     }
 }

@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Dtos;
 using StockManager.Application.Validations;
+using StockManager.Core.Domain.Exceptions;
 using StockManager.Core.Domain.Interfaces;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
 {
-    public class EditProductCommandHandler : IRequestHandler<EditProductCommand, ProductDto?>
+    public class EditProductCommandHandler : IRequestHandler<EditProductCommand, ProductDto>
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _repository;
@@ -22,7 +22,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
             _logger = logger;
         }
 
-        public async Task<ProductDto?> Handle(EditProductCommand request, CancellationToken cancellationToken)
+        public async Task<ProductDto> Handle(EditProductCommand request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -51,14 +51,14 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
                     {
                         _logger.LogWarning("Validation failed for product:{product}. Errors: {Errors}. Rolling back transaction",
                             product, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                        throw new ValidationException(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                        throw new BadRequestException(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), request.Id.ToString());
                     }
                 }
                 else
                 {
                     _logger.LogWarning("Product with id:{request.Id} not found. Rolling back transaction", request.Id);
                     await transaction.RollbackAsync();
-                    return null;
+                    throw new NotFoundException(nameof(ProductDto), request.Id.ToString());
                 }
             }
             catch (Exception ex)

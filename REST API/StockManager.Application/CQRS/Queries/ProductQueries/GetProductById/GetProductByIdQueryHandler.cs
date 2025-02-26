@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using MediatR;
 using StockManager.Application.Dtos;
+using StockManager.Core.Domain.Exceptions;
 using StockManager.Core.Domain.Interfaces;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 {
-    public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto?>
+    public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _repository;
@@ -15,7 +16,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
             _repository = repository;
         }
 
-        public async Task<ProductDto?> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+        public async Task<ProductDto> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -23,7 +24,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 
             var dto = _mapper.Map<ProductDto?>(product);
 
-            if (dto == null) return null;
+            if (dto == null) throw new NotFoundException(nameof(ProductDto), request.Id.ToString());
 
             return dto;
         }

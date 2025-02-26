@@ -4,7 +4,6 @@ using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.Dtos;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
-using System.ComponentModel.DataAnnotations;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 
@@ -69,12 +68,6 @@ namespace StockManager.Controllers
 
             var product = await _mediator.Send(new GetProductByIdQuery(id), cancellationToken);
 
-            if (product is null)
-            {
-                _logger.LogWarning("Product with id:{id} not found", id);
-                return NotFound("Product does not exists");
-            }
-
             _logger.LogInformation("Succesfully found the product with id:{id}", id);
             return Ok(product);
         }
@@ -92,28 +85,11 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
         {
-            try
-            {
+          
                 var product = await _mediator.Send(new AddProductCommand(productDto), cancellationToken);
 
                 _logger.LogInformation("Succesfully added a new product:{productDto.Id}", productDto.Id);
                 return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogError(ex, "Validation failed for product");
-                return BadRequest(new { errors = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Unexpected error while adding a product");
-                return StatusCode(500, new ProblemDetails
-                {
-                    Status = 500,
-                    Title = "Internal Server Error",
-                    Detail = $"Error detail: {ex.InnerException?.Message ?? ex.Message}",
-                });
-            }   
         }
 
         /// <summary>
@@ -131,34 +107,11 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> EditProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
         {
-            try
-            {
+          
                 var product = await _mediator.Send(new EditProductCommand(id), cancellationToken);
-
-                if (product is null)
-                {
-                    _logger.LogWarning("Product with id:{id} not found", id);
-                    return NotFound("Product does not exists");
-                }
 
                 _logger.LogInformation("Product with id:{id} succesfully modified", id);
                 return Ok(product);
-            }
-            catch (ValidationException ex)
-            {
-                _logger.LogError(ex, "Validation failed for product");
-                return BadRequest(new { errors = ex.Message });
-            }
-            catch (Exception ex) 
-            {
-                _logger.LogError(ex, "Unexpected error while adding a product");
-                return StatusCode(500, new ProblemDetails
-                {
-                    Status = 500,
-                    Title = "Internal Server Error",
-                    Detail = $"Error detail: {ex.InnerException?.Message ?? ex.Message}",
-                });
-            }
         }
 
         /// <summary>
@@ -175,30 +128,11 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
         {
-            try
-            {
+           
                 var product = await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
-
-                if (product is null)
-                {
-                    _logger.LogWarning("Product with id:{id} not found", id);
-                    return NotFound("Product does not exists");
-                }
 
                 _logger.LogInformation("Provided product with id:{id} deleted succesfully", id);
                 return Ok(product);
-
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new ProblemDetails
-                {
-                    Status = 500,
-                    Title = "Internal Server Error",
-                    Detail = ex.Message
-                });
-            }
-
         }
     }
 }

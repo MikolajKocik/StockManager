@@ -28,5 +28,10 @@ namespace StockManager.Infrastructure.Repositories
             await _dbContext.SaveChangesAsync(cancellationToken);
             return supplier;
         }
+
+        public void AttachSupplier(Supplier supplier)
+        {
+            _dbContext.Suppliers.Attach(supplier);
+        }
     }
 }

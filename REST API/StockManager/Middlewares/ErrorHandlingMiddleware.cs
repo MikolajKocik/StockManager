@@ -14,21 +14,21 @@ namespace StockManager.Middlewares
             {
                 logger.LogError(ex, ex.Message);
 
-                context.Response.StatusCode = 400;
-                await context.Response.WriteAsync("Validation failed");
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync("Validation failed for object");
             }
             catch (NotFoundException ex)
             {
                 logger.LogError(ex, ex.Message);
 
-                context.Response.StatusCode = 404;
+                context.Response.StatusCode = StatusCodes.Status404NotFound;
                 await context.Response.WriteAsync("Provided object doesnt exist");
             }
             catch (Exception ex)
             {
                 logger.LogError(ex.InnerException?.Message ?? ex.Message);
 
-                context.Response.StatusCode = 500;
+                context.Response.StatusCode = StatusCodes.Status500InternalServerError;
                 await context.Response.WriteAsync("Internal error, something went wrong");
             }
         }

@@ -1,46 +1,17 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
 using Serilog;
 using StockManager.Application.Extensions;
 using StockManager.Core.Domain.Models;
+using StockManager.Extensions;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Extensions;
 using StockManager.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-
+builder.AddPresentation();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication(builder.Configuration);
-
-builder.Services.AddScoped<ErrorHandlingMiddleware>();
-
-//serilog
-builder.Host.UseSerilog((context, configuration) =>
-     configuration.ReadFrom.Configuration(context.Configuration)
-);
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
-{
-    c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
-    {
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer"
-    });
-
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-          new OpenApiSecurityScheme
-          {
-            Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "bearerAuth" }
-          },
-          []
-        }
-    });
-});
 
 var app = builder.Build();
 
@@ -72,7 +43,9 @@ using (var scope = app.Services.CreateScope())
 
 app.UseHttpsRedirection();
 
-app.MapGroup("api/identity").MapIdentityApi<User>();
+app.MapGroup("api/identity")
+    .WithTags("Identity")
+    .MapIdentityApi<User>();
 
 app.UseAuthorization();
 

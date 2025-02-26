@@ -6,11 +6,13 @@ using StockManager.Application.Dtos;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StockManager.Controllers
 {
     [Route("api/products")]
     [ApiController]
+    [Authorize]
     public class ProductController : ControllerBase
     {
         private readonly IMediator _mediator;

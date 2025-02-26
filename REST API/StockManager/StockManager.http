@@ -1,8 +1,11 @@
 @Host = https://localhost
 @Port = 7210
+@Token = CfDJ8Inr7dzWiSBAj1dF25gLc5MClyoSogZxtldzx3exdqwzXz9gl2q5D84v2tPigJWq4jJmNglK-lSDvItZX_mKhJc-QS-K3sVYVhDa8vZ2yOD2RsAy_7ibMpt17y3-NwJ7WEYPO2xDsUoOn2v2I48I6LyyLnBP_I9A1cBfmNZMYYtcBopJArDX3eRXhmCSTE4YVkOSWy4YxYgh9yzdrWseqbrEO9EWNeFy_kpc9CnC2l65CD7Pp5BQYrM31hMGDV7KXgvVLEAoEtyFKxfYhYsHBee-E51y6CUHhZQ1OaCVqVZqb3uNOjRizj1JfttqtmTwOqRGaWBcJYZeFW1GADMYP2NzDH1D8ZvO9rMKDBG7xeG4tsxu5HuN7P_GWHQzTx9tJePKCMx-ubCsrMszV2u0kIDdtTjdt-Pli6N0BFFsGxrnQEwuhUfwhqnPCCK4zYN8TEq-QC3rSWEibo0PhuTHH7ZYtY9LxHp3croqB98MKWHqMUhE5mckAZ686JF_jrKmACyQBnI7Q0cjt1w4DqdlsTfEhvyKTJdJIZf7yGHQSjODpuc0_oHg7pwxoNWQozUpGFQCfiQYhv_Jv8-CXrTeV8DmawSCh4xWpM0-lgkOyEuseiYLxcnh-z6PfCJJb23NpOapyzpcZ1nnhD2bGefIATf6IYlnJQjkGlotIYipIl90QvyD1vTK8RH3CXF3oVNGxQ
+
 @StockManager_HostAddress = https://localhost:7210
 
-GET {{StockManager_HostAddress}}/api/products?name=milk&genre=dairy
+GET {{StockManager_HostAddress}}/api/products
+Authorization: Bearer {{Token}}
 Accept: application/json
 
 ###
@@ -55,7 +58,7 @@ Content-Type: application/json
 
 ###
 
-POST {{StockManager_HostAddress}}/register
+POST {{StockManager_HostAddress}}/api/identity/register
 Content-Type: application/json
 
 {
@@ -65,7 +68,7 @@ Content-Type: application/json
 
 ###
 
-POST {{StockManager_HostAddress}}/login
+POST {{StockManager_HostAddress}}/api/identity/login
 Content-Type: application/json
 
 {

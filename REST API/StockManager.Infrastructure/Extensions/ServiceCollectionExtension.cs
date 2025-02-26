@@ -5,6 +5,7 @@ using StockManager.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using StockManager.Core.Domain.Interfaces;
 using StockManager.Infrastructure.Repositories;
+using StockManager.Core.Domain.Models;
 
 
 namespace StockManager.Infrastructure.Extensions
@@ -18,11 +19,9 @@ namespace StockManager.Infrastructure.Extensions
                     .UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
                     .EnableSensitiveDataLogging());
 
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddRoles<IdentityRole>() // Employee + Manager
-                .AddEntityFrameworkStores<StockManagerDbContext>()
-                .AddDefaultTokenProviders();
-
+            services.AddIdentityApiEndpoints<User>()
+                .AddEntityFrameworkStores<StockManagerDbContext>();
+              
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
         }

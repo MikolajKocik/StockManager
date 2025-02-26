@@ -54,3 +54,21 @@ Content-Type: application/json
 }
 
 ###
+
+POST {{StockManager_HostAddress}}/register
+Content-Type: application/json
+
+{
+  "email": "testuser@tes.com",
+  "password": "Password1!"
+}
+
+###
+
+POST {{StockManager_HostAddress}}/login
+Content-Type: application/json
+
+{
+  "email": "testuser@tes.com",
+  "password": "Password1!"
+}

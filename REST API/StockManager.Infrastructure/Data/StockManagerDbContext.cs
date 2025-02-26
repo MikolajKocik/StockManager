@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using StockManager.Core.Domain.Models;
 using StockManager.Models;
 
 namespace StockManager.Infrastructure.Data
 {
-    public class StockManagerDbContext : IdentityDbContext<IdentityUser>
+    internal class StockManagerDbContext(DbContextOptions<StockManagerDbContext> options) 
+        : IdentityDbContext<User>(options)
     {
-        public StockManagerDbContext(DbContextOptions<StockManagerDbContext> options) : base(options) 
-        {
-        }
 
-        public DbSet<Product> Products { get; set; }
-        public DbSet<Supplier> Suppliers { get; set; }
+        internal DbSet<Product> Products { get; set; }
+        internal DbSet<Supplier> Suppliers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

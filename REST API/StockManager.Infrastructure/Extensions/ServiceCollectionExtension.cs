@@ -20,6 +20,7 @@ namespace StockManager.Infrastructure.Extensions
                     .EnableSensitiveDataLogging());
 
             services.AddIdentityApiEndpoints<User>()
+                .AddRoles<IdentityRole>()
                 .AddEntityFrameworkStores<StockManagerDbContext>();
               
             services.AddScoped<IProductRepository, ProductRepository>();

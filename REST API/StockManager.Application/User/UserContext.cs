@@ -27,7 +27,7 @@ namespace StockManager.Application.User
 
             var userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)!.Value;
             var email = user.FindFirst(c => c.Type == ClaimTypes.Email)!.Value;
-            var roles = user.Claims.Where(c => c.Type == ClaimTypes.Email)!.Select(c => c.Value);
+            var roles = user.Claims.Where(c => c.Type == ClaimTypes.Role)!.Select(c => c.Value);
 
             return new CurrentUser(userId, email, roles);
         }

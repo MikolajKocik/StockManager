@@ -2,7 +2,7 @@
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StockManager.Application.User;
+using StockManager.Application.UserHttp;
 
 
 namespace StockManager.Application.Extensions

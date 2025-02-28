@@ -21,7 +21,8 @@ namespace StockManager.Infrastructure.Extensions
 
             services.AddIdentityApiEndpoints<User>()
                 .AddRoles<IdentityRole>()
-                .AddEntityFrameworkStores<StockManagerDbContext>();
+                .AddEntityFrameworkStores<StockManagerDbContext>()
+                .AddDefaultTokenProviders();
               
             services.AddScoped<IProductRepository, ProductRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();

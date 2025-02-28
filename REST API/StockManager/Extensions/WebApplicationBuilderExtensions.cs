@@ -8,7 +8,9 @@ namespace StockManager.Extensions
     {
         public static void AddPresentation(this WebApplicationBuilder builder)
         {
+            // configure JWT token
             builder.Services.AddAuthentication();
+
             builder.Services.AddControllers();
             builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
@@ -17,7 +19,6 @@ namespace StockManager.Extensions
                  configuration.ReadFrom.Configuration(context.Configuration)
             );
 
-            builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
                 c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme

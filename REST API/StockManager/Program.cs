@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting.Builder;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using StockManager.Application.Extensions;
@@ -9,8 +10,15 @@ using StockManager.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
+if (builder.Environment.IsDevelopment())
+{
+    // user secrets data
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
 builder.AddPresentation();
 builder.Services.AddInfrastructure(builder.Configuration);
+
 builder.Services.AddApplication(builder.Configuration);
 
 var app = builder.Build();

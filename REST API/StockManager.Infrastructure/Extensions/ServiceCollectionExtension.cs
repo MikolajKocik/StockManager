@@ -3,9 +3,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using StockManager.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
-using StockManager.Core.Domain.Interfaces;
 using StockManager.Infrastructure.Repositories;
 using StockManager.Core.Domain.Models;
+using StockManager.Core.Domain.Interfaces.Repositories;
 
 
 namespace StockManager.Infrastructure.Extensions

@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 namespace StockManager.Core.Domain.Exceptions
 {
     public class ConflictException(string resourceType, string resourceIdentifier)
-        : Exception($"{resourceType} with id: {resourceIdentifier} already exists");
+        : Exception($"{resourceType} with provided object: {resourceIdentifier} already exists");
 
 }

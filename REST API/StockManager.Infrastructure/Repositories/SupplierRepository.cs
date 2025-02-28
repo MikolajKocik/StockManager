@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using StockManager.Core.Domain.Interfaces;
+using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Infrastructure.Data;
 using StockManager.Models;
 

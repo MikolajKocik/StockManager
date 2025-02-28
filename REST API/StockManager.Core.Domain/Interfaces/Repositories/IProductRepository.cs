@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Models;
 
-namespace StockManager.Core.Domain.Interfaces
+namespace StockManager.Core.Domain.Interfaces.Repositories
 {
     public interface IProductRepository
     {

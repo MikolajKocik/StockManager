@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
-namespace StockManager.Application.User
+namespace StockManager.Application.UserHttp
 {
     public interface IUserContext
     {

@@ -2,7 +2,7 @@
 using MediatR;
 using StockManager.Application.Dtos;
 using StockManager.Core.Domain.Exceptions;
-using StockManager.Core.Domain.Interfaces;
+using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 {

@@ -24,6 +24,13 @@ namespace StockManager.Middlewares
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
                 await context.Response.WriteAsync("Provided object doesnt exist");
             }
+            catch (ConflictException ex)
+            {
+                logger.LogError(ex, ex.Message);
+
+                context.Response.StatusCode = StatusCodes.Status409Conflict;
+                await context.Response.WriteAsync("Provided object already exist");
+            }
             catch (Exception ex)
             {
                 logger.LogError(ex.InnerException?.Message ?? ex.Message);

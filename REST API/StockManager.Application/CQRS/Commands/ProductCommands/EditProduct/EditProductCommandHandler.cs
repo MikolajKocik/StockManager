@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using StockManager.Application.Dtos;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Exceptions;
-using StockManager.Core.Domain.Interfaces;
+using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
 {

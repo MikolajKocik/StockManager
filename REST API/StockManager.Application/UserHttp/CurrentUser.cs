@@ -1,4 +1,4 @@
-﻿namespace StockManager.Application.User
+﻿namespace StockManager.Application.UserHttp
 {
     public record CurrentUser(string Id, string Email, IEnumerable<string> Roles)
     {

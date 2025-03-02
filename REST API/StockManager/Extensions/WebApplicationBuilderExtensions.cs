@@ -11,7 +11,9 @@ namespace StockManager.Extensions
     {
         public static void AddPresentation(this WebApplicationBuilder builder)
         {
-            var key = Encoding.UTF8.GetBytes("Secret");
+            var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+
+            var key = Encoding.UTF8.GetBytes(jwtSettings["Secret"]!);
 
             // configure JWT token
             builder.Services.AddAuthentication(options =>
@@ -27,8 +29,14 @@ namespace StockManager.Extensions
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings["Issuer"],
+
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings["Audience"],
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -46,7 +54,10 @@ namespace StockManager.Extensions
                 c.AddSecurityDefinition("bearerAuth", new OpenApiSecurityScheme
                 {
                     Type = SecuritySchemeType.Http,
-                    Scheme = "Bearer"
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Provide JWT Token without 'Bearer' prefix"
                 });
 
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -54,9 +65,13 @@ namespace StockManager.Extensions
                      {
                          new OpenApiSecurityScheme
                          {
-                               Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "bearerAuth" }
+                               Reference = new OpenApiReference 
+                               { 
+                                   Type = ReferenceType.SecurityScheme,
+                                   Id = "bearerAuth"
+                               }
                          },
-                        []
+                         Array.Empty<string>()
                      }
                 });
             });

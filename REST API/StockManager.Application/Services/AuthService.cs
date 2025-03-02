@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using StockManager.Core.Domain.Dtos.Authorization;
@@ -15,10 +16,13 @@ namespace StockManager.Application.Services
     {
         private readonly ILogger<AuthService> _logger;
         private readonly UserManager<User> _userManager;
-        public AuthService(ILogger<AuthService> logger, UserManager<User> userManager)
+        private readonly IConfiguration _configuration;
+
+        public AuthService(ILogger<AuthService> logger, UserManager<User> userManager, IConfiguration configuration)
         {
             _logger = logger;
             _userManager = userManager;
+            _configuration = configuration;
         }
 
         public async Task RegisterUser(RegisterDto register)
@@ -55,14 +59,21 @@ namespace StockManager.Application.Services
                 throw new UnauthorizedAccessException();
 
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.UTF8.GetBytes("Secret");
+            var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!);
+
+            var roles = await _userManager.GetRolesAsync(user);
+
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, user.UserName!),
+                new Claim(ClaimTypes.NameIdentifier, user.Id)
+            };
+
+            claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserName!),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id)
-                }),
+                Subject = new ClaimsIdentity(claims),
                 Expires = DateTime.UtcNow.AddHours(1),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
@@ -70,10 +81,7 @@ namespace StockManager.Application.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return new LoginResultDto
-            {
-                Token = tokenString
-            };
+            return new LoginResultDto { Token = tokenString };
         }
     }
 }

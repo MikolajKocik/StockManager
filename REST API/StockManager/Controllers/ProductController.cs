@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
-using StockManager.Application.Dtos;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using Microsoft.AspNetCore.Authorization;
+using StockManager.Core.Domain.Dtos.ModelsDto;
 
 namespace StockManager.Controllers
 {

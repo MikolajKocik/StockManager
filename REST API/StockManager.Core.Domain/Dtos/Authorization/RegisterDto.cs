@@ -1,8 +1,8 @@
-﻿namespace StockManager.Application.Dtos.Authorization
+﻿namespace StockManager.Core.Domain.Dtos.Authorization
 {
     public class RegisterDto
     {
-        public string Username { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
 }

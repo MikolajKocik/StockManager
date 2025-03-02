@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using StockManager.Application.Dtos;
+using StockManager.Core.Domain.Dtos.ModelsDto;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
 {

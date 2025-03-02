@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
-using StockManager.Application.Dtos;
 using Microsoft.EntityFrameworkCore;
 using StockManager.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Dtos.ModelsDto;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {

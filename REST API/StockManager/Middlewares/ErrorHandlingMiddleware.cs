@@ -36,7 +36,7 @@ namespace StockManager.Middlewares
                 logger.LogError(ex.InnerException?.Message ?? ex.Message);
 
                 context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-                await context.Response.WriteAsync("Internal error, something went wrong");
+                await context.Response.WriteAsync(string.Join(", ", ex.InnerException?.Message ?? ex.Message)); 
             }
         }
     }

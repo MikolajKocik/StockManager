@@ -4,13 +4,10 @@ namespace StockManager.Core.Domain.Models
 {
     public class User : IdentityUser
     {
-        public string Username { get; set; }
-        public string Password { get; set; }
-
-        public User(string username, string password)
+        public User(string userName, string password)
         {
-            Username = username;
-            Password = password;
+            UserName = userName;
+            PasswordHash = new PasswordHasher<User>().HashPassword(this, password);
         }
         public User() { }
     }

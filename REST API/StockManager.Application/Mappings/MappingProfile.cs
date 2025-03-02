@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
-using StockManager.Application.Dtos;
+using StockManager.Core.Domain.Dtos.Authorization;
+using StockManager.Core.Domain.Dtos.ModelsDto;
+using StockManager.Core.Domain.Models;
 using StockManager.Models;
 
 namespace StockManager.Application.Mappings
@@ -37,6 +39,12 @@ namespace StockManager.Application.Mappings
                 .ForMember(dest => dest.Supplier, opt => opt.Condition(src => src.Supplier != null))
                 .ForMember(dest => dest.Supplier, opt => opt.MapFrom(src => src.Supplier!))
                 .ForMember(dest => dest.SupplierId, opt => opt.MapFrom(src => src.SupplierId ?? Guid.Empty));
+
+            CreateMap<RegisterDto, User>().ReverseMap();
+
+            CreateMap<LoginDto, User>().ReverseMap();
+
+            CreateMap<LoginResultDto, User>().ReverseMap();
         }
     }
 }

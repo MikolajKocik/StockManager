@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
-using StockManager.Application.Dtos;
 using StockManager.Application.Validations;
+using StockManager.Core.Domain.Dtos.ModelsDto;
 using StockManager.Core.Domain.Exceptions;
 using StockManager.Core.Domain.Interfaces.Repositories;
 

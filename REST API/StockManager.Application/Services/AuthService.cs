@@ -1,10 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using StockManager.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Dtos.Authorization;
 using StockManager.Core.Domain.Exceptions;
-using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,50 +13,44 @@ namespace StockManager.Application.Services
 {
     public class AuthService : IAuthService
     {
-        private readonly IUserRepository _repository;
         private readonly ILogger<AuthService> _logger;
         private readonly UserManager<User> _userManager;
-        public AuthService(IUserRepository repository, ILogger<AuthService> logger, UserManager<User> userManager)
+        public AuthService(ILogger<AuthService> logger, UserManager<User> userManager)
         {
-            _repository = repository;
             _logger = logger;
             _userManager = userManager;
         }
 
         public async Task RegisterUser(RegisterDto register)
         {
-            var existingUser = await _repository.GetUserByLoginAsync(register.Username);
+            var existingUser = await _userManager.FindByNameAsync(register.UserName);
 
-            try
+            if (existingUser != null)
             {
-                if (existingUser != null)
+                _logger.LogWarning("User: {@User} already exists", register.UserName);
+                throw new ConflictException(nameof(RegisterDto), register.UserName);
+            }
+            else
+            {
+                var user = new User(register.UserName, register.Password);
+
+                var result = await _userManager.CreateAsync(user, register.Password);
+
+                if (!result.Succeeded)
                 {
-                    _logger.LogWarning("User: {@User} already exists", register.Username);
-                    throw new ConflictException(nameof(RegisterDto), register.Username);
+                    _logger.LogError("User: {@User} registration failed", register.UserName);
+                    throw new Exception("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
                 else
                 {
-                    var user = new User(register.Username, register.Password);
-
-                    PasswordHasher<User> hash = new PasswordHasher<User>();
-
-                    var hashedPassword = hash.HashPassword(user, user.Password);
-
-                    user.PasswordHash = hashedPassword;
-
-                    await _repository.AddUserAsync(user);
+                    _logger.LogInformation("User: {@User} registered succesfully", register.UserName);
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occured while adding user");
-                throw;
             }
         }
 
         public async Task<LoginResultDto> LoginUser(LoginDto login)
         {
-            var user = await _userManager.FindByNameAsync(login.Username);
+            var user = await _userManager.FindByNameAsync(login.UserName);
             if (user == null || !await _userManager.CheckPasswordAsync(user, login.Password))
                 throw new UnauthorizedAccessException();
 
@@ -78,8 +70,8 @@ namespace StockManager.Application.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return new LoginResultDto 
-            { 
+            return new LoginResultDto
+            {
                 Token = tokenString
             };
         }

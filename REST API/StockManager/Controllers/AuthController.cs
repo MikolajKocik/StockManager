@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using StockManager.Application.Dtos.Authorization;
+using StockManager.Core.Domain.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Controllers
@@ -20,7 +20,7 @@ namespace StockManager.Controllers
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterDto register)
         {
-            _logger.LogInformation("User: {@User} registered succesfully", register.Username);
+            _logger.LogInformation("User: {@User} registered succesfully", register.UserName);
 
             await _authService.RegisterUser(register);
             return Ok(new { message = "User registered succesfully"});
@@ -30,7 +30,7 @@ namespace StockManager.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
 
-            _logger.LogInformation("User: {@User} logged succesfully", login.Username);
+            _logger.LogInformation("User: {@User} logged succesfully", login.UserName);
 
             await _authService.LoginUser(login);
             return Ok(new { message = "User logged succesfully" });

@@ -1,5 +1,5 @@
 ﻿using FluentValidation;
-using StockManager.Application.Dtos;
+using StockManager.Core.Domain.Dtos.ModelsDto;
 
 namespace StockManager.Application.Validations
 {

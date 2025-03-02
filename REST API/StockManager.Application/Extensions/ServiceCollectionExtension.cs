@@ -2,7 +2,8 @@
 using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StockManager.Application.UserHttp;
+using StockManager.Application.Services;
+using StockManager.Core.Domain.Interfaces.Services;
 
 
 namespace StockManager.Application.Extensions
@@ -20,9 +21,9 @@ namespace StockManager.Application.Extensions
             services.AddValidatorsFromAssembly(applicationAssembly)
                 .AddFluentValidationAutoValidation();
 
-            services.AddScoped<IUserContext, UserContext>();
-
             services.AddHttpContextAccessor();
+
+            services.AddScoped<IAuthService, AuthService>();
         }
     }
 }

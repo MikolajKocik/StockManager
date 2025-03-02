@@ -1,4 +1,4 @@
-﻿namespace StockManager.Application.Dtos
+﻿namespace StockManager.Core.Domain.Dtos.ModelsDto
 {
     public class ProductDto
     {

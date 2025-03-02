@@ -1,5 +1,4 @@
-﻿using StockManager.Application.Dtos.Authorization;
-using StockManager.Core.Domain.Dtos.Authorization;
+﻿using StockManager.Core.Domain.Dtos.Authorization;
 
 namespace StockManager.Core.Domain.Interfaces.Services
 {

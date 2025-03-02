@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
-using StockManager.Application.Dtos;
+using StockManager.Core.Domain.Dtos.ModelsDto;
 using StockManager.Core.Domain.Exceptions;
 using StockManager.Core.Domain.Interfaces.Repositories;
 

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StockManager.Application.Dtos
+namespace StockManager.Core.Domain.Dtos.ModelsDto
 {
     public class AddressDto
     {

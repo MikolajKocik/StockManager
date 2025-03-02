@@ -32,8 +32,8 @@ namespace StockManager.Controllers
 
             _logger.LogInformation("User: {@User} logged succesfully", login.UserName);
 
-            await _authService.LoginUser(login);
-            return Ok(new { message = "User logged succesfully" });
+            var result = await _authService.LoginUser(login);
+            return Ok(new { message = "User logged succesfully", result });
         }
     }
 }

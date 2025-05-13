@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using StockManager.Core.Domain.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 
@@ -18,6 +19,8 @@ namespace StockManager.Controllers
         }
 
         [HttpPost("register")]
+        [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] RegisterDto register)
         {
             _logger.LogInformation("User: {@User} registered succesfully", register.UserName);
@@ -27,6 +30,10 @@ namespace StockManager.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
+        [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
 

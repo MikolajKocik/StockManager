@@ -13,3 +13,5 @@ The REST API incorporates the following:
 - **Clean Architecture:** Provides a clear and organized project structure for scalability and maintainability.
 
 - **SOLID Principles:** Promotes best practices in object-oriented programming to achieve flexibility and reusability.
+
+  Still working

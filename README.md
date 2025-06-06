@@ -1,5 +1,5 @@
 # Overview
-This project is a REST API application with a frontend in winforms.
+This project is a REST Web API application with a frontend in winforms.
 
 ## Features
 The REST API incorporates the following:

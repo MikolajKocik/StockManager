@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.Helpers;
 using StockManager.Models;
+using System.Linq.Expressions;
 
 namespace StockManager.Infrastructure.Repositories
 {
@@ -16,17 +18,15 @@ namespace StockManager.Infrastructure.Repositories
         }
 
         public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
-            => await _dbContext.Suppliers
-                .AsNoTracking()
-                .Include(s => s.Address)
-                .FirstOrDefaultAsync(s => s.Id == supplierId, cancellationToken);
-
-
-        public async Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
         {
-            _dbContext.Suppliers.Add(supplier);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-            return supplier;
+            Expression<Func<Supplier, bool>> predicate = s => s.Id == supplierId;
+
+            return await RepositoryQueriesHelpers.GetEntityWithIncludeAsync(_dbContext, s => s.Address, predicate, cancellationToken);
+        }
+
+        public async Task AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+        {
+            await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
         }
 
         public void AttachSupplier(Supplier supplier)

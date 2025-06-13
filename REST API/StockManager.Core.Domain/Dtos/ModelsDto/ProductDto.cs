@@ -1,6 +1,6 @@
 ﻿namespace StockManager.Core.Domain.Dtos.ModelsDto
 {
-    public class ProductDto
+    public sealed class ProductDto
     {
 
         public int Id { get; set; }

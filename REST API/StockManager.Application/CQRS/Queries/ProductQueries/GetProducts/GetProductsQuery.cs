@@ -3,7 +3,7 @@ using StockManager.Core.Domain.Dtos.ModelsDto;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
-    public record GetProductsQuery(
+    public sealed record GetProductsQuery(
         string? Name,
         string? Genre,
         string? Unit,

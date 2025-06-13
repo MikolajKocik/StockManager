@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StockManager.Core.Domain.Dtos.ModelsDto
 {
-    public class AddressDto
+    public sealed class AddressDto
     {
         public Guid Id { get; set; }
         public string City { get; set; } = string.Empty;

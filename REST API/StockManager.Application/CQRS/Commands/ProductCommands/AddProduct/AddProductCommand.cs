@@ -3,7 +3,7 @@ using StockManager.Core.Domain.Dtos.ModelsDto;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
 {
-    public class AddProductCommand : IRequest<ProductDto>
+    public sealed class AddProductCommand : IRequest<ProductDto>
     {
         public ProductDto Product { get; set; }
 

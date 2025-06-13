@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace StockManager.Core.Domain.Dtos.ModelsDto
 {
-    public class SupplierDto
+    public sealed class SupplierDto
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
-        public AddressDto? Address { get; set; } = default!; 
+        public AddressDto? Address { get; set; } = new(); 
         public Guid? AddressId { get; set; }
     }
 }

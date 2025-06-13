@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.Extensions.Logging;
-using StockManager.Core.Domain.Exceptions;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.Helpers;
 using StockManager.Models;
+using System.Linq.Expressions;
 
 namespace StockManager.Infrastructure.Repositories
 {
@@ -24,18 +24,16 @@ namespace StockManager.Infrastructure.Repositories
                     .ThenInclude(a => a.Address);
 
         public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
-            => await _dbContext.Products
-                .AsNoTracking()
-                .Include(s => s.Supplier)
-                .ThenInclude(a => a.Address)
-                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-
-        public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
         {
-            await _dbContext.Products
-                .AddAsync(product, cancellationToken);
-            _dbContext.SaveChanges();
-            return product;
+            Expression<Func<Product, bool>> predicate = p => p.Id == id;
+
+            return await RepositoryQueriesHelpers.GetEntityWithNestedIncludeAsync(
+                _dbContext, s => s.Supplier, a => a.Address, predicate, cancellationToken);
+        }
+
+        public async Task AddProductAsync(Product product, CancellationToken cancellationToken)
+        {
+            await RepositoryQueriesHelpers.AddEntityAsync(product, _dbContext, cancellationToken);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()

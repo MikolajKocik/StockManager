@@ -1,5 +1,5 @@
 # Overview
-This project is a REST API application with a frontend, created to showcase my understanding of REST APIs and their implementation. The focus is on designing a clean, scalable, and maintainable architecture while adhering to best practices in software development.
+This project is a REST Web API application with a frontend in winforms.
 
 ## Features
 The REST API incorporates the following:
@@ -13,3 +13,5 @@ The REST API incorporates the following:
 - **Clean Architecture:** Provides a clear and organized project structure for scalability and maintainability.
 
 - **SOLID Principles:** Promotes best practices in object-oriented programming to achieve flexibility and reusability.
+
+  Still working

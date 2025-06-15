@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace StockManager.Core.Domain.Dtos.Authorization
 {
-    public class LoginResultDto
+    public sealed class LoginResultDto
     {
-        public string Token { get; set; } = string.Empty;
+        public required string Token { get; set; } 
     }
 }

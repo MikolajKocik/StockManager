@@ -10,9 +10,9 @@ namespace StockManager.Core.Domain.Dtos.ModelsDto
     public sealed class AddressDto
     {
         public Guid Id { get; set; }
-        public string City { get; set; } = string.Empty;
-        public string Country { get; set; } = string.Empty;
-        public string PostalCode { get; set; } = string.Empty;
+        public required string City { get; set; } 
+        public required string Country { get; set; }
+        public required string PostalCode { get; set; } 
         public Guid SupplierId { get; set; }
     }
 }

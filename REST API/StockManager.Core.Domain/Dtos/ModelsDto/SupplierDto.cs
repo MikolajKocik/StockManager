@@ -10,8 +10,8 @@ namespace StockManager.Core.Domain.Dtos.ModelsDto
     public sealed class SupplierDto
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } = string.Empty;
-        public AddressDto? Address { get; set; } = new(); 
+        public required string Name { get; set; } 
+        public AddressDto? Address { get; set; } 
         public Guid? AddressId { get; set; }
     }
 }

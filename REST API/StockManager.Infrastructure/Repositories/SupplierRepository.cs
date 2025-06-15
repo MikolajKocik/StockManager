@@ -7,7 +7,7 @@ using System.Linq.Expressions;
 
 namespace StockManager.Infrastructure.Repositories
 {
-    public class SupplierRepository : ISupplierRepository
+    public sealed class SupplierRepository : ISupplierRepository
     {
 
         private readonly StockManagerDbContext _dbContext;
@@ -24,9 +24,9 @@ namespace StockManager.Infrastructure.Repositories
             return await RepositoryQueriesHelpers.GetEntityWithIncludeAsync(_dbContext, s => s.Address, predicate, cancellationToken);
         }
 
-        public async Task AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+        public async Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
         {
-            await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
+            return await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
         }
 
         public void AttachSupplier(Supplier supplier)

@@ -5,7 +5,7 @@ namespace StockManager.Application.Validations
 {
     public class SupplierValidator : AbstractValidator<SupplierDto>
     {
-        public SupplierValidator() // TODO validation fields on winforms
+        public SupplierValidator() 
         {
             RuleFor(n => n.Name)
                 .NotEmpty()

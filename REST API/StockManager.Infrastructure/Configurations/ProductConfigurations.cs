@@ -4,7 +4,7 @@ using StockManager.Models;
 
 namespace StockManager.Infrastructure.Configurations
 {
-    public class ProductConfigurations : IEntityTypeConfiguration<Product>
+    internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
     {
         public void Configure(EntityTypeBuilder<Product> builder)
         {

@@ -6,7 +6,7 @@ using StockManager.Models;
 
 namespace StockManager.Infrastructure.Data
 {
-    public class StockManagerDbContext(DbContextOptions<StockManagerDbContext> options) 
+    public sealed class StockManagerDbContext(DbContextOptions<StockManagerDbContext> options) 
         : IdentityDbContext<User>(options)
     {
 

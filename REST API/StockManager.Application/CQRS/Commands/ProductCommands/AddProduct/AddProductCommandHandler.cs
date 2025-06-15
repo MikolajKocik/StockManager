@@ -54,7 +54,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
                     }
 
                     var product = _mapper.Map<Product>(request.Product);
-                    product.Supplier = supplier;
+                    product.SetSupplier(supplier);
 
                     _logger.LogInformation("Adding a new product {request.Product} to database", request.Product);
                     var newProduct = await _productRepository.AddProductAsync(product, cancellationToken);

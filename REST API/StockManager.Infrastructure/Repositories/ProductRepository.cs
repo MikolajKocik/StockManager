@@ -31,9 +31,9 @@ namespace StockManager.Infrastructure.Repositories
                 _dbContext, s => s.Supplier, a => a.Address, predicate, cancellationToken);
         }
 
-        public async Task AddProductAsync(Product product, CancellationToken cancellationToken)
+        public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
         {
-            await RepositoryQueriesHelpers.AddEntityAsync(product, _dbContext, cancellationToken);
+            return await RepositoryQueriesHelpers.AddEntityAsync(product, _dbContext, cancellationToken);
         }
 
         public async Task<IDbContextTransaction> BeginTransactionAsync()
@@ -64,11 +64,11 @@ namespace StockManager.Infrastructure.Repositories
                     newSupplier = existingProduct.Supplier;
                 }
 
-                existingProduct.Supplier = newSupplier;
+                existingProduct.SetSupplier(newSupplier);
 
                 if (product.Supplier?.Name != null)
                 {
-                    newSupplier.Name = product.Supplier.Name;
+                    newSupplier.ChangeName(product.Supplier.Name); 
                 }
 
                 if (product.Supplier?.Address != null)

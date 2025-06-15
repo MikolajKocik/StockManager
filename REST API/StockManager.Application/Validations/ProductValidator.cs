@@ -5,7 +5,7 @@ namespace StockManager.Application.Validations
 {
     public class ProductValidator : AbstractValidator<ProductDto>
     {
-        public ProductValidator() // TODO validation fields on winforms
+        public ProductValidator() 
         {
             RuleFor(n => n.Name)
                 .NotEmpty()
@@ -20,16 +20,17 @@ namespace StockManager.Application.Validations
             RuleFor(u => u.Unit)
                 .MaximumLength(15)
                 .When(u => u.Unit != null)
+                .Must(u => AllowedUnits(u)).WithMessage("Bad unit, allowed units: kg, deg, pcs, l, ml")
                 .WithMessage("Field 'Unit' has maximum length of 15 characters.");
 
             RuleFor(ed => ed.ExpirationDate)
                 .NotEmpty()
-                .GreaterThan(DateTime.Today)
+                .Must(IsValidExpirationDate()).WithMessage("Field 'EXpirationDate' must be in the future")
                 .WithMessage("Field 'Expiration Date' is required.");
 
-            RuleFor(ed => ed.DeliveredAt)
+            RuleFor(da => da.DeliveredAt)
                 .NotEmpty()
-                .GreaterThanOrEqualTo(DateTime.Today)
+                .GreaterThanOrEqualTo(DateTime.UtcNow)
                 .WithMessage("Field 'Delivered At' is required.");
 
             RuleFor(t => t.Type)
@@ -45,6 +46,22 @@ namespace StockManager.Application.Validations
             RuleFor(s => s.Supplier!)
                 .SetValidator(new SupplierValidator())
                 .When(s => s.Supplier != null);
+        }
+
+        private static bool AllowedUnits(string unit)
+        {
+            string[] units = ["kg", "deg", "pcs", "l", "ml"];
+
+            return units.Contains(unit);
+        }
+
+        private static Func<ProductDto, DateTime, bool> IsValidExpirationDate()
+        {
+            Func<ProductDto, DateTime, bool> isValid = (product, _) => 
+                product.ExpirationDate.Date > DateTime.UtcNow.Date &&
+                product.ExpirationDate.Date > product.DeliveredAt.Date;
+
+            return isValid;
         }
     }
 }

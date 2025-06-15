@@ -5,7 +5,7 @@ namespace StockManager.Application.Validations
 {
     public class AddressValidator : AbstractValidator<AddressDto>
     {
-        public AddressValidator() // TODO validation fields on winforms
+        public AddressValidator() 
         {
             RuleFor(c => c.City)
                 .NotEmpty()

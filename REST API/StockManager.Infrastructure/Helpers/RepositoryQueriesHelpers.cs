@@ -3,15 +3,15 @@ using System.Linq.Expressions;
 
 namespace StockManager.Infrastructure.Helpers
 {
-    public class RepositoryQueriesHelpers 
+    internal sealed class RepositoryQueriesHelpers 
     {
         public static async Task<T> AddEntityAsync<T>(
             T entity,
             DbContext db,
             CancellationToken cancellationToken) where T : class 
         {
-            await db.Set<T>().AddAsync(entity);
-            await db.SaveChangesAsync(cancellationToken);
+            await db.Set<T>().AddAsync(entity, cancellationToken).ConfigureAwait(false);
+            await db.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
             return entity;
         }
 
@@ -23,7 +23,7 @@ namespace StockManager.Infrastructure.Helpers
         {
             return await db.Set<T>()
                 .Include(include)
-                .FirstOrDefaultAsync(predicate, cancellation);
+                .FirstOrDefaultAsync(predicate, cancellation).ConfigureAwait(false);
         }
 
         public static async Task<T?> GetEntityWithNestedIncludeAsync<T, TProperty, TThenProperty>(
@@ -36,7 +36,7 @@ namespace StockManager.Infrastructure.Helpers
             return await db.Set<T>()
                 .Include(include)
                 .ThenInclude(thenInclude)
-                .FirstOrDefaultAsync(predicate, cancellation);
+                .FirstOrDefaultAsync(predicate, cancellation).ConfigureAwait(false);
         }
     }
 }

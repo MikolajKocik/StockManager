@@ -4,7 +4,7 @@ using StockManager.Models;
 
 namespace StockManager.Infrastructure.Configurations
 {
-    public class AddressConfiguration : IEntityTypeConfiguration<Address>
+    internal sealed class AddressConfiguration : IEntityTypeConfiguration<Address>
     {
         public void Configure(EntityTypeBuilder<Address> builder)
         {

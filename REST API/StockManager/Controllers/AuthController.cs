@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using StockManager.Core.Domain.Dtos.Authorization;
+using StockManager.Application.Extensions.ErrorExtensions;
+using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Controllers
@@ -23,10 +24,16 @@ namespace StockManager.Controllers
         [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Register([FromBody] RegisterDto register)
         {
-            _logger.LogInformation("User: {@User} registered succesfully", register.UserName);
+            _logger.LogInformation("User: {@user} registered succesfully", register.UserName);
 
-            await _authService.RegisterUser(register);
-            return Ok(new { message = "User registered succesfully"});
+            var result = await _authService.RegisterUser(register);
+
+            if(result.IsSuccess)
+            {
+                return Ok(new { message = "User registered succesfully" });
+            }
+
+            return result.Error!.ToActionResult();          
         }
 
         [HttpPost("login")]
@@ -37,10 +44,16 @@ namespace StockManager.Controllers
         public async Task<IActionResult> Login([FromBody] LoginDto login)
         {
 
-            _logger.LogInformation("User: {@User} logged succesfully", login.UserName);
+            _logger.LogInformation("User: {@user} logged succesfully", login.UserName);
 
             var result = await _authService.LoginUser(login);
-            return Ok(new { message = "User logged succesfully", result });
+
+            if(result.IsSuccess)
+            {
+                return Ok(new { message = "User logged succesfully", result });
+            }
+
+            return result.Error!.ToActionResult();
         }
     }
 }

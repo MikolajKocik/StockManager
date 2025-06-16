@@ -1,4 +1,4 @@
-﻿namespace StockManager.Core.Domain.Dtos.Authorization
+﻿namespace StockManager.Core.Application.Dtos.Authorization
 {
     public sealed class LoginDto
     {

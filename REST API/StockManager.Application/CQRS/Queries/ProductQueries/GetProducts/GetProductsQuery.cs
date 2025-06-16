@@ -1,5 +1,5 @@
-﻿using MediatR;
-using StockManager.Core.Domain.Dtos.ModelsDto;
+﻿using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Core.Application.Dtos.ModelsDto;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
@@ -9,5 +9,5 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
         string? Unit,
         DateTime? ExpirationDate,
         DateTime? DeliveredAt
-        ) : IRequest<IEnumerable<ProductDto>>;
+        ) : IQuery<IEnumerable<ProductDto>>;
 }

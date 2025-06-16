@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using StockManager.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Dtos.ModelsDto;
+using StockManager.Core.Application.Dtos.ModelsDto;
+using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
-    public class GetProductsQueryHandler : IRequestHandler<GetProductsQuery, IEnumerable<ProductDto>>
+    public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, IEnumerable<ProductDto>>
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _repository;
@@ -18,7 +19,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
             _repository = repository;
         }
 
-        public async Task<IEnumerable<ProductDto>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -59,7 +60,8 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 
             var dtos = _mapper.Map<IEnumerable<ProductDto>>(await products.ToListAsync(cancellationToken));
 
-            return dtos.Any() ? dtos : Enumerable.Empty<ProductDto>();
+            return Result<IEnumerable<ProductDto>>.Success(
+                dtos.Any() ? dtos : Enumerable.Empty<ProductDto>());
         }
     }
 }

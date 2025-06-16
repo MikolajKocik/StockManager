@@ -1,4 +1,4 @@
-﻿namespace StockManager.Core.Domain.Dtos.ModelsDto
+﻿namespace StockManager.Core.Application.Dtos.ModelsDto
 {
     public sealed class ProductDto
     {

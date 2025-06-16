@@ -1,8 +1,6 @@
-﻿using StockManager.Core.Domain.Exceptions;
-
-namespace StockManager.Middlewares
+﻿namespace StockManager.Middlewares
 {
-    public class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
+    public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
     {
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
@@ -10,26 +8,19 @@ namespace StockManager.Middlewares
             {
                 await next.Invoke(context);
             }
-            catch (BadRequestException ex)
+            catch(ArgumentNullException ex)
             {
-                logger.LogError(ex, ex.Message);
-
-                context.Response.StatusCode = StatusCodes.Status400BadRequest;
-                await context.Response.WriteAsync("Validation failed for object");
-            }
-            catch (NotFoundException ex)
-            {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex.Message);
 
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
-                await context.Response.WriteAsync("Provided object doesnt exist");
+                await context.Response.WriteAsync(string.Join(", ", ex.Message));
             }
-            catch (ConflictException ex)
+            catch (ArgumentException ex)
             {
-                logger.LogError(ex, ex.Message);
+                logger.LogError(ex.Message);
 
-                context.Response.StatusCode = StatusCodes.Status409Conflict;
-                await context.Response.WriteAsync("Provided object already exist");
+                context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                await context.Response.WriteAsync(string.Join(", ", ex.Message));
             }
             catch (Exception ex)
             {

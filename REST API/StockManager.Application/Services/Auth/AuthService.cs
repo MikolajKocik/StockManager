@@ -2,15 +2,15 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using StockManager.Core.Domain.Dtos.Authorization;
-using StockManager.Core.Domain.Exceptions;
+using StockManager.Application.Common;
+using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace StockManager.Application.Services
+namespace StockManager.Application.Services.Auth
 {
     public class AuthService : IAuthService
     {
@@ -25,14 +25,20 @@ namespace StockManager.Application.Services
             _configuration = configuration;
         }
 
-        public async Task RegisterUser(RegisterDto register)
+        public async Task<Result<RegisterDto>> RegisterUser(RegisterDto register)
         {
             var existingUser = await _userManager.FindByNameAsync(register.UserName);
 
-            if (existingUser != null)
+            if (existingUser is null)
             {
-                _logger.LogWarning("User: {@User} already exists", register.UserName);
-                throw new ConflictException(nameof(RegisterDto), register.UserName);
+                _logger.LogWarning("User: {@user} already exists", register.UserName);
+
+                var error = new Error(
+                    $"User: {existingUser} already exists",
+                    code: "User.Conflict"
+                );
+
+                return Result<RegisterDto>.Failure(error);
             }
             else
             {
@@ -42,21 +48,36 @@ namespace StockManager.Application.Services
 
                 if (!result.Succeeded)
                 {
-                    _logger.LogError("User: {@User} registration failed", register.UserName);
-                    throw new Exception("Failed to create user: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                    _logger.LogError("User: {@user} registration failed", register.UserName);
+
+                    var error = new Error(
+                        $"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}",
+                        code: "User.?"
+                    );
+
+                    return Result<RegisterDto>.Failure(error);
                 }
                 else
                 {
-                    _logger.LogInformation("User: {@User} registered succesfully", register.UserName);
+                    _logger.LogInformation("User: {@user} registered succesfully", register.UserName);
+
+                    return Result<RegisterDto>.Success(register);
                 }
             }
         }
 
-        public async Task<LoginResultDto> LoginUser(LoginDto login)
+        public async Task<Result<LoginResultDto>> LoginUser(LoginDto login)
         {
             var user = await _userManager.FindByNameAsync(login.UserName);
-            if (user == null || !await _userManager.CheckPasswordAsync(user, login.Password))
-                throw new UnauthorizedAccessException();
+            if (user is null || !await _userManager.CheckPasswordAsync(user, login.Password))
+            {
+                var error = new Error(
+                    $"UnauthorizedAccess {user}",
+                    code: "User.Unauthorized"
+                );
+
+                return Result<LoginResultDto>.Failure(error);
+            }
 
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!);
@@ -81,7 +102,11 @@ namespace StockManager.Application.Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return new LoginResultDto { Token = tokenString };
+            return Result<LoginResultDto>.Success(
+                new LoginResultDto
+                {
+                    Token = tokenString
+                });
         }
     }
 }

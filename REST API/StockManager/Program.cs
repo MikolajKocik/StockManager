@@ -1,6 +1,13 @@
-using Microsoft.AspNetCore.Hosting.Builder;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
+using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
+using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
+using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
+using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.Extensions;
 using StockManager.Core.Domain.Models;
 using StockManager.Extensions;
@@ -20,6 +27,29 @@ builder.AddPresentation();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddApplication(builder.Configuration);
+
+// scrutor package
+builder.Services.Scan(scan => scan
+    .FromAssemblies(
+         typeof(AddProductCommand).Assembly,
+         typeof(DeleteProductCommand).Assembly,
+         typeof(EditProductCommand).Assembly,
+         typeof(GetProductByIdQuery).Assembly,
+         typeof(GetProductsQuery).Assembly
+    )
+    .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<>)))
+        .AsImplementedInterfaces()
+        .WithScopedLifetime()
+    .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<,>)))
+        .AsImplementedInterfaces()
+        .WithScopedLifetime()
+    .AddClasses(c => c.AssignableTo(typeof(IQueryHandler<,>)))
+        .AsImplementedInterfaces()
+        .WithScopedLifetime()
+    .AddClasses(c => c.AssignableTo(typeof(IRequestHandler<,>))) // adapters
+        .AsImplementedInterfaces()
+        .WithScopedLifetime()
+);
 
 var app = builder.Build();
 

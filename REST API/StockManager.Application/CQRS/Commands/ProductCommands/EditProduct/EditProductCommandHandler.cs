@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
-using MediatR;
 using Microsoft.Extensions.Logging;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common;
 using StockManager.Application.Validations;
-using StockManager.Core.Domain.Dtos.ModelsDto;
-using StockManager.Core.Domain.Exceptions;
+using StockManager.Core.Application.Dtos.ModelsDto;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
 {
-    public class EditProductCommandHandler : IRequestHandler<EditProductCommand, ProductDto>
+    public class EditProductCommandHandler : ICommandHandler<EditProductCommand, ProductDto>
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _repository;
@@ -22,7 +22,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
             _logger = logger;
         }
 
-        public async Task<ProductDto> Handle(EditProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(EditProductCommand request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -32,9 +32,9 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
             {
                 var product = await _repository.GetProductByIdAsync(request.Id, cancellationToken);
 
-                if (product != null)
+                if (product is not null)
                 { 
-                    _logger.LogInformation("Modifying the provided product:{request.Id} with {@ModifiedProduct}", request.Id, request);
+                    _logger.LogInformation("Modifying the provided product:{@productId} with {@modifiedProduct}", request.Id, request);
                     var updateProduct = await _repository.UpdateProductAsync(product, cancellationToken);
 
                     var productModified = _mapper.Map<ProductDto>(updateProduct);
@@ -45,20 +45,33 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
                     if (validationResult.IsValid)
                     {
                         await transaction.CommitAsync();
-                        return productModified;
+
+                        return Result<ProductDto>.Success(productModified);
                     }
                     else
                     {
-                        _logger.LogWarning("Validation failed for product:{product}. Errors: {Errors}. Rolling back transaction",
+                        _logger.LogWarning("Validation failed for product:{@product}. Errors: {Errors}. Rolling back transaction",
                             product, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
-                        throw new BadRequestException(string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), request.Id.ToString());
+
+                        var error = new Error(
+                            string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                            code: $"Validation.BadRequest"
+                        );
+
+                        return Result<ProductDto>.Failure(error);
                     }
                 }
                 else
                 {
-                    _logger.LogWarning("Product with id:{request.Id} not found. Rolling back transaction", request.Id);
+                    _logger.LogWarning("Product with id:{@productId} not found. Rolling back transaction", request.Id);
                     await transaction.RollbackAsync();
-                    throw new NotFoundException(nameof(ProductDto), request.Id.ToString());
+
+                    var error = new Error(
+                        $"Product with id {request.Id} not found",
+                        code: "Product.NotFound"
+                    );
+
+                    return Result<ProductDto>.Failure(error);
                 }
             }
             catch (Exception ex)

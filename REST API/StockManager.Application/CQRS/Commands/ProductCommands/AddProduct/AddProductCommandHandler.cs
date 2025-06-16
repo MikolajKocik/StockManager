@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using MediatR;
 using Microsoft.Extensions.Logging;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common;
 using StockManager.Application.Validations;
-using StockManager.Core.Domain.Dtos.ModelsDto;
-using StockManager.Core.Domain.Exceptions;
+using StockManager.Core.Application.Dtos.ModelsDto;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
 {
-    public class AddProductCommandHandler : IRequestHandler<AddProductCommand, ProductDto>
+    public class AddProductCommandHandler : ICommandHandler<AddProductCommand, ProductDto>
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _productRepository;
@@ -25,14 +25,13 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
             _logger = logger;
         }
 
-        public async Task<ProductDto> Handle(AddProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(AddProductCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 await using var transaction = await _productRepository.BeginTransactionAsync();
-
 
                 var validate = new ProductValidator();
                 var validationResult = validate.Validate(request.Product);
@@ -41,7 +40,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
                 {
                     var supplier = await _supplierRepository.GetSupplierByIdAsync(request.Product.SupplierId, cancellationToken);
 
-                    if (supplier != null)
+                    if (supplier is not null)
                     {
                         _logger.LogInformation("Supplier {SupplierId} already exists. Assigning the product to the existing supplier.", supplier.Id);
                         _supplierRepository.AttachSupplier(supplier);
@@ -63,16 +62,20 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
 
                     var dto = _mapper.Map<ProductDto>(newProduct);
 
-                    return dto;
+                    return Result<ProductDto>.Success(dto);
                 }
                 else
                 {
                     _logger.LogError("Validation failed for product. Rolling back transaction");
                     await transaction.RollbackAsync();
-                    throw new BadRequestException(
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), request.Product.Id.ToString());
-                }
 
+                    var error = new Error(
+                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                        code: "Validation.BadRequest"
+                    );
+
+                    return Result<ProductDto>.Failure(error);
+                }
             }
             catch (Exception ex)
             {

@@ -6,14 +6,15 @@ using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using Microsoft.AspNetCore.Authorization;
-using StockManager.Core.Domain.Dtos.ModelsDto;
+using StockManager.Core.Application.Dtos.ModelsDto;
+using StockManager.Application.Extensions.ErrorExtensions;
 
 namespace StockManager.Controllers
 {
-    [Route("api/products")]
-    [ApiController]
     [Authorize]
-    public class ProductController : ControllerBase
+    [ApiController]
+    [Route("api/products")]
+    public sealed class ProductController : ControllerBase
     {
         private readonly IMediator _mediator;
         private readonly ILogger<ProductController> _logger;
@@ -49,10 +50,10 @@ namespace StockManager.Controllers
 
             var query = new GetProductsQuery(name, genre, unit, expirationDate, deliveredAt);
 
-            var products = await _mediator.Send(query, cancellationToken);
+            var result = await _mediator.Send(query, cancellationToken);
 
-            _logger.LogInformation("Succesfully returns a list of products: {products}", products);
-            return Ok(products);
+            _logger.LogInformation("Succesfully returns a list of products: {products}", result);
+            return Ok(result);
         }
 
         /// <summary>
@@ -68,10 +69,15 @@ namespace StockManager.Controllers
         public async Task<IActionResult> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
         {
 
-            var product = await _mediator.Send(new GetProductByIdQuery(id), cancellationToken);
+            var result = await _mediator.Send(new GetProductByIdQuery(id), cancellationToken);
 
-            _logger.LogInformation("Succesfully found the product with id:{id}", id);
-            return Ok(product);
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Succesfully found the product with id:{id}", id);
+                return Ok(result);
+            }
+
+            return result.Error!.ToActionResult();
         }
 
         /// <summary>
@@ -87,11 +93,18 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
         {
-          
-                var product = await _mediator.Send(new AddProductCommand(productDto), cancellationToken);
 
-                _logger.LogInformation("Succesfully added a new product:{productDto.Id}", productDto.Id);
-                return CreatedAtAction(nameof(GetProductById), new { id = product.Id }, product);
+            var result = await _mediator.Send(new AddProductCommand(productDto), cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                var createdProduct = result.Value!;
+                _logger.LogInformation("Succesfully added a new product:{productDto.Id}", createdProduct.Id);
+
+                return CreatedAtAction(nameof(GetProductById), new { id = productDto.Id }, productDto);
+            }
+
+            return result.Error!.ToActionResult();
         }
 
         /// <summary>
@@ -107,13 +120,21 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> EditProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> EditProduct(
+            [FromBody] ProductDto productDto,
+            [FromRoute] int id,
+            CancellationToken cancellationToken)
         {
-          
-                var product = await _mediator.Send(new EditProductCommand(id), cancellationToken);
 
+            var result = await _mediator.Send(new EditProductCommand(id), cancellationToken);
+
+            if (result.IsSuccess)
+            {
                 _logger.LogInformation("Product with id:{id} succesfully modified", id);
-                return Ok(product);
+                return NoContent();
+            }
+
+            return result.Error!.ToActionResult();
         }
 
         /// <summary>
@@ -128,13 +149,21 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> DeleteProduct([FromBody] ProductDto productDto, [FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<IActionResult> DeleteProduct(
+            [FromBody] ProductDto productDto,
+            [FromRoute] int id,
+            CancellationToken cancellationToken)
         {
-           
-                var product = await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
 
+            var result = await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
+
+            if (result.IsSuccess)
+            {
                 _logger.LogInformation("Provided product with id:{id} deleted succesfully", id);
-                return Ok(product);
+                return NoContent();
+            }
+
+            return result.Error!.ToActionResult();
         }
     }
 }

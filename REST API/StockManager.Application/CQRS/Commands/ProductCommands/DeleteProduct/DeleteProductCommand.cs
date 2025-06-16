@@ -1,9 +1,10 @@
 ﻿using MediatR;
-using StockManager.Core.Domain.Dtos.ModelsDto;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Core.Application.Dtos.ModelsDto;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
 {
-    public sealed class DeleteProductCommand : IRequest<ProductDto>
+    public sealed class DeleteProductCommand : ICommand<ProductDto>
     {
         public int Id { get; set; }
 

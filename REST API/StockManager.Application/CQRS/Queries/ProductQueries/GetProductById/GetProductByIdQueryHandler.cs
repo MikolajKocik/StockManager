@@ -1,12 +1,13 @@
 ﻿using AutoMapper;
 using MediatR;
-using StockManager.Core.Domain.Dtos.ModelsDto;
-using StockManager.Core.Domain.Exceptions;
+using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common;
+using StockManager.Core.Application.Dtos.ModelsDto;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 {
-    public class GetProductByIdQueryHandler : IRequestHandler<GetProductByIdQuery, ProductDto>
+    public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ProductDto>
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _repository;
@@ -16,7 +17,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
             _repository = repository;
         }
 
-        public async Task<ProductDto> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -24,9 +25,20 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 
             var dto = _mapper.Map<ProductDto?>(product);
 
-            if (dto == null) throw new NotFoundException(nameof(ProductDto), request.Id.ToString());
+            if (dto is not null)
+            {
+                return Result<ProductDto>.Success(dto);
 
-            return dto;
+            }
+            else
+            {
+                var error = new Error(
+                    $"Product with id: {product.Id} not found",
+                    code: "Product.NotFound"
+                );
+
+                return Result<ProductDto>.Failure(error);
+            }
         }
     }
 }

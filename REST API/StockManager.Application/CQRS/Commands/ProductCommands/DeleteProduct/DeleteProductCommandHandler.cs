@@ -1,13 +1,13 @@
 ﻿using AutoMapper;
-using MediatR;
 using Microsoft.Extensions.Logging;
-using StockManager.Core.Domain.Dtos.ModelsDto;
-using StockManager.Core.Domain.Exceptions;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common;
+using StockManager.Core.Application.Dtos.ModelsDto;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
 {
-    public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, ProductDto>
+    public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, ProductDto>
     {
         private readonly IMapper _mapper;
         private readonly IProductRepository _repository;
@@ -21,7 +21,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
             _logger = logger;
         }
 
-        public async Task<ProductDto> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -31,21 +31,28 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
             {
                 var product = await _repository.GetProductByIdAsync(request.Id, cancellationToken);
 
-                if (product != null)
+                if (product is not null)
                 {
-                    _logger.LogInformation("Removing the provided product:{@Product}", request);
+                    _logger.LogInformation("Removing the provided product:{@product}", request);
                     var remove = await _repository.DeleteProductAsync(product, cancellationToken);
 
                     var dto = _mapper.Map<ProductDto>(remove);
 
                     await transaction.CommitAsync();
-                    return dto;
+
+                    return Result<ProductDto>.Success(dto);
                 }
                 else
                 {
-                    _logger.LogWarning("Product with id:{request.Id} not found. Rolling back transaction", request.Id);
+                    _logger.LogWarning("Product with id:{@productId} not found. Rolling back transaction", request.Id);
                     await transaction.RollbackAsync();
-                    throw new NotFoundException(nameof(ProductDto), request.Id.ToString());
+
+                    var error = new Error(
+                        $"Product with id {request.Id} not found",
+                        code: "Product.NotFound"
+                    );
+
+                    return Result<ProductDto>.Failure(error);
                 }
             }
             catch (Exception ex)

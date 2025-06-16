@@ -38,5 +38,17 @@ namespace StockManager.Infrastructure.Helpers
                 .ThenInclude(thenInclude)
                 .FirstOrDefaultAsync(predicate, cancellation).ConfigureAwait(false);
         }
+
+        public static async Task<T?> EntityFindAsync<T, I>(
+            I id,          
+            DbContext db,
+            CancellationToken cancellationToken
+            ) 
+            where T : class
+            where I : notnull
+        {
+            return await db.Set<T>()
+                .FindAsync(new object[] { id }, cancellationToken).ConfigureAwait(false);
+        }
     }
 }

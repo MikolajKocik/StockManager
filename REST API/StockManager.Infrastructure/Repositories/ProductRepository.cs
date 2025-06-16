@@ -46,11 +46,6 @@ namespace StockManager.Infrastructure.Repositories
                 .ThenInclude(a => a.Address)
                 .FirstOrDefaultAsync(p => p.Id == product.Id, cancellationToken);
 
-            if (existingProduct == null)
-            {
-                throw new KeyNotFoundException("Product with provided id not found");
-            }
-
             _dbContext.Entry(existingProduct).CurrentValues.SetValues(product);
 
             if (product.SupplierId != existingProduct.SupplierId)
@@ -59,19 +54,19 @@ namespace StockManager.Infrastructure.Repositories
                     .Include(a => a.Address)
                     .FirstOrDefaultAsync(s => s.Id == product.SupplierId);
 
-                if (newSupplier == null)
+                if (newSupplier is null)
                 {
                     newSupplier = existingProduct.Supplier;
                 }
 
                 existingProduct.SetSupplier(newSupplier);
 
-                if (product.Supplier?.Name != null)
+                if (product.Supplier?.Name is not null)
                 {
                     newSupplier.ChangeName(product.Supplier.Name); 
                 }
 
-                if (product.Supplier?.Address != null)
+                if (product.Supplier?.Address is not null)
                 {
                     _dbContext.Entry(existingProduct.Supplier.Address).CurrentValues.SetValues(product.Supplier.Address);
                 }
@@ -79,20 +74,17 @@ namespace StockManager.Infrastructure.Repositories
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
             return existingProduct;
         }
 
         public async Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken)
         {
-            var productExist = await _dbContext.Products.FindAsync(new object[] { product.Id }, cancellationToken);
+            var productExist = await RepositoryQueriesHelpers.EntityFindAsync<Product, int>(product.Id, _dbContext, cancellationToken);
 
-            if (productExist == null)
-            {
-                throw new KeyNotFoundException("Product with provided id not found");
-            }
-
-            _dbContext.Products.Remove(productExist);
+            _dbContext.Products.Remove(productExist!);
             await _dbContext.SaveChangesAsync(cancellationToken);
+
             return productExist;
         }
     }

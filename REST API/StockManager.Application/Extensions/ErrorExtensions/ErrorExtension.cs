@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.Common;
 using StockManager.Application.Helpers.ProblemDetails;
-using System;
+
 namespace StockManager.Application.Extensions.ErrorExtensions
 {
     public static class ErrorExtension
@@ -37,6 +37,6 @@ namespace StockManager.Application.Extensions.ErrorExtensions
                 var c when c.Contains("Validation") => StatusCodes.Status400BadRequest,
                 _ => StatusCodes.Status500InternalServerError
             };
-        }
+        } 
     }
 }

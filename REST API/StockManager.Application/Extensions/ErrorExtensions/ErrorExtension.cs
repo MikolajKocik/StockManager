@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.Common;
+using StockManager.Application.Helpers.ProblemDetails;
 using System;
 namespace StockManager.Application.Extensions.ErrorExtensions
 {
@@ -16,12 +17,14 @@ namespace StockManager.Application.Extensions.ErrorExtensions
 
         public static ProblemDetails ToProblemDetails(this Error error, int? statusCode = null)
         {
+            var typeResult = new ProblemDetailsHelper(error);
+
             return new ProblemDetails
             {
                 Title = error.Message,
                 Status = statusCode ?? GetStatusCode(error),
-                Detail = $"Code : {error.Code}",
-                Type = $"https://localhost:7210/errors/{error.Code.ToLowerInvariant().Replace(".", "-")}"
+                Detail = $"Code: {error.Code}",
+                Type = typeResult.Type
             };
         }
 

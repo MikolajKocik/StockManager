@@ -39,7 +39,7 @@ namespace StockManager.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetProducts(
+        public async Task<ActionResult<ProductDtoCollection>> GetProducts(
             [FromQuery] string? name = null,
             [FromQuery] string? genre = null,
             [FromQuery] string? unit = null,
@@ -53,7 +53,11 @@ namespace StockManager.Controllers
             var result = await _mediator.Send(query, cancellationToken);
 
             _logger.LogInformation("Succesfully returns a list of products: {products}", result);
-            return Ok(result);
+
+            return Ok(new ProductDtoCollection 
+            { 
+                Data = result.Value! 
+            });
         }
 
         /// <summary>
@@ -66,7 +70,7 @@ namespace StockManager.Controllers
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
+        public async Task<ActionResult<ProductDto?>> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
         {
 
             var result = await _mediator.Send(new GetProductByIdQuery(id), cancellationToken);
@@ -74,10 +78,15 @@ namespace StockManager.Controllers
             if (result.IsSuccess)
             {
                 _logger.LogInformation("Succesfully found the product with id:{id}", id);
-                return Ok(result);
+                return Ok(result.Value);
             }
 
-            return result.Error!.ToActionResult();
+            ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
+
+            return new ObjectResult(problem)
+            {
+                StatusCode = problem.Status
+            };
         }
 
         /// <summary>
@@ -91,7 +100,7 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
+        public async Task<ActionResult<ProductDto>> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
         {
 
             var result = await _mediator.Send(new AddProductCommand(productDto), cancellationToken);
@@ -101,10 +110,15 @@ namespace StockManager.Controllers
                 var createdProduct = result.Value!;
                 _logger.LogInformation("Succesfully added a new product:{productDto.Id}", createdProduct.Id);
 
-                return CreatedAtAction(nameof(GetProductById), new { id = productDto.Id }, productDto);
+                return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.Id }, createdProduct);
             }
 
-            return result.Error!.ToActionResult();
+            ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
+
+            return new ObjectResult(problem)
+            {
+                StatusCode = problem.Status
+            };
         }
 
         /// <summary>
@@ -126,7 +140,7 @@ namespace StockManager.Controllers
             CancellationToken cancellationToken)
         {
 
-            var result = await _mediator.Send(new EditProductCommand(id), cancellationToken);
+            var result = await _mediator.Send(new EditProductCommand(id, productDto), cancellationToken);
 
             if (result.IsSuccess)
             {
@@ -150,7 +164,6 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteProduct(
-            [FromBody] ProductDto productDto,
             [FromRoute] int id,
             CancellationToken cancellationToken)
         {

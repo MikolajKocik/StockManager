@@ -41,41 +41,38 @@ namespace StockManager.Infrastructure.Repositories
 
         public async Task<Product?> UpdateProductAsync(Product product, CancellationToken cancellationToken)
         {
-            var existingProduct = await _dbContext.Products
-                .Include(s => s.Supplier)
-                .ThenInclude(a => a.Address)
-                .FirstOrDefaultAsync(p => p.Id == product.Id, cancellationToken);
+            // I attach the entity to EF and force a full update - without downloading the original from the database
+            _dbContext.Attach(product);
+            _dbContext.Entry(product).State = EntityState.Modified;
 
-            _dbContext.Entry(existingProduct).CurrentValues.SetValues(product);
-
-            if (product.SupplierId != existingProduct.SupplierId)
+            if (product.Supplier is not null)
             {
-                var newSupplier = await _dbContext.Suppliers
+                // Try to load the existing supplier with the same ID from the database
+                var existingSupplier = await _dbContext.Suppliers
                     .Include(a => a.Address)
-                    .FirstOrDefaultAsync(s => s.Id == product.SupplierId);
+                    .FirstOrDefaultAsync(s => s.Id == product.SupplierId, cancellationToken);
 
-                if (newSupplier is null)
+                if (existingSupplier is not null)
                 {
-                    newSupplier = existingProduct.Supplier;
+                    // Assign the existing supplier entity to preserve tracking and FK integrity
+                    product.SetSupplier(existingSupplier); 
+
+                    if (product.Supplier?.Name is not null)
+                    {
+                        existingSupplier.ChangeName(product.Supplier.Name);
+                    }
+
+                    if (product.Supplier?.Address is not null)
+                    {
+                        // Update supplier's address fields if they were provided by the client
+                        _dbContext.Entry(existingSupplier.Address).CurrentValues.SetValues(product.Supplier.Address);
+                    }
                 }
-
-                existingProduct.SetSupplier(newSupplier);
-
-                if (product.Supplier?.Name is not null)
-                {
-                    newSupplier.ChangeName(product.Supplier.Name); 
-                }
-
-                if (product.Supplier?.Address is not null)
-                {
-                    _dbContext.Entry(existingProduct.Supplier.Address).CurrentValues.SetValues(product.Supplier.Address);
-                }
-
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return existingProduct;
+            return product;
         }
 
         public async Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken)

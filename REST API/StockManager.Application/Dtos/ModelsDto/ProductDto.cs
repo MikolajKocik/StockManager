@@ -1,5 +1,12 @@
-﻿namespace StockManager.Core.Application.Dtos.ModelsDto
+﻿using StockManager.Application.Common;
+
+namespace StockManager.Core.Application.Dtos.ModelsDto
 {
+    public sealed record ProductDtoCollection
+    {
+        public required IEnumerable<ProductDto> Data { get; init; }
+    }
+
     public sealed class ProductDto
     {
 

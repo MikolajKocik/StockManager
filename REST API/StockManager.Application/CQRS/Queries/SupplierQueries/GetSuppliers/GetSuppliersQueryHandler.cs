@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Query;
@@ -52,7 +51,7 @@ namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers
                     s => EF.Functions.Like(s.Address.PostalCode, $"%{request.Address!.PostalCode}%"))
                 .IfHasValue(
                     productIds is not null,
-                    s => s.Products.Any(p => productIds.Contains(p.Id)));
+                    s => s.Products.Any(p => productIds!.Contains(p.Id)));
 
             var result = _mapper.Map<IEnumerable<SupplierDto>>(await suppliers.ToListAsync());
 

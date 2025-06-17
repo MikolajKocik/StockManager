@@ -2,7 +2,7 @@
 
 namespace StockManager.Application.Abstractions.CQRS.Query.QueryHelpers.Supplier
 {
-    public static class SupplierQueries
+    internal static class SupplierQueries
     {
         public static IQueryable<TEntity> IfHasValue<TEntity>(
             this IQueryable<TEntity> source,

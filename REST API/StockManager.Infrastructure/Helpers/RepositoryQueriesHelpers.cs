@@ -15,30 +15,6 @@ namespace StockManager.Infrastructure.Helpers
             return entity;
         }
 
-        public static async Task<T?> GetEntityWithIncludeAsync<T, TProperty>(
-            DbContext db,
-            Expression<Func<T, TProperty>> include,
-            Expression<Func<T, bool>> predicate,
-            CancellationToken cancellation) where T : class
-        {
-            return await db.Set<T>()
-                .Include(include)
-                .FirstOrDefaultAsync(predicate, cancellation).ConfigureAwait(false);
-        }
-
-        public static async Task<T?> GetEntityWithNestedIncludeAsync<T, TProperty, TThenProperty>(
-            DbContext db,
-            Expression<Func<T, TProperty>> include,
-            Expression<Func<TProperty, TThenProperty>> thenInclude,
-            Expression<Func<T, bool>> predicate,
-            CancellationToken cancellation) where T : class
-        {
-            return await db.Set<T>()
-                .Include(include)
-                .ThenInclude(thenInclude)
-                .FirstOrDefaultAsync(predicate, cancellation).ConfigureAwait(false);
-        }
-
         public static async Task<T?> EntityFindAsync<T, I>(
             I id,          
             DbContext db,

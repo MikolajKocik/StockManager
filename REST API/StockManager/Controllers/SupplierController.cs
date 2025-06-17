@@ -1,10 +1,12 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
 using StockManager.Application.Dtos.ModelsDto.Address;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Extensions.ErrorExtensions;
 
 namespace StockManager.Controllers
 {
@@ -24,10 +26,10 @@ namespace StockManager.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<SupplierDto>> GetSuppliers(
-            string? name = null,
-            AddressDto? address = null,
-            IEnumerable<ProductDto>? products = null,
+        public async Task<ActionResult<SupplierDtoCollection>> GetSuppliers(
+            [FromQuery] string? name = null,
+            [FromQuery] AddressDto? address = null,
+            [FromQuery] IEnumerable<ProductDto>? products = null,
             CancellationToken cancellationToken = default
             )
         {
@@ -42,5 +44,32 @@ namespace StockManager.Controllers
                 Data = result.Value!
             });
         }
+
+        [HttpGet("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<SupplierDto>> GetSupplierById(
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new GetSupplierByIdQuery(id), cancellationToken);
+
+            if(result.IsSuccess)
+            {
+                _logger.LogInformation("Supplier {@supplier} found successfull", result.Value);
+
+                return Ok(result.Value);
+            }
+
+            ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error! , 404);
+
+            return new ObjectResult(problem)
+            {
+                StatusCode = problem.Status
+            };
+        }
+
+
     }
 }

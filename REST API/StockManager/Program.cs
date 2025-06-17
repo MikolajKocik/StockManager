@@ -53,7 +53,7 @@ builder.Services.Scan(scan => scan
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP command pipeline.
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -62,7 +62,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//serilog requests
+//serilog commands
 app.UseSerilogRequestLogging();
 
 // Automatically checks pending migrations and update database

@@ -25,30 +25,30 @@ namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers
             _logger = logger;
         }
 
-        public async Task<Result<IEnumerable<SupplierDto>>> Handle(GetSuppliersQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<SupplierDto>>> Handle(GetSuppliersQuery query, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
             _logger.LogInformation("Preparing suppliers data for use.");
 
             // adding list of product ids to supplier query if products field provided
-            var productIds = request.products?.Any() is true 
-                ? request.products?.Select(p => p.Id).ToList() 
+            var productIds = query.products?.Any() is true 
+                ? query.products?.Select(p => p.Id).ToList() 
                 : null;
 
             var suppliers = _supplierRepository.GetSuppliers()
                 .IfHasValue(
-                    !string.IsNullOrWhiteSpace(request.Name),
-                    s => EF.Functions.Like(s.Name, $"%{request.Name}%"))
+                    !string.IsNullOrWhiteSpace(query.Name),
+                    s => EF.Functions.Like(s.Name, $"%{query.Name}%"))
                 .IfHasValue(
-                    !string.IsNullOrWhiteSpace(request.Address?.City),
-                    s => EF.Functions.Like(s.Address.City, $"%{request.Address!.City}%"))
+                    !string.IsNullOrWhiteSpace(query.Address?.City),
+                    s => EF.Functions.Like(s.Address.City, $"%{query.Address!.City}%"))
                 .IfHasValue(
-                    !string.IsNullOrWhiteSpace(request.Address?.Country),
-                    s => EF.Functions.Like(s.Address.Country, $"%{request.Address!.Country}%"))
+                    !string.IsNullOrWhiteSpace(query.Address?.Country),
+                    s => EF.Functions.Like(s.Address.Country, $"%{query.Address!.Country}%"))
                 .IfHasValue(
-                    !string.IsNullOrWhiteSpace(request.Address?.PostalCode),
-                    s => EF.Functions.Like(s.Address.PostalCode, $"%{request.Address!.PostalCode}%"))
+                    !string.IsNullOrWhiteSpace(query.Address?.PostalCode),
+                    s => EF.Functions.Like(s.Address.PostalCode, $"%{query.Address!.PostalCode}%"))
                 .IfHasValue(
                     productIds is not null,
                     s => s.Products.Any(p => productIds!.Contains(p.Id)));

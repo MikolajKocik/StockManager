@@ -22,21 +22,19 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
             _logger = logger;
         }
 
-        public async Task<Result<ProductDto>> Handle(EditProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(EditProductCommand command, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await using var transaction = await _repository.BeginTransactionAsync();
-
             try
             {
-                var product = await _repository.GetProductByIdAsync(request.Id, cancellationToken);
+                await using var transaction = await _repository.BeginTransactionAsync();
+
+                var product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
                 if (product is not null)
                 { 
-                    _logger.LogInformation("Modifying the provided product:{@productId} with {@modifiedProduct}", request.Id, request);
-
-                    product = _mapper.Map(request.Product, product);
+                    _logger.LogInformation("Modifying the provided product:{@productId} with {@modifiedProduct}", command.Id, command);
 
                     var updateProduct = await _repository.UpdateProductAsync(product, cancellationToken);
 
@@ -58,7 +56,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
 
                         var error = new Error(
                             string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                            code: $"Validation.BadRequest"
+                            code: $"Validation.Badcommand"
                         );
 
                         return Result<ProductDto>.Failure(error);
@@ -66,11 +64,11 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct
                 }
                 else
                 {
-                    _logger.LogWarning("Product with id:{@productId} not found. Rolling back transaction", request.Id);
+                    _logger.LogWarning("Product with id:{@productId} not found. Rolling back transaction", command.Id);
                     await transaction.RollbackAsync();
 
                     var error = new Error(
-                        $"Product with id {request.Id} not found",
+                        $"Product with id {command.Id} not found",
                         code: "Product.NotFound"
                     );
 

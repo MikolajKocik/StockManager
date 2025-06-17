@@ -14,18 +14,15 @@ namespace StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier
     {
         private readonly IMapper _mapper;
         private readonly ISupplierRepository _supplierRepository;
-        private readonly IProductRepository _productRepository;
         private readonly ILogger<AddSupplierCommandHandler> _logger;
 
         public AddSupplierCommandHandler(
             IMapper mapper,
             ISupplierRepository supplierRepository,
-            IProductRepository productRepository,
             ILogger<AddSupplierCommandHandler> logger)
         {
             _mapper = mapper;
             _supplierRepository = supplierRepository;
-            _productRepository = productRepository;
             _logger = logger;
         }
 
@@ -35,7 +32,7 @@ namespace StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                await using var transaction = await _productRepository.BeginTransactionAsync();
+                await using var transaction = await _supplierRepository.BeginTransactionAsync();
 
                 var validate = new SupplierValidator();
                 var validationResult = validate.Validate(command.Supplier);

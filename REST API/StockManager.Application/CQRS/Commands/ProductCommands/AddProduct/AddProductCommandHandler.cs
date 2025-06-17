@@ -25,20 +25,21 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
             _logger = logger;
         }
 
-        public async Task<Result<ProductDto>> Handle(AddProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
 
                 await using var transaction = await _productRepository.BeginTransactionAsync();
 
                 var validate = new ProductValidator();
-                var validationResult = validate.Validate(request.Product);
+                var validationResult = validate.Validate(command.Product);
 
                 if (validationResult.IsValid)
                 {
-                    var supplier = await _supplierRepository.GetSupplierByIdAsync(request.Product.SupplierId, cancellationToken);
+                    var supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
 
                     if (supplier is not null)
                     {
@@ -47,15 +48,15 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
                     }
                     else
                     {
-                        _logger.LogWarning("Supplier with ID {SupplierId} does not exist. Creating a new supplier.", request.Product.SupplierId);
-                        supplier = _mapper.Map<Supplier>(request.Product.Supplier);
+                        _logger.LogWarning("Supplier with ID {SupplierId} does not exist. Creating a new supplier.", command.Product.SupplierId);
+                        supplier = _mapper.Map<Supplier>(command.Product.Supplier);
                         await _supplierRepository.AddSupplierAsync(supplier, cancellationToken);
                     }
 
-                    var product = _mapper.Map<Product>(request.Product);
+                    var product = _mapper.Map<Product>(command.Product);
                     product.SetSupplier(supplier);
 
-                    _logger.LogInformation("Adding a new product {request.Product} to database", request.Product);
+                    _logger.LogInformation("Adding a new product {command.Product} to database", command.Product);
                     var newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
 
                     await transaction.CommitAsync();
@@ -71,7 +72,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
 
                     var error = new Error(
                         string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                        code: "Validation.BadRequest"
+                        code: "Validation.Badcommand"
                     );
 
                     return Result<ProductDto>.Failure(error);

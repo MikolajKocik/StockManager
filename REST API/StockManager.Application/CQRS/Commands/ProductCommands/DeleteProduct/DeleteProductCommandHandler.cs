@@ -21,19 +21,19 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
             _logger = logger;
         }
 
-        public async Task<Result<ProductDto>> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            await using var transaction = await _repository.BeginTransactionAsync();
-
             try
             {
-                var product = await _repository.GetProductByIdAsync(request.Id, cancellationToken);
+                await using var transaction = await _repository.BeginTransactionAsync();
+
+                var product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
                 if (product is not null)
                 {
-                    _logger.LogInformation("Removing the provided product:{@product}", request);
+                    _logger.LogInformation("Removing the provided product:{@product}", command);
                     var remove = await _repository.DeleteProductAsync(product, cancellationToken);
 
                     var dto = _mapper.Map<ProductDto>(remove);
@@ -44,11 +44,11 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
                 }
                 else
                 {
-                    _logger.LogWarning("Product with id:{@productId} not found. Rolling back transaction", request.Id);
+                    _logger.LogWarning("Product with id:{@productId} not found. Rolling back transaction", command.Id);
                     await transaction.RollbackAsync();
 
                     var error = new Error(
-                        $"Product with id {request.Id} not found",
+                        $"Product with id {command.Id} not found",
                         code: "Product.NotFound"
                     );
 

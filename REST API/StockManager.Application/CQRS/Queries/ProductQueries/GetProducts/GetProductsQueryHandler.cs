@@ -5,6 +5,7 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Abstractions.CQRS.Query.QueryHelpers.Supplier;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
@@ -19,52 +20,47 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
             _repository = repository;
         }
 
-        public async Task<Result<IEnumerable<ProductDto>>> Handle(GetProductsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IEnumerable<ProductDto>>> Handle(GetProductsQuery query, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var products = _repository.GetProducts(); // product with IQueryable
+            var products = _repository.GetProducts()
+                .IfHasValue(
+                    !string.IsNullOrWhiteSpace(query.Name),
+                    p => EF.Functions.Like(p.Name, $"%{query.Name}%"))
+                .IfHasValue(
+                    !string.IsNullOrWhiteSpace(query.Unit),
+                    p => p.Unit != null && EF.Functions.Like(p.Unit, $"%{query.Unit}%"))
+                .IfHasValue(
+                    query.DeliveredAt.HasValue,
+                    p => p.DeliveredAt.Date == query.DeliveredAt!.Value.Date); 
 
-            if (!string.IsNullOrWhiteSpace(request.Name))
-            {
-                products = products.Where(p => EF.Functions.Like(p.Name, $"%{request.Name}%"));
-            }
 
-            if (!string.IsNullOrWhiteSpace(request.Warehouse))
+            if (!string.IsNullOrWhiteSpace(query.Warehouse))
             {
-                if (Enum.TryParse<Warehouse>(request.Warehouse, true, out var warehouse))
+                if (Enum.TryParse<Warehouse>(query.Warehouse, true, out var warehouse))
                 {
 
                     products = products.Where(p => p.Type == warehouse);
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Genre))
+            if (!string.IsNullOrWhiteSpace(query.Genre))
             {
-                if (Enum.TryParse<Genre>(request.Genre, true, out var genre))
+                if (Enum.TryParse<Genre>(query.Genre, true, out var genre))
                 {
                     products = products.Where(p => p.Genre == genre);
                 }
             }
 
-            if (!string.IsNullOrWhiteSpace(request.Unit))
+            if (query.ExpirationDate.HasValue)
             {
-                products = products.Where(p => p.Unit != null && EF.Functions.Like(p.Unit, $"%{request.Unit}%"));
-            }
-
-            if (request.ExpirationDate.HasValue)
-            {
-                products = products.Where(p => p.ExpirationDate.Date == request.ExpirationDate.Value.Date);
+                products = products.Where(p => p.ExpirationDate.Date == query.ExpirationDate.Value.Date);
             }
             else
             {
                 DateTime soon = DateTime.Today.AddDays(14);
                 products = products.Where(p => p.ExpirationDate >= DateTime.Today && p.ExpirationDate <= soon);
-            }
-
-            if (request.DeliveredAt.HasValue)
-            {
-                products = products.Where(p => p.DeliveredAt.Date == request.DeliveredAt.Value.Date);
             }
 
             var dtos = _mapper.Map<IEnumerable<ProductDto>>(await products.ToListAsync(cancellationToken));

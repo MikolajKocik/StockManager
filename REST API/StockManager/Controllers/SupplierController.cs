@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
+using StockManager.Application.CQRS.Commands.SupplierCommands.EditSupplier;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
 using StockManager.Application.Dtos.ModelsDto.Address;
@@ -75,7 +76,10 @@ namespace StockManager.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<SupplierDto>> AddSupplier([FromBody] SupplierDto supplierDto, CancellationToken cancellationToken)
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<ActionResult<SupplierDto>> AddSupplier(
+            [FromBody] SupplierDto supplierDto,
+            CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new AddSupplierCommand(supplierDto), cancellationToken);
 
@@ -93,6 +97,30 @@ namespace StockManager.Controllers
             };
         }
 
+        [HttpPut("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
 
+        public async Task<IActionResult> UpdateSupplier(
+            [FromRoute] Guid id,
+            [FromBody] SupplierDto supplierDto,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new EditSupplierCommand(id, supplierDto), cancellationToken);
+
+            if(result.IsSuccess)
+            {
+                _logger.LogInformation("Supplier with ID {id} updated successfully", id);
+                return NoContent();
+            }
+
+            ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
+            _logger.LogError("Error occurred while updating supplier with ID {id}: {error}", id, result.Error);
+
+            return new ObjectResult(problem)
+            {
+                StatusCode = problem.Status
+            };
+        }
     }
 }

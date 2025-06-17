@@ -17,11 +17,11 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
             _repository = repository;
         }
 
-        public async Task<Result<ProductDto>> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ProductDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var product = await _repository.GetProductByIdAsync(request.Id, cancellationToken);
+            var product = await _repository.GetProductByIdAsync(query.Id, cancellationToken);
 
             var dto = _mapper.Map<ProductDto?>(product);
 
@@ -33,7 +33,7 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
             else
             {
                 var error = new Error(
-                    $"Product with id: {product.Id} not found",
+                    $"Product with id: {product!.Id} not found",
                     code: "Product.NotFound"
                 );
 

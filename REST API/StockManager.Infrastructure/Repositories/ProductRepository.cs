@@ -25,10 +25,11 @@ namespace StockManager.Infrastructure.Repositories
 
         public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
         {
-            Expression<Func<Product, bool>> predicate = p => p.Id == id;
 
-            return await RepositoryQueriesHelpers.GetEntityWithNestedIncludeAsync(
-                _dbContext, s => s.Supplier, a => a.Address, predicate, cancellationToken);
+            return await _dbContext.Products
+                .Include(s => s.Supplier)
+                .ThenInclude(a => a.Address)
+                .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
         }
 
         public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)

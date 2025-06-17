@@ -8,6 +8,7 @@ using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using Microsoft.AspNetCore.Authorization;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Models;
 
 namespace StockManager.Controllers
 {
@@ -180,5 +181,13 @@ namespace StockManager.Controllers
 
             return result.Error!.ToActionResult();
         }
+
+        [HttpGet("genres")]
+        public ActionResult<Genre> GetGenres()
+            => Ok(Enum.GetNames(typeof(Genre)));
+
+        [HttpGet("warehouses")]
+        public ActionResult<Warehouse> GetWarehouses()
+            => Ok(Enum.GetNames(typeof(Warehouse)));
     }
 }

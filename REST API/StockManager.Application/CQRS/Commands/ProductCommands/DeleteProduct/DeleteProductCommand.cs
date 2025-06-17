@@ -4,7 +4,7 @@ using StockManager.Application.Dtos.ModelsDto.Product;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
 {
-    public sealed class DeleteProductCommand : ICommand<ProductDto>
+    public sealed record DeleteProductCommand : ICommand<ProductDto>
     {
         public int Id { get; }
 

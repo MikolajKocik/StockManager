@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
+using StockManager.Application.CQRS.Commands.SupplierCommands.DeleteSupplier;
 using StockManager.Application.CQRS.Commands.SupplierCommands.EditSupplier;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
@@ -116,6 +117,33 @@ namespace StockManager.Controllers
 
             ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
             _logger.LogError("Error occurred while updating supplier with ID {id}: {error}", id, result.Error);
+
+            return new ObjectResult(problem)
+            {
+                StatusCode = problem.Status
+            };
+        }
+
+        [HttpDelete("{id:guid}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
+        public async Task<IActionResult> DeleteSupplier(
+            [FromRoute] Guid id,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new DeleteSupplierCommand(id), cancellationToken);
+
+            if (result.IsSuccess)
+            {
+                _logger.LogInformation("Supplier with ID {id} deleted successfully", id);
+                return NoContent();
+            }
+
+            ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
+
+            _logger.LogError("Error occurred while deleting supplier with ID {id}: {error}", id, result.Error);
 
             return new ObjectResult(problem)
             {

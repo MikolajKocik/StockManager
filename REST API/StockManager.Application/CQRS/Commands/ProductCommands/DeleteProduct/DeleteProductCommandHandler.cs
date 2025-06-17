@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
@@ -49,7 +50,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
 
                     var error = new Error(
                         $"Product with id {command.Id} not found",
-                        code: "Product.NotFound"
+                        ErrorCodes.ProductNotFound
                     );
 
                     return Result<ProductDto>.Failure(error);

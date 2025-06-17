@@ -64,5 +64,15 @@ namespace StockManager.Infrastructure.Repositories
         {
             _dbContext.Suppliers.Attach(supplier);
         }
+
+        public async Task<Supplier?> DeleteSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+        {
+            var supplierExist = await RepositoryQueriesHelpers.EntityFindAsync<Supplier, Guid>(supplier.Id, _dbContext, cancellationToken);
+
+            _dbContext.Suppliers.Remove(supplierExist!);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return supplierExist;
+        }
     }
 }

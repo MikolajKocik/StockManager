@@ -17,6 +17,12 @@ namespace StockManager.Infrastructure.Repositories
             _dbContext = dbcontext;
         }
 
+        public IQueryable<Supplier> GetSuppliers()
+            => _dbContext.Suppliers
+                .AsNoTracking()
+                .Include(s => s.Address)
+                .Include(s => s.Products);
+
         public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
         {
             Expression<Func<Supplier, bool>> predicate = s => s.Id == supplierId;

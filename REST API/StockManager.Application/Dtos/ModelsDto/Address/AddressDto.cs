@@ -1,4 +1,4 @@
-﻿namespace StockManager.Core.Application.Dtos.ModelsDto
+﻿namespace StockManager.Application.Dtos.ModelsDto.Address
 {
     public sealed class AddressDto
     {

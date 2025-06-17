@@ -1,5 +1,8 @@
-﻿namespace StockManager.Core.Application.Dtos.ModelsDto
+﻿using StockManager.Application.Dtos.ModelsDto.Address;
+
+namespace StockManager.Application.Dtos.ModelsDto.Supplier
 {
+
     public sealed class SupplierDto
     {
         public Guid Id { get; set; }

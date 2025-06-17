@@ -1,5 +1,5 @@
 ﻿using StockManager.Application.Abstractions.CQRS.Query;
-using StockManager.Core.Application.Dtos.ModelsDto;
+using StockManager.Application.Dtos.ModelsDto.Product;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 {

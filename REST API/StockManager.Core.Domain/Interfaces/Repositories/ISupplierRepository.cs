@@ -7,5 +7,6 @@ namespace StockManager.Core.Domain.Interfaces.Repositories
         Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken);
         Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken);
         void AttachSupplier(Supplier supplier);
+        IQueryable<Supplier> GetSuppliers();
     }
 }

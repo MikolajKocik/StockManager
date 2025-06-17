@@ -1,10 +1,11 @@
 ﻿using StockManager.Application.Abstractions.CQRS.Query;
-using StockManager.Core.Application.Dtos.ModelsDto;
+using StockManager.Application.Dtos.ModelsDto.Product;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
     public sealed record GetProductsQuery(
         string? Name,
+        string? Warehouse,
         string? Genre,
         string? Unit,
         DateTime? ExpirationDate,

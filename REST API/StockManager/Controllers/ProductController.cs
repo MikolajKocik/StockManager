@@ -6,8 +6,8 @@ using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using Microsoft.AspNetCore.Authorization;
-using StockManager.Core.Application.Dtos.ModelsDto;
 using StockManager.Application.Extensions.ErrorExtensions;
+using StockManager.Application.Dtos.ModelsDto.Product;
 
 namespace StockManager.Controllers
 {
@@ -31,6 +31,7 @@ namespace StockManager.Controllers
         /// </summary>
         /// <param name="name">product name</param>
         /// <param name="genre">product's genre</param>
+        /// <param name="warehouse">product's warehouse</param>
         /// <param name="unit">unit of product</param>
         /// <param name="expirationDate">product expiration date</param>
         /// <param name="deliveredAt">product delivery date</param>
@@ -41,6 +42,7 @@ namespace StockManager.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<ProductDtoCollection>> GetProducts(
             [FromQuery] string? name = null,
+            [FromQuery] string? warehouse = null,
             [FromQuery] string? genre = null,
             [FromQuery] string? unit = null,
             [FromQuery] DateTime? expirationDate = null,
@@ -48,7 +50,7 @@ namespace StockManager.Controllers
             CancellationToken cancellationToken = default)
         {
 
-            var query = new GetProductsQuery(name, genre, unit, expirationDate, deliveredAt);
+            var query = new GetProductsQuery(name, warehouse, genre, unit, expirationDate, deliveredAt);
 
             var result = await _mediator.Send(query, cancellationToken);
 

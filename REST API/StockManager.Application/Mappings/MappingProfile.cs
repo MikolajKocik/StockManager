@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using StockManager.Application.Dtos.ModelsDto.Address;
+using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Core.Application.Dtos.Authorization;
-using StockManager.Core.Application.Dtos.ModelsDto;
 using StockManager.Core.Domain.Models;
 using StockManager.Models;
 

@@ -2,7 +2,7 @@
 using MediatR;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common;
-using StockManager.Core.Application.Dtos.ModelsDto;
+using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById

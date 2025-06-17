@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common;
-using StockManager.Core.Application.Dtos.ModelsDto;
+using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct

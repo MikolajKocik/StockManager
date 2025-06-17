@@ -2,9 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using StockManager.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Application.Dtos.ModelsDto;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common;
+using StockManager.Application.Dtos.ModelsDto.Product;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
@@ -28,6 +28,15 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
             if (!string.IsNullOrWhiteSpace(request.Name))
             {
                 products = products.Where(p => EF.Functions.Like(p.Name, $"%{request.Name}%"));
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Warehouse))
+            {
+                if (Enum.TryParse<Warehouse>(request.Warehouse, true, out var warehouse))
+                {
+
+                    products = products.Where(p => p.Type == warehouse);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(request.Genre))

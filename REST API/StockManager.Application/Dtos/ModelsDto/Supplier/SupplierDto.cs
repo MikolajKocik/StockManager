@@ -10,7 +10,7 @@ namespace StockManager.Application.Dtos.ModelsDto.Supplier
         public required string Name { get; set; }
         public AddressDto? Address { get; set; }
         public Guid? AddressId { get; set; }
-        public required List<ProductDto> Products { get; set; }
+        public List<ProductDto>? Products { get; set; }
     }
 }
 

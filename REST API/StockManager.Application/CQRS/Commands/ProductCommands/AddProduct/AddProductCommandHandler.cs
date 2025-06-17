@@ -67,7 +67,7 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
                 else
                 {
                     _logger.LogError("Validation failed for product. Rolling back transaction");
-                    await transaction.RollbackAsync();
+                    await transaction.RollbackAsync(cancellationToken);
 
                     var error = new Error(
                         string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),

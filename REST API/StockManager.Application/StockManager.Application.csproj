@@ -17,8 +17,4 @@
     <ProjectReference Include="..\StockManager.Core.Domain\StockManager.Core.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CQRS\Commands\SupplierCommands\" />
-  </ItemGroup>
-
 </Project>

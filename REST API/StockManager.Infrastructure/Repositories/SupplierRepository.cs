@@ -23,7 +23,7 @@ namespace StockManager.Infrastructure.Repositories
                 .Include(s => s.Address)
                 .Include(s => s.Products);
 
-        public async Task<Supplier?> GetSupplierByIdAsync(Guid supplierId, CancellationToken cancellationToken)
+        public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
         {
             return await _dbContext.Suppliers
                 .Include(s => s.Address)

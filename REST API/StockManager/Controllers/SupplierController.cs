@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
 using StockManager.Application.Dtos.ModelsDto.Address;
@@ -63,6 +64,28 @@ namespace StockManager.Controllers
             }
 
             ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error! , 404);
+            _logger.LogError("Error occurred while retrieving supplier by ID {id}: {error}", id, result.Error);
+
+            return new ObjectResult(problem)
+            {
+                StatusCode = problem.Status
+            };
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<SupplierDto>> AddSupplier([FromBody] SupplierDto supplierDto, CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(new AddSupplierCommand(supplierDto), cancellationToken);
+
+            if(result.IsSuccess)
+            {
+                return CreatedAtAction(nameof(GetSupplierById), new { id = result.Value!.Id }, result.Value);
+            }
+
+            ProblemDetails? problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
+            _logger.LogError("Error occurred while adding supplier: {error}", result.Error);
 
             return new ObjectResult(problem)
             {

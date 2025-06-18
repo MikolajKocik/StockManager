@@ -14,7 +14,6 @@ namespace StockManager.Application.Dtos.ModelsDto.Product
         public int Quantity { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime DeliveredAt { get; set; }
-        public required string Warehouse { get; set; }
         public required string BatchNumber { get; set; } 
         public SupplierDto? Supplier { get; set; }
         public Guid? SupplierId { get; set; }

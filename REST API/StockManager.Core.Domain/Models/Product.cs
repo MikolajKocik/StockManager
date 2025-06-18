@@ -1,5 +1,4 @@
-﻿using System;
-using UUIDNext;
+﻿using UUIDNext;
 
 namespace StockManager.Models
 {

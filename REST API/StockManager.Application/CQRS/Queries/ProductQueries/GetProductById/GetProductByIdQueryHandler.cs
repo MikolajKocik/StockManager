@@ -3,6 +3,7 @@ using MediatR;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
@@ -23,22 +24,19 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 
             var product = await _repository.GetProductByIdAsync(query.Id, cancellationToken);
 
-            var dto = _mapper.Map<ProductDto?>(product);
-
-            if (dto is not null)
-            {
-                return Result<ProductDto>.Success(dto);
-
-            }
-            else
+            if (product is null)
             {
                 var error = new Error(
-                    $"Product with id: {product!.Id} not found",
-                    code: "Product.NotFound"
+                    $"Product with id: {query.Id} not found",
+                    ErrorCodes.ProductNotFound
                 );
 
                 return Result<ProductDto>.Failure(error);
             }
+
+            var dto = _mapper.Map<ProductDto>(product);
+
+            return Result<ProductDto>.Success(dto);
         }
     }
 }

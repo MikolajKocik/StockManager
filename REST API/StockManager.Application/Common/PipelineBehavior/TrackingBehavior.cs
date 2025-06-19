@@ -44,6 +44,7 @@ namespace StockManager.Application.Common.PipelineBehavior
             }
         }
 
+        // reflection 
         private void TryLogBusinessFailure(object? response)
         {
             if (response is null)

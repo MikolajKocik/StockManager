@@ -1,7 +1,9 @@
 ﻿using FluentValidation;
 using FluentValidation.AspNetCore;
+using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Services.Auth;
 using StockManager.Core.Domain.Interfaces.Services;
 
@@ -24,6 +26,8 @@ namespace StockManager.Application.Extensions
             services.AddHttpContextAccessor();
 
             services.AddScoped<IAuthService, AuthService>();
+
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));
         }
     }
 }

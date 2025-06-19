@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -27,8 +27,6 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
 
         public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             try
             {
 

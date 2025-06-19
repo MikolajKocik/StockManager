@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StockManager.Application.Common
+namespace StockManager.Application.Common.ResultPattern
 {
     public sealed class Error
     {

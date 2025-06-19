@@ -1,4 +1,4 @@
-﻿using StockManager.Application.Common;
+﻿using StockManager.Application.Common.ResultPattern;
 using StockManager.Core.Application.Dtos.Authorization;
 
 namespace StockManager.Core.Domain.Interfaces.Services

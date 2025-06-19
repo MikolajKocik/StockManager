@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using StockManager.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Application.Abstractions.CQRS.Query;
-using StockManager.Application.Common;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Abstractions.CQRS.Query.QueryHelpers.Supplier;
+using StockManager.Application.Common.ResultPattern;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 {
@@ -22,8 +22,6 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts
 
         public async Task<Result<IEnumerable<ProductDto>>> Handle(GetProductsQuery query, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var products = _repository.GetProducts()
                 .IfHasValue(
                     !string.IsNullOrWhiteSpace(query.Name),

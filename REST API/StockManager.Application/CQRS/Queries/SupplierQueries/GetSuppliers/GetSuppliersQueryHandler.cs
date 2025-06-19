@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Abstractions.CQRS.Query.QueryHelpers.Supplier;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
@@ -27,8 +27,6 @@ namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers
 
         public async Task<Result<IEnumerable<SupplierDto>>> Handle(GetSuppliersQuery query, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             _logger.LogInformation("Preparing suppliers data for use.");
 
             // adding list of product ids to supplier query if products field provided

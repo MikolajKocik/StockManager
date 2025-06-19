@@ -2,7 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models;

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
-using MediatR;
 using StockManager.Application.Abstractions.CQRS.Query;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -20,8 +19,6 @@ namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
 
         public async Task<Result<ProductDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var product = await _repository.GetProductByIdAsync(query.Id, cancellationToken);
 
             if (product is null)

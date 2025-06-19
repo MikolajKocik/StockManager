@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using StockManager.Application.Abstractions.CQRS.Query;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -19,8 +19,6 @@ namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById
         }
         public async Task<Result<SupplierDto>> Handle(GetSupplierByIdQuery query, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             var getSupplier = await _supplierRepository.GetSupplierByIdAsync(query.Id, cancellationToken);
 
             if(getSupplier is null)

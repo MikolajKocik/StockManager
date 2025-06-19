@@ -1,4 +1,4 @@
-﻿using StockManager.Application.Common;
+﻿using StockManager.Application.Common.ResultPattern;
 
 namespace StockManager.Application.Abstractions.CQRS.Query
 {

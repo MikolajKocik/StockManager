@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -24,8 +24,6 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct
 
         public async Task<Result<ProductDto>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-
             try
             {
                 await using var transaction = await _repository.BeginTransactionAsync();

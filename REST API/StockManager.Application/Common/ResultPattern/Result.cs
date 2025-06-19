@@ -1,6 +1,6 @@
-﻿namespace StockManager.Application.Common
+﻿namespace StockManager.Application.Common.ResultPattern
 {
-    public sealed class Result<T>
+    public sealed class Result<T> : IResult
     {
         // Represents successfull action
         public Result(T value)

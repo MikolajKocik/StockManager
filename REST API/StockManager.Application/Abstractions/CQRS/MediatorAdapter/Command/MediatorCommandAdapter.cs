@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 
 namespace StockManager.Application.Abstractions.CQRS.MediatorAdapter.Command
 {

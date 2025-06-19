@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
@@ -30,8 +30,6 @@ namespace StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier
         {
             try
             {
-                cancellationToken.ThrowIfCancellationRequested();
-
                 await using var transaction = await _supplierRepository.BeginTransactionAsync();
 
                 var validate = new SupplierValidator();

@@ -5,7 +5,8 @@ using System.Reflection;
 namespace StockManager.Application.Common.PipelineBehavior
 {
     public sealed class TrackingBehavior<TRequest, TResponse> 
-        : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+        : IPipelineBehavior<TRequest, TResponse> 
+        where TRequest : notnull
     {
         private readonly ILogger<TrackingBehavior<TRequest, TResponse>> _logger;
 
@@ -24,27 +25,30 @@ namespace StockManager.Application.Common.PipelineBehavior
                 // checks if request was cancelled
                 cancellationToken.ThrowIfCancellationRequested();
 
+                // check if next is null
+                ArgumentNullException.ThrowIfNull(next);
+
                 // runs the actual handler logic
-                var response = await next();
+                var response = await next().ConfigureAwait(false);             
 
                 // tries to log business-level failure, if one occurred
                 TryLogBusinessFailure(response);
 
                 return response;
             }
-            catch (OperationCanceledException)
+            catch (OperationCanceledException ex)
             {
-                _logger.LogInformation("Request for {RequestType} was cancelled", typeof(TRequest).Name);
+                TrackingBehaviorLogMessages.LogRequestCancelled(_logger, typeof(TRequest).Name, ex);
                 throw;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Unhandled exception in request {RequestType}", typeof(TRequest).Name);
+                TrackingBehaviorLogMessages.LogUnhandledException(_logger, typeof(TRequest).Name, ex);
                 throw;
             }
         }
 
-        // reflection 
+        // reflection for result pattern response
         private void TryLogBusinessFailure(object? response)
         {
             if (response is null)
@@ -59,19 +63,18 @@ namespace StockManager.Application.Common.PipelineBehavior
                 var rawValue = isSuccessProp.GetValue(response);
                 
                 // sillently skip if null or not bool 
-                if (rawValue is not bool isSuccess)
+                if (rawValue is not bool IsSuccess)
                     return;
 
                 // if Result<>.Failure(), try to log the error info
-                if (!isSuccess)
+                if (!IsSuccess)
                 {
                     var error = errorProp.GetValue(response);
 
                     string? errorMessage = error?.GetType().GetProperty("Message")?.GetValue(error)?.ToString();
                     string? errorCode = error?.GetType().GetProperty("Error")?.GetValue(error)?.ToString();
 
-                    _logger.LogWarning("Business failure in {RequestType}: {ErrorCode} - {ErrorMessage}",
-                        typeof(TRequest).Name, errorCode, errorMessage);
+                    TrackingBehaviorLogMessages.LogBussinessFailure(_logger, typeof(TRequest).Name, errorCode, errorMessage, default);
                 }
             }
         }

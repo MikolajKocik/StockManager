@@ -4,36 +4,36 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Models;
 
-namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById
+namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
+
+public sealed class GetSupplierByIdQueryHandler : IQueryHandler<GetSupplierByIdQuery, SupplierDto>
 {
-    public sealed class GetSupplierByIdQueryHandler : IQueryHandler<GetSupplierByIdQuery, SupplierDto>
+    private readonly ISupplierRepository _supplierRepository;
+    private readonly IMapper _mapper;
+
+    public GetSupplierByIdQueryHandler(ISupplierRepository supplierRepository, IMapper mapper)
     {
-        private readonly ISupplierRepository _supplierRepository;
-        private readonly IMapper _mapper;
+        _supplierRepository = supplierRepository;
+        _mapper = mapper;
+    }
+    public async Task<Result<SupplierDto>> Handle(GetSupplierByIdQuery query, CancellationToken cancellationToken)
+    {
+        Supplier? getSupplier = await _supplierRepository.GetSupplierByIdAsync(query.Id, cancellationToken);
 
-        public GetSupplierByIdQueryHandler(ISupplierRepository supplierRepository, IMapper mapper)
+        if(getSupplier is null)
         {
-            _supplierRepository = supplierRepository;
-            _mapper = mapper;
+            var error = new Error(
+                $"Supplier with provided id : {query.Id} not found",
+                ErrorCodes.SupplierNotFound
+            );
+
+            return Result<SupplierDto>.Failure(error);
         }
-        public async Task<Result<SupplierDto>> Handle(GetSupplierByIdQuery query, CancellationToken cancellationToken)
-        {
-            var getSupplier = await _supplierRepository.GetSupplierByIdAsync(query.Id, cancellationToken);
 
-            if(getSupplier is null)
-            {
-                var error = new Error(
-                    $"Supplier with provided id : {query.Id} not found",
-                    ErrorCodes.SupplierNotFound
-                );
+        SupplierDto dto = _mapper.Map<SupplierDto>(getSupplier);
 
-                return Result<SupplierDto>.Failure(error);
-            }
-
-            var dto = _mapper.Map<SupplierDto>(getSupplier);
-
-            return Result<SupplierDto>.Success(dto);
-        }
+        return Result<SupplierDto>.Success(dto);
     }
 }

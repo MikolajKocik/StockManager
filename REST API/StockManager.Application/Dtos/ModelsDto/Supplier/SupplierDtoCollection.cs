@@ -1,10 +1,9 @@
 ﻿using StockManager.Application.Dtos.ModelsDto.Product;
 
-namespace StockManager.Application.Dtos.ModelsDto.Supplier
+namespace StockManager.Application.Dtos.ModelsDto.Supplier;
+
+public sealed record SupplierDtoCollection
 {
-    public sealed record SupplierDtoCollection
-    {
-        public required IEnumerable<SupplierDto> Data { get; init; }
-    }
+    public required IEnumerable<SupplierDto> Data { get; init; }
 }
 

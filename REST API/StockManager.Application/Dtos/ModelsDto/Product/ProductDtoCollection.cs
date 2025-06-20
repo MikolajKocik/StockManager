@@ -1,7 +1,6 @@
-﻿namespace StockManager.Application.Dtos.ModelsDto.Product
+﻿namespace StockManager.Application.Dtos.ModelsDto.Product;
+
+public sealed record ProductDtoCollection
 {
-    public sealed record ProductDtoCollection
-    {
-        public required IEnumerable<ProductDto> Data { get; init; }
-    }
+    public required IEnumerable<ProductDto> Data { get; init; }
 }

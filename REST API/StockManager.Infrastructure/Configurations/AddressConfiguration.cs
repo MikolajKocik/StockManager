@@ -2,17 +2,16 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Models;
 
-namespace StockManager.Infrastructure.Configurations
+namespace StockManager.Infrastructure.Configurations;
+
+internal sealed class AddressConfiguration : IEntityTypeConfiguration<Address>
 {
-    internal sealed class AddressConfiguration : IEntityTypeConfiguration<Address>
+    public void Configure(EntityTypeBuilder<Address> builder)
     {
-        public void Configure(EntityTypeBuilder<Address> builder)
-        {
-            builder.HasOne(a => a.Supplier)
-                .WithOne(s => s.Address)
-                .HasConstraintName("FK_Address_Supplier")
-                .HasForeignKey<Address>(a => a.SupplierId)
-                .OnDelete(DeleteBehavior.Cascade);
-        }
+        builder.HasOne(a => a.Supplier)
+            .WithOne(s => s.Address)
+            .HasConstraintName("FK_Address_Supplier")
+            .HasForeignKey<Address>(a => a.SupplierId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

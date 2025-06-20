@@ -2,28 +2,27 @@
 
 #nullable disable
 
-namespace StockManager.Infrastructure.Migrations
+namespace StockManager.Infrastructure.Migrations;
+
+/// <inheritdoc />
+public partial class uuidv7_user : Migration
 {
     /// <inheritdoc />
-    public partial class uuidv7_user : Migration
+    protected override void Up(MigrationBuilder migrationBuilder)
     {
-        /// <inheritdoc />
-        protected override void Up(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.AddColumn<string>(
-                name: "Slug",
-                table: "AspNetUsers",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
-        }
+        migrationBuilder.AddColumn<string>(
+            name: "Slug",
+            table: "AspNetUsers",
+            type: "nvarchar(max)",
+            nullable: false,
+            defaultValue: "");
+    }
 
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropColumn(
-                name: "Slug",
-                table: "AspNetUsers");
-        }
+    /// <inheritdoc />
+    protected override void Down(MigrationBuilder migrationBuilder)
+    {
+        migrationBuilder.DropColumn(
+            name: "Slug",
+            table: "AspNetUsers");
     }
 }

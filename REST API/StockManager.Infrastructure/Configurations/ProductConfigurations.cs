@@ -2,17 +2,16 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Models;
 
-namespace StockManager.Infrastructure.Configurations
+namespace StockManager.Infrastructure.Configurations;
+
+internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
 {
-    internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
+    public void Configure(EntityTypeBuilder<Product> builder)
     {
-        public void Configure(EntityTypeBuilder<Product> builder)
-        {
-            builder.HasOne(p => p.Supplier)
-                .WithMany(s => s.Products)
-                .HasConstraintName("FK_Product_Supplier")
-                .HasForeignKey(p => p.SupplierId)
-                .OnDelete(DeleteBehavior.Restrict);
-        }
+        builder.HasOne(p => p.Supplier)
+            .WithMany(s => s.Products)
+            .HasConstraintName("FK_Product_Supplier")
+            .HasForeignKey(p => p.SupplierId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

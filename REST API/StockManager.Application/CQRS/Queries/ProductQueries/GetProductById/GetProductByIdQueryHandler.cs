@@ -4,36 +4,36 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Models;
 
-namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById
+namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
+
+public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ProductDto>
 {
-    public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ProductDto>
+    private readonly IMapper _mapper;
+    private readonly IProductRepository _repository;
+    public GetProductByIdQueryHandler(IMapper mapper, IProductRepository repository)
     {
-        private readonly IMapper _mapper;
-        private readonly IProductRepository _repository;
-        public GetProductByIdQueryHandler(IMapper mapper, IProductRepository repository)
+        _mapper = mapper;
+        _repository = repository;
+    }
+
+    public async Task<Result<ProductDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
+    {
+        Product? product = await _repository.GetProductByIdAsync(query.Id, cancellationToken);
+
+        if (product is null)
         {
-            _mapper = mapper;
-            _repository = repository;
+            var error = new Error(
+                $"Product with id: {query.Id} not found",
+                ErrorCodes.ProductNotFound
+            );
+
+            return Result<ProductDto>.Failure(error);
         }
 
-        public async Task<Result<ProductDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
-        {
-            var product = await _repository.GetProductByIdAsync(query.Id, cancellationToken);
+        ProductDto dto = _mapper.Map<ProductDto>(product);
 
-            if (product is null)
-            {
-                var error = new Error(
-                    $"Product with id: {query.Id} not found",
-                    ErrorCodes.ProductNotFound
-                );
-
-                return Result<ProductDto>.Failure(error);
-            }
-
-            var dto = _mapper.Map<ProductDto>(product);
-
-            return Result<ProductDto>.Success(dto);
-        }
+        return Result<ProductDto>.Success(dto);
     }
 }

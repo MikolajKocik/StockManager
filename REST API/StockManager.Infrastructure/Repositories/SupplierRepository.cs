@@ -5,74 +5,77 @@ using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
 using StockManager.Models;
 
-namespace StockManager.Infrastructure.Repositories
+namespace StockManager.Infrastructure.Repositories;
+
+public sealed class SupplierRepository : ISupplierRepository
 {
-    public sealed class SupplierRepository : ISupplierRepository
+
+    private readonly StockManagerDbContext _dbContext;
+
+    public SupplierRepository(StockManagerDbContext dbcontext)
     {
+        _dbContext = dbcontext;
+    }
 
-        private readonly StockManagerDbContext _dbContext;
+    public IQueryable<Supplier> GetSuppliers()
+        => _dbContext.Suppliers
+            .AsNoTracking()
+            .Include(s => s.Address)
+            .Include(s => s.Products);
 
-        public SupplierRepository(StockManagerDbContext dbcontext)
+    public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
+    {
+        return await _dbContext.Suppliers
+            .Include(s => s.Address)
+            .FirstOrDefaultAsync(s => s.Id == supplierId, cancellationToken);
+    }
+
+    public async Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+    {
+        return await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
+    }
+
+    public async Task<Supplier?> UpdateSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+    {
+        Supplier? existingSupplier = await _dbContext.Suppliers
+            .Include(s => s.Address)
+            .FirstOrDefaultAsync(s => s.Id == supplier.Id, cancellationToken);
+
+        if (existingSupplier is null)
         {
-            _dbContext = dbcontext;
+            return null;
         }
 
-        public IQueryable<Supplier> GetSuppliers()
-            => _dbContext.Suppliers
-                .AsNoTracking()
-                .Include(s => s.Address)
-                .Include(s => s.Products);
-
-        public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
+        if (!string.IsNullOrWhiteSpace(supplier.Name))
         {
-            return await _dbContext.Suppliers
-                .Include(s => s.Address)
-                .FirstOrDefaultAsync(s => s.Id == supplierId, cancellationToken);
+            existingSupplier.ChangeName(supplier.Name);
         }
 
-        public async Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+        if (supplier.Address is not null)
         {
-            return await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
+            _dbContext.Entry(existingSupplier.Address).CurrentValues.SetValues(supplier.Address);
         }
 
-        public async Task<Supplier?> UpdateSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
-        {
-            var existingSupplier = await _dbContext.Suppliers
-                .Include(s => s.Address)
-                .FirstOrDefaultAsync(s => s.Id == supplier.Id, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (existingSupplier is null)
-                return null;
+        return existingSupplier;
+    }
 
-            if (!string.IsNullOrWhiteSpace(supplier.Name))
-                existingSupplier.ChangeName(supplier.Name);
+    public async Task<IDbContextTransaction> BeginTransactionAsync()
+      => await _dbContext.Database.BeginTransactionAsync();
 
-            if (supplier.Address is not null)
-            {
-                _dbContext.Entry(existingSupplier.Address).CurrentValues.SetValues(supplier.Address);
-            }
+    public void AttachSupplier(Supplier supplier)
+    {
+        _dbContext.Suppliers.Attach(supplier);
+    }
 
-            await _dbContext.SaveChangesAsync(cancellationToken);
+    public async Task<Supplier?> DeleteSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+    {
+        Supplier? supplierExist = await RepositoryQueriesHelpers.EntityFindAsync<Supplier, Guid>(supplier.Id, _dbContext, cancellationToken);
 
-            return existingSupplier;
-        }
+        _dbContext.Suppliers.Remove(supplierExist!);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
-        public async Task<IDbContextTransaction> BeginTransactionAsync()
-          => await _dbContext.Database.BeginTransactionAsync();
-
-        public void AttachSupplier(Supplier supplier)
-        {
-            _dbContext.Suppliers.Attach(supplier);
-        }
-
-        public async Task<Supplier?> DeleteSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
-        {
-            var supplierExist = await RepositoryQueriesHelpers.EntityFindAsync<Supplier, Guid>(supplier.Id, _dbContext, cancellationToken);
-
-            _dbContext.Suppliers.Remove(supplierExist!);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return supplierExist;
-        }
+        return supplierExist;
     }
 }

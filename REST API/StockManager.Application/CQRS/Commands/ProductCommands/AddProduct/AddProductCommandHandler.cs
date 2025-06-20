@@ -1,86 +1,89 @@
 ﻿using AutoMapper;
+using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
 
-namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct
+namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
+
+public class AddProductCommandHandler : ICommandHandler<AddProductCommand, ProductDto>
 {
-    public class AddProductCommandHandler : ICommandHandler<AddProductCommand, ProductDto>
+    private readonly IMapper _mapper;
+    private readonly IProductRepository _productRepository;
+    private readonly ISupplierRepository _supplierRepository;
+    private readonly ILogger<AddProductCommandHandler> _logger;
+
+    public AddProductCommandHandler(IMapper mapper, IProductRepository productRepository,
+        ISupplierRepository supplierRepository, ILogger<AddProductCommandHandler> logger)
     {
-        private readonly IMapper _mapper;
-        private readonly IProductRepository _productRepository;
-        private readonly ISupplierRepository _supplierRepository;
-        private readonly ILogger<AddProductCommandHandler> _logger;
+        _mapper = mapper;
+        _productRepository = productRepository;
+        _supplierRepository = supplierRepository;
+        _logger = logger;
+    }
 
-        public AddProductCommandHandler(IMapper mapper, IProductRepository productRepository,
-            ISupplierRepository supplierRepository, ILogger<AddProductCommandHandler> logger)
+    public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
+    {
+        try
         {
-            _mapper = mapper;
-            _productRepository = productRepository;
-            _supplierRepository = supplierRepository;
-            _logger = logger;
-        }
+            await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync();
 
-        public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
-        {
-            try
+            var validate = new ProductValidator();
+            ValidationResult validationResult = await validate.ValidateAsync(command.Product, cancellationToken);
+
+            if (validationResult.IsValid)
             {
+                Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
 
-                await using var transaction = await _productRepository.BeginTransactionAsync();
-
-                var validate = new ProductValidator();
-                var validationResult = validate.Validate(command.Product);
-
-                if (validationResult.IsValid)
+                if (supplier is not null)
                 {
-                    var supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
-
-                    if (supplier is not null)
-                    {
-                        _logger.LogInformation("Supplier {SupplierId} already exists. Assigning the product to the existing supplier.", supplier.Id);
-                        _supplierRepository.AttachSupplier(supplier);
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Supplier with ID {SupplierId} does not exist. Creating a new supplier.", command.Product.SupplierId);
-                        supplier = _mapper.Map<Supplier>(command.Product.Supplier);
-                        await _supplierRepository.AddSupplierAsync(supplier, cancellationToken);
-                    }
-
-                    var product = _mapper.Map<Product>(command.Product);
-                    product.SetSupplier(supplier);
-
-                    _logger.LogInformation("Adding a new product {command.Product} to database", command.Product);
-                    var newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
-
-                    await transaction.CommitAsync();
-
-                    var dto = _mapper.Map<ProductDto>(newProduct);
-
-                    return Result<ProductDto>.Success(dto);
+                    TrackingBehaviorLogMessages.LogSupplierAlreadyExists(_logger, supplier.Id, default);
+                    _supplierRepository.AttachSupplier(supplier);
                 }
                 else
                 {
-                    _logger.LogError("Validation failed for product. Rolling back transaction");
-                    await transaction.RollbackAsync(cancellationToken);
-
-                    var error = new Error(
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                        code: "Validation.Badcommand"
-                    );
-
-                    return Result<ProductDto>.Failure(error);
+                    TrackingBehaviorLogMessages.LogSupplierNotExists(_logger, command.Product.SupplierId, default);
+                    supplier = _mapper.Map<Supplier>(command.Product.Supplier);
+                    await _supplierRepository.AddSupplierAsync(supplier, cancellationToken);
                 }
+
+                Product product = _mapper.Map<Product>(command.Product);
+                product.SetSupplier(supplier);
+
+                TrackingBehaviorLogMessages.LogAddProductOperationSuccesfull(_logger, command.Product, default);
+
+                Product newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
+
+                await transaction.CommitAsync(cancellationToken);
+
+                ProductDto dto = _mapper.Map<ProductDto>(newProduct);
+
+                return Result<ProductDto>.Success(dto);
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "Error ocurred while adding a new product");
-                throw;
+                TrackingBehaviorLogMessages.LogProductValidationFailed(_logger, command.Product, default);
+                await transaction.RollbackAsync(cancellationToken);
+
+                var error = new Error(
+                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                    ErrorCodes.SupplierValidation
+                );
+
+                return Result<ProductDto>.Failure(error);
             }
+        }
+        catch (Exception ex)
+        {
+            TrackingBehaviorLogMessages.LogAddingDataException(_logger, ex);
+            throw;
         }
     }
 }

@@ -1,43 +1,43 @@
 ﻿using UUIDNext;
 
-namespace StockManager.Models
+namespace StockManager.Models;
+
+public sealed class Supplier
 {
-    public sealed class Supplier
+    public Guid Id { get; private set; }
+    public string Name { get; private set; } 
+    public string Slug { get; private set; }
+
+    // relation 1-1 with supplier
+    public Address Address { get; private set; } 
+
+    // relation 1-* with product
+    public List<Product> Products { get; private set; } = new List<Product>();
+
+    private Supplier() { Address = default!; }
+
+    public Supplier(Guid id, string name, Address address)
     {
-        public Guid Id { get; private set; }
-        public string Name { get; private set; } 
-        public string Slug { get; private set; }
+        Id = id;
+        Name = name;
+        Slug = $"s_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
+        Address = address;
+    }
 
-        // relation 1-1 with supplier
-        public Address Address { get; private set; } 
-
-        // relation 1-* with product
-        public List<Product> Products { get; private set; } = new List<Product>();
-
-        private Supplier() { Address = default!; }
-
-        public Supplier(Guid id, string name, string slug, Address address)
+    public void ChangeName(string newName)
+    {
+        if (string.IsNullOrWhiteSpace(newName))
         {
-            Id = id;
-            Name = name;
-            Slug = $"s_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
-            Address = address;
+            throw new ArgumentException("Name cannot be null or empty", nameof(newName));
         }
 
-        public void ChangeName(string newName)
-        {
-            if (string.IsNullOrWhiteSpace(newName))
-                throw new ArgumentException("Name cannot be null or empty", nameof(newName)); 
-            
-            Name = newName;
-        }
+        Name = newName;
+    }
 
-        public void ChangeAddress(Address newAddress)
-        {
-            if (newAddress is null)
-                throw new ArgumentNullException(nameof(newAddress));
-            
-            Address = newAddress;
-        }
+    public void ChangeAddress(Address newAddress)
+    {
+        ArgumentNullException.ThrowIfNull(newAddress);
+
+        Address = newAddress;
     }
 }

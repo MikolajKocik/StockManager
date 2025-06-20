@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace StockManager.Application.Common.ResultPattern
+namespace StockManager.Application.Common.ResultPattern;
+
+public interface IResult
 {
-    public interface IResult
-    {
-        bool IsSuccess { get; }
-        Error? Error { get; }
-    }
+    bool IsSuccess { get; }
+    Error? Error { get; }
 }

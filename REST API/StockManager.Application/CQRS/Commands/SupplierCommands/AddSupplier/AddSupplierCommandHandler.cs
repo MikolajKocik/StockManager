@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using FluentValidation.Results;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Application.Helpers.Error;
@@ -8,78 +11,77 @@ using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
 
-namespace StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier
+namespace StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
+
+public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierCommand, SupplierDto>
 {
-    public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierCommand, SupplierDto>
+    private readonly IMapper _mapper;
+    private readonly ISupplierRepository _supplierRepository;
+    private readonly ILogger<AddSupplierCommandHandler> _logger;
+
+    public AddSupplierCommandHandler(
+        IMapper mapper,
+        ISupplierRepository supplierRepository,
+        ILogger<AddSupplierCommandHandler> logger)
     {
-        private readonly IMapper _mapper;
-        private readonly ISupplierRepository _supplierRepository;
-        private readonly ILogger<AddSupplierCommandHandler> _logger;
+        _mapper = mapper;
+        _supplierRepository = supplierRepository;
+        _logger = logger;
+    }
 
-        public AddSupplierCommandHandler(
-            IMapper mapper,
-            ISupplierRepository supplierRepository,
-            ILogger<AddSupplierCommandHandler> logger)
+    public async Task<Result<SupplierDto>> Handle(AddSupplierCommand command, CancellationToken cancellationToken)
+    {
+        try
         {
-            _mapper = mapper;
-            _supplierRepository = supplierRepository;
-            _logger = logger;
-        }
+            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync();
 
-        public async Task<Result<SupplierDto>> Handle(AddSupplierCommand command, CancellationToken cancellationToken)
-        {
-            try
+            var validate = new SupplierValidator();
+            ValidationResult validationResult = await validate.ValidateAsync(command.Supplier, cancellationToken);
+
+            if(validationResult.IsValid)
             {
-                await using var transaction = await _supplierRepository.BeginTransactionAsync();
+                Supplier existingSupplier = await _supplierRepository.GetSupplierByIdAsync(command.Supplier.Id, cancellationToken);
 
-                var validate = new SupplierValidator();
-                var validationResult = validate.Validate(command.Supplier);
-
-                if(validationResult.IsValid)
+                if (existingSupplier is not null)
                 {
-                    var existingSupplier = await _supplierRepository.GetSupplierByIdAsync(command.Supplier.Id, cancellationToken);
+                    TrackingBehaviorLogMessages.LogSupplierAlreadyExists(_logger, existingSupplier.Id, default);
 
-                    if (existingSupplier is not null)
-                    {
-                        _logger.LogInformation("Supplier {SupplierName} already exists. Returning existing supplier.", existingSupplier.Name);
+                    SupplierDto dto = _mapper.Map<SupplierDto>(existingSupplier);
 
-                        var dto = _mapper.Map<SupplierDto>(existingSupplier);
-
-                        return Result<SupplierDto>.Success(dto);
-                    }
-                    else
-                    {
-                        var newSupplier = _mapper.Map<Supplier>(command.Supplier);
-
-                        _logger.LogInformation("Adding a new supplier {NewSupplier}", newSupplier);
-
-                        var addSupplier = await _supplierRepository.AddSupplierAsync(newSupplier, cancellationToken);
-
-                        await transaction.CommitAsync(cancellationToken);
-
-                        var dto = _mapper.Map<SupplierDto>(addSupplier);
-
-                        return Result<SupplierDto>.Success(dto);
-                    }               
+                    return Result<SupplierDto>.Success(dto);
                 }
                 else
                 {
-                    _logger.LogWarning("Validation failed for supplier: {ValidationErrors}", validationResult.Errors);
+                    Supplier newSupplier = _mapper.Map<Supplier>(command.Supplier);
 
-                    await transaction.RollbackAsync(cancellationToken);
+                    TrackingBehaviorLogMessages.LogAddSupplierOperationSuccesfull(_logger, newSupplier, default);
 
-                    var error = new Error(
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                        ErrorCodes.SupplierValidation);
+                    Supplier addSupplier = await _supplierRepository.AddSupplierAsync(newSupplier, cancellationToken);
 
-                    return Result<SupplierDto>.Failure(error);
-                }
+                    await transaction.CommitAsync(cancellationToken);
+
+                    SupplierDto dto = _mapper.Map<SupplierDto>(addSupplier);
+
+                    return Result<SupplierDto>.Success(dto);
+                }               
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "An error occurred while handling AddSupplierCommand");
-                throw;
+                TrackingBehaviorLogMessages.LogSupplierValidationFailed(_logger, validationResult.Errors, default);
+
+                await transaction.RollbackAsync(cancellationToken);
+
+                var error = new Error(
+                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                    ErrorCodes.SupplierValidation);
+
+                return Result<SupplierDto>.Failure(error);
             }
+        }
+        catch (Exception ex)
+        {
+            TrackingBehaviorLogMessages.LogAddingSupplierException(_logger, ex);
+            throw;
         }
     }
 }

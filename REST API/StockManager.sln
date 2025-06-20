@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D79174D1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution configuration", "Solution configuration", "{533CE36F-3D97-4DCA-BD4D-A1E9B3FC6F99}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\..\Desktop\.editorconfig = ..\..\..\..\Desktop\.editorconfig
+		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
 		Directory.Packages.props = Directory.Packages.props
 	EndProjectSection

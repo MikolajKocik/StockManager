@@ -1,82 +1,83 @@
 ﻿using AutoMapper;
 using FluentAssertions;
 using Moq;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Tests.TestHelpers.ProductFactory;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
-namespace StockManager.Application.Tests.CQRS.Queries.Product
+namespace StockManager.Application.Tests.CQRS.Queries.Product;
+
+public sealed class GetProductByIdQueryHandlerTests
 {
-    public sealed class GetProductByIdQueryHandlerTests
+    private readonly Mock<IProductRepository> _productRepositoryMock;
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly GetProductByIdQueryHandler _handler;
+
+    public GetProductByIdQueryHandlerTests()
+    { 
+        _productRepositoryMock = new Mock<IProductRepository>();
+        _mapperMock = new Mock<IMapper>();
+        _handler = new GetProductByIdQueryHandler(_mapperMock.Object, _productRepositoryMock.Object);
+    }
+
+    [Fact]
+    public async Task Handle_ShouldReturnProductDto_WhenProductsEXists()
     {
-        private readonly Mock<IProductRepository> _productRepositoryMock;
-        private readonly Mock<IMapper> _mapperMock;
-        private readonly GetProductByIdQueryHandler _handler;
+        // 
+        Models.Product? product = ProductTestFactory.CreateTestProduct();
+        ProductDto? dto = ProductTestDtoFactory.CreateTestDto();
+        var query = new GetProductByIdQuery(1);
 
-        public GetProductByIdQueryHandlerTests()
-        { 
-            _productRepositoryMock = new Mock<IProductRepository>();
-            _mapperMock = new Mock<IMapper>();
-            _handler = new GetProductByIdQueryHandler(_mapperMock.Object, _productRepositoryMock.Object);
-        }
+        _productRepositoryMock
+            .Setup(r => r.GetProductByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(product);
 
-        [Fact]
-        public async Task Handle_ShouldReturnProductDto_WhenProductsEXists()
-        {
-            // 
-            var product = ProductTestFactory.CreateTestProduct();
-            var dto = ProductTestDtoFactory.CreateTestDto();
-            var query = new GetProductByIdQuery(1);
+        _mapperMock
+            .Setup(m => m.Map<ProductDto>(product))
+            .Returns(dto);
+        
+        //
+        Result<ProductDto> result = await _handler.Handle(query, CancellationToken.None);
 
-            _productRepositoryMock
-                .Setup(r => r.GetProductByIdAsync(1, It.IsAny<CancellationToken>()))
-                .ReturnsAsync(product);
+        //
+        result.IsSuccess.Should().BeTrue();
+        result.Value.Should().BeEquivalentTo(dto);
+    }
 
-            _mapperMock
-                .Setup(m => m.Map<ProductDto>(product))
-                .Returns(dto);
-            
-            //
-            var result = await _handler.Handle(query, CancellationToken.None);
+    [Fact]
+    public async Task Handle_ShouldReturnFailure_WhenProductDoesNotExist()
+    {
+        //
+        var query = new GetProductByIdQuery(1);
 
-            //
-            result.IsSuccess.Should().BeTrue();
-            result.Value.Should().BeEquivalentTo(dto);
-        }
+        _productRepositoryMock
+            .Setup(r => r.GetProductByIdAsync(1, It.IsAny<CancellationToken>()))
+            .ReturnsAsync((Models.Product?)null);
 
-        [Fact]
-        public async Task Handle_ShouldReturnFailure_WhenProductDoesNotExist()
-        {
-            //
-            var query = new GetProductByIdQuery(1);
+        //
+        Result<ProductDto> result = await _handler.Handle(query, CancellationToken.None);
 
-            _productRepositoryMock
-                .Setup(r => r.GetProductByIdAsync(1, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((Models.Product?)null);
+        //
+        result.IsSuccess.Should().BeFalse();
+        result.Error.Should().NotBeNull();
+        result.Error.Code.Should().Be("Product.NotFound");
+    }
 
-            //
-            var result = await _handler.Handle(query, CancellationToken.None);
+    [Fact]
+    public async Task Handle_ShouldThrow_WhenCancellationRequested()
+    {
+        //
+        var query = new GetProductByIdQuery(1);
 
-            //
-            result.IsSuccess.Should().BeFalse();
-            result.Error.Should().NotBeNull();
-            result.Error.Code.Should().Be("Product.NotFound");
-        }
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+       
+        //
+        Func<Task<Result<ProductDto>>> act = async () => await _handler.Handle(query, cts.Token);
 
-        [Fact]
-        public async Task Handle_ShouldThrow_WhenCancellationRequested()
-        {
-            //
-            var query = new GetProductByIdQuery(1);
-            var cts = new CancellationTokenSource();
-            cts.Cancel();
-
-            //
-            var act = async () => await _handler.Handle(query, cts.Token);
-
-            //
-            await act.Should().ThrowAsync<OperationCanceledException>();
-        }
+        //
+        await act.Should().ThrowAsync<OperationCanceledException>();
     }
 }

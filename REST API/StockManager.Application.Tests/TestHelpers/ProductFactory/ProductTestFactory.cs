@@ -1,32 +1,31 @@
 ﻿using StockManager.Models;
 
-namespace StockManager.Application.Tests.TestHelpers.ProductFactory
+namespace StockManager.Application.Tests.TestHelpers.ProductFactory;
+
+public static class ProductTestFactory
 {
-    public static class ProductTestFactory
+    public static Product CreateTestProduct(
+        int id = 1,
+        string name = "Test Products",
+        Genre genre = Genre.Meat,
+        string unit = "kg",
+        int quantity = 10,
+        Warehouse type = Warehouse.FreezerSection,
+        string batchNumber = "BATCH-001",
+        Guid? supplierId = null,
+        DateTime? expiration = null
+        )
     {
-        public static Product CreateTestProduct(
-            int id = 1,
-            string name = "Test Products",
-            Genre genre = Genre.Meat,
-            string unit = "kg",
-            int quantity = 10,
-            Warehouse type = Warehouse.FreezerSection,
-            string batchNumber = "BATCH-001",
-            Guid? supplierId = null,
-            DateTime? expiration = null
-            )
-        {
-            return new Product(
-                id,
-                name,
-                genre,
-                unit,
-                quantity,
-                type,
-                batchNumber,
-                supplierId ?? Guid.NewGuid(),
-                expiration ?? DateTime.UtcNow.AddDays(30)
-                );
-        }
+        return new Product(
+            id,
+            name,
+            genre,
+            unit,
+            quantity,
+            type,
+            batchNumber,
+            supplierId ?? Guid.NewGuid(),
+            expiration ?? DateTime.UtcNow.AddDays(30)
+            );
     }
 }

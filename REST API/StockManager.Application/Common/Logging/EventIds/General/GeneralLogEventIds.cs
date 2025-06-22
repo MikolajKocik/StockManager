@@ -14,6 +14,7 @@ public static class GeneralLogEventIds
     public static readonly EventId InternalServerError = new(2, "InternalServerError");
     public static readonly EventId ArgumentException = new(3, "ArgumentException");
     public static readonly EventId ArgumentNullException = new(4, "ArgumentNullException");
+    public static readonly EventId InvalidOperationException = new(5, "InvalidOperationException");
 
     // Warning
     public static readonly EventId RequestCancelled = new(10, "RequestCancelled");

@@ -1,5 +1,9 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using OpenTelemetry.Logs;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Serilog;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Abstractions.CQRS.Query;
@@ -71,11 +75,11 @@ using (IServiceScope scope = app.Services.CreateScope())
     StockManagerDbContext dbContext = scope.ServiceProvider
         .GetRequiredService<StockManagerDbContext>();
 
-    IEnumerable<string> pendingMigrations = dbContext.Database.GetPendingMigrations();
+    IEnumerable<string> pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
 
     if (pendingMigrations.Any())
     {
-        dbContext.Database.Migrate();
+        await dbContext.Database.MigrateAsync();
     }
 }
 
@@ -90,4 +94,4 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();

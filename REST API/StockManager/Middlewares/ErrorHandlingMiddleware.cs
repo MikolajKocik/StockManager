@@ -25,6 +25,12 @@ public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> log
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsync(string.Join(", ", ex.Message));
         }
+        catch (InvalidOperationException ex)
+        {
+            GeneralLogError.InvalidOperationException(logger, ex.Message, ex);
+
+            await context.Response.WriteAsync(string.Join(", ", ex.Message));
+        }
         catch (Exception ex)
         {
             GeneralLogError.InternalServerError(logger, ex.InnerException?.Message ?? ex.Message, ex);

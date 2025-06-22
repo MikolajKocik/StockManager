@@ -31,7 +31,7 @@ public class AuthService : IAuthService
     {
         User? existingUser = await _userManager.FindByNameAsync(register.UserName);
 
-        if (existingUser is null)
+        if (existingUser is not null)
         {
             GeneralLogWarning.UserAlreadyExists(_logger, register.UserName, default);
 

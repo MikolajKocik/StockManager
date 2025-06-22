@@ -33,4 +33,10 @@ public static class GeneralLogError
             LogLevel.Error,
             GeneralLogEventIds.ArgumentNullException,
             "Argument exception null: {Error}");
+
+    public static readonly Action<ILogger, string, Exception?> InvalidOperationException =
+        LoggerMessage.Define<string>(
+            LogLevel.Error,
+            GeneralLogEventIds.InvalidOperationException,
+            "Invalid operation: {Error}");
 }

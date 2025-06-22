@@ -28,8 +28,6 @@ public sealed class GetSuppliersQueryHandler : IQueryHandler<GetSuppliersQuery, 
 
     public async Task<Result<IEnumerable<SupplierDto>>> Handle(GetSuppliersQuery query, CancellationToken cancellationToken)
     {
-        _logger.LogInformation("Preparing suppliers data for use.");
-
         // adding list of product ids to supplier query if products field provided
         List<int>? productIds = query.products?.Any() is true 
             ? query.products?.Select(p => p.Id).ToList() 
@@ -53,8 +51,6 @@ public sealed class GetSuppliersQueryHandler : IQueryHandler<GetSuppliersQuery, 
                 s => s.Products.Any(p => productIds!.Contains(p.Id)));
 
         IEnumerable<SupplierDto> result = _mapper.Map<IEnumerable<SupplierDto>>(await suppliers.ToListAsync(cancellationToken));
-
-        _logger.LogInformation("Mapping suppliers collection successfull");
 
         return Result<IEnumerable<SupplierDto>>.Success(
             result.Any() 

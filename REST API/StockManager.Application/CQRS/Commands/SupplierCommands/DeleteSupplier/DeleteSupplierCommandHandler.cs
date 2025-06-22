@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
@@ -35,7 +37,7 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
 
             if (supplier is not null)
             {
-                TrackingBehaviorLogMessages.LogRemovingSupplierOperation(_logger, command.Id, default);
+                SupplierLogInfo.LogRemovingSupplier(_logger, command.Id, default);
                 Supplier remove = await _supplierRepository.DeleteSupplierAsync(supplier, cancellationToken);
 
                 SupplierDto dto = _mapper.Map<SupplierDto>(remove);
@@ -46,7 +48,7 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
             }
             else
             {
-                TrackingBehaviorLogMessages.LogSupplierNotFound(_logger, command.Id, default);
+                SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
                 await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
@@ -59,7 +61,7 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
         }
         catch (Exception ex)
         {
-            TrackingBehaviorLogMessages.LogRemovingSupplierException(_logger, ex);
+            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
             throw;
         }
     }

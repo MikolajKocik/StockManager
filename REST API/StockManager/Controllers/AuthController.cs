@@ -1,59 +1,62 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 
-namespace StockManager.Controllers
+namespace StockManager.Controllers;
+
+[ApiController]
+[Route("api/auth")]
+public class AuthController : ControllerBase
 {
-    [Route("api/auth")]
-    [ApiController]
-    public class AuthController : ControllerBase
+    private readonly IAuthService _authService;
+    private readonly ILogger<AuthController> _logger;
+   
+    public AuthController(IAuthService authService, ILogger<AuthController> logger)
     {
-        private readonly IAuthService _authService;
-        private readonly ILogger<AuthController> _logger;
-       
-        public AuthController(IAuthService authService, ILogger<AuthController> logger)
+        _authService = authService;
+        _logger = logger;          
+    }
+
+    [HttpPost("register")]
+    [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Register([FromBody] RegisterDto register)
+    {
+        GeneralLogInfo.RegistrationSuccess(_logger, register.UserName, default);
+
+        Result<RegisterDto> result = await _authService.RegisterUser(register);
+
+        if(result.IsSuccess)
         {
-            _authService = authService;
-            _logger = logger;          
+            return Ok(new { message = "User registered succesfully" });
         }
 
-        [HttpPost("register")]
-        [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Register([FromBody] RegisterDto register)
+        GeneralLogWarning.RegistrationFailed(_logger, default);
+        return result.Error!.ToActionResult();          
+    }
+
+    [HttpPost("login")]
+    [AllowAnonymous]
+    [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> Login([FromBody] LoginDto login)
+    {
+
+        GeneralLogInfo.AuthorizationSuccess(_logger, login.UserName, default);
+
+        Result<LoginResultDto> result = await _authService.LoginUser(login);
+
+        if(result.IsSuccess)
         {
-            _logger.LogInformation("User: {@user} registered succesfully", register.UserName);
-
-            var result = await _authService.RegisterUser(register);
-
-            if(result.IsSuccess)
-            {
-                return Ok(new { message = "User registered succesfully" });
-            }
-
-            return result.Error!.ToActionResult();          
+            return Ok(new { message = "User logged succesfully", result });
         }
 
-        [HttpPost("login")]
-        [AllowAnonymous]
-        [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(LoginResultDto), StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> Login([FromBody] LoginDto login)
-        {
-
-            _logger.LogInformation("User: {@user} logged succesfully", login.UserName);
-
-            var result = await _authService.LoginUser(login);
-
-            if(result.IsSuccess)
-            {
-                return Ok(new { message = "User logged succesfully", result });
-            }
-
-            return result.Error!.ToActionResult();
-        }
+        GeneralLogWarning.AuthorizationFailed(_logger, default);
+        return result.Error!.ToActionResult();
     }
 }

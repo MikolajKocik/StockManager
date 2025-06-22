@@ -3,6 +3,8 @@ using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
@@ -37,7 +39,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
 
             if (product is not null)
             {
-                TrackingBehaviorLogMessages.LogModyfingProduct(_logger, command.Id, command.Product, default);
+                ProductLogInfo.LogModyfingProduct(_logger, command.Id, command.Product, default);
 
                 Product updateProduct = await _repository.UpdateProductAsync(product, cancellationToken);
 
@@ -54,7 +56,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
                 }
                 else
                 {
-                    TrackingBehaviorLogMessages.LogProductValidationFailedExtended(
+                    ProductLogWarning.LogProductValidationFailedExtended(
                         _logger,
                         product,
                         string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), default);
@@ -69,7 +71,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
             }
             else
             {
-                TrackingBehaviorLogMessages.LogProductNotFound(_logger, command.Id, default);
+                ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
                 await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
@@ -82,7 +84,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
         }
         catch (Exception ex)
         {
-            TrackingBehaviorLogMessages.LogEditingProductException(_logger, ex);
+            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
             throw;
         }
     }

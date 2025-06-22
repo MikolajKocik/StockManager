@@ -24,6 +24,7 @@ public sealed class Product
         string name,
         Genre genre,
         string unit,
+        int quantity,
         Warehouse type,
         string batchNumber,
         Guid supplierId,
@@ -33,6 +34,7 @@ public sealed class Product
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
         Unit = unit;
+        Quantity = quantity;
         Genre = genre;
         ExpirationDate = expirationDate;
         DeliveredAt = DateTime.UtcNow.Date;

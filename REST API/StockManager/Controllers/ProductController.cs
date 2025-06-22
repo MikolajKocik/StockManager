@@ -10,6 +10,7 @@ using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Models;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Common.Logging.Product;
 
 namespace StockManager.Controllers;
 
@@ -56,7 +57,7 @@ public sealed class ProductController : ControllerBase
 
         Result<IEnumerable<ProductDto>> result = await _mediator.Send(query, cancellationToken);
 
-        _logger.LogInformation("Succesfully returns a list of products: {Products}", result);
+        ProductLogInfo.LogReturningListOfProductSuccessfull(_logger, result, default);
 
         return Ok(new ProductDtoCollection 
         { 
@@ -81,7 +82,7 @@ public sealed class ProductController : ControllerBase
 
         if (result.IsSuccess)
         {
-            _logger.LogInformation("Succesfully found the product with id:{Id}", id);
+            ProductLogInfo.LogProductFoundSuccess(_logger, id, default);
             return Ok(result.Value);
         }
 
@@ -112,7 +113,7 @@ public sealed class ProductController : ControllerBase
         if (result.IsSuccess)
         {
             ProductDto createdProduct = result.Value!;
-            _logger.LogInformation("Succesfully added a new product:{ProductDto.Id}", createdProduct.Id);
+            ProductLogInfo.LogAddProductSuccesfull(_logger, createdProduct, default);
 
             return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.Id }, createdProduct);
         }
@@ -148,7 +149,7 @@ public sealed class ProductController : ControllerBase
 
         if (result.IsSuccess)
         {
-            _logger.LogInformation("Product with id:{Id} succesfully modified", id);
+            ProductLogInfo.LogProductModifiedSuccess(_logger, id, default);
             return NoContent();
         }
 
@@ -176,7 +177,7 @@ public sealed class ProductController : ControllerBase
 
         if (result.IsSuccess)
         {
-            _logger.LogInformation("Provided product with id:{Id} deleted succesfully", id);
+            ProductLogInfo.LogProductDeletedSuccess(_logger, id, default);
             return NoContent();
         }
 

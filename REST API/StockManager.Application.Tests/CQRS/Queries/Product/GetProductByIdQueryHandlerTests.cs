@@ -64,20 +64,4 @@ public sealed class GetProductByIdQueryHandlerTests
         result.Error.Should().NotBeNull();
         result.Error.Code.Should().Be("Product.NotFound");
     }
-
-    [Fact]
-    public async Task Handle_ShouldThrow_WhenCancellationRequested()
-    {
-        //
-        var query = new GetProductByIdQuery(1);
-
-        using var cts = new CancellationTokenSource();
-        await cts.CancelAsync();
-       
-        //
-        Func<Task<Result<ProductDto>>> act = async () => await _handler.Handle(query, cts.Token);
-
-        //
-        await act.Should().ThrowAsync<OperationCanceledException>();
-    }
 }

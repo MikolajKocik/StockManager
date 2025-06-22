@@ -3,6 +3,8 @@ using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
@@ -44,7 +46,7 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
 
                 if (existingSupplier is not null)
                 {
-                    TrackingBehaviorLogMessages.LogSupplierAlreadyExists(_logger, existingSupplier.Id, default);
+                    SupplierLogWarning.LogSupplierAlreadyExists(_logger, existingSupplier.Id, default);
 
                     SupplierDto dto = _mapper.Map<SupplierDto>(existingSupplier);
 
@@ -54,7 +56,7 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
                 {
                     Supplier newSupplier = _mapper.Map<Supplier>(command.Supplier);
 
-                    TrackingBehaviorLogMessages.LogAddSupplierOperationSuccesfull(_logger, newSupplier, default);
+                    SupplierLogInfo.LogSupplierAddedSuccesfull(_logger, newSupplier, default);
 
                     Supplier addSupplier = await _supplierRepository.AddSupplierAsync(newSupplier, cancellationToken);
 
@@ -67,7 +69,7 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
             }
             else
             {
-                TrackingBehaviorLogMessages.LogSupplierValidationFailed(_logger, validationResult.Errors, default);
+                SupplierLogWarning.LogSupplierValidationFailed(_logger, validationResult.Errors, default);
 
                 await transaction.RollbackAsync(cancellationToken);
 
@@ -80,7 +82,7 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
         }
         catch (Exception ex)
         {
-            TrackingBehaviorLogMessages.LogAddingSupplierException(_logger, ex);
+            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
             throw;
         }
     }

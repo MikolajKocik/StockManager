@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using System.Reflection;
+using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.Extensions.Configuration;
@@ -8,26 +9,25 @@ using StockManager.Application.Services.Auth;
 using StockManager.Core.Domain.Interfaces.Services;
 
 
-namespace StockManager.Application.Extensions
+namespace StockManager.Application.Extensions;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static void AddApplication(this IServiceCollection services)
     {
-        public static void AddApplication(this IServiceCollection services, IConfiguration configuration)
-        {
-            var applicationAssembly = typeof(ServiceCollectionExtensions).Assembly;
+        Assembly applicationAssembly = typeof(ServiceCollectionExtensions).Assembly;
 
-            services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(applicationAssembly));
+        services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(applicationAssembly));
 
-            services.AddAutoMapper(applicationAssembly);
+        services.AddAutoMapper(applicationAssembly);
 
-            services.AddValidatorsFromAssembly(applicationAssembly)
-                .AddFluentValidationAutoValidation();
+        services.AddValidatorsFromAssembly(applicationAssembly)
+            .AddFluentValidationAutoValidation();
 
-            services.AddHttpContextAccessor();
+        services.AddHttpContextAccessor();
 
-            services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAuthService, AuthService>();
 
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));
-        }
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));
     }
 }

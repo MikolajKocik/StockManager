@@ -8,4 +8,7 @@ public static class ErrorCodes
     public const string SupplierNotFound = "Supplier.NotFound";
     public const string SupplierConflict = "Supplier.Conflict";
     public const string SupplierValidation = "Supplier.Validation";
+    public const string UserConflict = "User.Conflict";
+    public const string UserValidation = "User.Validation";
+    public const string UserUnauthorized = "User.Unauthorized";
 }

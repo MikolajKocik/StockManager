@@ -3,8 +3,11 @@ using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
@@ -37,7 +40,7 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
 
            if(supplier is not null)
            {
-                _logger.LogError("Modyfing the provided supplier: {@supplierId} with modified {@modifiedSupplier}", command.Id, command.Supplier);
+                SupplierLogInfo.LogModyfingSupplier(_logger, command.Id, command.Supplier, default);
 
                 Supplier? updateSupplier = await _supplierRepository.UpdateSupplierAsync(supplier, cancellationToken);
 
@@ -54,12 +57,11 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
                 }
                 else
                 {
-                    _logger.LogWarning("Validation failed for supplier:{@supplier}. Errors: {Errors}. Rolling back transaction",
-                         supplier, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)));
+                    SupplierLogWarning.LogSupplierValidationFailedHandler(_logger, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), default);
 
                     var error = new Error(
                         string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                        code: $"Validation.Badcommand"
+                        ErrorCodes.SupplierValidation
                     );
 
                     return Result<SupplierDto>.Failure(error);
@@ -67,12 +69,12 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
             }
             else
             {
-                _logger.LogWarning("Product with id:{@productId} not found. Rolling back transaction", command.Id);
+                SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
                 await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
-                    $"Product with id {command.Id} not found",
-                    code: "Product.NotFound"
+                    $"Supplier with id {command.Id} not found",
+                    ErrorCodes.SupplierNotFound
                 );
 
                 return Result<SupplierDto>.Failure(error);
@@ -80,7 +82,7 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error occured while editing data");
+            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
             throw;
         }
     }

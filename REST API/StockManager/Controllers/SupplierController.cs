@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
@@ -42,7 +43,7 @@ public sealed class SupplierController : ControllerBase
 
         Result<IEnumerable<SupplierDto>> result = await _mediator.Send(query, cancellationToken);
 
-        TrackingBehaviorLogMessages.LogSuccesfullReturnedListOfSuppliers(_logger, result, default);
+        SupplierLogInfo.LogSuccesfullReturnedListOfSuppliers(_logger, result, default);
 
         return Ok(new SupplierDtoCollection
         {
@@ -62,13 +63,13 @@ public sealed class SupplierController : ControllerBase
 
         if(result.IsSuccess)
         {
-            TrackingBehaviorLogMessages.LogSupplierFoundSuccessfull(_logger, result, default);
+            SupplierLogInfo.LogSupplierFoundSuccessfull(_logger, result, default);
 
             return Ok(result.Value);
         }
 
         var problem = ErrorExtension.ToProblemDetails(result.Error! , 404);
-        _logger.LogError("Error occurred while retrieving supplier by ID {id}: {error}", id, result.Error);
+        SupplierLogError.LogRetrievingSupplierById(_logger, id, result.Error!.Message, default);
 
         return new ObjectResult(problem)
         {
@@ -88,11 +89,12 @@ public sealed class SupplierController : ControllerBase
 
         if(result.IsSuccess)
         {
+            SupplierLogInfo.LogReturningNewSupplier(_logger, supplierDto, default);
             return CreatedAtAction(nameof(GetSupplierById), new { id = result.Value!.Id }, result.Value);
         }
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
-        _logger.LogError("Error occurred while adding supplier: {error}", result.Error);
+        SupplierLogError.LogAddingSupplierException(_logger, result.Error!.Message, default);
 
         return new ObjectResult(problem)
         {
@@ -113,12 +115,12 @@ public sealed class SupplierController : ControllerBase
 
         if(result.IsSuccess)
         {
-            _logger.LogInformation("Supplier with ID {id} updated successfully", id);
+            SupplierLogInfo.LogSupplierModifiedSuccessfull(_logger, id, default);
             return NoContent();
         }
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
-        _logger.LogError("Error occurred while updating supplier with ID {id}: {error}", id, result.Error);
+        SupplierLogError.LogModifiedSupplierException(_logger, id, result.Error!.Message, default);
 
         return new ObjectResult(problem)
         {
@@ -139,13 +141,12 @@ public sealed class SupplierController : ControllerBase
 
         if (result.IsSuccess)
         {
-            _logger.LogInformation("Supplier with ID {id} deleted successfully", id);
+            SupplierLogInfo.LogSupplierRemovedSuccessfull(_logger, id, default);
             return NoContent();
         }
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
-
-        _logger.LogError("Error occurred while deleting supplier with ID {id}: {error}", id, result.Error);
+        SupplierLogError.LogRemovingSupplierException(_logger, id, result.Error!.Message, default);
 
         return new ObjectResult(problem)
         {

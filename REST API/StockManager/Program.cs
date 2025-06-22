@@ -15,7 +15,7 @@ using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Extensions;
 using StockManager.Middlewares;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsDevelopment())
 {
@@ -26,7 +26,7 @@ if (builder.Environment.IsDevelopment())
 builder.AddPresentation();
 builder.Services.AddInfrastructure(builder.Configuration);
 
-builder.Services.AddApplication(builder.Configuration);
+builder.Services.AddApplication();
 
 // scrutor package
 builder.Services.Scan(scan => scan
@@ -51,7 +51,7 @@ builder.Services.Scan(scan => scan
         .WithScopedLifetime()
 );
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP command pipeline.
 app.UseMiddleware<ErrorHandlingMiddleware>();
@@ -66,12 +66,12 @@ if (app.Environment.IsDevelopment())
 app.UseSerilogRequestLogging();
 
 // Automatically checks pending migrations and update database
-using (var scope = app.Services.CreateScope())
+using (IServiceScope scope = app.Services.CreateScope())
 {
-    var dbContext = scope.ServiceProvider
+    StockManagerDbContext dbContext = scope.ServiceProvider
         .GetRequiredService<StockManagerDbContext>();
 
-    var pendingMigrations = dbContext.Database.GetPendingMigrations();
+    IEnumerable<string> pendingMigrations = dbContext.Database.GetPendingMigrations();
 
     if (pendingMigrations.Any())
     {

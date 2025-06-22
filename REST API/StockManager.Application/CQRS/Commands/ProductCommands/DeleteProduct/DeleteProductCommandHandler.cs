@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
@@ -35,7 +37,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
 
             if (product is not null)
             {
-                TrackingBehaviorLogMessages.LogRemovingProductOperation(_logger, command.Id, default);
+                ProductLogInfo.LogRemovingProductOperation(_logger, command.Id, default);
                 Product remove = await _repository.DeleteProductAsync(product, cancellationToken);
 
                 ProductDto dto = _mapper.Map<ProductDto>(remove);
@@ -46,7 +48,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
             }
             else
             {
-                TrackingBehaviorLogMessages.LogProductNotFound(_logger, command.Id, default);
+                ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
                 await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
@@ -59,7 +61,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
         }
         catch (Exception ex)
         {
-            TrackingBehaviorLogMessages.LogRemovingProductException(_logger, ex);
+            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
             throw;
         }
     }

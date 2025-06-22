@@ -1,4 +1,7 @@
-﻿namespace StockManager.Middlewares;
+﻿using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Supplier;
+
+namespace StockManager.Middlewares;
 
 public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> logger) : IMiddleware
 {
@@ -10,21 +13,21 @@ public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> log
         }
         catch(ArgumentNullException ex)
         {
-            logger.LogError(ex.Message);
+            GeneralLogError.ArgumentNullException(logger, ex.Message, ex);
 
             context.Response.StatusCode = StatusCodes.Status404NotFound;
             await context.Response.WriteAsync(string.Join(", ", ex.Message));
         }
         catch (ArgumentException ex)
         {
-            logger.LogError(ex.Message);
+            GeneralLogError.ArgumentException(logger, ex.Message, ex);
 
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
             await context.Response.WriteAsync(string.Join(", ", ex.Message));
         }
         catch (Exception ex)
         {
-            logger.LogError(ex.InnerException?.Message ?? ex.Message);
+            GeneralLogError.InternalServerError(logger, ex.InnerException?.Message ?? ex.Message, ex);
 
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
             await context.Response.WriteAsync(string.Join(", ", ex.InnerException?.Message ?? ex.Message)); 

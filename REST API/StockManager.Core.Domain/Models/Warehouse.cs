@@ -1,12 +1,11 @@
 ﻿using System.Runtime.Serialization;
 
-namespace StockManager.Models
+namespace StockManager.Models;
+
+public enum Warehouse
 {
-    public enum Warehouse
-    {
-        RegularStorage,
-        RefrigeratedSection,
-        FreezerSection,
-        OutdoorStorage
-    }
+    RegularStorage,
+    RefrigeratedSection,
+    FreezerSection,
+    OutdoorStorage
 }

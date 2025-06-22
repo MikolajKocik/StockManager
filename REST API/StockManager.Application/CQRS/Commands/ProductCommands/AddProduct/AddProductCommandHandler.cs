@@ -3,6 +3,9 @@ using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Product;
+using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
@@ -44,12 +47,12 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
 
                 if (supplier is not null)
                 {
-                    TrackingBehaviorLogMessages.LogSupplierAlreadyExists(_logger, supplier.Id, default);
+                    SupplierLogWarning.LogSupplierAlreadyExists(_logger, supplier.Id, default);
                     _supplierRepository.AttachSupplier(supplier);
                 }
                 else
                 {
-                    TrackingBehaviorLogMessages.LogSupplierNotExists(_logger, command.Product.SupplierId, default);
+                    SupplierLogWarning.LogSupplierNotExists(_logger, command.Product.SupplierId, default);
                     supplier = _mapper.Map<Supplier>(command.Product.Supplier);
                     await _supplierRepository.AddSupplierAsync(supplier, cancellationToken);
                 }
@@ -57,7 +60,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
                 Product product = _mapper.Map<Product>(command.Product);
                 product.SetSupplier(supplier);
 
-                TrackingBehaviorLogMessages.LogAddProductOperationSuccesfull(_logger, command.Product, default);
+                ProductLogInfo.LogAddProductSuccesfull(_logger, command.Product, default);
 
                 Product newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
 
@@ -69,7 +72,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
             }
             else
             {
-                TrackingBehaviorLogMessages.LogProductValidationFailed(_logger, command.Product, default);
+                ProductLogWarning.LogProductValidationFailed(_logger, command.Product, default);
                 await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
@@ -82,7 +85,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         }
         catch (Exception ex)
         {
-            TrackingBehaviorLogMessages.LogAddingDataException(_logger, ex);
+            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
             throw;
         }
     }

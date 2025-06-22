@@ -6,11 +6,12 @@ public static class ProductTestDtoFactory
 {
     public static ProductDto CreateTestDto(
        int id = 1,
+       string genre = "Meat",  
        string name = "Test Products", 
        string unit = "kg",
-       string batch = "BATCH-001",
-       string genre = "Meat",              
-       string warehouse = "FreezerSection"  
+       int quantity = 10,
+       string warehouse = "FreezerSection",
+       string batch = "BATCH-001"
         )    
     {
         return new ProductDto
@@ -23,7 +24,7 @@ public static class ProductTestDtoFactory
             Type = warehouse, 
             DeliveredAt = DateTime.UtcNow,
             ExpirationDate = DateTime.UtcNow.AddDays(30),
-            Quantity = 10,
+            Quantity = quantity,
             SupplierId = Guid.NewGuid()
         };
     }

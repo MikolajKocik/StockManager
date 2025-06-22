@@ -2,7 +2,9 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.Error;
 using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models;
@@ -31,11 +33,11 @@ public class AuthService : IAuthService
 
         if (existingUser is null)
         {
-            _logger.LogWarning("User: {@user} already exists", register.UserName);
+            GeneralLogWarning.UserAlreadyExists(_logger, register.UserName, default);
 
             var error = new Error(
                 $"User: {existingUser} already exists",
-                code: "User.Conflict"
+                ErrorCodes.UserConflict
             );
 
             return Result<RegisterDto>.Failure(error);
@@ -48,18 +50,18 @@ public class AuthService : IAuthService
 
             if (!result.Succeeded)
             {
-                _logger.LogError("User: {@user} registration failed", register.UserName);
+                GeneralLogWarning.RegistrationFailedService(_logger, register.UserName, default);
 
                 var error = new Error(
                     $"Failed to create user: {string.Join(", ", result.Errors.Select(e => e.Description))}",
-                    code: "User.?"
+                    ErrorCodes.UserValidation
                 );
 
                 return Result<RegisterDto>.Failure(error);
             }
             else
             {
-                _logger.LogInformation("User: {@user} registered succesfully", register.UserName);
+                GeneralLogInfo.RegistrationSuccess(_logger, register.UserName, default);
 
                 return Result<RegisterDto>.Success(register);
             }
@@ -73,7 +75,7 @@ public class AuthService : IAuthService
         {
             var error = new Error(
                 $"UnauthorizedAccess {user}",
-                code: "User.Unauthorized"
+                ErrorCodes.UserUnauthorized
             );
 
             return Result<LoginResultDto>.Failure(error);

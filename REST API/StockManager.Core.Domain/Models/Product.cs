@@ -5,18 +5,18 @@ namespace StockManager.Models;
 public sealed class Product
 {
     public int Id { get; private set; } 
-    public string Name { get; private set; } 
-    public string Slug { get; private set; }
+    public string Name { get; private set; } = default!;
+    public string Slug { get; private set; } = default!;
     public Genre Genre { get; private set; }
-    public string Unit { get; private set; } 
+    public string Unit { get; private set; } = default!;
     public int Quantity {  get; private set; }
     public DateTime ExpirationDate { get; private set; }
     public DateTime DeliveredAt { get; private set; }
     public Warehouse Type { get; private set; }
-    public string BatchNumber { get; private set; }
+    public string BatchNumber { get; private set; } = default!;
 
     // relation 1-* with supplier
-    public Supplier Supplier { get; private set; }
+    public Supplier Supplier { get; private set; } = default!;
     public Guid SupplierId { get; private set; }
 
     public Product(
@@ -43,7 +43,7 @@ public sealed class Product
         SupplierId = supplierId;
     }
 
-    private Product() { Supplier = default!; }
+    private Product() { }
 
     public void ChangeQuantity(int quantity)
     {

@@ -9,4 +9,9 @@
 		<EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 		<UserSecretsId>7f5c2ae6-358f-4682-ab5c-9d484d2da312</UserSecretsId>
 	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(BuildingInsideDocker)' == 'true'">
+		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+		<CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
+	</PropertyGroup>
 </Project>

@@ -6,17 +6,23 @@ using Microsoft.AspNetCore.Identity;
 using StockManager.Infrastructure.Repositories;
 using StockManager.Core.Domain.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 
 namespace StockManager.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
+    public static void AddInfrastructure(this IServiceCollection services)
     {
-        services.AddDbContext<StockManagerDbContext>(options => 
+        string? connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection");
+        ArgumentException.ThrowIfNullOrEmpty(connectionString);
+
+        Console.WriteLine($"[INF] DockerConnection = {connectionString}");
+
+        services.AddDbContext<StockManagerDbContext>(options =>
             options
-                .UseSqlServer(configuration.GetConnectionString("DefaultConnection"))
+                .UseSqlServer(connectionString)
                 .EnableSensitiveDataLogging());
 
         services.AddIdentityApiEndpoints<User>()

@@ -5,17 +5,17 @@ namespace StockManager.Models;
 
 public sealed class Address
 {
-    public Guid Id { get; private set; }
-    public string Slug { get; private set; }
-    public string City { get; private set; } 
-    public string Country { get; private set; } 
-    public string PostalCode { get; private set; }
+    public Guid Id { get; private set; } 
+    public string Slug { get; private set; } = default!;
+    public string City { get; private set; } = default!;
+    public string Country { get; private set; } = default!;
+    public string PostalCode { get; private set; } = default!;
 
     // relation 1-1 with supplier
     public Guid SupplierId { get; private set; }
-    public Supplier Supplier { get; private set; } 
+    public Supplier Supplier { get; private set; } = default!;
 
-    private Address() { Supplier = default!; }
+    private Address() { }
 
     public Address(
         Guid id,

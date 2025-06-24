@@ -1,0 +1,36 @@
+services:
+  stockmanager:
+    container_name: stockmanager
+    image: ${DOCKER_REGISTRY-}stockmanager
+    build:
+      context: .
+      dockerfile: StockManager/Dockerfile
+    ports:
+     - "5000:8080"
+     - "5001:8081"
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+     - JWT__Key=${JWT__Key}
+     - JWT__Issuer=${JWT__Issuer}
+     - JWT__Audience=${JWT__Audience}
+     - ConnectionStrings__DockerConnection=${DOCKER_DB_CONN}
+     - OTEL_RESOURCE_ATTRIBUTES=service.name=my-app,service.namespace=my-application-group,deployment.environment=production
+     - OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
+     - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic ${GRAFANA_OTEL_TOKEN}
+     - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+    volumes:
+     - ./logs:/app/logs
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+        SA_PASSWORD: ${SA_PASSWORD}
+        ACCEPT_EULA: "Y"
+    ports:
+     - "1433:1433"
+    volumes:
+     - sql-data:/var/opt/mssql
+
+volumes:
+    sql-data:    
+  

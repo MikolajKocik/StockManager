@@ -13,5 +13,5 @@ public class User : IdentityUser
     }
     public User() { }
 
-    public string Slug { get; private set; }
+    public string Slug { get; private set; } = default!;
 }

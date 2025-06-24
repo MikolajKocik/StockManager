@@ -11,9 +11,21 @@ public static class WebApplicationBuilderExtensions
 {
     public static void AddPresentation(this WebApplicationBuilder builder)
     {
-        IConfigurationSection jwtSettings = builder.Configuration.GetSection("JwtSettings");
+        byte[] key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key")!);
 
-        byte[] key = Encoding.UTF8.GetBytes(jwtSettings["Secret"]!);
+        string? issuer = Environment.GetEnvironmentVariable("JWT__Issuer")!;
+
+        string? audience = Environment.GetEnvironmentVariable("JWT__Audience")!;
+
+        IsConfigured(key, issuer, audience);
+
+        static void IsConfigured(params object[] args)
+        {
+            foreach (object item in args)
+            {
+                ArgumentException.ThrowIfNullOrWhiteSpace(item.ToString());
+            }
+        }
 
         // configure JWT token
         builder.Services.AddAuthentication(options =>
@@ -30,10 +42,10 @@ public static class WebApplicationBuilderExtensions
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = true,
-                ValidIssuer = jwtSettings["Issuer"],
+                ValidIssuer = issuer,
 
                 ValidateAudience = true,
-                ValidAudience = jwtSettings["Audience"],
+                ValidAudience = audience,
 
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero
@@ -65,8 +77,8 @@ public static class WebApplicationBuilderExtensions
                  {
                      new OpenApiSecurityScheme
                      {
-                           Reference = new OpenApiReference 
-                           { 
+                           Reference = new OpenApiReference
+                           {
                                Type = ReferenceType.SecurityScheme,
                                Id = "bearerAuth"
                            }

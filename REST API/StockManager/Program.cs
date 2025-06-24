@@ -1,5 +1,7 @@
 using MediatR;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Npgsql;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
@@ -21,15 +23,8 @@ using StockManager.Middlewares;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-if (builder.Environment.IsDevelopment())
-{
-    // user secrets data
-    builder.Configuration.AddUserSecrets<Program>();
-}
-
 builder.AddPresentation();
-builder.Services.AddInfrastructure(builder.Configuration);
-
+builder.Services.AddInfrastructure();
 builder.Services.AddApplication();
 
 // scrutor package
@@ -55,6 +50,39 @@ builder.Services.Scan(scan => scan
         .WithScopedLifetime()
 );
 
+builder.Services
+    .AddOpenTelemetry()
+    .ConfigureResource(resource =>
+    {
+        resource.AddService(
+            serviceName: "my-app",
+            serviceNamespace: "my-application-group",
+            serviceVersion: "1.0.0");
+    })
+    .WithTracing(tracing =>
+    {
+        tracing
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+            .AddConsoleExporter()
+            .AddOtlpExporter(opt =>
+            {
+                opt.Endpoint = new Uri(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] 
+                    ?? throw new ArgumentException("configuration endpoint is empty"));
+                opt.Headers = builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"];
+                opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+            });
+    });
+
+
+builder.Logging.AddOpenTelemetry(logging =>
+{
+    logging.IncludeScopes = true;
+    logging.IncludeFormattedMessage = true;
+
+    logging.AddOtlpExporter();
+});
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP command pipeline.
@@ -75,11 +103,34 @@ using (IServiceScope scope = app.Services.CreateScope())
     StockManagerDbContext dbContext = scope.ServiceProvider
         .GetRequiredService<StockManagerDbContext>();
 
-    IEnumerable<string> pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+    int retryCount = 0;
+    int maxRetries = 10;
+    var delay = TimeSpan.FromSeconds(3);
 
-    if (pendingMigrations.Any())
+    while(retryCount < maxRetries)
     {
-        await dbContext.Database.MigrateAsync();
+        try
+        {
+
+            IEnumerable<string> pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync();
+
+            if (pendingMigrations.Any())
+            {
+                await dbContext.Database.MigrateAsync();
+            }
+
+            break;
+        }
+        catch (SqlException ex)
+        {
+            if (ex.Number == 1801)
+            { 
+                break; 
+            }
+
+            retryCount++;
+            Console.WriteLine($"SQL Server not ready (attempt {retryCount}: {ex.Message}");
+        }
     }
 }
 

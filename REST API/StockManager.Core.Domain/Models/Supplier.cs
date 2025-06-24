@@ -5,16 +5,16 @@ namespace StockManager.Models;
 public sealed class Supplier
 {
     public Guid Id { get; private set; }
-    public string Name { get; private set; } 
-    public string Slug { get; private set; }
+    public string Name { get; private set; } = default!;
+    public string Slug { get; private set; } = default!;
 
     // relation 1-1 with supplier
-    public Address Address { get; private set; } 
+    public Address Address { get; private set; } = default!;
 
     // relation 1-* with product
     public List<Product> Products { get; private set; } = new List<Product>();
 
-    private Supplier() { Address = default!; }
+    private Supplier() { }
 
     public Supplier(Guid id, string name, Address address)
     {

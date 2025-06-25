@@ -11,6 +11,7 @@ using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Models;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Common.Logging.Product;
+using StockManager.Application.CQRS.Commands.ProductCommands.TrackProductView;
 
 namespace StockManager.Controllers;
 
@@ -182,6 +183,16 @@ public sealed class ProductController : ControllerBase
         }
 
         return result.Error!.ToActionResult();
+    }
+
+    [HttpPost("{id:guid}/track-view")]
+    public async Task<IActionResult> TrackView(Guid id)
+    {
+        Result<Unit> result = await _mediator.Send(new TrackProductViewCommand(id));
+
+        return result.IsSuccess
+            ? NoContent()
+            : result.Error!.ToActionResult();
     }
 
     [HttpGet("genres")]

@@ -6,30 +6,65 @@ services:
       context: .
       dockerfile: StockManager/Dockerfile
     ports:
-     - "5000:8080"
-     - "5001:8081"
+      - "5000:8080"
+      - "5001:8081"
     environment:
-     - ASPNETCORE_ENVIRONMENT=Development
-     - JWT__Key=${JWT__Key}
-     - JWT__Issuer=${JWT__Issuer}
-     - JWT__Audience=${JWT__Audience}
-     - ConnectionStrings__DockerConnection=${DOCKER_DB_CONN}
-     - OTEL_RESOURCE_ATTRIBUTES=service.name=my-app,service.namespace=my-application-group,deployment.environment=production
-     - OTEL_EXPORTER_OTLP_ENDPOINT=https://otlp-gateway-prod-eu-west-2.grafana.net/otlp
-     - OTEL_EXPORTER_OTLP_HEADERS=Authorization=Basic ${GRAFANA_OTEL_TOKEN}
-     - OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+      - ASPNETCORE_ENVIRONMENT=Development
+    env_file:
+      - .env
+    depends_on:
+        redis:
+            condition: service_healthy
+        sqlserver:
+            condition: service_healthy
+        rabbitmq:
+            condition: service_healthy
     volumes:
-     - ./logs:/app/logs
+      - ./logs:/app/logs
 
   sqlserver:
+    container_name: stockmanager-sql
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
         SA_PASSWORD: ${SA_PASSWORD}
         ACCEPT_EULA: "Y"
     ports:
-     - "1433:1433"
+      - "1433:1433"
     volumes:
-     - sql-data:/var/opt/mssql
+      - sql-data:/var/opt/mssql
+    healthcheck:
+        test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-U","sa","-P","${SA_PASSWORD}","-Q","SELECT 1"]
+        interval: 10s
+        timeout: 5s
+        retries: 10
+  
+  redis:
+    container_name: stockmanager-redis
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+        test: ["CMD", "redis-cli", "ping"]
+        interval: 10s
+        timeout: 5s
+        retries: 5
+
+  rabbitmq:
+    container_name: stockmanager-rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"      # AMQP
+      - "15672:15672"    # UI management
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ_USER}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ_PASS}"
+    restart: unless-stopped
+    healthcheck:
+        test: ["CMD", "rabbitmqctl", "status"]
+        interval: 10s
+        timeout: 5s
+        retries: 5  
 
 volumes:
     sql-data:    

@@ -1,19 +1,23 @@
+using System.Globalization;
 using System.Reflection;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Npgsql;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Abstractions.CQRS.MediatorAdapter;
 using StockManager.Application.Abstractions.CQRS.MediatorAdapter.Command;
 using StockManager.Application.Abstractions.CQRS.MediatorAdapter.Query;
 using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common.Events;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Configuration;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
@@ -23,7 +27,9 @@ using StockManager.Application.Extensions;
 using StockManager.Core.Domain.Models;
 using StockManager.Extensions;
 using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.EventBus;
 using StockManager.Infrastructure.Extensions;
+using StockManager.Infrastructure.Settings;
 using StockManager.Middlewares;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -133,6 +139,48 @@ builder.Logging.AddOpenTelemetry(logging =>
     logging.AddOtlpExporter();
 });
 
+// Rabbitmq
+CultureInfo format = CultureInfo.InvariantCulture;
+builder.Services.Configure<RabbitMqSettings>(opts =>
+{
+    opts.HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST")!;
+    opts.Port = Convert.ToInt32(Environment.GetEnvironmentVariable("RABBITMQ_PORT")!, format);
+    opts.UserName = Environment.GetEnvironmentVariable("RABBITMQ_USER")!;
+    opts.Password = Environment.GetEnvironmentVariable("RABBITMQ_PASS")!;
+    opts.Exchange = Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE") ?? "stock-exchange";
+});
+builder.Services.AddSingleton<IEventBus, RabbitMqEventBus>();
+
+// Redis
+string redisHost = Environment.GetEnvironmentVariable("REDIS_HOST")!;
+string redisPort = Environment.GetEnvironmentVariable("REDIS_PORT")!;
+
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration = $"{redisHost}:{redisPort}";
+    options.InstanceName = "MyAppCache:";
+});
+
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect($"{redisHost}:{redisPort}")
+);
+
+builder.Services.Configure<CacheSettings>(opts =>
+{
+    opts.ProductAbsoluteTtlHours = Convert.ToInt32(Environment.GetEnvironmentVariable("PRODUCT_ABSOLUTE_TTL_HOURS") ?? "6", format);
+    opts.ProductSlidingTtlMinutes = Convert.ToInt32(Environment.GetEnvironmentVariable("PRODUCT_SLIDING_TTL_MINUTES") ?? "60", format);
+});
+
+// health checks
+string sqlConn = Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection")
+              ?? throw new ArgumentException("Empty variable ConnectionStrings__DockerConnection");
+
+builder.Services.AddHealthChecks()
+    .AddRedis($"{redisHost}:{redisPort}", name: "redis")
+    .AddSqlServer(sqlConn, name: "sqlserver")
+    // for RabbitMQ use IConnection from DI
+    .AddRabbitMQ();
+
 WebApplication app = builder.Build();
 
 // Configure the HTTP command pipeline.
@@ -194,5 +242,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// health check endpoint
+app.MapHealthChecks("/health")
+    .RequireAuthorization();
 
 await app.RunAsync();

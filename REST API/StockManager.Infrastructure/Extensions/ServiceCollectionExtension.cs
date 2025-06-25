@@ -7,6 +7,7 @@ using StockManager.Infrastructure.Repositories;
 using StockManager.Core.Domain.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Http.HttpResults;
+using StockManager.Infrastructure.Settings;
 
 
 namespace StockManager.Infrastructure.Extensions;

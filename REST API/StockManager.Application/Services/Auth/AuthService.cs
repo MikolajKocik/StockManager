@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.Error;
+using StockManager.Application.Helpers.NullConfiguration;
 using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models;
@@ -18,13 +19,11 @@ public class AuthService : IAuthService
 {
     private readonly ILogger<AuthService> _logger;
     private readonly UserManager<User> _userManager;
-    private readonly IConfiguration _configuration;
 
-    public AuthService(ILogger<AuthService> logger, UserManager<User> userManager, IConfiguration configuration)
+    public AuthService(ILogger<AuthService> logger, UserManager<User> userManager)
     {
         _logger = logger;
         _userManager = userManager;
-        _configuration = configuration;
     }
 
     public async Task<Result<RegisterDto>> RegisterUser(RegisterDto register)
@@ -82,7 +81,12 @@ public class AuthService : IAuthService
         }
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        byte[] key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]!);
+
+        byte[] key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key")!);
+        string? issuer = Environment.GetEnvironmentVariable("JWT__Issuer")!;
+        string? audience = Environment.GetEnvironmentVariable("JWT__Audience")!;
+
+        NullCheck.IsConfigured(key, issuer, audience);
 
         IList<string> roles = await _userManager.GetRolesAsync(user);
 
@@ -98,6 +102,8 @@ public class AuthService : IAuthService
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddHours(1),
+            Audience = audience,
+            Issuer = issuer,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
 

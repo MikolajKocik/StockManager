@@ -1,3 +1,4 @@
+using System.Reflection;
 using MediatR;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,11 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Abstractions.CQRS.MediatorAdapter;
+using StockManager.Application.Abstractions.CQRS.MediatorAdapter.Command;
+using StockManager.Application.Abstractions.CQRS.MediatorAdapter.Query;
 using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
@@ -36,6 +41,7 @@ builder.Services.Scan(scan => scan
          typeof(GetProductByIdQuery).Assembly,
          typeof(GetProductsQuery).Assembly
     )
+    // handlers
     .AddClasses(c => c.AssignableTo(typeof(ICommandHandler<>)))
         .AsImplementedInterfaces()
         .WithScopedLifetime()
@@ -45,10 +51,54 @@ builder.Services.Scan(scan => scan
     .AddClasses(c => c.AssignableTo(typeof(IQueryHandler<,>)))
         .AsImplementedInterfaces()
         .WithScopedLifetime()
-    .AddClasses(c => c.AssignableTo(typeof(IRequestHandler<,>))) // adapters
-        .AsImplementedInterfaces()
-        .WithScopedLifetime()
 );
+
+Assembly appAsm = typeof(StockManager.Application.Extensions.ServiceCollectionExtensions).Assembly;
+foreach (Type type in appAsm.GetTypes())
+{
+    if (type.IsAbstract || !type.IsClass)
+    {
+        continue;
+    }
+
+    foreach(Type iface in type.GetInterfaces())
+    {
+        if(!iface.IsGenericType)
+        {
+            continue;
+        }
+
+        Type def = iface.GetGenericTypeDefinition();
+
+        // QueryHandler<TQ,TR>
+        if (def == typeof(IQueryHandler<,>))
+        {
+            (Type TQ, Type TR) = (iface.GetGenericArguments()[0], iface.GetGenericArguments()[1]);
+            builder.Services.AddTransient(
+                typeof(IRequestHandler<,>).MakeGenericType(TQ, typeof(Result<>).MakeGenericType(TR)),
+                typeof(MediatorQueryAdapter<,>).MakeGenericType(TQ, TR)
+            );
+        }
+        // CommandHandler<TC,TR>
+        else if (def==typeof(ICommandHandler<,>))
+        {
+            (Type TC, Type TR) = (iface.GetGenericArguments()[0], iface.GetGenericArguments()[1]);
+            builder.Services.AddTransient(
+                typeof(IRequestHandler<,>).MakeGenericType(TC, typeof(Result<>).MakeGenericType(TR)),
+                typeof(MediatorCommandAdapterValue<,>).MakeGenericType(TC, TR)
+            );
+        }
+        // CommandHandler<TC> (void)
+        else if (def == typeof(ICommandHandler<>))
+        {
+            Type TC = iface.GetGenericArguments()[0];
+            builder.Services.AddTransient(
+                typeof(IRequestHandler<,>).MakeGenericType(TC, typeof(Result<Unit>)),
+                typeof(MediatorCommandAdapter<>).MakeGenericType(TC)
+            );
+        }
+    }
+}
 
 builder.Services
     .AddOpenTelemetry()
@@ -67,9 +117,9 @@ builder.Services
             .AddConsoleExporter()
             .AddOtlpExporter(opt =>
             {
-                opt.Endpoint = new Uri(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] 
+                opt.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
                     ?? throw new ArgumentException("configuration endpoint is empty"));
-                opt.Headers = builder.Configuration["OTEL_EXPORTER_OTLP_HEADERS"];
+                opt.Headers = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS");
                 opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
             });
     });
@@ -107,7 +157,7 @@ using (IServiceScope scope = app.Services.CreateScope())
     int maxRetries = 10;
     var delay = TimeSpan.FromSeconds(3);
 
-    while(retryCount < maxRetries)
+    while (retryCount < maxRetries)
     {
         try
         {
@@ -124,8 +174,8 @@ using (IServiceScope scope = app.Services.CreateScope())
         catch (SqlException ex)
         {
             if (ex.Number == 1801)
-            { 
-                break; 
+            {
+                break;
             }
 
             retryCount++;

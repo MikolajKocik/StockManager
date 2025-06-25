@@ -18,8 +18,6 @@ public static class ServiceCollectionExtension
         string? connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection");
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
-        Console.WriteLine($"[INF] DockerConnection = {connectionString}");
-
         services.AddDbContext<StockManagerDbContext>(options =>
             options
                 .UseSqlServer(connectionString)

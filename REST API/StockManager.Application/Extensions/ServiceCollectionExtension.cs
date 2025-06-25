@@ -4,7 +4,12 @@ using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using StockManager.Application.Common.PipelineBehavior;
+using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
+using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
+using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
+using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
 using StockManager.Application.Services.Auth;
 using StockManager.Core.Domain.Interfaces.Services;
 

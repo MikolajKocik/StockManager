@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using StockManager.Application.Helpers.NullConfiguration;
 using StockManager.Middlewares;
 using System.Text;
 
@@ -17,15 +18,7 @@ public static class WebApplicationBuilderExtensions
 
         string? audience = Environment.GetEnvironmentVariable("JWT__Audience")!;
 
-        IsConfigured(key, issuer, audience);
-
-        static void IsConfigured(params object[] args)
-        {
-            foreach (object item in args)
-            {
-                ArgumentException.ThrowIfNullOrWhiteSpace(item.ToString());
-            }
-        }
+        NullCheck.IsConfigured(key, issuer, audience);      
 
         // configure JWT token
         builder.Services.AddAuthentication(options =>

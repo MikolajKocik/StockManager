@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.Error;
 using StockManager.Application.Helpers.ProblemDetails;
 
 namespace StockManager.Application.Extensions.ErrorExtensions;
@@ -30,12 +31,20 @@ public static class ErrorExtension
 
     private static int GetStatusCode(Error error)
     {
-        return error.Code.ToLowerInvariant() switch
+        return error.Code switch
         {
-            var c when c.Contains("NotFound") => StatusCodes.Status404NotFound,
-            var c when c.Contains("Conflict") => StatusCodes.Status409Conflict,
-            var c when c.Contains("Validation") => StatusCodes.Status400BadRequest,
-            var c when c.Contains("Unauthorized") => StatusCodes.Status401Unauthorized,
+
+            ErrorCodes.UserUnauthorized => StatusCodes.Status401Unauthorized,
+            ErrorCodes.UserConflict => StatusCodes.Status409Conflict,
+            ErrorCodes.UserValidation => StatusCodes.Status400BadRequest,
+            //
+            ErrorCodes.ProductNotFound => StatusCodes.Status404NotFound,
+            ErrorCodes.ProductConflict => StatusCodes.Status409Conflict,
+            ErrorCodes.ProductValidation => StatusCodes.Status400BadRequest,
+            //
+            ErrorCodes.SupplierNotFound => StatusCodes.Status404NotFound,
+            ErrorCodes.SupplierConflict => StatusCodes.Status409Conflict,
+            ErrorCodes.SupplierValidation => StatusCodes.Status400BadRequest,
             _ => StatusCodes.Status500InternalServerError
         };
     } 

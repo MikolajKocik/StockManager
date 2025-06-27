@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace StockManager.Application.Common.Events.Product;
 
-public sealed record ProductAddedIntegrationEvent(
+public sealed record ProductUpdatedIntegrationEvent(
     int ProductId,
-    string Name,
-    Guid SupplierId
+    string NewName,
+    Guid? SupplierId
     ) : IIntegrationEvent;
 

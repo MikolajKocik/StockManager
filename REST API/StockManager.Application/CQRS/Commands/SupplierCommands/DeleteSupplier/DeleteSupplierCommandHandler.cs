@@ -1,12 +1,16 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Events;
+using StockManager.Application.Common.Events.Supplier;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
@@ -18,13 +22,21 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
     private readonly IMapper _mapper;
     private readonly ISupplierRepository _supplierRepository;
     private readonly ILogger<DeleteSupplierCommandHandler> _logger;
+    private readonly IConnectionMultiplexer _redis;
+    private readonly IEventBus _eventBus;
 
-    public DeleteSupplierCommandHandler(IMapper mapper, ISupplierRepository repository,
-        ILogger<DeleteSupplierCommandHandler> logger)
+    public DeleteSupplierCommandHandler(
+        IMapper mapper,
+        ISupplierRepository repository,
+        ILogger<DeleteSupplierCommandHandler> logger,
+          IConnectionMultiplexer redis,
+          IEventBus eventBus)
     {
         _mapper = mapper;
         _supplierRepository = repository;
         _logger = logger;
+        _redis = redis;
+        _eventBus = eventBus;
     }
 
     public async Task<Result<SupplierDto>> Handle(DeleteSupplierCommand command, CancellationToken cancellationToken)
@@ -43,6 +55,18 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
                 SupplierDto dto = _mapper.Map<SupplierDto>(remove);
 
                 await transaction.CommitAsync(cancellationToken);
+
+                await _redis.RemoveKeyAsync(
+                    $"supplier:{command.Id}:views")
+                    .ConfigureAwait(false);
+
+                await _redis.RemoveKeyAsync(
+                    $"suppleir:{command.Id}:details")
+                    .ConfigureAwait(false);
+
+                await _eventBus.PublishAsync(new SupplierDeletedIntegrationEvent(
+                    command.Id)
+                    ).ConfigureAwait(false);
 
                 return Result<SupplierDto>.Success(dto);
             }

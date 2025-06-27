@@ -11,4 +11,5 @@ public static class LoggingCategories
     public const string Product = "StockManager.Product";
     public const string Supplier = "StockManager.Supplier";
     public const string General = "StockManager.General";
+    public const string RedisCache = "StockManager.Redis";
 }

@@ -8,6 +8,15 @@ namespace StockManager.Application.Configuration;
 
 public class CacheSettings
 {
-    public int ProductAbsoluteTtlHours { get; set; } = 6;
-    public int ProductSlidingTtlMinutes { get; set; } = 60;
+    public static int AbsoluteTtlHours { get; set; } = 6;
+    public static int SlidingTtlMinutes { get; set; } = 60;
+
+    //
+    public int ProductAbsoluteTtlHours { get; } = AbsoluteTtlHours;
+    public int ProductSlidingTtlMinutes { get; } = SlidingTtlMinutes;
+
+    //
+    public int SupplierAbsoluteTtlHours { get; } = AbsoluteTtlHours;
+    public int SupplierSlidingTtlMinutes { get; } = SlidingTtlMinutes;
+  
 }

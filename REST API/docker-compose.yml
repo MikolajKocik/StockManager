@@ -33,10 +33,11 @@ services:
     volumes:
       - sql-data:/var/opt/mssql
     healthcheck:
-        test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-U","sa","-P","${SA_PASSWORD}","-Q","SELECT 1"]
-        interval: 10s
-        timeout: 5s
-        retries: 10
+        test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/1433'"]
+        interval: 15s
+        timeout: 10s
+        retries: 5
+        start_period: 60s
   
   redis:
     container_name: stockmanager-redis

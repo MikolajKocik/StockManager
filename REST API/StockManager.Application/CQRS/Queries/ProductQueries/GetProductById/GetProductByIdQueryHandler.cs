@@ -2,11 +2,14 @@
 using AutoMapper;
 using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common.Logging.Product.ProductCache;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Configuration;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
@@ -19,30 +22,33 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Pro
     private readonly IProductRepository _repository;
     private readonly IDistributedCache _cache;
     private readonly CacheSettings _cacheSettings;
+    private readonly ILogger<GetProductByIdQueryHandler> _logger;
 
     public GetProductByIdQueryHandler(
         IMapper mapper,
         IProductRepository repository,
         IDistributedCache cache,
-        IOptions<CacheSettings> cacheOptions)
+        IOptions<CacheSettings> cacheOptions,
+        ILogger<GetProductByIdQueryHandler> logger)
     {
         _mapper = mapper;
         _repository = repository;
         _cache = cache;
         _cacheSettings = cacheOptions.Value;
+        _logger = logger;
     }
 
     public async Task<Result<ProductDto>> Handle(GetProductByIdQuery query, CancellationToken cancellationToken)
     {
-        string cacheKey = $"product:{query.Id}";
-        string? cached = await _cache.GetStringAsync(cacheKey, cancellationToken);
+        string cacheKey = $"product:{query.Id}:details";
 
-        if (cached is not null)
+        (bool found, ProductDto? dtoFromCache) = await _cache.TryGetFromCacheAsync<ProductDto>(cacheKey, cancellationToken);
+
+        if (found)
         {
-            // here will be logger   _logger.LogInformation("Zwracam produkt z cache’a (key={CacheKey})", cacheKey);
-            ProductDto? dtoFromCache = JsonSerializer.Deserialize<ProductDto>(cached)!;
+            ProductCacheLog.ReturnCacheFromProduct(_logger, cacheKey, default);
 
-            return Result<ProductDto>.Success(dtoFromCache);
+            return Result<ProductDto>.Success(dtoFromCache!);
         }
 
         Product? product = await _repository.GetProductByIdAsync(query.Id, cancellationToken);
@@ -58,18 +64,20 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Pro
         }
 
         ProductDto dto = _mapper.Map<ProductDto>(product);
-        string serialized = JsonSerializer.Serialize(dto);
 
-        var options = new DistributedCacheEntryOptions
-        {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(_cacheSettings.ProductAbsoluteTtlHours),
-            SlidingExpiration = TimeSpan.FromMinutes(_cacheSettings.ProductSlidingTtlMinutes)
-        };
-        await _cache.SetStringAsync(cacheKey, serialized, options, cancellationToken);
-        //   _logger.LogInformation("Stored {Key} in cache for {Abs}h absolute, {Slide}m sliding",
-       // cacheKey,
-          //  _cacheSettings.ProductAbsoluteTtlHours,
-          //  _cacheSettings.ProductSlidingTtlMinutes);
+        await _cache.SetCacheObjectAsync(
+            cacheKey,
+            dto,
+            _cacheSettings.ProductAbsoluteTtlHours,
+            _cacheSettings.ProductSlidingTtlMinutes,
+            cancellationToken);
+          
+        ProductCacheLog.StoredKeys(      
+            _logger, 
+            cacheKey, 
+            _cacheSettings.ProductAbsoluteTtlHours, 
+            _cacheSettings.ProductSlidingTtlMinutes, 
+            default);
 
         return Result<ProductDto>.Success(dto);
     }

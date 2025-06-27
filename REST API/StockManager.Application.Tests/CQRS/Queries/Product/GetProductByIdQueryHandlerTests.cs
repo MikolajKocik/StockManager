@@ -1,7 +1,12 @@
 ﻿using AutoMapper;
 using FluentAssertions;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Configuration;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Tests.TestHelpers.ProductFactory;
@@ -13,13 +18,23 @@ public sealed class GetProductByIdQueryHandlerTests
 {
     private readonly Mock<IProductRepository> _productRepositoryMock;
     private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IDistributedCache> _cache;
     private readonly GetProductByIdQueryHandler _handler;
+    private readonly Mock<IOptions<CacheSettings>> _cacheOptions;
 
     public GetProductByIdQueryHandlerTests()
     { 
         _productRepositoryMock = new Mock<IProductRepository>();
         _mapperMock = new Mock<IMapper>();
-        _handler = new GetProductByIdQueryHandler(_mapperMock.Object, _productRepositoryMock.Object);
+        _cache = new Mock<IDistributedCache>();
+        _cacheOptions = new Mock<IOptions<CacheSettings>>();
+        ILogger<GetProductByIdQueryHandler> logger = NullLogger<GetProductByIdQueryHandler>.Instance;
+        _handler = new GetProductByIdQueryHandler(
+            _mapperMock.Object,
+            _productRepositoryMock.Object,
+            _cache.Object,
+            _cacheOptions.Object,
+            logger);
     }
 
     [Fact]

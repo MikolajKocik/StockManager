@@ -1,6 +1,10 @@
 using System.Globalization;
 using System.Reflection;
+using HealthChecks.UI.Client;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +12,7 @@ using Microsoft.Extensions.Options;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using RabbitMQ.Client;
 using Serilog;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
@@ -149,6 +154,24 @@ builder.Services.Configure<RabbitMqSettings>(opts =>
     opts.Password = Environment.GetEnvironmentVariable("RABBITMQ_PASS")!;
     opts.Exchange = Environment.GetEnvironmentVariable("RABBITMQ_EXCHANGE") ?? "stock-exchange";
 });
+
+builder.Services.AddSingleton(sp =>
+{
+    RabbitMqSettings settings = sp.GetRequiredService<IOptions<RabbitMqSettings>>().Value;
+    var factory = new ConnectionFactory
+    {
+        HostName = settings.HostName,
+        Port = settings.Port,
+        UserName = settings.UserName,
+        Password = settings.Password
+    };
+
+    return factory
+        .CreateConnectionAsync()
+        .GetAwaiter()
+        .GetResult();
+});
+
 builder.Services.AddSingleton<IEventBus, RabbitMqEventBus>();
 
 // Redis
@@ -165,12 +188,6 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     ConnectionMultiplexer.Connect($"{redisHost}:{redisPort}")
 );
 
-builder.Services.Configure<CacheSettings>(opts =>
-{
-    opts.ProductAbsoluteTtlHours = Convert.ToInt32(Environment.GetEnvironmentVariable("PRODUCT_ABSOLUTE_TTL_HOURS") ?? "6", format);
-    opts.ProductSlidingTtlMinutes = Convert.ToInt32(Environment.GetEnvironmentVariable("PRODUCT_SLIDING_TTL_MINUTES") ?? "60", format);
-});
-
 // health checks
 string sqlConn = Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection")
               ?? throw new ArgumentException("Empty variable ConnectionStrings__DockerConnection");
@@ -178,8 +195,8 @@ string sqlConn = Environment.GetEnvironmentVariable("ConnectionStrings__DockerCo
 builder.Services.AddHealthChecks()
     .AddRedis($"{redisHost}:{redisPort}", name: "redis")
     .AddSqlServer(sqlConn, name: "sqlserver")
-    // for RabbitMQ use IConnection from DI
-    .AddRabbitMQ();
+    // for RabbitMQ is used IConnection from DI
+    .AddRabbitMQ(name: "rabbitmq");
 
 WebApplication app = builder.Build();
 
@@ -203,7 +220,7 @@ using (IServiceScope scope = app.Services.CreateScope())
 
     int retryCount = 0;
     int maxRetries = 10;
-    var delay = TimeSpan.FromSeconds(3);
+    var delay = TimeSpan.FromSeconds(5);
 
     while (retryCount < maxRetries)
     {
@@ -228,6 +245,8 @@ using (IServiceScope scope = app.Services.CreateScope())
 
             retryCount++;
             Console.WriteLine($"SQL Server not ready (attempt {retryCount}: {ex.Message}");
+
+            await Task.Delay(delay);
         }
     }
 }
@@ -244,7 +263,9 @@ app.UseAuthorization();
 app.MapControllers();
 
 // health check endpoint
-app.MapHealthChecks("/health")
-    .RequireAuthorization();
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
 
 await app.RunAsync();

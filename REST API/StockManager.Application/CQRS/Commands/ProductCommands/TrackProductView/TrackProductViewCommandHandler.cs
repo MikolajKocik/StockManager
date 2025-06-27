@@ -7,6 +7,7 @@ using MediatR;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Extensions.Redis;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.TrackProductView;
 
@@ -19,18 +20,15 @@ public class TrackProductViewCommandHandler : ICommandHandler<TrackProductViewCo
         _redis = redis;
     }
 
-    public async Task<Result<Unit>> Handle(TrackProductViewCommand command, CancellationToken ct)
+    public async Task<Result<Unit>> Handle(TrackProductViewCommand command, CancellationToken cancellationToken)
     {
-        IDatabase db = _redis.GetDatabase();
         string key = $"product:{command.ProductId}:views";
 
-        // increment with 1 and return new
-        long newCount = await db.StringIncrementAsync(key);
-
-        if (newCount == 1)
-        {
-            await db.KeyExpireAsync(key, TimeSpan.FromHours(24));
-        }
+        await _redis.IncrementKeyAsync(
+            key,
+            TimeSpan.FromHours(24),
+            cancellationToken)
+            .ConfigureAwait(false);
 
         return Result<Unit>.Success(Unit.Value);
     }

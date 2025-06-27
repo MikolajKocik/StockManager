@@ -3,6 +3,7 @@ using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Events;
 using StockManager.Application.Common.Events.Product;
@@ -12,10 +13,12 @@ using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
+using IDatabase = StackExchange.Redis.IDatabase;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 
@@ -26,24 +29,35 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
     private readonly ISupplierRepository _supplierRepository;
     private readonly ILogger<AddProductCommandHandler> _logger;
     private readonly IEventBus _eventBus;
+    private readonly IConnectionMultiplexer _redis;
 
     public AddProductCommandHandler(
         IMapper mapper, IProductRepository productRepository,
         ISupplierRepository supplierRepository,
         ILogger<AddProductCommandHandler> logger,
-        IEventBus eventBus)
+        IEventBus eventBus,
+        IConnectionMultiplexer redis)
     {
         _mapper = mapper;
         _productRepository = productRepository;
         _supplierRepository = supplierRepository;
         _logger = logger;
         _eventBus = eventBus;
+        _redis = redis;
     }
 
     public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
     {
         try
         {
+            string key = $"product:{command.Product.Id}:views";
+
+            await _redis.IncrementKeyAsync(
+                key,
+                TimeSpan.FromHours(24),
+                cancellationToken)
+                .ConfigureAwait(false);
+
             await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync();
 
             var validate = new ProductValidator();
@@ -73,11 +87,12 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
                 Product newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
 
                 await transaction.CommitAsync(cancellationToken);
+                   
+                ProductDto dto = _mapper.Map<ProductDto>(newProduct);
 
                 await _eventBus.PublishAsync(new ProductAddedIntegrationEvent(
-                    newProduct.Id, newProduct.Name, supplier.Id)).ConfigureAwait(false);             
-
-                ProductDto dto = _mapper.Map<ProductDto>(newProduct);
+                   newProduct.Id, newProduct.Name, supplier.Id)
+                    ).ConfigureAwait(false);
 
                 return Result<ProductDto>.Success(dto);
             }

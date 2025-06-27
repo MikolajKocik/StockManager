@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
 
-namespace StockManager.Application.Abstractions.CQRS.Query.QueryHelpers.Supplier;
+namespace StockManager.Application.Extensions.CQRS.Query;
 
-internal static class SupplierQueries
+internal static class FilterHasValue
 {
     public static IQueryable<TEntity> IfHasValue<TEntity>(
         this IQueryable<TEntity> source,

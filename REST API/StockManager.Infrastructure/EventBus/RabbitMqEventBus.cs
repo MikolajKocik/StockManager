@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -15,23 +16,18 @@ public class RabbitMqEventBus : IEventBus, IAsyncDisposable
     private readonly IConnection _connection;
     private readonly IChannel _channel;
     private readonly RabbitMqSettings _settings;
-    private readonly IFormatProvider _format;
 
-    public RabbitMqEventBus(IOptions<RabbitMqSettings> opts)
+    public RabbitMqEventBus(IConnection connection, IOptions<RabbitMqSettings> opts)
     {
+        _connection = connection;
         _settings = opts.Value;
-        var factory = new ConnectionFactory
-        {
-            HostName = Environment.GetEnvironmentVariable("RABBITMQ_HOST")!,
-            Port = Convert.ToInt32(Environment.GetEnvironmentVariable("RABBITMQ_PORT"), _format)!,
-            UserName = _settings.UserName,
-            Password = _settings.Password,
-        };
-        NullCheck.IsConfigured(factory.HostName, factory.Port);
 
-        _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult(); 
+        NullCheck.IsConfigured(_settings);
+        
         _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
-        _channel.ExchangeDeclareAsync(_settings.Exchange, ExchangeType.Topic, durable: true);
+        _channel.ExchangeDeclareAsync(opts.Value.Exchange, ExchangeType.Topic, durable: true)
+            .GetAwaiter()
+            .GetResult();
     }
 
     public async Task PublishAsync<TEvent>(TEvent @event) where TEvent : IIntegrationEvent

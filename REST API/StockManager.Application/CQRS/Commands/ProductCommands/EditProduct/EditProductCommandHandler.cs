@@ -2,12 +2,16 @@
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
+using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Events;
+using StockManager.Application.Common.Events.Product;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -20,13 +24,22 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
     private readonly IMapper _mapper;
     private readonly IProductRepository _repository;
     private readonly ILogger<EditProductCommandHandler> _logger;
+    private readonly IConnectionMultiplexer _redis;
+    private readonly IEventBus _eventBus;
 
-    public EditProductCommandHandler(IMapper mapper, IProductRepository repository, 
-        ILogger<EditProductCommandHandler> logger)
+
+    public EditProductCommandHandler(
+        IMapper mapper,
+        IProductRepository repository, 
+        ILogger<EditProductCommandHandler> logger,
+        IConnectionMultiplexer redis,
+        IEventBus eventBus)
     {
         _mapper = mapper;
         _repository = repository;
         _logger = logger;
+        _redis = redis;
+        _eventBus = eventBus;
     }
 
     public async Task<Result<ProductDto>> Handle(EditProductCommand command, CancellationToken cancellationToken)
@@ -49,8 +62,16 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
                 ValidationResult validationResult = await validate.ValidateAsync(productModified, cancellationToken);
 
                 if (validationResult.IsValid)
-                {
+                {                   
                     await transaction.CommitAsync(cancellationToken);
+
+                    await _redis.RemoveKeyAsync(
+                        $"product:{command.Id}:details")
+                        .ConfigureAwait(false);
+
+                    await _eventBus.PublishAsync(new ProductUpdatedIntegrationEvent(
+                        command.Id, command.Product.Name, command.Product.SupplierId))
+                        .ConfigureAwait(false);
 
                     return Result<ProductDto>.Success(productModified);
                 }

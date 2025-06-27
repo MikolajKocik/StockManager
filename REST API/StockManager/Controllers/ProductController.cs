@@ -18,6 +18,7 @@ namespace StockManager.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/products")]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 public sealed class ProductController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -75,7 +76,7 @@ public sealed class ProductController : ControllerBase
 
     [HttpGet("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProductDto?>> GetProductById([FromRoute] int id, CancellationToken cancellationToken)
     {
 
@@ -104,8 +105,7 @@ public sealed class ProductController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ProductDto>> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
     {
 
@@ -137,9 +137,8 @@ public sealed class ProductController : ControllerBase
 
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EditProduct(
         [FromBody] ProductDto productDto,
         [FromRoute] int id,
@@ -167,8 +166,7 @@ public sealed class ProductController : ControllerBase
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteProduct(
         [FromRoute] int id,
         CancellationToken cancellationToken)
@@ -185,6 +183,9 @@ public sealed class ProductController : ControllerBase
         return result.Error!.ToActionResult();
     }
 
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     [HttpPost("{id:guid}/track-view")]
     public async Task<IActionResult> TrackView(Guid id)
     {
@@ -195,10 +196,12 @@ public sealed class ProductController : ControllerBase
             : result.Error!.ToActionResult();
     }
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("genres")]
     public ActionResult<Genre> GetGenres()
         => Ok(Enum.GetNames(typeof(Genre)));
 
+    [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("warehouses")]
     public ActionResult<Warehouse> GetWarehouses()
         => Ok(Enum.GetNames(typeof(Warehouse)));

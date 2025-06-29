@@ -72,9 +72,9 @@ foreach (Type type in appAsm.GetTypes())
         continue;
     }
 
-    foreach(Type iface in type.GetInterfaces())
+    foreach (Type iface in type.GetInterfaces())
     {
-        if(!iface.IsGenericType)
+        if (!iface.IsGenericType)
         {
             continue;
         }
@@ -91,7 +91,7 @@ foreach (Type type in appAsm.GetTypes())
             );
         }
         // CommandHandler<TC,TR>
-        else if (def==typeof(ICommandHandler<,>))
+        else if (def == typeof(ICommandHandler<,>))
         {
             (Type TC, Type TR) = (iface.GetGenericArguments()[0], iface.GetGenericArguments()[1]);
             builder.Services.AddTransient(
@@ -111,6 +111,12 @@ foreach (Type type in appAsm.GetTypes())
     }
 }
 
+// opentelemetry tracing
+
+string otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
+    ?? throw new ArgumentException("OTLP endpoint is not configured");
+string? otlpHeaders = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS");
+
 builder.Services
     .AddOpenTelemetry()
     .ConfigureResource(resource =>
@@ -128,10 +134,12 @@ builder.Services
             .AddConsoleExporter()
             .AddOtlpExporter(opt =>
             {
-                opt.Endpoint = new Uri(Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
-                    ?? throw new ArgumentException("configuration endpoint is empty"));
-                opt.Headers = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS");
+                opt.Endpoint = new Uri(otlpEndpoint);
                 opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                if (!string.IsNullOrWhiteSpace(otlpHeaders))
+                {
+                    opt.Headers = otlpHeaders;
+                }
             });
     });
 
@@ -141,7 +149,15 @@ builder.Logging.AddOpenTelemetry(logging =>
     logging.IncludeScopes = true;
     logging.IncludeFormattedMessage = true;
 
-    logging.AddOtlpExporter();
+    logging.AddOtlpExporter(opt =>
+    {
+        opt.Endpoint = new Uri(otlpEndpoint);
+        opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+        if(!string.IsNullOrWhiteSpace(otlpHeaders))
+        {
+            opt.Headers = otlpHeaders;
+        }
+    });
 });
 
 // Rabbitmq

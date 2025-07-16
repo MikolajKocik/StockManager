@@ -1,5 +1,5 @@
 # Overview
-This project is a REST Web API warehouse application to magane inventory, stock and orders. 
+This project is a REST Web API warehouse application to manage inventory, stock and orders. 
 
 ## Features
 The REST API incorporates the following:
@@ -16,7 +16,7 @@ The REST API incorporates the following:
   
 - **Grafana:** Monitoring the application metrices and traces.
 
-- **Docker:** Containerize appliaction to be open on multi-platform usecase operating systems.
+- **Docker:** Containerize application to be open on multi-platform usecase operating systems.
 
 - **Docker compose:** Docker orchiestration to manage docker images.
 

@@ -10,9 +10,7 @@ using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
-using StockManager.Application.Services.Auth;
-using StockManager.Core.Domain.Interfaces.Services;
-
+using StockManager.Application.Services;
 
 namespace StockManager.Application.Extensions;
 
@@ -30,8 +28,6 @@ public static class ServiceCollectionExtensions
             .AddFluentValidationAutoValidation();
 
         services.AddHttpContextAccessor();
-
-        services.AddScoped<IAuthService, AuthService>();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));
     }

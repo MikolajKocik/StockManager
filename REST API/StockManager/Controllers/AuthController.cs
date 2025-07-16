@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Extensions.ErrorExtensions;
+using StockManager.Application.Services;
 using StockManager.Core.Application.Dtos.Authorization;
-using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Controllers;
 

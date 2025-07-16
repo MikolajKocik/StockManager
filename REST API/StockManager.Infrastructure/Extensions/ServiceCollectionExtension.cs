@@ -8,6 +8,8 @@ using StockManager.Core.Domain.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Http.HttpResults;
 using StockManager.Infrastructure.Settings;
+using StockManager.Application.Services;
+using StockManager.Infrastructure.Services.Auth;
 
 
 namespace StockManager.Infrastructure.Extensions;
@@ -28,7 +30,9 @@ public static class ServiceCollectionExtension
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<StockManagerDbContext>()
             .AddDefaultTokenProviders();
-          
+
+        services.AddScoped<IAuthService, AuthService>();
+
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<ISupplierRepository, SupplierRepository>();
     }

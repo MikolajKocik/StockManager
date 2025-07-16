@@ -1,4 +1,5 @@
-﻿using StockManager.Models;
+﻿using StockManager.Core.Domain.Enums;
+using StockManager.Models;
 
 namespace StockManager.Application.Tests.TestHelpers.ProductFactory;
 
@@ -21,7 +22,6 @@ public static class ProductTestFactory
             name,
             genre,
             unit,
-            quantity,
             type,
             batchNumber,
             supplierId ?? Guid.NewGuid(),

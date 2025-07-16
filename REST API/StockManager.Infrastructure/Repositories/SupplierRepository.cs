@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
 using StockManager.Models;
@@ -35,7 +36,7 @@ public sealed class SupplierRepository : ISupplierRepository
         return await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
     }
 
-    public async Task<Supplier?> UpdateSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
+    public async Task<Supplier?> UpdateSupplierAsync(Supplier supplier, ISupplierService supplierService, CancellationToken cancellationToken)
     {
         Supplier? existingSupplier = await _dbContext.Suppliers
             .Include(s => s.Address)
@@ -48,7 +49,7 @@ public sealed class SupplierRepository : ISupplierRepository
 
         if (!string.IsNullOrWhiteSpace(supplier.Name))
         {
-            existingSupplier.ChangeName(supplier.Name);
+            supplierService.ChangeName(existingSupplier, supplier.Name);
         }
 
         if (supplier.Address is not null)

@@ -17,6 +17,7 @@ using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Models;
 using IDatabase = StackExchange.Redis.IDatabase;
 
@@ -30,13 +31,15 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
     private readonly ILogger<AddProductCommandHandler> _logger;
     private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
+    private readonly IProductService _productService;
 
     public AddProductCommandHandler(
         IMapper mapper, IProductRepository productRepository,
         ISupplierRepository supplierRepository,
         ILogger<AddProductCommandHandler> logger,
         IEventBus eventBus,
-        IConnectionMultiplexer redis)
+        IConnectionMultiplexer redis,
+        IProductService productService)
     {
         _mapper = mapper;
         _productRepository = productRepository;
@@ -44,6 +47,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         _logger = logger;
         _eventBus = eventBus;
         _redis = redis;
+        _productService = productService;
     }
 
     public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
@@ -80,7 +84,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
                 }
 
                 Product product = _mapper.Map<Product>(command.Product);
-                product.SetSupplier(supplier);
+                _productService.SetSupplier(product, supplier);
 
                 ProductLogInfo.LogAddProductSuccesfull(_logger, command.Product, default);
 

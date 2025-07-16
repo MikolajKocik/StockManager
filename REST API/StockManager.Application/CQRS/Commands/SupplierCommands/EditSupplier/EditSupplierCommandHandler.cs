@@ -14,6 +14,7 @@ using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Models;
 
 namespace StockManager.Application.CQRS.Commands.SupplierCommands.EditSupplier;
@@ -25,19 +26,23 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
     private readonly ILogger<EditSupplierCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEventBus _eventBus;
+    private readonly ISupplierService _supplierService;
 
     public EditSupplierCommandHandler(
         ISupplierRepository supplierRepository,
         IMapper mapper,
         ILogger<EditSupplierCommandHandler> logger,
-          IConnectionMultiplexer redis,
-          IEventBus eventBus)
+        IConnectionMultiplexer redis,
+        IEventBus eventBus,
+        ISupplierService supplierService
+        )
     {
         _supplierRepository = supplierRepository;
         _mapper = mapper;
         _logger = logger;
         _redis = redis;
         _eventBus = eventBus;
+        _supplierService = supplierService;
     }
 
     public async Task<Result<SupplierDto>> Handle(EditSupplierCommand command, CancellationToken cancellationToken)
@@ -52,7 +57,7 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
            {
                 SupplierLogInfo.LogModyfingSupplier(_logger, command.Id, command.Supplier, default);
 
-                Supplier? updateSupplier = await _supplierRepository.UpdateSupplierAsync(supplier, cancellationToken);
+                Supplier? updateSupplier = await _supplierRepository.UpdateSupplierAsync(supplier, _supplierService, cancellationToken);
 
                 SupplierDto supplierModified = _mapper.Map<SupplierDto>(updateSupplier);
 

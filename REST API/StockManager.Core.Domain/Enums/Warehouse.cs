@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace StockManager.Models;
+namespace StockManager.Core.Domain.Enums;
 
 public enum Warehouse
 {

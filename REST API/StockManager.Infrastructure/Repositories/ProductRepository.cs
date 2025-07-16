@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
 using StockManager.Models;
@@ -40,9 +41,13 @@ public class ProductRepository : IProductRepository
     public async Task<IDbContextTransaction> BeginTransactionAsync()
         => await _dbContext.Database.BeginTransactionAsync();
 
-    public async Task<Product?> UpdateProductAsync(Product product, CancellationToken cancellationToken)
+    public async Task<Product?> UpdateProductAsync(
+        IProductService productService,
+        Product product,
+        ISupplierService supplierService,
+        CancellationToken cancellationToken)
     {
-        // I attach the entity to EF and force a full update - without downloading the original from the database
+        // Attach the entity to EF and force a full update - without downloading the original from the database
         _dbContext.Attach(product);
         _dbContext.Entry(product).State = EntityState.Modified;
 
@@ -56,11 +61,11 @@ public class ProductRepository : IProductRepository
             if (existingSupplier is not null)
             {
                 // Assign the existing supplier entity to preserve tracking and FK integrity
-                product.SetSupplier(existingSupplier); 
+                productService.SetSupplier(product, existingSupplier); 
 
                 if (product.Supplier?.Name is not null)
                 {
-                    existingSupplier.ChangeName(product.Supplier.Name);
+                    supplierService.ChangeName(existingSupplier, product.Supplier.Name);
                 }
 
                 if (product.Supplier?.Address is not null)

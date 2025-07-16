@@ -1,7 +1,7 @@
 ﻿using StockManager.Application.Common.ResultPattern;
 using StockManager.Core.Application.Dtos.Authorization;
 
-namespace StockManager.Core.Domain.Interfaces.Services;
+namespace StockManager.Application.Services;
 
 public interface IAuthService
 {

@@ -15,6 +15,7 @@ using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Models;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
@@ -26,20 +27,25 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
     private readonly ILogger<EditProductCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEventBus _eventBus;
-
+    private readonly IProductService _productService;
+    private readonly ISupplierService _supplierService;
 
     public EditProductCommandHandler(
         IMapper mapper,
         IProductRepository repository, 
         ILogger<EditProductCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus)
+        IEventBus eventBus,
+        IProductService productService,
+        ISupplierService supplierService)
     {
         _mapper = mapper;
         _repository = repository;
         _logger = logger;
         _redis = redis;
         _eventBus = eventBus;
+        _productService = productService;
+        _supplierService = supplierService;
     }
 
     public async Task<Result<ProductDto>> Handle(EditProductCommand command, CancellationToken cancellationToken)
@@ -54,7 +60,11 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
             {
                 ProductLogInfo.LogModyfingProduct(_logger, command.Id, command.Product, default);
 
-                Product updateProduct = await _repository.UpdateProductAsync(product, cancellationToken);
+                Product updateProduct = await _repository.UpdateProductAsync(
+                    _productService,
+                    product,
+                    _supplierService,
+                    cancellationToken);
 
                 ProductDto productModified = _mapper.Map<ProductDto>(updateProduct);
 

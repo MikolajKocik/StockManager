@@ -7,6 +7,7 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Tests.TestHelpers.ProductFactory;
+using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Models;
 using Xunit.Sdk;

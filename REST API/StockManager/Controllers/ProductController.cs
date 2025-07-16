@@ -8,10 +8,10 @@ using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using Microsoft.AspNetCore.Authorization;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Application.Dtos.ModelsDto.Product;
-using StockManager.Models;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.CQRS.Commands.ProductCommands.TrackProductView;
+using StockManager.Core.Domain.Enums;
 
 namespace StockManager.Controllers;
 

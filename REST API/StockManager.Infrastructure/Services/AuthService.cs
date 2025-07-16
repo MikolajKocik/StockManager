@@ -6,14 +6,14 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Helpers.NullConfiguration;
+using StockManager.Application.Services;
 using StockManager.Core.Application.Dtos.Authorization;
-using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace StockManager.Application.Services.Auth;
+namespace StockManager.Infrastructure.Services.Auth;
 
 public class AuthService : IAuthService
 {

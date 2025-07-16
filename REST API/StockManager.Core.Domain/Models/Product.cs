@@ -1,4 +1,5 @@
-﻿using UUIDNext;
+﻿using StockManager.Core.Domain.Enums;
+using UUIDNext;
 
 namespace StockManager.Models;
 
@@ -9,14 +10,13 @@ public sealed class Product
     public string Slug { get; private set; } = default!;
     public Genre Genre { get; private set; }
     public string Unit { get; private set; } = default!;
-    public int Quantity {  get; private set; }
     public DateTime ExpirationDate { get; private set; }
     public DateTime DeliveredAt { get; private set; }
     public Warehouse Type { get; private set; }
     public string BatchNumber { get; private set; } = default!;
 
     // relation 1-* with supplier
-    public Supplier Supplier { get; private set; } = default!;
+    public Supplier Supplier { get; set; } = default!;
     public Guid SupplierId { get; private set; }
 
     public Product(
@@ -24,7 +24,6 @@ public sealed class Product
         string name,
         Genre genre,
         string unit,
-        int quantity,
         Warehouse type,
         string batchNumber,
         Guid supplierId,
@@ -34,7 +33,6 @@ public sealed class Product
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
         Unit = unit;
-        Quantity = quantity;
         Genre = genre;
         ExpirationDate = expirationDate;
         DeliveredAt = DateTime.UtcNow.Date;
@@ -44,20 +42,4 @@ public sealed class Product
     }
 
     private Product() { }
-
-    public void ChangeQuantity(int quantity)
-    {
-        if (quantity <= 0)
-        {
-            throw new ArgumentException("Quantity must be greater than zero.");
-        }
-
-        Quantity = quantity;
-    }
-
-    public void SetSupplier(Supplier newSupplier)
-    {
-        Supplier = newSupplier ?? throw new ArgumentNullException(nameof(newSupplier));
-    }
-
 }

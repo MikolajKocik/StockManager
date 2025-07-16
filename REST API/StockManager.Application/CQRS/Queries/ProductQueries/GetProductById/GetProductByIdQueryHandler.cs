@@ -12,7 +12,7 @@ using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.Product;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 

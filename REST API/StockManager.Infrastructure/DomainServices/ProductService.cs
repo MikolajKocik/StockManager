@@ -4,14 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.ProductEntity;
+using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Infrastructure.DomainServices;
 
 public sealed class ProductService : IProductService
 {
     public void SetSupplier(Product product, Supplier newSupplier)
-    {
-        product.Supplier = newSupplier ?? throw new ArgumentNullException(nameof(newSupplier));
-    }
+        => product.SetSupplier(newSupplier);
 }

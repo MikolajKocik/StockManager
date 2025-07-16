@@ -12,8 +12,8 @@ namespace StockManager.Application.Common.Logging.Supplier;
 
 public static class SupplierLogInfo
 {
-    public static readonly Action<ILogger, Models.Supplier, Exception?> LogSupplierAddedSuccesfull =
-        LoggerMessage.Define<Models.Supplier>(
+    public static readonly Action<ILogger, Core.Domain.Models.SupplierEntity.Supplier, Exception?> LogSupplierAddedSuccesfull =
+        LoggerMessage.Define<Core.Domain.Models.SupplierEntity.Supplier>(
             LogLevel.Information,
             SupplierLogEventIds.SupplierAddedSuccesfull,
             "Adding a new supplier {@supplier} to database");

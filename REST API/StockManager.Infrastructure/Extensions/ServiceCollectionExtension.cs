@@ -4,12 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using StockManager.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using StockManager.Infrastructure.Repositories;
-using StockManager.Core.Domain.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using Microsoft.AspNetCore.Http.HttpResults;
 using StockManager.Infrastructure.Settings;
 using StockManager.Application.Services;
 using StockManager.Infrastructure.Services.Auth;
+using StockManager.Core.Domain.Models.UserEntity;
 
 
 namespace StockManager.Infrastructure.Extensions;

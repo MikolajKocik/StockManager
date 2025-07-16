@@ -11,7 +11,7 @@ using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 

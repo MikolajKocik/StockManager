@@ -29,7 +29,7 @@ using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.Extensions;
-using StockManager.Core.Domain.Models;
+using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Extensions;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.EventBus;

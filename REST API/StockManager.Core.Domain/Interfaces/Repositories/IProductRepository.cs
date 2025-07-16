@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.Product;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 

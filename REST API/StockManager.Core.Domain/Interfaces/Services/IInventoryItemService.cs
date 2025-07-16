@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using StockManager.Core.Domain.Models;
+using StockManager.Core.Domain.Models.InventoryItemEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Services;
 

@@ -16,7 +16,7 @@ using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.Product;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 

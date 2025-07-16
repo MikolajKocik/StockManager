@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using StockManager.Core.Domain.Models;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.Product;
+using StockManager.Core.Domain.Models.SupplierEntity;
+using StockManager.Core.Domain.Models.UserEntity;
 
 namespace StockManager.Infrastructure.Data;
 

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using StockManager.Core.Domain.Enums;
 
-namespace StockManager.Core.Domain.Models;
+namespace StockManager.Core.Domain.Models.InventoryItemEntity;
 
 public sealed class InventoryItem
 {

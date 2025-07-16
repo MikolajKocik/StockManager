@@ -15,7 +15,7 @@ using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
 

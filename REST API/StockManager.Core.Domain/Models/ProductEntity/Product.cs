@@ -1,9 +1,10 @@
 ﻿using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Models.SupplierEntity;
 using UUIDNext;
 
-namespace StockManager.Models;
+namespace StockManager.Core.Domain.Models.ProductEntity;
 
-public sealed class Product
+public sealed partial class Product
 {
     public int Id { get; private set; } 
     public string Name { get; private set; } = default!;
@@ -16,11 +17,10 @@ public sealed class Product
     public string BatchNumber { get; private set; } = default!;
 
     // relation 1-* with supplier
-    public Supplier Supplier { get; set; } = default!;
+    public Supplier Supplier { get;  private set; } = default!;
     public Guid SupplierId { get; private set; }
 
     public Product(
-        int id,
         string name,
         Genre genre,
         string unit,
@@ -29,7 +29,6 @@ public sealed class Product
         Guid supplierId,
         DateTime expirationDate)
     {
-        Id = id;
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
         Unit = unit;

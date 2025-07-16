@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using UUIDNext;
 
-namespace StockManager.Core.Domain.Models;
+namespace StockManager.Core.Domain.Models.UserEntity;
 
 public class User : IdentityUser
 {

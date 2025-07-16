@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using StockManager.Models;
+using StockManager.Core.Domain.Models.AddressEntity;
+using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Services;
 

@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Diagnostics;
+using StockManager.Core.Domain.Models.SupplierEntity;
 using UUIDNext;
 
-namespace StockManager.Models;
+namespace StockManager.Core.Domain.Models.AddressEntity;
 
 public sealed class Address
 {
@@ -18,13 +19,12 @@ public sealed class Address
     private Address() { }
 
     public Address(
-        Guid id,
         string city,
         string country,
         string postalCode,
-        Guid supplierId)
+        Guid supplierId
+        )
     {
-        Id = id;
         Slug = $"add_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
         City = city;
         Country = country;

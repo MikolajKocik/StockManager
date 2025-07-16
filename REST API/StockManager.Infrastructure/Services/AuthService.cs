@@ -8,7 +8,7 @@ using StockManager.Application.Helpers.Error;
 using StockManager.Application.Helpers.NullConfiguration;
 using StockManager.Application.Services;
 using StockManager.Core.Application.Dtos.Authorization;
-using StockManager.Core.Domain.Models;
+using StockManager.Core.Domain.Models.UserEntity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

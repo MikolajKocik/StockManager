@@ -41,7 +41,7 @@ public sealed class GetProductByIdQueryHandlerTests
     public async Task Handle_ShouldReturnProductDto_WhenProductsEXists()
     {
         // 
-        Models.Product? product = ProductTestFactory.CreateTestProduct();
+        Core.Domain.Models.Product.Product? product = ProductTestFactory.CreateTestProduct();
         ProductDto? dto = ProductTestDtoFactory.CreateTestDto();
         var query = new GetProductByIdQuery(1);
 
@@ -69,7 +69,7 @@ public sealed class GetProductByIdQueryHandlerTests
 
         _productRepositoryMock
             .Setup(r => r.GetProductByIdAsync(1, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((Models.Product?)null);
+            .ReturnsAsync((Core.Domain.Models.Product.Product?)null);
 
         //
         Result<ProductDto> result = await _handler.Handle(query, CancellationToken.None);

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using StockManager.Models;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Models.Product;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 

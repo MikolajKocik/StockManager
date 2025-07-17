@@ -11,14 +11,17 @@ namespace StockManager.Core.Domain.Models.ReorderRuleEntity;
 public sealed class ReorderRule
 {
     public int Id { get; private set; }
-    public int ProductId { get; private set; }
     public Warehouse Warehouse { get; private set; }
     public decimal MinLevel { get; private set; }
     public decimal MaxLevel { get; private set; }
 
+    // relation *-1 with product 
+    public int ProductId { get; private set; }
+    public Product Product { get; private set; }
+
     private ReorderRule() { } 
 
-    public ReorderRule(int productId, Warehouse warehouse, decimal minLevel, decimal maxLevel)
+    public ReorderRule(int productId, Warehouse warehouse, decimal minLevel, decimal maxLevel, Product product)
     {
         if (productId <= 0)
         {
@@ -35,9 +38,15 @@ public sealed class ReorderRule
             throw new ArgumentException("MaxLevel must be ≥ MinLevel", nameof(maxLevel));
         }
 
+        if (product is null)
+        {
+            throw new ArgumentNullException(nameof(product), "Product is required");
+        }    
+
         ProductId = productId;
         Warehouse = warehouse;
         MinLevel = minLevel;
         MaxLevel = maxLevel;
+        Product = product;
     }
 }

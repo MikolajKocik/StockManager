@@ -14,12 +14,12 @@ public sealed class ReturnOrderLine
     public int Id { get; private set; }
     public int ReturnOrderId { get; private set; }
     public ReturnOrder ReturnOrder { get; private set; }
-
-    public int ProductId { get; private set; }
-    public Product Product { get; private set; }
-
     public decimal Quantity { get; private set; }
     public UnitOfMeasure UoM { get; private set; }
+
+    // relation *-1 with product
+    public int ProductId { get; private set; }
+    public Product Product { get; private set; }
 
     private ReturnOrderLine() { }
 

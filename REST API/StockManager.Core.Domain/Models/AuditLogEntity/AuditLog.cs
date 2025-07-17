@@ -13,16 +13,19 @@ public sealed class AuditLog
     public string EntityName { get; private set; }      
     public int EntityId { get; private set; }            
     public string Action { get; private set; }           
-    public User ChangedBy { get; private set; } // UserName
     public DateTime Timestamp { get; private set; }
-
     public string Changes { get; private set; }
+
+    // relation *-1 with user
+    public string ChangedById { get; private set; }
+    public User ChangedBy { get; private set; } // UserName
 
     private AuditLog() {}
     public AuditLog(
         string entityName, 
         int entityId,
         string action,
+        string changedById,
         User changedBy,
         DateTime timestamp,
         string changes
@@ -44,6 +47,7 @@ public sealed class AuditLog
         EntityName = entityName;
         EntityId = entityId;
         Action = action;
+        ChangedById = changedById;
         ChangedBy = changedBy;
         Timestamp = timestamp;
         Changes = changes;

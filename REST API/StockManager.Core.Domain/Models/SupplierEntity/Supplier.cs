@@ -10,11 +10,13 @@ public sealed partial class Supplier
     public string Name { get; private set; } = default!;
     public string Slug { get; private set; } = default!;
 
-    // relation 1-1 with supplier
+    // relation 1-1 with address
     public Address Address { get; private set; } = default!;
 
     // relation 1-* with product
-    public List<Product> Products { get; private set; } = new List<Product>();
+    private readonly List<Product> _products = new();
+    public IReadOnlyCollection<Product> Products
+        => _products.AsReadOnly();
 
     private Supplier() { }
 

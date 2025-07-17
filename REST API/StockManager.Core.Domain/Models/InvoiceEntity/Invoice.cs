@@ -13,12 +13,19 @@ public sealed partial class Invoice
 {
     public int Id { get; private set; }
     public InvoiceType Type { get; private set; }
-    public int? PurchaseOrderId { get; private set; }
-    public int? SalesOrderId { get; private set; }
     public DateTime InvoiceDate { get; private set; }
     public DateTime? DueDate { get; private set; }
     public InvoiceStatus Status { get; private set; }
     public decimal TotalAmount { get; private set; }
+
+    // relation 1-1 with purchaseOrder
+    public int? PurchaseOrderId { get; private set; }
+    public PurchaseOrder? PurchaseOrder { get; private set; }
+
+    // relation 1-1 with salesOrder
+    public SalesOrder? SalesOrder { get; private set; }
+    public int? SalesOrderId { get; private set; }
+
 
     private Invoice() { }
 
@@ -28,7 +35,9 @@ public sealed partial class Invoice
         decimal totalAmount,
         DateTime? dueDate = null,
         int? purchaseOrderId = null,
-        int? salesOrderId = null
+        PurchaseOrder? purchaseOrder = null,
+        int? salesOrderId = null,
+        SalesOrder? salesOrder = null
         )
     {
         if (totalAmount < 0)
@@ -46,7 +55,9 @@ public sealed partial class Invoice
         TotalAmount = totalAmount;
         DueDate = dueDate?.Date;
         PurchaseOrderId = purchaseOrderId;
+        PurchaseOrder = purchaseOrder;
         SalesOrderId = salesOrderId;
+        SalesOrder = salesOrder;
         Status = InvoiceStatus.Draft;
     }
 }

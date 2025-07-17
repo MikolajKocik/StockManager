@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Models.ProductEntity;
+using StockManager.Core.Domain.Models.PurchaseOrderEntity;
+using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Core.Domain.Models.PurchaseOrderLineEntity;
 
 public sealed class PurchaseOrderLine
 {
     public int Id { get; private set; }
-    public int PurchaseOrderId { get; private set; }
     public decimal Quantity { get; private set; }
     public UnitOfMeasure UoM { get; private set; }        
     public decimal UnitPrice { get; private set; }
@@ -21,15 +22,21 @@ public sealed class PurchaseOrderLine
     public Product Product { get; private set; }
     public int ProductId { get; private set; }
 
+    // relation *-1 with purchaseOrder
+    public PurchaseOrder PurchaseOrder { get; private set; }
+    public int PurchaseOrderId { get; private set; }
+
     private PurchaseOrderLine() { }
 
     internal PurchaseOrderLine(
-    int purchaseOrderId,
-    Product product,
-    int productId,
-    decimal quantity,
-    UnitOfMeasure uom,
-    decimal unitPrice)
+        int purchaseOrderId,
+        Product product,
+        int productId,
+        decimal quantity,
+        UnitOfMeasure uom,
+        decimal unitPrice,
+        PurchaseOrder purchaseOrder
+        )
     {
         if (purchaseOrderId <= 0)
         {
@@ -51,10 +58,8 @@ public sealed class PurchaseOrderLine
             throw new ArgumentException("UnitPrice cannot be negative", nameof(unitPrice));
         }
 
-        if (product is null)
-        {
-            throw new ArgumentException("Product is required", nameof(product));
-        }
+        ArgumentException.ThrowIfNullOrEmpty("Product is required", nameof(product));
+        ArgumentException.ThrowIfNullOrEmpty("PurchaseOrder is required", nameof(purchaseOrder));
 
         PurchaseOrderId = purchaseOrderId;
         Product = product;
@@ -62,5 +67,6 @@ public sealed class PurchaseOrderLine
         Quantity = quantity;
         UoM = uom;
         UnitPrice = unitPrice;
+        PurchaseOrder = purchaseOrder;
     }
 }

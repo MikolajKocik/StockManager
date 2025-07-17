@@ -12,8 +12,6 @@ namespace StockManager.Core.Domain.Models.SalesOrderLineEntity;
 public sealed class SalesOrderLine
 {
     public int Id { get; private set; }
-    public int SalesOrderId { get; private set; }
-    public SalesOrder SalesOrder { get; private set; }
     public decimal Quantity { get; private set; }
     public UnitOfMeasure UoM { get; private set; }
     public decimal UnitPrice { get; private set; }
@@ -22,6 +20,10 @@ public sealed class SalesOrderLine
     // relation *-1 with product
     public int ProductId { get; private set; }
     public Product Product { get; private set; }
+
+    // relation *-1 with salesOrder
+    public int SalesOrderId { get; private set; }
+    public SalesOrder SalesOrder { get; private set; }
 
 
     private SalesOrderLine() { }
@@ -36,6 +38,8 @@ public sealed class SalesOrderLine
         {
             throw new ArgumentException("Price cannot be negative value");
         }
+
+        ArgumentException.ThrowIfNullOrEmpty("SalesOrder is required", nameof(order));
 
         SalesOrder = order;
         SalesOrderId = order.Id;

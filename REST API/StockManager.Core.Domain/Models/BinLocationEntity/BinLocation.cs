@@ -16,15 +16,17 @@ public sealed class BinLocation
     public string Code { get; private set; }             
     public string Description { get; private set; }
 
-    public ICollection<InventoryItem> InventoryItems { get; private set; }
+
+    // relation 1-* with inventoryItems
+    private readonly List<InventoryItem> _inventoryItems = new();
+    public IReadOnlyCollection<InventoryItem> InventoryItems
+        => _inventoryItems.AsReadOnly();
+
 
     private BinLocation() {}
     public BinLocation(Warehouse warehouse, string code, string description)
     {
-        if (string.IsNullOrWhiteSpace(code))
-        {
-            throw new ArgumentException("Code required");
-        }
+        ArgumentException.ThrowIfNullOrWhiteSpace("Code required", code);
 
         Warehouse = warehouse;
         Code = code;

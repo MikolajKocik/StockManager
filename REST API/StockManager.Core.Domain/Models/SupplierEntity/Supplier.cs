@@ -1,5 +1,7 @@
 ﻿using StockManager.Core.Domain.Models.AddressEntity;
 using StockManager.Core.Domain.Models.ProductEntity;
+using StockManager.Core.Domain.Models.PurchaseOrderEntity;
+using StockManager.Core.Domain.Models.PurchaseOrderLineEntity;
 using UUIDNext;
 
 namespace StockManager.Core.Domain.Models.SupplierEntity;
@@ -17,6 +19,11 @@ public sealed partial class Supplier
     private readonly List<Product> _products = new();
     public IReadOnlyCollection<Product> Products
         => _products.AsReadOnly();
+
+    // realtion 1-* with purchaseOrderLines
+    private readonly List<PurchaseOrder> _purchaseOrders = new();
+    public IReadOnlyCollection<PurchaseOrder> PurchaseOrders
+        => _purchaseOrders.AsReadOnly();
 
     private Supplier() { }
 

@@ -20,7 +20,9 @@ public sealed class Customer
     public string Email { get; private set; }
     public string Phone { get; private set; }
 
-    public ICollection<SalesOrder> SalesOrders { get; set; } = new List<SalesOrder>();
+    private readonly List<SalesOrder> _salesOrders = new();
+    public IReadOnlyCollection<SalesOrder> SalesOrders
+        => _salesOrders.AsReadOnly();
 
     private Customer() { }
 

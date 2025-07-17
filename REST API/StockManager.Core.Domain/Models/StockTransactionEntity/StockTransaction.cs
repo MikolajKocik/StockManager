@@ -4,19 +4,23 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Models.InventoryItemEntity;
 
 namespace StockManager.Core.Domain.Models.StockTransactionEntity;
 
 public sealed class StockTransaction
 {
     public int Id { get; private set; }
-    public int InventoryItemId { get; private set; }
     public TransactionType Type { get; private set; }
     public decimal Quantity { get; private set; }
     public DateTime Date { get; private set; }
     public int? SourceLocationId { get; private set; }
     public int? TargetLocationId { get; private set; }
     public string ReferenceNumber { get; private set; }
+
+    // relation *-1 with inventoryItem
+    public InventoryItem InventoryItem { get; private set; }
+    public int InventoryItemId { get; private set; }
 
     private StockTransaction() { }
 
@@ -26,6 +30,7 @@ public sealed class StockTransaction
        decimal quantity,
        DateTime date,
        string referenceNumber,
+       InventoryItem inventoryItem,
        int? sourceLocationId = null,
        int? targetLocationId = null)
     {
@@ -44,6 +49,8 @@ public sealed class StockTransaction
             throw new ArgumentException("Date cannot be in the future", nameof(date));
         }
 
+        ArgumentException.ThrowIfNullOrEmpty(nameof(inventoryItem));
+
         ArgumentException.ThrowIfNullOrWhiteSpace(referenceNumber, nameof(referenceNumber));
 
         InventoryItemId = inventoryItemId;
@@ -53,5 +60,6 @@ public sealed class StockTransaction
         ReferenceNumber = referenceNumber;
         SourceLocationId = sourceLocationId;
         TargetLocationId = targetLocationId;
+        InventoryItem = inventoryItem;
     }
 }

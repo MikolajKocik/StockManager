@@ -11,14 +11,15 @@ namespace StockManager.Core.Domain.Models.ShipmentEntity;
 public sealed partial class Shipment
 {
     public int Id { get; private set; }
-    public int SalesOrderId { get; private set; }
-    public SalesOrder SalesOrder { get; private set; }
-
     public string TrackingNumber { get; private set; }
     public ShipmentStatus Status { get; private set; }
 
     public DateTime ShippedDate { get; private set; }
     public DateTime? DeliveredDate { get; private set; }
+
+    // relation *-1 with salesOrder
+    public int SalesOrderId { get; private set; }
+    public SalesOrder SalesOrder { get; private set; }
 
     private Shipment() { }
     public Shipment(

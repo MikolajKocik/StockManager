@@ -5,6 +5,7 @@ using Serilog;
 using StockManager.Application.Helpers.NullConfiguration;
 using StockManager.Middlewares;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace StockManager.Extensions;
 
@@ -45,7 +46,11 @@ public static class WebApplicationBuilderExtensions
             };
         });
 
-        builder.Services.AddControllers();
+        builder.Services
+            .AddControllers()
+            .AddJsonOptions(opts =>
+                opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
         builder.Services.AddScoped<ErrorHandlingMiddleware>();
 
         //serilog

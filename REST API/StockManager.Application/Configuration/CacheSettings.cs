@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace StockManager.Application.Configuration;
 
-public class CacheSettings
+public sealed class CacheSettings
 {
     public static int AbsoluteTtlHours { get; set; } = 6;
     public static int SlidingTtlMinutes { get; set; } = 60;

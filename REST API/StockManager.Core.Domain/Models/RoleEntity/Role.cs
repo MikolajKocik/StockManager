@@ -12,8 +12,11 @@ public sealed partial class Role
 {
     public int Id { get; private set; }
     public string Name { get; private set; }
+
+    // relation *-* with permission
     private readonly List<Permission> _permissions = new();
-    public IReadOnlyList<Permission> Permissions => _permissions;
+    public IReadOnlyList<Permission> Permissions 
+        => _permissions.AsReadOnly();
 
     private Role() { }
     public Role(string name)

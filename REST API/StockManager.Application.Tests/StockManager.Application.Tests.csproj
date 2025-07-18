@@ -22,7 +22,6 @@
   <ItemGroup>
     <Folder Include="CQRS\Commands\Supplier\" />
     <Folder Include="CQRS\Commands\Product\" />
-    <Folder Include="CQRS\Queries\Supplier\" />
     <Folder Include="Helpers\" />
     <Folder Include="Validations\" />
   </ItemGroup>

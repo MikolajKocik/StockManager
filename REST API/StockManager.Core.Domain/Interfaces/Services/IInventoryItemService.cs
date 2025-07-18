@@ -9,8 +9,9 @@ namespace StockManager.Core.Domain.Interfaces.Services;
 
 public interface IInventoryItemService
 {
-    void AddStock(InventoryItem item, decimal amount);
-    void Reserve(InventoryItem item, decimal amount);
-    void ReleaseReservation(InventoryItem item, decimal amount);
-    void RemoveStock(InventoryItem item, decimal amount);
+    void IncreaseQuantity(InventoryItem item, decimal amount);
+    void DecreaseQuantity(InventoryItem item, decimal amount);
+    void ReserveQuantity(InventoryItem item, decimal amount);
+    void ReleaseQuantity(InventoryItem item, decimal amount);
+    void AssignToBinLocation(InventoryItem item, int newBinLocationId);
 }

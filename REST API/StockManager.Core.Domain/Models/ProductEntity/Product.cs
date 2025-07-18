@@ -1,4 +1,6 @@
-﻿using StockManager.Core.Domain.Enums;
+﻿using StockManager.Core.Domain.Common;
+using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderLineEntity;
 using StockManager.Core.Domain.Models.ReorderRuleEntity;
@@ -9,20 +11,19 @@ using UUIDNext;
 
 namespace StockManager.Core.Domain.Models.ProductEntity;
 
-public sealed partial class Product
+public sealed partial class Product : Entity<int>
 {
-    public int Id { get; private set; } 
-    public string Name { get; private set; } = default!;
-    public string Slug { get; private set; } = default!;
+    public string Name { get; private set; } 
+    public string Slug { get; private set; } 
     public Genre Genre { get; private set; }
-    public string Unit { get; private set; } = default!;
+    public string Unit { get; private set; } 
     public DateTime ExpirationDate { get; private set; }
     public DateTime DeliveredAt { get; private set; }
     public Warehouse Type { get; private set; }
-    public string BatchNumber { get; private set; } = default!;
+    public string BatchNumber { get; private set; } 
 
     // relation *-1 with supplier
-    public Supplier Supplier { get;  private set; } = default!;
+    public Supplier Supplier { get; private set; } 
     public Guid SupplierId { get; private set; }
 
     // relation 1-* with inventoryItem
@@ -57,8 +58,15 @@ public sealed partial class Product
         Warehouse type,
         string batchNumber,
         Guid supplierId,
-        DateTime expirationDate)
+        DateTime expirationDate
+        ) : base()
     {
+        Guard.AgainstNullOrWhiteSpace(name, unit, batchNumber);
+        Guard.AgainstInvalidEnumValue(genre);
+        Guard.AgainstInvalidEnumValue(type);
+        Guard.AgainstDefaultValue(supplierId);
+        IsValidExpirationDate(expirationDate);
+
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
         Unit = unit;
@@ -70,5 +78,46 @@ public sealed partial class Product
         SupplierId = supplierId;
     }
 
-    private Product() { }
+    private Product() : base() { }
+
+    public Product(
+        int id,
+        string name,
+        Genre genre,
+        string unit,
+        Warehouse type,
+        string batchNumber,
+        Guid supplierId,
+        DateTime expirationDate
+        ) : base(id)
+    {
+        Guard.AgainstNullOrWhiteSpace(name, unit, batchNumber);
+        Guard.AgainstInvalidEnumValue(genre);
+        Guard.AgainstInvalidEnumValue(type);
+        Guard.AgainstDefaultValue(supplierId);
+        IsValidExpirationDate(expirationDate);
+
+        Name = name;
+        Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
+        Unit = unit;
+        Genre = genre;
+        ExpirationDate = expirationDate;
+        DeliveredAt = DateTime.UtcNow.Date;
+        Type = type;
+        BatchNumber = batchNumber;
+        SupplierId = supplierId;
+    }
+
+    private void IsValidExpirationDate(DateTime date)
+    {
+        if (Equals(date, default(DateTime)))
+        {
+            throw new ArgumentException("Expiration date cannot be its default value.", nameof(date));
+        }
+
+        if (date.Date < DateTime.UtcNow.Date)
+        {
+            throw new ArgumentException("Expiration date cannot be in the past.", nameof(date));
+        }
+    }
 }

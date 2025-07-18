@@ -10,44 +10,18 @@ namespace StockManager.Infrastructure.DomainServices;
 
 public sealed class InventoryItemService : IInventoryItemService
 {
-    public void AddStock(InventoryItem item, decimal amount)
-    {
-        if(amount <= 0)
-        {
-            throw new ArgumentException("Amount must be greater than zero");
-        }
+    public void AssignToBinLocation(InventoryItem item, int newBinLocationId)
+        => item.AssignToBinLocation(newBinLocationId);
 
-        item.QuantityOnHand += amount;
-    }
+    public void DecreaseQuantity(InventoryItem item, decimal amount)
+        => item.DecreaseQuantity(amount);
 
-    public void ReleaseReservation(InventoryItem item, decimal amount)
-    {
-        if (amount <= 0 || amount > item.QuantityReserved)
-        {
-            throw new InvalidOperationException("Bad amount to release");
-        }
+    public void IncreaseQuantity(InventoryItem item, decimal amount)
+        => item.IncreaseQuantity(amount);
 
-        item.QuantityReserved -= amount;
-    }
+    public void ReleaseQuantity(InventoryItem item, decimal amount)
+        => item.ReleaseQuantity(amount);
 
-    public void RemoveStock(InventoryItem item, decimal amount)
-    {
-        if (amount <= 0 || amount > item.QuantityAvailable)
-        {
-            throw new InvalidOperationException("Cannot remove the stock with provided amount");
-        }
-
-        item.QuantityOnHand -= amount;
-    }
-
-    public void Reserve(InventoryItem item, decimal amount)
-    {
-        if (amount <= 0 || amount > item.QuantityAvailable)
-        {
-
-            throw new InvalidOperationException("Cannot reserve with this value amount");
-        }
-
-        item.QuantityReserved += amount;
-    }
+    public void ReserveQuantity(InventoryItem item, decimal amount)
+        => item.ReserveQuantity(amount);
 }

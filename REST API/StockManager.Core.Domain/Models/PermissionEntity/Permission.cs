@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Common;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.RoleEntity;
 
 namespace StockManager.Core.Domain.Models.PermissionEntity;
 
-public sealed class Permission
+public sealed class Permission : Entity<int>
 {
-    public int Id { get; private set; }
     public string Name { get; private set; }
     public string Description { get; private set; }
 
@@ -18,10 +19,24 @@ public sealed class Permission
     public IReadOnlyCollection<Role> Roles
         => _roles.AsReadOnly();
 
-    private Permission() { }
-    public Permission(string name, string description)
+    private Permission() : base() { }
+
+    public Permission(
+        int id,
+        string name,
+        string description
+        ) : base(id)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        Guard.AgainstNullOrWhiteSpace(name, nameof(name));
+        Name = name;
+        Description = description ?? "";
+    }
+    public Permission(
+      string name,
+      string description
+      ) : base()
+    {
+        Guard.AgainstNullOrWhiteSpace(name, nameof(name));
         Name = name;
         Description = description ?? "";
     }

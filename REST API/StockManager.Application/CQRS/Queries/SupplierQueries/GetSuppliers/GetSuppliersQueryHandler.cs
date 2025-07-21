@@ -14,16 +14,14 @@ public sealed class GetSuppliersQueryHandler : IQueryHandler<GetSuppliersQuery, 
 {
     private readonly ISupplierRepository _supplierRepository;
     private readonly IMapper _mapper;
-    private readonly ILogger<GetSuppliersQueryHandler> _logger;
 
     public GetSuppliersQueryHandler(
         ISupplierRepository supplierRepository,
-        IMapper mapper,
-        ILogger<GetSuppliersQueryHandler> logger)
+        IMapper mapper
+        )
     {
         _supplierRepository = supplierRepository;
         _mapper = mapper;
-        _logger = logger;
     }
 
     public async Task<Result<IEnumerable<SupplierDto>>> Handle(GetSuppliersQuery query, CancellationToken cancellationToken)

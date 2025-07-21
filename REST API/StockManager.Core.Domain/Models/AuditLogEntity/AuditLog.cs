@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Common;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.UserEntity;
 
 namespace StockManager.Core.Domain.Models.AuditLogEntity;
 
-public sealed class AuditLog
+public sealed class AuditLog : Entity<int>
 {
-    public int Id { get; private set; }
     public string EntityName { get; private set; }      
     public int EntityId { get; private set; }            
     public string Action { get; private set; }           
@@ -20,35 +21,47 @@ public sealed class AuditLog
     public string ChangedById { get; private set; }
     public User ChangedBy { get; private set; } // UserName
 
-    private AuditLog() {}
+    private AuditLog() : base() {}
+
     public AuditLog(
         string entityName, 
         int entityId,
         string action,
         string changedById,
-        User changedBy,
         DateTime timestamp,
         string changes
-        )
+        ) : base()
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(entityName, nameof(entityName));
-
-        ArgumentException.ThrowIfNullOrWhiteSpace(action, nameof(action));
-        
-        ArgumentNullException.ThrowIfNull(changedBy, nameof(changedBy));
-
-        if (timestamp > DateTime.UtcNow)
-        {
-            throw new ArgumentException("Timestamp cannot be in the future", nameof(timestamp));
-        }
-
-        ArgumentException.ThrowIfNullOrWhiteSpace(changes, nameof(changes));
+        Guard.AgainstNullOrWhiteSpace(entityName, action, changedById, changes);
+        Guard.AgainstDefaultValue(entityId);
+        Guard.IsValidDate(timestamp);
 
         EntityName = entityName;
         EntityId = entityId;
         Action = action;
         ChangedById = changedById;
-        ChangedBy = changedBy;
+        Timestamp = timestamp;
+        Changes = changes;
+    }
+
+    public AuditLog(
+        int id,
+        string entityName,
+        int entityId,
+        string action,
+        string changedById,
+        DateTime timestamp,
+        string changes
+        ) : base(id)
+    {
+        Guard.AgainstNullOrWhiteSpace(entityName, action, changedById, changes);
+        Guard.AgainstDefaultValue(entityId);
+        Guard.IsValidDate(timestamp);
+
+        EntityName = entityName;
+        EntityId = entityId;
+        Action = action;
+        ChangedById = changedById;
         Timestamp = timestamp;
         Changes = changes;
     }

@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 using StockManager.Core.Domain.Models.ReturnOrderLineEntity;
 using StockManager.Core.Domain.Models.SalesOrderEntity;
 
 namespace StockManager.Core.Domain.Models.ReturnOrderEntity;
 
-public sealed partial class ReturnOrder
+public sealed partial class ReturnOrder : Entity<int>
 {
-    public int Id { get; private set; }
     public ReturnOrderType Type { get; private set; }
     public ReturnOrderStatus Status { get; private set; }
     public DateTime ReturnDate { get; private set; }
@@ -30,13 +31,35 @@ public sealed partial class ReturnOrder
     public IReadOnlyCollection<ReturnOrderLine> ReturnOrderLines 
         => _returnOrderlines.AsReadOnly();
 
+    private ReturnOrder() : base() { }
+
     public ReturnOrder(
         ReturnOrderType type,
         DateTime returnDate,
         int? purchaseOrderId = null,
         int? salesOrderId = null
-        )
+        ) : base()
     {
+        // todo validation + guard nullable foreign id's
+
+        Type = type;
+        ReturnDate = returnDate.Date;
+        Status = ReturnOrderStatus.Draft;
+        PurchaseOrderId = purchaseOrderId;
+        SalesOrderId = salesOrderId;
+    }
+
+    public ReturnOrder(
+       int id,
+       ReturnOrderType type,
+       DateTime returnDate,
+       int? purchaseOrderId = null,
+       int? salesOrderId = null
+       ) : base(id)
+    {
+        
+        // todo validation + guard nullable foreign id's
+
         Type = type;
         ReturnDate = returnDate.Date;
         Status = ReturnOrderStatus.Draft;

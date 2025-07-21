@@ -1,10 +1,12 @@
 using System.Globalization;
 using System.Reflection;
+using System.Threading.RateLimiting;
 using HealthChecks.UI.Client;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -42,6 +44,20 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.AddPresentation();
 builder.Services.AddInfrastructure();
 builder.Services.AddApplication();
+
+// rate limitting
+builder.Services.AddRateLimiter(opts =>
+{
+    opts.AddFixedWindowLimiter("fixed", opt =>
+    {
+        opt.PermitLimit = 5;
+        opt.Window = TimeSpan.FromSeconds(5);
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        opt.QueueLimit = 0;
+    });
+
+    opts.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+}); 
 
 // scrutor package
 builder.Services.Scan(scan => scan
@@ -215,6 +231,9 @@ builder.Services.AddHealthChecks()
     .AddRabbitMQ(name: "rabbitmq");
 
 WebApplication app = builder.Build();
+
+// rate limit middleware
+app.UseRateLimiter();
 
 // Configure the HTTP command pipeline.
 app.UseMiddleware<ErrorHandlingMiddleware>();

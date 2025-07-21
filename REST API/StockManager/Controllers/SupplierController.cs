@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
@@ -18,7 +19,9 @@ namespace StockManager.Controllers;
 
 [Authorize]
 [ApiController]
+[EnableRateLimiting("fixed")]
 [Route("api/suppliers")]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 public sealed class SupplierController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -54,7 +57,6 @@ public sealed class SupplierController : ControllerBase
     [HttpGet("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<SupplierDto>> GetSupplierById(
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
@@ -80,7 +82,6 @@ public sealed class SupplierController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     public async Task<ActionResult<SupplierDto>> AddSupplier(
         [FromBody] SupplierDto supplierDto,
         CancellationToken cancellationToken)
@@ -131,7 +132,6 @@ public sealed class SupplierController : ControllerBase
     [HttpDelete("{id:guid}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
     public async Task<IActionResult> DeleteSupplier(
         [FromRoute] Guid id,

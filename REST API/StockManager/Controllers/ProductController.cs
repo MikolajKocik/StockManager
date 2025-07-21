@@ -12,11 +12,13 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.CQRS.Commands.ProductCommands.TrackProductView;
 using StockManager.Core.Domain.Enums;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace StockManager.Controllers;
 
 [Authorize]
 [ApiController]
+[EnableRateLimiting("fixed")]
 [Route("api/products")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 public sealed class ProductController : ControllerBase

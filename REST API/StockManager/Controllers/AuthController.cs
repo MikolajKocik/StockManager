@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Extensions.ErrorExtensions;
@@ -9,7 +10,9 @@ using StockManager.Core.Application.Dtos.Authorization;
 namespace StockManager.Controllers;
 
 [ApiController]
+[EnableRateLimiting("fixed")]
 [Route("api/auth")]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -21,6 +24,7 @@ public class AuthController : ControllerBase
         _logger = logger;          
     }
 
+    // for page where suppliers can tracking their deliveries
     [HttpPost("register")]
     [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status400BadRequest)]

@@ -20,7 +20,7 @@ The REST API incorporates the following:
 
 - **Docker compose:** Docker orchiestration to manage docker images.
 
-- **Azure:** used for manage CI/CD pipelines in application
+- **Azure DevOps:** used for manage CI/CD pipelines in application
 
 - **JWT auth** uses token to verify user and user roles
 

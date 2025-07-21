@@ -40,7 +40,9 @@ public sealed partial class ReturnOrder : Entity<int>
         int? salesOrderId = null
         ) : base()
     {
-        // todo validation + guard nullable foreign id's
+        Guard.AgainstInvalidEnumValue(type);
+        Guard.AgainstDefaultValueIfProvided(purchaseOrderId, nameof(purchaseOrderId));
+        Guard.AgainstDefaultValueIfProvided(salesOrderId, nameof(salesOrderId));
 
         Type = type;
         ReturnDate = returnDate.Date;
@@ -57,8 +59,9 @@ public sealed partial class ReturnOrder : Entity<int>
        int? salesOrderId = null
        ) : base(id)
     {
-        
-        // todo validation + guard nullable foreign id's
+        Guard.AgainstInvalidEnumValue(type);
+        Guard.AgainstDefaultValueIfProvided(purchaseOrderId, nameof(purchaseOrderId));
+        Guard.AgainstDefaultValueIfProvided(salesOrderId, nameof(salesOrderId));
 
         Type = type;
         ReturnDate = returnDate.Date;

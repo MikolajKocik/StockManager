@@ -4,13 +4,14 @@ using System.Linq;
 using System.Security;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Common;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.PermissionEntity;
 
 namespace StockManager.Core.Domain.Models.RoleEntity;
 
-public sealed partial class Role
+public sealed partial class Role : Entity<int>
 {
-    public int Id { get; private set; }
     public string Name { get; private set; }
 
     // relation *-* with permission
@@ -18,10 +19,23 @@ public sealed partial class Role
     public IReadOnlyList<Permission> Permissions 
         => _permissions.AsReadOnly();
 
-    private Role() { }
-    public Role(string name)
+    private Role() : base() { }
+
+    public Role(
+        int id,
+        string name
+        ) : base(id)
     {
-        ArgumentException.ThrowIfNullOrWhiteSpace(name, nameof(name));
+        Guard.AgainstNullOrWhiteSpace(name, nameof(name));
+        Name = name;
+    }
+
+    public Role(
+        string name
+        ) : base()
+    {
+        Guard.AgainstNullOrWhiteSpace(name, nameof(name));
+
         Name = name;
     }
 }

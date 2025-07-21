@@ -39,9 +39,9 @@ public sealed class BinLocation : Entity<int>
 
     public BinLocation(
         int id,
-      Warehouse warehouse,
-      string code,
-      string description
+        Warehouse warehouse,
+        string code,
+        string description
       ) : base(id)
     {
         Guard.AgainstNullOrWhiteSpace(code, description);

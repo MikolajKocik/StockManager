@@ -65,7 +65,8 @@ public sealed partial class Product : Entity<int>
         Guard.AgainstInvalidEnumValue(genre);
         Guard.AgainstInvalidEnumValue(type);
         Guard.AgainstDefaultValue(supplierId);
-        IsValidExpirationDate(expirationDate);
+        Guard.IsValidDate(expirationDate);
+        Guard.AgainstDefaultValue(expirationDate);
 
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
@@ -95,7 +96,8 @@ public sealed partial class Product : Entity<int>
         Guard.AgainstInvalidEnumValue(genre);
         Guard.AgainstInvalidEnumValue(type);
         Guard.AgainstDefaultValue(supplierId);
-        IsValidExpirationDate(expirationDate);
+        Guard.IsValidDate(expirationDate);
+        Guard.AgainstDefaultValue(expirationDate);
 
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
@@ -106,18 +108,5 @@ public sealed partial class Product : Entity<int>
         Type = type;
         BatchNumber = batchNumber;
         SupplierId = supplierId;
-    }
-
-    private void IsValidExpirationDate(DateTime date)
-    {
-        if (Equals(date, default(DateTime)))
-        {
-            throw new ArgumentException("Expiration date cannot be its default value.", nameof(date));
-        }
-
-        if (date.Date < DateTime.UtcNow.Date)
-        {
-            throw new ArgumentException("Expiration date cannot be in the past.", nameof(date));
-        }
     }
 }

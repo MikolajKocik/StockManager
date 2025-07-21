@@ -1,4 +1,6 @@
-﻿using StockManager.Core.Domain.Models.AddressEntity;
+﻿using StockManager.Core.Domain.Common;
+using StockManager.Core.Domain.GuardMethods;
+using StockManager.Core.Domain.Models.AddressEntity;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderLineEntity;
@@ -6,14 +8,14 @@ using UUIDNext;
 
 namespace StockManager.Core.Domain.Models.SupplierEntity;
 
-public sealed partial class Supplier
+public sealed partial class Supplier : Entity<Guid>
 {
-    public Guid Id { get; private set; }
-    public string Name { get; private set; } = default!;
-    public string Slug { get; private set; } = default!;
+    public string Name { get; private set; } 
+    public string Slug { get; private set; } 
 
     // relation 1-1 with address
-    public Address Address { get; private set; } = default!;
+    public int AddressId { get; private set; }
+    public Address Address { get; private set; } 
 
     // relation 1-* with product
     private readonly List<Product> _products = new();
@@ -25,12 +27,32 @@ public sealed partial class Supplier
     public IReadOnlyCollection<PurchaseOrder> PurchaseOrders
         => _purchaseOrders.AsReadOnly();
 
-    private Supplier() { }
+    private Supplier() : base() { }
 
-    public Supplier(string name, Address address)
+    public Supplier(
+        string name,
+        int addressId
+        ) : base()
     {
+        Guard.AgainstNullOrWhiteSpace(name);
+        Guard.AgainstDefaultValue(addressId);
+
         Name = name;
         Slug = $"s_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
-        Address = address;
+        AddressId = addressId;
+    }
+
+    public Supplier(
+        Guid id,
+        string name,
+        int addressId
+        ) : base(id)
+    {
+        Guard.AgainstNullOrWhiteSpace(name);
+        Guard.AgainstDefaultValue(addressId);
+
+        Name = name;
+        Slug = $"s_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
+        AddressId = addressId;
     }
 }

@@ -3,14 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 
 namespace StockManager.Core.Domain.Models.StockTransactionEntity;
 
-public sealed class StockTransaction
+public sealed class StockTransaction : Entity<int>
 {
-    public int Id { get; private set; }
     public TransactionType Type { get; private set; }
     public decimal Quantity { get; private set; }
     public DateTime Date { get; private set; }
@@ -22,36 +23,26 @@ public sealed class StockTransaction
     public InventoryItem InventoryItem { get; private set; }
     public int InventoryItemId { get; private set; }
 
-    private StockTransaction() { }
+    private StockTransaction() : base() { }
 
     public StockTransaction(
-       int inventoryItemId,
-       TransactionType type,
-       decimal quantity,
-       DateTime date,
-       string referenceNumber,
-       InventoryItem inventoryItem,
-       int? sourceLocationId = null,
-       int? targetLocationId = null)
+        int id,
+        int inventoryItemId,
+        TransactionType type,
+        decimal quantity,
+        DateTime date,
+        string referenceNumber,
+        int? sourceLocationId = null,
+        int? targetLocationId = null
+        ) : base (id)
     {
-        if (inventoryItemId <= 0)
-        {
-            throw new ArgumentException("Invalid InventoryItemId", nameof(inventoryItemId));
-        }
-
-        if (quantity <= 0)
-        {
-            throw new ArgumentException("Quantity must be > 0", nameof(quantity));
-        }
-
-        if (date > DateTime.UtcNow)
-        {
-            throw new ArgumentException("Date cannot be in the future", nameof(date));
-        }
-
-        ArgumentException.ThrowIfNullOrEmpty(nameof(inventoryItem));
-
-        ArgumentException.ThrowIfNullOrWhiteSpace(referenceNumber, nameof(referenceNumber));
+        Guard.AgainstDefaultValue(inventoryItemId);
+        Guard.AgainstDefaultValueIfProvided(sourceLocationId, nameof(sourceLocationId));
+        Guard.AgainstDefaultValueIfProvided(targetLocationId, nameof(targetLocationId));
+        Guard.DecimalValueGreaterThanZero(quantity);
+        Guard.IsValidDate(date, nameof(date));
+        Guard.AgainstNullOrWhiteSpace(referenceNumber);
+        Guard.AgainstInvalidEnumValue(type);
 
         InventoryItemId = inventoryItemId;
         Type = type;
@@ -60,6 +51,32 @@ public sealed class StockTransaction
         ReferenceNumber = referenceNumber;
         SourceLocationId = sourceLocationId;
         TargetLocationId = targetLocationId;
-        InventoryItem = inventoryItem;
+    }
+
+    public StockTransaction(
+        int inventoryItemId,
+        TransactionType type,
+        decimal quantity,
+        DateTime date,
+        string referenceNumber,
+        int? sourceLocationId = null,
+        int? targetLocationId = null
+        ) : base() 
+    {
+        Guard.AgainstDefaultValue(inventoryItemId);
+        Guard.AgainstDefaultValueIfProvided(sourceLocationId, nameof(sourceLocationId));
+        Guard.AgainstDefaultValueIfProvided(targetLocationId, nameof(targetLocationId));
+        Guard.DecimalValueGreaterThanZero(quantity);
+        Guard.IsValidDate(date, nameof(date));
+        Guard.AgainstNullOrWhiteSpace(referenceNumber);
+        Guard.AgainstInvalidEnumValue(type);
+
+        InventoryItemId = inventoryItemId;
+        Type = type;
+        Quantity = quantity;
+        Date = date;
+        ReferenceNumber = referenceNumber;
+        SourceLocationId = sourceLocationId;
+        TargetLocationId = targetLocationId;
     }
 }

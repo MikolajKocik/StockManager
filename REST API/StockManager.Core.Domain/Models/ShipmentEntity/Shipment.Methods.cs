@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.GuardMethods;
 
 namespace StockManager.Core.Domain.Models.ShipmentEntity;
 
@@ -21,10 +22,7 @@ public sealed partial class Shipment
             throw new ArgumentException("DeliveredDate cannot be before ShippedDate", nameof(deliveredDate));
         }
 
-        if (deliveredDate.Date > DateTime.UtcNow.Date)
-        {
-            throw new ArgumentException("DeliveredDate cannot be in the future", nameof(deliveredDate));
-        }
+        Guard.IsValidDate(deliveredDate, nameof(deliveredDate));
 
         DeliveredDate = deliveredDate.Date;
         Status = ShipmentStatus.Delivered;

@@ -5,7 +5,7 @@ using StockManager.Application.Dtos.ModelsDto.Supplier;
 using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Models.AddressEntity;
-using StockManager.Core.Domain.Models.Product;
+using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using StockManager.Core.Domain.Models.UserEntity;
 

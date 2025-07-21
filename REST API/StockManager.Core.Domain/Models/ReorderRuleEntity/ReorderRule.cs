@@ -61,10 +61,7 @@ public sealed class ReorderRule : Entity<int>
 
     private void ValidateLevels(decimal minLevel, decimal maxLevel)
     {
-        if (minLevel < 0)
-        {
-            throw new ArgumentException("MinLevel must be ≥ 0", nameof(minLevel));
-        }
+        Guard.DecimalValueGreaterThanZero(minLevel);
 
         if (maxLevel < minLevel)
         {

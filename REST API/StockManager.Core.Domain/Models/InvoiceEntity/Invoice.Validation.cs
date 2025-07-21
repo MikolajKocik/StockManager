@@ -9,14 +9,6 @@ namespace StockManager.Core.Domain.Models.InvoiceEntity;
 
 public sealed partial class Invoice
 {
-    private void VerifyAmount(decimal amount)
-    {
-        if (amount < 0)
-        {
-            throw new ArgumentException("Amount must be greater or equal to zero", nameof(amount));
-        }
-    }
-
     private void ValidateInvoiceDates(DateTime invoiceDate, DateTime? dueDate) 
     {
         if (Equals(invoiceDate, default(DateTime)))

@@ -39,15 +39,16 @@ public sealed partial class Invoice : Entity<int>
         int? salesOrderId = null
         ) : base()
     {
-        VerifyAmount(totalAmount);
+        Guard.DecimalValueGreaterThanZero(totalAmount);
         ValidateInvoiceDates(invoiceDate, dueDate);
         ValidateOrderAssociations(purchaseOrderId, salesOrderId);
+        Guard.AgainstInvalidEnumValue(type);
+        Guard.SetOptionalDate(dueDate, date => dueDate = date, nameof(dueDate));
         Guard.AgainstInvalidEnumValue(type);
 
         Type = type;
         InvoiceDate = invoiceDate.Date;
         TotalAmount = totalAmount;
-        DueDate = dueDate?.Date;
         PurchaseOrderId = purchaseOrderId;
         SalesOrderId = salesOrderId;
         Status = InvoiceStatus.Draft;
@@ -63,15 +64,16 @@ public sealed partial class Invoice : Entity<int>
         int? salesOrderId = null
         ) : base(id)
     {
-        VerifyAmount(totalAmount);
+        Guard.DecimalValueGreaterThanZero(totalAmount);
         ValidateInvoiceDates(invoiceDate, dueDate);
         ValidateOrderAssociations(purchaseOrderId, salesOrderId);
+        Guard.AgainstInvalidEnumValue(type);
+        Guard.SetOptionalDate(dueDate, date => dueDate = date, nameof(dueDate));
         Guard.AgainstInvalidEnumValue(type);
 
         Type = type;
         InvoiceDate = invoiceDate.Date;
         TotalAmount = totalAmount;
-        DueDate = dueDate?.Date;
         PurchaseOrderId = purchaseOrderId;
         SalesOrderId = salesOrderId;
         Status = InvoiceStatus.Draft;

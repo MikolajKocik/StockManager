@@ -16,10 +16,7 @@ public sealed partial class InventoryItem
     /// <exception cref="ArgumentException">Thrown if the amount is negative or results in an invalid state.</exception>
     public void IncreaseQuantity(decimal amount)
     {
-        if (amount <= 0)
-        {
-            throw new ArgumentException("Amount to increase must be positive.", nameof(amount));
-        }
+        Guard.DecimalValueGreaterThanZero(amount);
         // Validate that the new quantity doesn't lead to issues (e.g., negative after some other operation, though unlikely here)
         // You might consider a Guard.AgainstNegative(amount) here if you add such a method.
         QuantityOnHand += amount;
@@ -33,10 +30,7 @@ public sealed partial class InventoryItem
     /// or if it would make quantity on hand less than quantity reserved.</exception>
     public void DecreaseQuantity(decimal amount)
     {
-        if (amount <= 0)
-        {
-            throw new ArgumentException("Amount to decrease must be positive.", nameof(amount));
-        }
+        Guard.DecimalValueGreaterThanZero(amount);
         // Ensure we don't go below zero or below reserved quantity
         if (QuantityOnHand - amount < QuantityReserved)
         {
@@ -52,10 +46,7 @@ public sealed partial class InventoryItem
     /// <exception cref="ArgumentException">Thrown if the amount is negative or if it exceeds available quantity.</exception>
     public void ReserveQuantity(decimal amount)
     {
-        if (amount <= 0)
-        {
-            throw new ArgumentException("Amount to reserve must be positive.", nameof(amount));
-        }
+        Guard.DecimalValueGreaterThanZero(amount);
         if (QuantityAvailable < amount)
         {
             throw new ArgumentException("Cannot reserve more than available quantity.", nameof(amount));
@@ -70,10 +61,7 @@ public sealed partial class InventoryItem
     /// <exception cref="ArgumentException">Thrown if the amount is negative or if it exceeds the reserved quantity.</exception>
     public void ReleaseQuantity(decimal amount)
     {
-        if (amount <= 0)
-        {
-            throw new ArgumentException("Amount to release must be positive.", nameof(amount));
-        }
+        Guard.DecimalValueGreaterThanZero(amount);
         if (QuantityReserved < amount)
         {
             throw new ArgumentException("Cannot release more than reserved quantity.", nameof(amount));

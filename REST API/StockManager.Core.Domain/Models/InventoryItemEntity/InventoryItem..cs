@@ -45,10 +45,11 @@ public sealed partial class InventoryItem : Entity<int>
         decimal quantityReserved = 0
         ) : base(id)
     {
-        IsValidQuantity(quantityOnHand, quantityReserved);
-
+        Guard.DecimalValueGreaterThanZero(quantityOnHand, quantityReserved);
         Guard.AgainstDefaultValue(productId, binLocationId);
         Guard.AgainstInvalidEnumValue(warehouse);
+
+        QuantityCompare(quantityOnHand, quantityReserved);
 
         ProductId = productId;
         Warehouse = warehouse;
@@ -65,10 +66,11 @@ public sealed partial class InventoryItem : Entity<int>
      decimal quantityReserved = 0
      ) : base()
     {
-        IsValidQuantity(quantityOnHand, quantityReserved);
-
+        Guard.DecimalValueGreaterThanZero(quantityOnHand, quantityReserved);
         Guard.AgainstDefaultValue(productId, binLocationId);
         Guard.AgainstInvalidEnumValue(warehouse);
+
+        QuantityCompare(quantityOnHand, quantityReserved);
 
         ProductId = productId;
         Warehouse = warehouse;
@@ -77,18 +79,8 @@ public sealed partial class InventoryItem : Entity<int>
         BinLocationId = binLocationId;
     }
 
-    private static void IsValidQuantity(decimal quantityReserved, decimal quantityOnHand)
+    private static void QuantityCompare(decimal quantityReserved, decimal quantityOnHand)
     {
-        if (quantityOnHand < 0)
-        {
-            throw new ArgumentException("Quantity on hand cannot be negative.", nameof(quantityOnHand));
-        }
-
-        if (quantityReserved < 0)
-        {
-            throw new ArgumentException("Quantity reserved cannot be negative.", nameof(quantityReserved));
-        }
-
         if (quantityReserved > quantityOnHand)
         {
             throw new ArgumentException("Reserved quantity cannot be greater than on-hand quantity.");

@@ -40,8 +40,7 @@ public sealed class PurchaseOrderLine : Entity<int>
     {
         Guard.AgainstDefaultValue(purchaseOrderId, productId);
         Guard.AgainstInvalidEnumValue(uom);
-
-        ValidateLineQuantitiesAndPrice(quantity, unitPrice);
+        Guard.DecimalValueGreaterThanZero(quantity, unitPrice);
 
         PurchaseOrderId = purchaseOrderId;
         ProductId = productId;
@@ -59,26 +58,12 @@ public sealed class PurchaseOrderLine : Entity<int>
     {
         Guard.AgainstDefaultValue(purchaseOrderId, productId);
         Guard.AgainstInvalidEnumValue(uom);
-
-        ValidateLineQuantitiesAndPrice(quantity, unitPrice);
+        Guard.DecimalValueGreaterThanZero(quantity, unitPrice);
 
         PurchaseOrderId = purchaseOrderId;
         ProductId = productId;
         Quantity = quantity;
         UoM = uom;
         UnitPrice = unitPrice;
-    }
-
-    private  void ValidateLineQuantitiesAndPrice(decimal quantity, decimal unitPrice)
-    {
-        if (quantity <= 0)
-        {
-            throw new ArgumentException("Quantity must be positive.", nameof(quantity));
-        }
-
-        if (unitPrice < 0)
-        {
-            throw new ArgumentException("Unit price cannot be negative.", nameof(unitPrice));
-        }
     }
 }

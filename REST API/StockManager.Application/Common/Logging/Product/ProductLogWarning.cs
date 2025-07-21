@@ -23,8 +23,8 @@ public static class ProductLogWarning
             ProductLogEventIds.ProductValidationFailed,
             "Validation failed for {Product}. Rolling back transaction");
 
-    public static readonly Action<ILogger, Core.Domain.Models.Product.Product, string, Exception?> LogProductValidationFailedExtended =
-        LoggerMessage.Define<Core.Domain.Models.Product.Product, string>(
+    public static readonly Action<ILogger, Core.Domain.Models.ProductEntity.Product, string, Exception?> LogProductValidationFailedExtended =
+        LoggerMessage.Define<Core.Domain.Models.ProductEntity.Product, string>(
             LogLevel.Warning,
             ProductLogEventIds.ProductValidationFailedExtended,
             "Validation failed for product:{@product}. Errors: {Errors}. Rolling back transaction");

@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.ReturnOrderEntity;
 
 namespace StockManager.Core.Domain.Models.ReturnOrderLineEntity;
 
-public sealed class ReturnOrderLine
+public sealed class ReturnOrderLine : Entity<int>
 {
-    public int Id { get; private set; }
     public int ReturnOrderId { get; private set; }
     public ReturnOrder ReturnOrder { get; private set; }
     public decimal Quantity { get; private set; }
@@ -21,29 +22,36 @@ public sealed class ReturnOrderLine
     public int ProductId { get; private set; }
     public Product Product { get; private set; }
 
-    private ReturnOrderLine() { }
+    private ReturnOrderLine() : base() { }
 
     internal ReturnOrderLine(
-       int returnOrderId,
-       int productId,
-       decimal quantity,
-       UnitOfMeasure uom
-        )
+        int returnOrderId,
+        int productId,
+        decimal quantity,
+        UnitOfMeasure uom
+        ) : base()
     {
-        if (returnOrderId <= 0)
-        {
-            throw new ArgumentException(null, nameof(returnOrderId));
-        }
+        Guard.AgainstDefaultValue(returnOrderId, productId);
+        Guard.AgainstInvalidEnumValue(uom);
+        Guard.DecimalValueGreaterThanZero(quantity);
 
-        if (productId <= 0)
-        {
-            throw new ArgumentException(null, nameof(productId));
-        }
+        ReturnOrderId = returnOrderId;
+        ProductId = productId;
+        Quantity = quantity;
+        UoM = uom;
+    }
 
-        if (quantity <= 0)
-        {
-            throw new ArgumentException("Quantity must be greater than zero", nameof(quantity));
-        }
+    internal ReturnOrderLine(
+        int id,
+        int returnOrderId,
+        int productId,
+        decimal quantity,
+        UnitOfMeasure uom
+       ) : base(id)
+    {
+        Guard.AgainstDefaultValue(returnOrderId, productId);
+        Guard.AgainstInvalidEnumValue(uom);
+        Guard.DecimalValueGreaterThanZero(quantity);
 
         ReturnOrderId = returnOrderId;
         ProductId = productId;

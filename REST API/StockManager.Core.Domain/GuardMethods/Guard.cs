@@ -39,6 +39,26 @@ internal static class Guard
         }
     }
 
+    public static void AgainstDefaultValueIfProvided<T>(T? value, string? paramName = null) where T : struct
+    {
+        if (value is null)
+        {
+            return;
+        }
+
+        T actualValue = value.Value;
+
+        var defaultValue = default(T);
+
+        if (EqualityComparer<T>.Default.Equals(actualValue, defaultValue))
+        {
+            throw new ArgumentException(
+                $"Parameter '{paramName ?? nameof(value)}' cannot be its default value (e.g., 0 or Guid.Empty) when provided.",
+                paramName ?? nameof(value));
+
+        }
+    }
+
     public static void AgainstNull<T>(params T[] values) where T : class
     {
         foreach (T value in values)
@@ -47,13 +67,39 @@ internal static class Guard
         }
     }
 
-    public static void IsValidDate(DateTime timestamp)
+    public static void IsValidDate(DateTime timestamp, string? paramName = null)
     {
         AgainstDefaultValue(timestamp);
 
         if (timestamp > DateTime.UtcNow)
         {
             throw new ArgumentException("Timestamp cannot be in the future", nameof(timestamp));
+        }
+    }
+
+    private static void RequireOptionalDate(DateTime? date, string? paramName = null)
+    {
+        AgainstDefaultValueIfProvided(date, nameof(paramName));
+
+        if (date.HasValue)
+        {
+            IsValidDate(date.Value);
+        }
+    }
+
+    public static void SetOptionalDate(
+       DateTime? date,
+       Action<DateTime?> action,
+       string? paramName = null)
+    {
+        if (date.HasValue)
+        {
+            RequireOptionalDate(date, paramName);
+            action(date);
+        }
+        else
+        {
+            action(null);
         }
     }
 
@@ -71,6 +117,17 @@ internal static class Guard
         {
             throw new ArgumentException(
                 $"The value '{value}' is not a valid defined member of the {typeof(TEnum).Name} enumeration.");
+        }
+    }
+
+    public static void DecimalValueGreaterThanZero(params decimal[] values)
+    {
+        foreach (decimal value in values)
+        {
+            if (value <= 0)
+            {
+                throw new ArgumentException("Value must be positive");
+            }
         }
     }
 }

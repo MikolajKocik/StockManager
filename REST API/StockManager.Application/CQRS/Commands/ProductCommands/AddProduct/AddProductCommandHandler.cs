@@ -18,7 +18,7 @@ using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Core.Domain.Models.Product;
+using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using IDatabase = StackExchange.Redis.IDatabase;
 

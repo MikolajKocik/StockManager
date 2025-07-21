@@ -22,7 +22,4 @@ public sealed class GetSuppliersQueryHandlerTests
             _repository.Object,
             _mapper.Object);
     }
-
-    [Fact]
-    public async Task Handle_Should_Return_
 }

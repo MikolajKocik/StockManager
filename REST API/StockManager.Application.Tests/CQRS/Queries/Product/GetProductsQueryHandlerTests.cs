@@ -9,7 +9,7 @@ using StockManager.Application.Dtos.ModelsDto.Product;
 using StockManager.Application.Tests.TestHelpers.ProductFactory;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.Product;
+using StockManager.Core.Domain.Models.ProductEntity;
 using Xunit.Sdk;
 
 namespace StockManager.Application.Tests;

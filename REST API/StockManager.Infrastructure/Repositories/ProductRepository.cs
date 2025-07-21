@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Core.Domain.Models.Product;
+using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;

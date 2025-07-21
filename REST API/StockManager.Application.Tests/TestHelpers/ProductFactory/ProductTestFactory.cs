@@ -1,5 +1,5 @@
 ﻿using StockManager.Core.Domain.Enums;
-using StockManager.Core.Domain.Models.Product;
+using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.Tests.TestHelpers.ProductFactory;
 

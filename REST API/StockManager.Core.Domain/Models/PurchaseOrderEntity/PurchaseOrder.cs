@@ -49,13 +49,13 @@ public sealed partial class PurchaseOrder : Entity<int>
     {
         Guard.AgainstDefaultValue(supplierId, returnOrderId, invoiceId);
         Guard.IsValidDate(orderDate);
+        Guard.SetOptionalDate(expectedDate, date => expectedDate = date, nameof(expectedDate));
 
         SupplierId = supplierId;
         OrderDate = orderDate.Date;
         Status = PurchaseOrderStatus.Draft;
         InvoiceId = invoiceId;
         ReturnOrderId = returnOrderId;
-        ExpectedDate = expectedDate;
     }
 
     public PurchaseOrder(
@@ -68,6 +68,7 @@ public sealed partial class PurchaseOrder : Entity<int>
     {
         Guard.AgainstDefaultValue(supplierId, returnOrderId, invoiceId);
         Guard.IsValidDate(orderDate);
+        Guard.SetOptionalDate(expectedDate, date => expectedDate = date, nameof(expectedDate));
 
         SupplierId = supplierId;
         OrderDate = orderDate.Date;

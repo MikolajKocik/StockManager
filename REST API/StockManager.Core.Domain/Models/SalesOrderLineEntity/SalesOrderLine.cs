@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SalesOrderEntity;
 
 namespace StockManager.Core.Domain.Models.SalesOrderLineEntity;
 
-public sealed class SalesOrderLine
+public sealed class SalesOrderLine : Entity<int>
 {
-    public int Id { get; private set; }
     public decimal Quantity { get; private set; }
     public UnitOfMeasure UoM { get; private set; }
     public decimal UnitPrice { get; private set; }
@@ -26,23 +27,41 @@ public sealed class SalesOrderLine
     public SalesOrder SalesOrder { get; private set; }
 
 
-    private SalesOrderLine() { }
-    internal SalesOrderLine(SalesOrder order, int productId, decimal qty, decimal price, UnitOfMeasure unit)
+    private SalesOrderLine() : base() { }
+
+    internal SalesOrderLine(
+        int salesOrderId,
+        int productId,
+        decimal qty,
+        decimal price,
+        UnitOfMeasure unit
+        ) : base() 
     {
-        if (qty <= 0)
-        {
-            throw new ArgumentException("Quantity must be positive value");
-        }
+        Guard.AgainstDefaultValue(salesOrderId, productId);
+        Guard.DecimalValueGreaterThanZero(qty, price);
+        Guard.AgainstInvalidEnumValue(unit);
 
-        if (price < 0)
-        {
-            throw new ArgumentException("Price cannot be negative value");
-        }
+        SalesOrderId = salesOrderId;
+        ProductId = productId;
+        Quantity = qty;
+        UnitPrice = price;
+        UoM = unit;
+    }
 
-        ArgumentException.ThrowIfNullOrEmpty("SalesOrder is required", nameof(order));
+    internal SalesOrderLine(
+        int id,
+        int salesOrderId,
+        int productId,
+        decimal qty,
+        decimal price,
+        UnitOfMeasure unit
+       ) : base(id)
+    {
+        Guard.AgainstDefaultValue(salesOrderId, productId);
+        Guard.DecimalValueGreaterThanZero(qty, price);
+        Guard.AgainstInvalidEnumValue(unit);
 
-        SalesOrder = order;
-        SalesOrderId = order.Id;
+        SalesOrderId = salesOrderId;
         ProductId = productId;
         Quantity = qty;
         UnitPrice = price;

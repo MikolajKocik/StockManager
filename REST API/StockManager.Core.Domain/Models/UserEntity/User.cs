@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.Models.AuditLogEntity;
 using UUIDNext;
 

@@ -23,6 +23,8 @@ public sealed partial class PurchaseOrder
 
     public void AddLine(PurchaseOrderLine line)
     {
+        Guard.AgainstNull(line);
+
         if (Status != PurchaseOrderStatus.Draft)
         {
             throw new InvalidOperationException("Cannot add lines unless Draft");

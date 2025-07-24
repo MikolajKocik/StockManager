@@ -10,6 +10,7 @@ using StockManager.Infrastructure.Settings;
 using StockManager.Application.Services;
 using StockManager.Infrastructure.Services.Auth;
 using StockManager.Core.Domain.Models.UserEntity;
+using System.Reflection;
 
 
 namespace StockManager.Infrastructure.Extensions;
@@ -18,7 +19,9 @@ public static class ServiceCollectionExtension
 {
     public static void AddInfrastructure(this IServiceCollection services)
     {
-        string? connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection");
+        string? connectionString =
+        Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection") ??
+            Environment.GetEnvironmentVariable("VS__Connection");
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
         services.AddDbContext<StockManagerDbContext>(options =>

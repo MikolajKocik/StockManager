@@ -11,11 +11,11 @@ using StockManager.Application.Dtos.ModelsDto.Product;
 namespace StockManager.Application.Common.Logging.Product;
 public static class ProductLogInfo 
 {
-    public static readonly Action<ILogger, ProductDto, Exception?> LogAddProductSuccesfull =
-        LoggerMessage.Define<ProductDto>(
+    public static readonly Action<ILogger, int, string, Exception?> LogAddProductSuccesfull =
+        LoggerMessage.Define<int, string>(
             LogLevel.Information,
             ProductLogEventIds.AddProductSuccesfull,
-            "A new product {Product} added to database");
+            "A new product id: {Id} with name: {Product} added to database");
 
     public static readonly Action<ILogger, int, Exception?> LogRemovingProductOperation =
         LoggerMessage.Define<int>(

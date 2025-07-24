@@ -22,7 +22,6 @@ public static class ProductTestDtoFactory
             BatchNumber = batch,
             Genre = genre,
             Type = warehouse, 
-            DeliveredAt = DateTime.UtcNow,
             ExpirationDate = DateTime.UtcNow.AddDays(30),
             Quantity = quantity,
             SupplierId = Guid.NewGuid()

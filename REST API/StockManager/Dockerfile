@@ -34,15 +34,18 @@ COPY ["Tests/StockManager.Application.Tests/StockManager.Application.Tests.cspro
 COPY ./Tests/StockManager.Application.Tests ./StockManager.Application.Tests
 RUN dotnet test "StockManager.Application.Tests/StockManager.Application.Tests.csproj" --no-restore --verbosity normal
 
-# Ten etap służy do publikowania projektu usługi do skopiowania do etapu końcowego
+# This stage is used to publish the service design to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src/StockManager
 RUN dotnet publish "StockManager.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BuildingInsideDocker=true
 
+COPY StockManager/appsettings.json /app/publish/
+COPY StockManager/appsettings.Development.json /app/publish/
+
 RUN ls -la /app/publish
 
-# Ten etap jest używany w środowisku produkcyjnym lub w przypadku uruchamiania z programu VS w trybie regularnym (domyślnie, gdy nie jest używana konfiguracja debugowania)
+# This stage is used in production environment or when running from VS in regular mode (default when not using debug configuration)
 FROM base AS final
 ARG APP_UID=1000
 

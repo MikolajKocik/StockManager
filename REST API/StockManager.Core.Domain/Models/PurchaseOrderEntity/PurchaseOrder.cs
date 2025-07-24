@@ -21,7 +21,7 @@ public sealed partial class PurchaseOrder : Entity<int>
 
     // relation *-1 with supplier
     public Supplier Supplier { get; private set; }
-    public int SupplierId { get; private set; }
+    public Guid SupplierId { get; private set; }
 
     // relation 1-* with purchaseOrderLines
     private readonly List<PurchaseOrderLine> _purchaseOrderLines = new();
@@ -40,14 +40,15 @@ public sealed partial class PurchaseOrder : Entity<int>
 
     public PurchaseOrder(
         int id,
-        int supplierId,
+        Guid supplierId,
         DateTime orderDate,      
         int returnOrderId,
         int invoiceId,
         DateTime? expectedDate = null
         ) : base(id)
     {
-        Guard.AgainstDefaultValue(supplierId, returnOrderId, invoiceId);
+        Guard.AgainstDefaultValue(returnOrderId, invoiceId);
+        Guard.AgainstDefaultValue(supplierId);
         Guard.IsValidDate(orderDate);
         Guard.SetOptionalDate(expectedDate, date => expectedDate = date, nameof(expectedDate));
 
@@ -59,14 +60,15 @@ public sealed partial class PurchaseOrder : Entity<int>
     }
 
     public PurchaseOrder(
-       int supplierId,
+       Guid supplierId,
        DateTime orderDate,
        int returnOrderId,
        int invoiceId,
        DateTime? expectedDate = null
        ) : base()
     {
-        Guard.AgainstDefaultValue(supplierId, returnOrderId, invoiceId);
+        Guard.AgainstDefaultValue(returnOrderId, invoiceId);
+        Guard.AgainstDefaultValue(supplierId);
         Guard.IsValidDate(orderDate);
         Guard.SetOptionalDate(expectedDate, date => expectedDate = date, nameof(expectedDate));
 

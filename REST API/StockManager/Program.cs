@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Reflection;
 using System.Threading.RateLimiting;
+using Grafana.OpenTelemetry;
 using HealthChecks.UI.Client;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,10 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using RabbitMQ.Client;
@@ -34,6 +38,7 @@ using StockManager.Application.Extensions;
 using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Extensions;
 using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.DomainServices;
 using StockManager.Infrastructure.EventBus;
 using StockManager.Infrastructure.Extensions;
 using StockManager.Infrastructure.Settings;
@@ -57,7 +62,7 @@ builder.Services.AddRateLimiter(opts =>
     });
 
     opts.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
-}); 
+});
 
 // scrutor package
 builder.Services.Scan(scan => scan
@@ -79,6 +84,15 @@ builder.Services.Scan(scan => scan
         .AsImplementedInterfaces()
         .WithScopedLifetime()
 );
+
+// domain services 
+Assembly domainServicesAssembly = typeof(ProductService).Assembly;
+
+builder.Services.Scan(scan => scan
+    .FromAssemblies(domainServicesAssembly)
+    .AddClasses(classes => classes.InNamespaces("StockManager.Infrastructure.DomainServices"))
+    .AsImplementedInterfaces()
+    .WithTransientLifetime());
 
 Assembly appAsm = typeof(StockManager.Application.Extensions.ServiceCollectionExtensions).Assembly;
 foreach (Type type in appAsm.GetTypes())
@@ -127,52 +141,50 @@ foreach (Type type in appAsm.GetTypes())
     }
 }
 
-// opentelemetry tracing
+// otlp debug
+string otlLogLevel = Environment.GetEnvironmentVariable("OTEL_LOG_LEVEL") ?? "";
 
-string otlpEndpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")
-    ?? throw new ArgumentException("OTLP endpoint is not configured");
-string? otlpHeaders = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS");
+builder.Logging.SetMinimumLevel(otlLogLevel.ToLower() switch
+{
+    "debug" => LogLevel.Debug,
+    "information" => LogLevel.Information,
+    "warning" => LogLevel.Warning,
+    "error" => LogLevel.Error,
+    "critical" => LogLevel.Critical,
+    _ => LogLevel.Information
+});
 
+// otlp config
 builder.Services
     .AddOpenTelemetry()
     .ConfigureResource(resource =>
     {
         resource.AddService(
-            serviceName: "my-app",
-            serviceNamespace: "my-application-group",
-            serviceVersion: "1.0.0");
+            serviceName: "StockManager",
+            serviceNamespace: "StockManager-group"
+            );
     })
-    .WithTracing(tracing =>
-    {
-        tracing
-            .AddAspNetCoreInstrumentation()
-            .AddHttpClientInstrumentation()
-            .AddConsoleExporter()
-            .AddOtlpExporter(opt =>
-            {
-                opt.Endpoint = new Uri(otlpEndpoint);
-                opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-                if (!string.IsNullOrWhiteSpace(otlpHeaders))
-                {
-                    opt.Headers = otlpHeaders;
-                }
-            });
-    });
+    .WithTracing(t => t.UseGrafana().AddConsoleExporter())
+    .WithMetrics(m => m.UseGrafana().AddConsoleExporter());
 
+builder.Logging.ClearProviders();
 
 builder.Logging.AddOpenTelemetry(logging =>
 {
+    logging.AddConsoleExporter();
+
     logging.IncludeScopes = true;
     logging.IncludeFormattedMessage = true;
+    logging.ParseStateValues = true;
+
+    string baseUrl = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")!;
+    string headers = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS")!;
 
     logging.AddOtlpExporter(opt =>
     {
-        opt.Endpoint = new Uri(otlpEndpoint);
-        opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
-        if(!string.IsNullOrWhiteSpace(otlpHeaders))
-        {
-            opt.Headers = otlpHeaders;
-        }
+        opt.Endpoint = new Uri($"{baseUrl}/v1/logs");
+        opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+        opt.Headers = headers; 
     });
 });
 

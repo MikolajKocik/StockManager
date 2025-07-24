@@ -55,14 +55,6 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
     {
         try
         {
-            string key = $"product:{command.Product.Id}:views";
-
-            await _redis.IncrementKeyAsync(
-                key,
-                TimeSpan.FromHours(24),
-                cancellationToken)
-                .ConfigureAwait(false);
-
             await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync();
 
             var validate = new ProductValidator();
@@ -72,27 +64,36 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
             {
                 Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
 
-                if (supplier is not null)
-                {
-                    SupplierLogWarning.LogSupplierAlreadyExists(_logger, supplier.Id, default);
-                    _supplierRepository.AttachSupplier(supplier);
-                }
-                else
+                if (supplier is null)
                 {
                     SupplierLogWarning.LogSupplierNotExists(_logger, command.Product.SupplierId, default);
-                    supplier = _mapper.Map<Supplier>(command.Product.Supplier);
-                    await _supplierRepository.AddSupplierAsync(supplier, cancellationToken);
+
+                    await transaction.RollbackAsync(cancellationToken);
+
+                    var error = new Error(
+                        $"Supplier with ID {command.Product.SupplierId} not found.",
+                        ErrorCodes.SupplierNotFound
+                    );
+                    return Result<ProductDto>.Failure(error);
                 }
 
                 Product product = _mapper.Map<Product>(command.Product);
                 _productService.SetSupplier(product, supplier);
 
-                ProductLogInfo.LogAddProductSuccesfull(_logger, command.Product, default);
-
                 Product newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
 
                 await transaction.CommitAsync(cancellationToken);
-                   
+
+                ProductLogInfo.LogAddProductSuccesfull(_logger, newProduct.Id, newProduct.Name, default);
+
+                string key = $"product:{newProduct.Id}:views";
+
+                await _redis.IncrementKeyAsync(
+                    key,
+                    TimeSpan.FromHours(24),
+                    cancellationToken)
+                    .ConfigureAwait(false);
+
                 ProductDto dto = _mapper.Map<ProductDto>(newProduct);
 
                 await _eventBus.PublishAsync(new ProductAddedIntegrationEvent(

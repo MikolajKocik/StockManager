@@ -116,7 +116,7 @@ public sealed class ProductController : ControllerBase
         if (result.IsSuccess)
         {
             ProductDto createdProduct = result.Value!;
-            ProductLogInfo.LogAddProductSuccesfull(_logger, createdProduct, default);
+            ProductLogInfo.LogAddProductSuccesfull(_logger, createdProduct.Id, createdProduct.Name, default);
 
             return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.Id }, createdProduct);
         }

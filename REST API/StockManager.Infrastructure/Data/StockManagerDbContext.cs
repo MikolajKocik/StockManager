@@ -52,6 +52,8 @@ public sealed class StockManagerDbContext(DbContextOptions<StockManagerDbContext
     {
         base.OnModelCreating(builder);
 
+        builder.HasDefaultSchema("StockManager");
+
         builder.ApplyConfigurationsFromAssembly(GetType().Assembly);
     }
 }

@@ -1,24 +1,27 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using StockManager.Infrastructure.Data;
-using Microsoft.AspNetCore.Identity;
-using StockManager.Infrastructure.Repositories;
-using StockManager.Core.Domain.Interfaces.Repositories;
-using Microsoft.AspNetCore.Http.HttpResults;
-using StockManager.Infrastructure.Settings;
 using StockManager.Application.Services;
-using StockManager.Infrastructure.Services.Auth;
+using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.UserEntity;
+using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.Repositories;
+using StockManager.Infrastructure.Services.Auth;
+using StockManager.Infrastructure.Settings;
 
 
 namespace StockManager.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void AddInfrastructure(this IServiceCollection services)
+    public static void AddInfrastructure(this IServiceCollection services, IConfiguration config)
     {
-        string? connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection");
+        string? connectionString = config.GetConnectionString("DockerConnection")
+            ?? throw new ArgumentException("Connection string is empty for local database");
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
         services.AddDbContext<StockManagerDbContext>(options =>

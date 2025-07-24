@@ -24,14 +24,12 @@ public class ProductValidator : AbstractValidator<ProductDto>
             .WithMessage("Field 'Unit' has maximum length of 15 characters.");
 
         RuleFor(ed => ed.ExpirationDate)
-            .NotEmpty()
-            .Must(IsValidExpirationDate()).WithMessage("Field 'EXpirationDate' must be in the future")
-            .WithMessage("Field 'Expiration Date' is required.");
+            .Must(IsValidExpirationDate())
+            .WithMessage("Field 'EXpirationDate' must be in the future");
 
-        RuleFor(da => da.DeliveredAt)
-            .NotEmpty()
-            .GreaterThanOrEqualTo(DateTime.UtcNow)
-            .WithMessage("Field 'Delivered At' is required.");
+        RuleFor(ed => ed.ExpirationDate)
+          .Must(ed => ed.Date != default)
+          .WithMessage("Field 'Expiration Date' is required.");
 
         RuleFor(t => t.Type)
             .NotEmpty()
@@ -42,10 +40,6 @@ public class ProductValidator : AbstractValidator<ProductDto>
             .WithMessage("Field 'BatchNumber' is required")
             .MaximumLength(200)
             .WithMessage("Maximum length of field 'BatchNumber' is 200 characters.");
-
-        RuleFor(s => s.Supplier!)
-            .SetValidator(new SupplierValidator())
-            .When(s => s.Supplier != null);
     }
 
     private static bool AllowedUnits(string unit)
@@ -57,9 +51,8 @@ public class ProductValidator : AbstractValidator<ProductDto>
 
     private static Func<ProductDto, DateTime, bool> IsValidExpirationDate()
     {
-        Func<ProductDto, DateTime, bool> isValid = (product, _) => 
-            product.ExpirationDate.Date > DateTime.UtcNow.Date &&
-            product.ExpirationDate.Date > product.DeliveredAt.Date;
+        Func<ProductDto, DateTime, bool> isValid = (product, _) =>
+            product.ExpirationDate.Date > DateTime.UtcNow.Date;
 
         return isValid;
     }

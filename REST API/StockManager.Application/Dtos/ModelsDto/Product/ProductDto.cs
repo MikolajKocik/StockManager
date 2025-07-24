@@ -13,8 +13,6 @@ public sealed class ProductDto
     public required string Unit { get; set; }
     public int Quantity { get; set; }
     public DateTime ExpirationDate { get; set; }
-    public DateTime DeliveredAt { get; set; }
     public required string BatchNumber { get; set; } 
-    public SupplierDto? Supplier { get; set; }
     public Guid? SupplierId { get; set; }
 }

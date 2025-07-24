@@ -67,6 +67,20 @@ services:
         timeout: 5s
         retries: 5  
 
+  grafana:
+    container_name: stockmanager-grafana
+    image: grafana/grafana:10.4.2
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    ports:
+     - "3000:3000"
+    volumes:
+     - grafana-storage:/var/lib/grafana
+
 volumes:
-    sql-data:    
+    sql-data: {}
+    grafana-storage: {}
+
   

@@ -45,14 +45,6 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
     {
         try
         {
-            string key = $"supplier:{command.Supplier.Id}:views";
-
-            await _redis.IncrementKeyAsync(
-                key,
-                TimeSpan.FromHours(24),
-                cancellationToken)
-                .ConfigureAwait(false);
-
             await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync();
 
             var validate = new SupplierValidator();
@@ -79,6 +71,14 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
                     Supplier addSupplier = await _supplierRepository.AddSupplierAsync(newSupplier, cancellationToken);
 
                     await transaction.CommitAsync(cancellationToken);
+
+                    string key = $"supplier:{command.Supplier.Id}:views";
+
+                    await _redis.IncrementKeyAsync(
+                        key,
+                        TimeSpan.FromHours(24),
+                        cancellationToken)
+                        .ConfigureAwait(false);
 
                     SupplierDto dto = _mapper.Map<SupplierDto>(addSupplier);
 

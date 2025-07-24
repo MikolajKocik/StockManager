@@ -47,7 +47,7 @@ using StockManager.Middlewares;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddPresentation();
-builder.Services.AddInfrastructure();
+builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 
 // rate limitting

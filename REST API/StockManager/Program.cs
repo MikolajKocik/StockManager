@@ -1,6 +1,8 @@
 using System.Globalization;
 using System.Reflection;
 using System.Threading.RateLimiting;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Grafana.OpenTelemetry;
 using HealthChecks.UI.Client;
 using MediatR;
@@ -164,9 +166,26 @@ builder.Services
             serviceNamespace: "StockManager-group"
             );
     })
-    .WithTracing(t => t.UseGrafana().AddConsoleExporter())
-    .WithMetrics(m => m.UseGrafana().AddConsoleExporter());
+    // grafana
+    .WithTracing(t =>
+    {
+        t.UseGrafana()
+        .AddConsoleExporter()
+        .AddAzureMonitorTraceExporter();
+    })
+    .WithMetrics(m =>
+    {
+        m.UseGrafana()
+        .AddConsoleExporter()
+        .AddAzureMonitorMetricExporter();
+    });
 
+// azure config
+builder.Services.Configure<AzureMonitorExporterOptions>(a =>
+{
+    a.ConnectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+});
+    
 builder.Logging.ClearProviders();
 
 builder.Logging.AddOpenTelemetry(logging =>
@@ -303,6 +322,14 @@ app.UseHttpsRedirection();
 app.MapGroup("api/identity")
     .WithTags("Identity")
     .MapIdentityApi<User>();
+
+app.Use(async (ctx, next) =>
+{
+    if (ctx.Request.Path.StartsWithSegments("/scm"))
+    {
+        await next();
+    }
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

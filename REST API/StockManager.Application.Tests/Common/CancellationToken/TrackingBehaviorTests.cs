@@ -13,7 +13,7 @@ using Moq;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Tests.TestHelpers.ProductFactory;
 
 namespace StockManager.Application.Tests.Common.PipelineBehavior;

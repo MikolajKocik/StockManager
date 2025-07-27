@@ -10,9 +10,9 @@ using StockManager.Application.CQRS.Commands.SupplierCommands.DeleteSupplier;
 using StockManager.Application.CQRS.Commands.SupplierCommands.EditSupplier;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
-using StockManager.Application.Dtos.ModelsDto.Address;
-using StockManager.Application.Dtos.ModelsDto.Product;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.AddressDtos;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
 
 namespace StockManager.Controllers;

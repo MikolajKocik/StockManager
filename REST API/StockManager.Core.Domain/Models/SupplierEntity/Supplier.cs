@@ -14,7 +14,7 @@ public sealed partial class Supplier : Entity<Guid>
     public string Slug { get; private set; } 
 
     // relation 1-1 with address
-    public int AddressId { get; private set; }
+    public Guid AddressId { get; private set; }
     public Address Address { get; private set; } 
 
     // relation 1-* with product
@@ -31,7 +31,7 @@ public sealed partial class Supplier : Entity<Guid>
 
     public Supplier(
         string name,
-        int addressId
+        Guid addressId
         ) : base()
     {
         Guard.AgainstNullOrWhiteSpace(name);
@@ -45,7 +45,7 @@ public sealed partial class Supplier : Entity<Guid>
     public Supplier(
         Guid id,
         string name,
-        int addressId
+        Guid addressId
         ) : base(id)
     {
         Guard.AgainstNullOrWhiteSpace(name);

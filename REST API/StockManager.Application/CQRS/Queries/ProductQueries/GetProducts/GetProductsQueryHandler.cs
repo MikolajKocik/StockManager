@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Application.Abstractions.CQRS.Query;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Enums;

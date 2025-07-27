@@ -31,7 +31,7 @@ public sealed partial class Supplier : Entity<Guid>
 
     public Supplier(
         string name,
-        int addressId
+        Guid addressId
         ) : base()
     {
         Guard.AgainstNullOrWhiteSpace(name);
@@ -45,7 +45,7 @@ public sealed partial class Supplier : Entity<Guid>
     public Supplier(
         Guid id,
         string name,
-        int addressId
+        Guid addressId
         ) : base(id)
     {
         Guard.AgainstNullOrWhiteSpace(name);

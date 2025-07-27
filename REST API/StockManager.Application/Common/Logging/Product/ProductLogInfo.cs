@@ -23,8 +23,8 @@ public static class ProductLogInfo
             ProductLogEventIds.RemovingProductOperation,
             "Removing the provided product:{@product}");
 
-    public static readonly Action<ILogger, int, ProductDto, Exception?> LogModyfingProduct =
-        LoggerMessage.Define<int, ProductDto>(
+    public static readonly Action<ILogger, int, ProductUpdateDto, Exception?> LogModyfingProduct =
+        LoggerMessage.Define<int, ProductUpdateDto>(
             LogLevel.Information,
             ProductLogEventIds.ModyfingProduct,
             "Modifying the provided product:{@productId} with {@modifiedProduct}");

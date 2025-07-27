@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using FluentValidation.Results;
+using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -14,13 +16,14 @@ using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
+using StockManager.Application.Validations.ProductValidation;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 
-public class EditProductCommandHandler : ICommandHandler<EditProductCommand, ProductDto>
+public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Unit>
 {
     private readonly IMapper _mapper;
     private readonly IProductRepository _repository;
@@ -29,6 +32,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
     private readonly IEventBus _eventBus;
     private readonly IProductService _productService;
     private readonly ISupplierService _supplierService;
+    private readonly IValidator<ProductUpdateDto> _validator;
 
     public EditProductCommandHandler(
         IMapper mapper,
@@ -37,7 +41,9 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
         IConnectionMultiplexer redis,
         IEventBus eventBus,
         IProductService productService,
-        ISupplierService supplierService)
+        ISupplierService supplierService,
+        IValidator<ProductUpdateDto> validator
+        )
     {
         _mapper = mapper;
         _repository = repository;
@@ -46,13 +52,16 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
         _eventBus = eventBus;
         _productService = productService;
         _supplierService = supplierService;
+        _validator = validator;
     }
 
-    public async Task<Result<ProductDto>> Handle(EditProductCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(EditProductCommand command, CancellationToken cancellationToken)
     {
         try
         {
             await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync();
+
+            ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
 
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
@@ -60,19 +69,16 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
             {
                 ProductLogInfo.LogModyfingProduct(_logger, command.Id, command.Product, default);
 
-                Product updateProduct = await _repository.UpdateProductAsync(
-                    _productService,
-                    product,
-                    _supplierService,
-                    cancellationToken);
-
-                ProductDto productModified = _mapper.Map<ProductDto>(updateProduct);
-
-                var validate = new ProductValidator();
-                ValidationResult validationResult = await validate.ValidateAsync(productModified, cancellationToken);
-
                 if (validationResult.IsValid)
-                {                   
+                {
+                    Product updateProduct = await _repository.UpdateProductAsync(
+                        _productService,
+                        product,
+                        _supplierService,
+                        cancellationToken);
+
+                    ProductDto productModified = _mapper.Map<ProductDto>(updateProduct);
+
                     await transaction.CommitAsync(cancellationToken);
 
                     await _redis.RemoveKeyAsync(
@@ -80,10 +86,10 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
                         .ConfigureAwait(false);
 
                     await _eventBus.PublishAsync(new ProductUpdatedIntegrationEvent(
-                        command.Id, command.Product.Name, command.Product.SupplierId))
+                        productModified.Id, productModified.Name, productModified.SupplierId))
                         .ConfigureAwait(false);
 
-                    return Result<ProductDto>.Success(productModified);
+                    return Result<Unit>.Success(Unit.Value);
                 }
                 else
                 {
@@ -97,7 +103,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
                         ErrorCodes.ProductValidation
                     );
 
-                    return Result<ProductDto>.Failure(error);
+                    return Result<Unit>.Failure(error);
                 }
             }
             else
@@ -110,7 +116,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
                     ErrorCodes.ProductNotFound
                 );
 
-                return Result<ProductDto>.Failure(error);
+                return Result<Unit>.Failure(error);
             }
         }
         catch (Exception ex)

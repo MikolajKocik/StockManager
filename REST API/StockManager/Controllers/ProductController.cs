@@ -108,10 +108,10 @@ public sealed class ProductController : ControllerBase
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<ProductDto>> AddProduct([FromBody] ProductDto productDto, CancellationToken cancellationToken)
+    public async Task<ActionResult<ProductDto>> AddProduct([FromBody] ProductCreateDto createDto, CancellationToken cancellationToken)
     {
 
-        Result<ProductDto> result = await _mediator.Send(new AddProductCommand(productDto), cancellationToken);
+        Result<ProductDto> result = await _mediator.Send(new AddProductCommand(createDto), cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -142,12 +142,12 @@ public sealed class ProductController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> EditProduct(
-        [FromBody] ProductDto productDto,
+        [FromBody] ProductUpdateDto productDto,
         [FromRoute] int id,
         CancellationToken cancellationToken)
     {
 
-        Result<ProductDto> result = await _mediator.Send(new EditProductCommand(id, productDto), cancellationToken);
+        Result<Unit> result = await _mediator.Send(new EditProductCommand(id, productDto), cancellationToken);
 
         if (result.IsSuccess)
         {

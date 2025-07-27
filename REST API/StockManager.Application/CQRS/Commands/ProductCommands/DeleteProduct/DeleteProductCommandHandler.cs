@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -12,6 +14,8 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
+using StockManager.Application.Validations.ProductValidation;
+using StockManager.Application.Validations.ProductValidation.Command;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ProductEntity;
 
@@ -24,20 +28,23 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
     private readonly ILogger<DeleteProductCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEventBus _eventBus;
-
+    private readonly IValidator<DeleteProductCommand> _validator;
 
     public DeleteProductCommandHandler(
         IMapper mapper,
         IProductRepository repository,
         ILogger<DeleteProductCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus)
+        IEventBus eventBus,
+        IValidator<DeleteProductCommand> validator
+        )
     {
         _mapper = mapper;
         _repository = repository;
         _logger = logger;
         _redis = redis;
         _eventBus = eventBus;
+        _validator = validator;
     }
 
     public async Task<Result<ProductDto>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
@@ -45,6 +52,22 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
         try
         {
             await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync();
+
+            ValidationResult validationResult = await _validator.ValidateAsync(command, cancellationToken);
+
+            if (!validationResult.IsValid)
+            {
+                IFormatProvider provider = new System.Globalization.CultureInfo("en-US");
+                ProductLogWarning.LogProductValidationFailedExtended(_logger, default, command.Id.ToString(provider), default);
+
+                await transaction.RollbackAsync(cancellationToken);
+
+                var error = new Error(
+                    $"Product id {command.Id} is invalid",
+                    ErrorCodes.ProductValidation
+                );
+                return Result<ProductDto>.Failure(error);
+            }
 
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 

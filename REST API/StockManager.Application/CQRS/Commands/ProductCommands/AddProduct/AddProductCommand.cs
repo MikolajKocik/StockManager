@@ -6,9 +6,9 @@ namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 
 public sealed class AddProductCommand : ICommand<ProductDto>
 {
-    public ProductDto Product { get; set; }
+    public ProductCreateDto Product { get; set; }
 
-    public AddProductCommand(ProductDto product)
+    public AddProductCommand(ProductCreateDto product)
     {
         Product = product;
     }

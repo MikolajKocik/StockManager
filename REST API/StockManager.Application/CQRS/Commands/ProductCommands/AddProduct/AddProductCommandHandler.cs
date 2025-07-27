@@ -35,6 +35,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
     private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
     private readonly IProductService _productService;
+    private readonly IValidator<ProductCreateDto> _validator;
 
     public AddProductCommandHandler(
         IMapper mapper, IProductRepository productRepository,
@@ -42,7 +43,9 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         ILogger<AddProductCommandHandler> logger,
         IEventBus eventBus,
         IConnectionMultiplexer redis,
-        IProductService productService)
+        IProductService productService, 
+        IValidator<ProductCreateDto> validator
+        )
     {
         _mapper = mapper;
         _productRepository = productRepository;
@@ -51,6 +54,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         _eventBus = eventBus;
         _redis = redis;
         _productService = productService;
+        _validator = validator;
     }
 
     public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
@@ -59,8 +63,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         {
             await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync();
 
-            var validate = new ProductCreateValidator();
-            ValidationResult validationResult = await validate.ValidateAsync(command.Product, cancellationToken);
+            ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
 
             if (validationResult.IsValid)
             {

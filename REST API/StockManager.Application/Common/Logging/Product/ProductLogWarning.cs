@@ -17,14 +17,14 @@ public static class ProductLogWarning
            ProductLogEventIds.ProductNotFound,
            "Product with id:{ProductId} not found. Rolling back transaction");
 
-    public static readonly Action<ILogger, ProductDto, Exception?> LogProductValidationFailed =
-        LoggerMessage.Define<ProductDto>(
+    public static readonly Action<ILogger, ProductCreateDto, Exception?> LogProductValidationFailed =
+        LoggerMessage.Define<ProductCreateDto>(
             LogLevel.Warning,
             ProductLogEventIds.ProductValidationFailed,
             "Validation failed for {Product}. Rolling back transaction");
 
-    public static readonly Action<ILogger, Core.Domain.Models.ProductEntity.Product, string, Exception?> LogProductValidationFailedExtended =
-        LoggerMessage.Define<Core.Domain.Models.ProductEntity.Product, string>(
+    public static readonly Action<ILogger, Core.Domain.Models.ProductEntity.Product?, string, Exception?> LogProductValidationFailedExtended =
+        LoggerMessage.Define<Core.Domain.Models.ProductEntity.Product?, string>(
             LogLevel.Warning,
             ProductLogEventIds.ProductValidationFailedExtended,
             "Validation failed for product:{@product}. Errors: {Errors}. Rolling back transaction");

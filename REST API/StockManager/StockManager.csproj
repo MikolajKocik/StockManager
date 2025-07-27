@@ -9,6 +9,8 @@
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" />
     <PackageReference Include="Grafana.OpenTelemetry" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
@@ -28,6 +30,7 @@
     <!-- ...-->
 	<PackageReference Include="Scrutor" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 

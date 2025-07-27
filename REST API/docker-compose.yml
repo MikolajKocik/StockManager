@@ -1,7 +1,8 @@
+version: '3.8'
 services:
   stockmanager:
     container_name: stockmanager
-    image: ${DOCKER_REGISTRY-}stockmanager
+    image: stockmanager:latest
     build:
       context: .
       dockerfile: StockManager/Dockerfile

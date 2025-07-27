@@ -1,29 +1,25 @@
-﻿using StockManager.Application.Dtos.ModelsDto.Product;
+﻿using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.Tests.TestHelpers.ProductFactory;
 
 public static class ProductTestDtoFactory
 {
-    public static ProductDto CreateTestDto(
-       int id = 1,
+    public static ProductCreateDto CreateTestDto(
        string genre = "Meat",  
        string name = "Test Products", 
        string unit = "kg",
-       int quantity = 10,
        string warehouse = "FreezerSection",
        string batch = "BATCH-001"
         )    
     {
-        return new ProductDto
+        return new ProductCreateDto
         {
-            Id = id,
             Name = name,
             Unit = unit,
             BatchNumber = batch,
             Genre = genre,
             Type = warehouse, 
             ExpirationDate = DateTime.UtcNow.AddDays(30),
-            Quantity = quantity,
             SupplierId = Guid.NewGuid()
         };
     }

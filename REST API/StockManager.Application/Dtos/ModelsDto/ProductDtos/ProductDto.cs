@@ -1,5 +1,5 @@
 ﻿using StockManager.Application.Common;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 
 namespace StockManager.Application.Dtos.ModelsDto.ProductDtos;
 

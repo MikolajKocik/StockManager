@@ -7,7 +7,7 @@ using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.Supplier;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 
 namespace StockManager.Application.Common.Logging.Supplier;
 

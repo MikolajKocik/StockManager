@@ -10,7 +10,7 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;

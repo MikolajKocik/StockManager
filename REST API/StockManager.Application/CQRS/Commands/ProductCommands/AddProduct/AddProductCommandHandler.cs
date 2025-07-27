@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Caching.Distributed;
@@ -12,10 +13,11 @@ using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
+using StockManager.Application.Validations.ProductValidation;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
@@ -57,7 +59,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         {
             await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync();
 
-            var validate = new ProductValidator();
+            var validate = new ProductCreateValidator();
             ValidationResult validationResult = await validate.ValidateAsync(command.Product, cancellationToken);
 
             if (validationResult.IsValid)

@@ -30,6 +30,7 @@
     <!-- ...-->
 	<PackageReference Include="Scrutor" />
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
     <PackageReference Include="Swashbuckle.AspNetCore" />
   </ItemGroup>
 

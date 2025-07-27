@@ -12,11 +12,11 @@ public class ProductUpdateValidator : AbstractValidator<ProductUpdateDto>
         RuleFor(x => x.Name)
             .MaximumLength(100);
         RuleFor(x => x.Genre)
-            .MaximumLength(50);
+            .NotEmpty().WithMessage("Genre is required");
         RuleFor(x => x.Unit)
             .MaximumLength(20);
         RuleFor(x => x.Type)
-            .MaximumLength(50);
+            .NotEmpty().WithMessage("Type is required");
         RuleFor(x => x.BatchNumber)
             .MaximumLength(50);
         RuleFor(x => x.SupplierId)

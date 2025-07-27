@@ -1,0 +1,14 @@
+using System;
+
+namespace StockManager.Application.Dtos.ModelsDto.StockTransaction;
+
+public sealed record StockTransactionCreateDto
+{
+    public int InventoryItemId { get; init; }
+    public string Type { get; init; }
+    public decimal Quantity { get; init; }
+    public DateTime Date { get; init; }
+    public string ReferenceNumber { get; init; }
+    public int? SourceLocationId { get; init; }
+    public int? TargetLocationId { get; init; }
+}

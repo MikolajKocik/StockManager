@@ -14,7 +14,7 @@ public sealed partial class Supplier : Entity<Guid>
     public string Slug { get; private set; } 
 
     // relation 1-1 with address
-    public int AddressId { get; private set; }
+    public Guid AddressId { get; private set; }
     public Address Address { get; private set; } 
 
     // relation 1-* with product

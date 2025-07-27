@@ -3,16 +3,17 @@ using StockManager.Application.Dtos.ModelsDto.Supplier;
 
 namespace StockManager.Application.Dtos.ModelsDto.Product;
 
-
-public sealed class ProductDto
+public sealed record ProductDto
 {
-    public int Id { get; set; }
-    public required string Name { get; set; } 
-    public required string Type { get; set; }
-    public required string Genre { get; set; } 
-    public required string Unit { get; set; }
-    public int Quantity { get; set; }
-    public DateTime ExpirationDate { get; set; }
-    public required string BatchNumber { get; set; } 
-    public Guid? SupplierId { get; set; }
+    public int Id { get; }
+    public string Name { get; }
+    public string Slug { get; }
+    public string Genre { get; }
+    public string Unit { get; }
+    public DateTime ExpirationDate { get; }
+    public DateTime DeliveredAt { get; }
+    public string Type { get; }
+    public string BatchNumber { get; }
+    public Guid SupplierId { get; }
+    public string? SupplierName { get; } 
 }

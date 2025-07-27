@@ -1,10 +1,16 @@
 ﻿namespace StockManager.Application.Dtos.ModelsDto.Address;
 
-public sealed class AddressDto
+public sealed record AddressDto
 {
-    public Guid Id { get; set; }
-    public required string City { get; set; } 
-    public required string Country { get; set; }
-    public required string PostalCode { get; set; } 
-    public Guid SupplierId { get; set; }
+    public Guid Id { get;  }
+    public string City { get; }
+    public string Country { get; }
+    public string PostalCode { get; }
+    public Guid SupplierId { get; }
 }
+
+
+
+
+
+

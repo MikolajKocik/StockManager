@@ -12,6 +12,5 @@ public sealed record SupplierUpdatedIntegrationEvent(
     Guid SupplierId,
     string Name,
     AddressDto? Address,
-    Guid? AddressId,
-    List<ProductDto>? Products
+    Guid? AddressId
     ) : IIntegrationEvent;

@@ -13,4 +13,5 @@ public interface ISupplierRepository
     void AttachSupplier(Supplier supplier);
     IQueryable<Supplier> GetSuppliers();
     Task<IDbContextTransaction> BeginTransactionAsync();
+    Task<Supplier?> FindByNameAsync(string name, CancellationToken cancellationToken);
 }

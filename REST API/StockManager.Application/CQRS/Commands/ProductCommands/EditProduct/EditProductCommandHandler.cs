@@ -36,7 +36,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
 
     public EditProductCommandHandler(
         IMapper mapper,
-        IProductRepository repository, 
+        IProductRepository repository,
         ILogger<EditProductCommandHandler> logger,
         IConnectionMultiplexer redis,
         IEventBus eventBus,
@@ -57,11 +57,26 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
 
     public async Task<Result<Unit>> Handle(EditProductCommand command, CancellationToken cancellationToken)
     {
+        ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            ProductLogWarning.LogProductValidationFailedExtended(
+                _logger,
+                command.Product,
+                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), default);
+
+            var error = new Error(
+                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                ErrorCodes.ProductValidation
+            );
+
+            return Result<Unit>.Failure(error);
+        }
+
         try
         {
             await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync();
-
-            ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
 
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
@@ -69,55 +84,36 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
             {
                 ProductLogInfo.LogModyfingProduct(_logger, command.Id, command.Product, default);
 
-                if (validationResult.IsValid)
-                {
-                    Product updateProduct = await _repository.UpdateProductAsync(
-                        _productService,
-                        product,
-                        _supplierService,
-                        cancellationToken);
+                Product updateProduct = await _repository.UpdateProductAsync(
+                    _productService,
+                    product,
+                    _supplierService,
+                    cancellationToken);
 
-                    ProductDto productModified = _mapper.Map<ProductDto>(updateProduct);
+                ProductDto productModified = _mapper.Map<ProductDto>(updateProduct);
 
-                    await transaction.CommitAsync(cancellationToken);
+                await transaction.CommitAsync(cancellationToken);
 
-                    await _redis.RemoveKeyAsync(
-                        $"product:{command.Id}:details")
-                        .ConfigureAwait(false);
+                await _redis.RemoveKeyAsync(
+                    $"product:{command.Id}:details")
+                    .ConfigureAwait(false);
 
-                    await _eventBus.PublishAsync(new ProductUpdatedIntegrationEvent(
-                        productModified.Id, productModified.Name, productModified.SupplierId))
-                        .ConfigureAwait(false);
+                await _eventBus.PublishAsync(new ProductUpdatedIntegrationEvent(
+                    productModified.Id, productModified.Name, productModified.SupplierId))
+                    .ConfigureAwait(false);
 
-                    return Result<Unit>.Success(Unit.Value);
-                }
-                else
-                {
-                    ProductLogWarning.LogProductValidationFailedExtended(
-                        _logger,
-                        product,
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), default);
-
-                    var error = new Error(
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                        ErrorCodes.ProductValidation
-                    );
-
-                    return Result<Unit>.Failure(error);
-                }
+                return Result<Unit>.Success(Unit.Value);
             }
-            else
-            {
-                ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
-                await transaction.RollbackAsync(cancellationToken);
 
-                var error = new Error(
-                    $"Product with id {command.Id} not found",
-                    ErrorCodes.ProductNotFound
-                );
+            ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
+            await transaction.RollbackAsync(cancellationToken);
 
-                return Result<Unit>.Failure(error);
-            }
+            var error = new Error(
+                $"Product with id {command.Id} not found",
+                ErrorCodes.ProductNotFound
+            );
+
+            return Result<Unit>.Failure(error);
         }
         catch (Exception ex)
         {

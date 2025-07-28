@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
@@ -24,13 +26,25 @@ public sealed class SupplierRepository : ISupplierRepository
             .Include(s => s.Address)
             .Include(s => s.Products);
 
-    public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Suppliers
+    public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken) 
+        => await _dbContext.Suppliers
             .Include(s => s.Address)
             .FirstOrDefaultAsync(s => s.Id == supplierId, cancellationToken);
-    }
 
+    public async Task<Supplier?> FindByNameAsync(string name, CancellationToken cancellationToken)
+    {
+        if(string.IsNullOrWhiteSpace(name))
+        {
+            return null;
+        }
+
+        string normalized = name.Trim().ToUpperInvariant();
+
+        return await _dbContext.Suppliers
+            .Where(s => string.Equals(s.Name.ToUpperInvariant(), normalized))
+            .FirstOrDefaultAsync(cancellationToken);
+    }    
+        
     public async Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
     {
         return await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);

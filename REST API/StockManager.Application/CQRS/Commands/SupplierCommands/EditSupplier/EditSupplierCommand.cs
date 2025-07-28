@@ -7,9 +7,9 @@ public sealed class EditSupplierCommand : ICommand<SupplierDto>
 {
     public Guid Id { get; }
 
-    public SupplierDto Supplier { get; set; }
+    public SupplierUpdateDto Supplier { get; set; }
 
-    public EditSupplierCommand(Guid id, SupplierDto supplier)
+    public EditSupplierCommand(Guid id, SupplierUpdateDto supplier)
     {
         Id = id;
         Supplier = supplier;

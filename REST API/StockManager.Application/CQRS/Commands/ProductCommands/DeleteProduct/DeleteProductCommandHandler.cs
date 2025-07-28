@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using FluentValidation;
 using FluentValidation.Results;
+using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -21,7 +22,7 @@ using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 
-public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, ProductDto>
+public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, Unit>
 {
     private readonly IMapper _mapper;
     private readonly IProductRepository _repository;
@@ -47,7 +48,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
         _validator = validator;
     }
 
-    public async Task<Result<ProductDto>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
     {
         try
         {
@@ -66,7 +67,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
                     $"Product id {command.Id} is invalid",
                     ErrorCodes.ProductValidation
                 );
-                return Result<ProductDto>.Failure(error);
+                return Result<Unit>.Failure(error);
             }
 
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
@@ -75,8 +76,6 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
             {
                 ProductLogInfo.LogRemovingProductOperation(_logger, command.Id, default);
                 Product remove = await _repository.DeleteProductAsync(product, cancellationToken);
-
-                ProductDto dto = _mapper.Map<ProductDto>(remove);         
 
                 await transaction.CommitAsync(cancellationToken);
 
@@ -92,7 +91,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
                     command.Id)
                     ).ConfigureAwait(false);
 
-                return Result<ProductDto>.Success(dto);
+                return Result<Unit>.Success(Unit.Value);
             }
             else
             {
@@ -104,7 +103,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
                     ErrorCodes.ProductNotFound
                 );
 
-                return Result<ProductDto>.Failure(error);
+                return Result<Unit>.Failure(error);
             }
         }
         catch (Exception ex)

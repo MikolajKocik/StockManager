@@ -83,7 +83,7 @@ public sealed class SupplierController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<SupplierDto>> AddSupplier(
-        [FromBody] SupplierDto supplierDto,
+        [FromBody] SupplierCreateDto supplierDto,
         CancellationToken cancellationToken)
     {
         Result<SupplierDto> result = await _mediator.Send(new AddSupplierCommand(supplierDto), cancellationToken);
@@ -109,7 +109,7 @@ public sealed class SupplierController : ControllerBase
 
     public async Task<IActionResult> UpdateSupplier(
         [FromRoute] Guid id,
-        [FromBody] SupplierDto supplierDto,
+        [FromBody] SupplierUpdateDto supplierDto,
         CancellationToken cancellationToken)
     {
         Result<SupplierDto> result = await _mediator.Send(new EditSupplierCommand(id, supplierDto), cancellationToken);
@@ -137,7 +137,7 @@ public sealed class SupplierController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        Result<SupplierDto> result = await _mediator.Send(new DeleteSupplierCommand(id), cancellationToken);
+        Result<Unit> result = await _mediator.Send(new DeleteSupplierCommand(id), cancellationToken);
 
         if (result.IsSuccess)
         {

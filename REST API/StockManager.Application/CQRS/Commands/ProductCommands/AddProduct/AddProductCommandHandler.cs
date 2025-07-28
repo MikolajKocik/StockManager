@@ -43,7 +43,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         ILogger<AddProductCommandHandler> logger,
         IEventBus eventBus,
         IConnectionMultiplexer redis,
-        IProductService productService, 
+        IProductService productService,
         IValidator<ProductCreateDto> validator
         )
     {
@@ -59,66 +59,63 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
 
     public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
     {
+        ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
+
+        if (!validationResult.IsValid)
+        {
+            ProductLogWarning.LogProductValidationFailed(_logger, command.Product, default);
+
+            var error = new Error(
+                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                ErrorCodes.SupplierValidation
+            );
+
+            return Result<ProductDto>.Failure(error);
+        }
+
         try
         {
             await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync();
 
-            ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
+            Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
 
-            if (validationResult.IsValid)
+            if (supplier is null)
             {
-                Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
+                SupplierLogWarning.LogSupplierNotExists(_logger, command.Product.SupplierId, default);
 
-                if (supplier is null)
-                {
-                    SupplierLogWarning.LogSupplierNotExists(_logger, command.Product.SupplierId, default);
-
-                    await transaction.RollbackAsync(cancellationToken);
-
-                    var error = new Error(
-                        $"Supplier with ID {command.Product.SupplierId} not found.",
-                        ErrorCodes.SupplierNotFound
-                    );
-                    return Result<ProductDto>.Failure(error);
-                }
-
-                Product product = _mapper.Map<Product>(command.Product);
-                _productService.SetSupplier(product, supplier);
-
-                Product newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
-
-                await transaction.CommitAsync(cancellationToken);
-
-                ProductLogInfo.LogAddProductSuccesfull(_logger, newProduct.Id, newProduct.Name, default);
-
-                string key = $"product:{newProduct.Id}:views";
-
-                await _redis.IncrementKeyAsync(
-                    key,
-                    TimeSpan.FromHours(24),
-                    cancellationToken)
-                    .ConfigureAwait(false);
-
-                ProductDto dto = _mapper.Map<ProductDto>(newProduct);
-
-                await _eventBus.PublishAsync(new ProductAddedIntegrationEvent(
-                   newProduct.Id, newProduct.Name, supplier.Id)
-                    ).ConfigureAwait(false);
-
-                return Result<ProductDto>.Success(dto);
-            }
-            else
-            {
-                ProductLogWarning.LogProductValidationFailed(_logger, command.Product, default);
                 await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
-                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                    ErrorCodes.SupplierValidation
+                    $"Supplier with ID {command.Product.SupplierId} not found.",
+                    ErrorCodes.SupplierNotFound
                 );
-
                 return Result<ProductDto>.Failure(error);
             }
+
+            Product product = _mapper.Map<Product>(command.Product);
+            _productService.SetSupplier(product, supplier);
+
+            Product newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
+
+            await transaction.CommitAsync(cancellationToken);
+
+            ProductLogInfo.LogAddProductSuccesfull(_logger, newProduct.Id, newProduct.Name, default);
+
+            string key = $"product:{newProduct.Id}:views";
+
+            await _redis.IncrementKeyAsync(
+                key,
+                TimeSpan.FromHours(24),
+                cancellationToken)
+                .ConfigureAwait(false);
+
+            ProductDto dto = _mapper.Map<ProductDto>(newProduct);
+
+            await _eventBus.PublishAsync(new ProductAddedIntegrationEvent(
+               newProduct.Id, newProduct.Name, supplier.Id)
+                ).ConfigureAwait(false);
+
+            return Result<ProductDto>.Success(dto);
         }
         catch (Exception ex)
         {

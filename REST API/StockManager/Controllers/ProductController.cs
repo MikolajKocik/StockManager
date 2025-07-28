@@ -174,7 +174,7 @@ public sealed class ProductController : ControllerBase
         CancellationToken cancellationToken)
     {
 
-        Result<ProductDto> result = await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
+        Result<Unit> result = await _mediator.Send(new DeleteProductCommand(id), cancellationToken);
 
         if (result.IsSuccess)
         {

@@ -5,8 +5,8 @@ namespace StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
 
 public sealed class AddSupplierCommand : ICommand<SupplierDto>
 {
-    public SupplierDto Supplier { get; set; }
-    public AddSupplierCommand(SupplierDto supplier)
+    public SupplierCreateDto Supplier { get; set; }
+    public AddSupplierCommand(SupplierCreateDto supplier)
     {
         Supplier = supplier;
     }

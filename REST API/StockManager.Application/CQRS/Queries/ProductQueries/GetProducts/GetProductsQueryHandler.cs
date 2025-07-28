@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Application.Abstractions.CQRS.Query;
-using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
@@ -62,7 +65,11 @@ public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, IEnumerab
             products = products.Where(p => p.ExpirationDate >= DateTime.Today && p.ExpirationDate <= soon);
         }
 
-        IEnumerable<ProductDto> dtos = _mapper.Map<IEnumerable<ProductDto>>(await products.ToListAsync(cancellationToken));
+        IEnumerable<ProductDto> dtos = await products
+                 .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+                 .Skip((query.PageNumber - 1) * query.PageSize)
+                 .Take(query.PageSize)
+                 .ToListAsync(cancellationToken);
 
         return Result<IEnumerable<ProductDto>>.Success(
             dtos.Any() ? dtos : Enumerable.Empty<ProductDto>());

@@ -16,7 +16,6 @@ using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations.ProductValidation;
-using StockManager.Application.Validations.ProductValidation.Command;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ProductEntity;
 
@@ -52,7 +51,7 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
     {
         try
         {
-            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync();
+            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync(cancellationToken);
 
             ValidationResult validationResult = await _validator.ValidateAsync(command, cancellationToken);
 

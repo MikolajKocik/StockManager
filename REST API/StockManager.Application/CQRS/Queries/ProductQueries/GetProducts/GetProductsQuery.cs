@@ -9,5 +9,7 @@ public sealed record GetProductsQuery(
     string? Genre,
     string? Unit,
     DateTime? ExpirationDate,
-    DateTime? DeliveredAt
+    DateTime? DeliveredAt,
+    int PageNumber = 1,
+    int PageSize = 10
     ) : IQuery<IEnumerable<ProductDto>>;

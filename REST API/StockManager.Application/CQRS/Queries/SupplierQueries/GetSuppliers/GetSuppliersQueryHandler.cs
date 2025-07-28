@@ -1,11 +1,14 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
@@ -26,11 +29,6 @@ public sealed class GetSuppliersQueryHandler : IQueryHandler<GetSuppliersQuery, 
 
     public async Task<Result<IEnumerable<SupplierDto>>> Handle(GetSuppliersQuery query, CancellationToken cancellationToken)
     {
-        // adding list of product ids to supplier query if products field provided
-        List<int>? productIds = query.products?.Any() is true 
-            ? query.products?.Select(p => p.Id).ToList() 
-            : null;
-
         IQueryable<Supplier> suppliers = _supplierRepository.GetSuppliers()
             .IfHasValue(
                 !string.IsNullOrWhiteSpace(query.Name),
@@ -43,16 +41,17 @@ public sealed class GetSuppliersQueryHandler : IQueryHandler<GetSuppliersQuery, 
                 s => EF.Functions.Like(s.Address.Country, $"%{query.Address!.Country}%"))
             .IfHasValue(
                 !string.IsNullOrWhiteSpace(query.Address?.PostalCode),
-                s => EF.Functions.Like(s.Address.PostalCode, $"%{query.Address!.PostalCode}%"))
-            .IfHasValue(
-                productIds is not null,
-                s => s.Products.Any(p => productIds!.Contains(p.Id)));
+                s => EF.Functions.Like(s.Address.PostalCode, $"%{query.Address!.PostalCode}%"));
 
-        IEnumerable<SupplierDto> result = _mapper.Map<IEnumerable<SupplierDto>>(await suppliers.ToListAsync(cancellationToken));
+        IEnumerable<SupplierDto> dtos = await suppliers
+            .ProjectTo<SupplierDto>(_mapper.ConfigurationProvider)
+            .Skip((query.PageNumber - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(cancellationToken);
 
         return Result<IEnumerable<SupplierDto>>.Success(
-            result.Any() 
-            ? result
+            dtos.Any() 
+            ? dtos
             : Enumerable.Empty<SupplierDto>());
     }
 }

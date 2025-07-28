@@ -8,4 +8,6 @@ namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
 public sealed record GetSuppliersQuery(
     string? Name,
     AddressDto? Address,
-    IEnumerable<ProductDto>? products) : IQuery<IEnumerable<SupplierDto>> { }
+    int PageNumber = 1,
+    int PageSize = 10
+    ) : IQuery<IEnumerable<SupplierDto>> { }

@@ -56,8 +56,13 @@ public sealed class ProductController : ControllerBase
         [FromQuery] DateTime? deliveredAt = null,
         CancellationToken cancellationToken = default)
     {
-
-        var query = new GetProductsQuery(name, warehouse, genre, unit, expirationDate, deliveredAt);
+        var query = new GetProductsQuery(
+            name,
+            warehouse, 
+            genre, 
+            unit, 
+            expirationDate,
+            deliveredAt);
 
         Result<IEnumerable<ProductDto>> result = await _mediator.Send(query, cancellationToken);
 
@@ -91,6 +96,8 @@ public sealed class ProductController : ControllerBase
         }
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
+
+        ProductLogWarning.LogProductNotFound(_logger, id, default);   
 
         return new ObjectResult(problem)
         {
@@ -159,12 +166,13 @@ public sealed class ProductController : ControllerBase
     }
 
     /// <summary>
-    /// Removes existing product by action.
+    /// Deletes a product identified by the specified ID.
     /// </summary>
-    /// <param name="productDto">Existing product to remove</param>
-    /// <param name="id">Product id</param>
-    /// <param name="cancellationToken">A token that allows the connection to the database to be broken in case of an abandoned action</param>
-    /// <returns>Returns a success status if product removed succesfully</returns>
+    /// <param name="id">The unique identifier of the product to delete.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <see cref="NoContentResult"/> if
+    /// the deletion is successful; otherwise, returns a <see cref="ProblemDetails"/> with status 404 if the product is
+    /// not found.</returns>
 
     [HttpDelete("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -185,6 +193,17 @@ public sealed class ProductController : ControllerBase
         return result.Error!.ToActionResult();
     }
 
+    /// <summary>
+    /// Tracks a view for the specified product.
+    /// </summary>
+    /// <remarks>This method sends a command to track a product view and returns an appropriate HTTP response
+    /// based on the outcome.</remarks>
+    /// <param name="id">The unique identifier of the product to track.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <see
+    /// cref="StatusCodes.Status204NoContent"/> if the operation is successful. Returns <see
+    /// cref="StatusCodes.Status400BadRequest"/> if the request is invalid. Returns <see
+    /// cref="StatusCodes.Status404NotFound"/> if the product is not found.</returns>
+
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
@@ -198,11 +217,22 @@ public sealed class ProductController : ControllerBase
             : result.Error!.ToActionResult();
     }
 
+    /// <summary>
+    /// Retrieves a list of all available genres.
+    /// </summary>
+    /// <remarks>This method returns an HTTP 200 OK response with the list of genre names.</remarks>
+    /// <returns>An <see cref="ActionResult{T}"/> containing an array of strings, each representing a genre name.</returns>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("genres")]
     public ActionResult<Genre> GetGenres()
         => Ok(Enum.GetNames(typeof(Genre)));
 
+    /// <summary>
+    /// Retrieves a list of all warehouse names.
+    /// </summary>
+    /// <remarks>This method returns a 200 OK response with the list of warehouse names. The list is derived
+    /// from the enumeration of warehouse types.</remarks>
+    /// <returns>An <see cref="ActionResult{T}"/> containing an array of strings with the names of all warehouses.</returns>
     [ProducesResponseType(StatusCodes.Status200OK)]
     [HttpGet("warehouses")]
     public ActionResult<Warehouse> GetWarehouses()

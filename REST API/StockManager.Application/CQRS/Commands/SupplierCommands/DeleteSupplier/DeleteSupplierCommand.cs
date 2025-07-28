@@ -4,11 +4,4 @@ using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 
 namespace StockManager.Application.CQRS.Commands.SupplierCommands.DeleteSupplier;
 
-public sealed record DeleteSupplierCommand : ICommand<Unit>
-{
-    public Guid Id { get; } 
-    public DeleteSupplierCommand(Guid id)
-    {
-        Id = id;
-    }
-}
+public sealed record DeleteSupplierCommand(Guid Id) : ICommand<Unit>;

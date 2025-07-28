@@ -75,7 +75,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
 
         try
         {
-            await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync();
+            await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync(cancellationToken);
 
             Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
 

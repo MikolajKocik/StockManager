@@ -44,7 +44,7 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
     {
         try
         {
-            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync();
+            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync(cancellationToken);
 
             Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Id, cancellationToken);
 

@@ -24,19 +24,19 @@ public sealed class TrackingBehaviorTests
     public async Task Handle_ShouldThrow_WhenCancellationRequested()
     {
         //
-        NullLogger<TrackingBehavior<GetProductByIdQuery, Result<ProductDto>>> logger = 
-            NullLogger<TrackingBehavior<GetProductByIdQuery, Result<ProductDto>>>.Instance;
+        NullLogger<TrackingBehavior<GetProductByIdQuery, Result<ProductCreateDto>>> logger = 
+            NullLogger<TrackingBehavior<GetProductByIdQuery, Result<ProductCreateDto>>>.Instance;
 
-        var behavior = new TrackingBehavior<GetProductByIdQuery, Result<ProductDto>>(logger);
+        var behavior = new TrackingBehavior<GetProductByIdQuery, Result<ProductCreateDto>>(logger);
 
         using var cts = new CancellationTokenSource();
         await cts.CancelAsync();
 
         var query = new GetProductByIdQuery(1);
-        ProductDto data = ProductTestDtoFactory.CreateTestDto();
+        ProductCreateDto data = ProductTestDtoFactory.CreateTestDto();
 
         //
-        var next = new RequestHandlerDelegate<Result<ProductDto>>(() => Task.FromResult(Result<ProductDto>.Success(data)));
+        var next = new RequestHandlerDelegate<Result<ProductCreateDto>>(() => Task.FromResult(Result<ProductCreateDto>.Success(data)));
 
         Func<Task> act = async () => await behavior.Handle(query, next, cts.Token);
 

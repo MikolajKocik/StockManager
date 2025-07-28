@@ -35,12 +35,10 @@ public class ProductRepository : IProductRepository
     }
 
     public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
-    {
-        return await RepositoryQueriesHelpers.AddEntityAsync(product, _dbContext, cancellationToken);
-    }
+        => await RepositoryQueriesHelpers.AddEntityAsync(product, _dbContext, cancellationToken);
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync()
-        => await _dbContext.Database.BeginTransactionAsync();
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
     public async Task<Product?> UpdateProductAsync(
         IProductService productService,
@@ -88,7 +86,6 @@ public class ProductRepository : IProductRepository
 
         _dbContext.Products.Remove(productExist!);
         await _dbContext.SaveChangesAsync(cancellationToken);
-
         return productExist;
     }
 }

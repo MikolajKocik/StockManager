@@ -4,12 +4,7 @@ using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 
-public sealed class AddProductCommand : ICommand<ProductDto>
-{
-    public ProductCreateDto Product { get; set; }
+public sealed record AddProductCommand(
+    ProductCreateDto Product)
+    : ICommand<ProductDto>;
 
-    public AddProductCommand(ProductCreateDto product)
-    {
-        Product = product;
-    }
-}

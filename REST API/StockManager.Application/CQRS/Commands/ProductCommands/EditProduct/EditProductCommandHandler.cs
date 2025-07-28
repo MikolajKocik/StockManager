@@ -76,7 +76,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
 
         try
         {
-            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync();
+            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync(cancellationToken);
 
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 

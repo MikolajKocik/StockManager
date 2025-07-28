@@ -64,7 +64,7 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
 
         try
         {
-            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync();
+            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync(cancellationToken);
 
             Supplier existingSupplier = await _supplierRepository.FindByNameAsync(command.Supplier.Name, cancellationToken);
 

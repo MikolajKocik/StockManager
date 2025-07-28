@@ -29,5 +29,4 @@ public static class ProductLogEventIds
     public static readonly EventId ProductFoundSuccess = new(84, "ProductFoundSuccess");
     public static readonly EventId ProductModifiedSuccess = new(85, "ProductsModifiedSuccess");
     public static readonly EventId ProductDeletedSuccess = new(86, "ProductDeletedSuccess");
-
 }

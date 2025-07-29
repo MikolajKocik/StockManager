@@ -58,4 +58,22 @@ public static class ErrorCodes
     public const string SalesOrderAlreadyProcessing = "SalesOrder.AlreadyProcessing";
     public const string SalesOrderAlreadyDelivered = "SalesOrder.AlreadyDelivered";
     public const string SalesOrderAlreadyReturned = "SalesOrder.AlreadyReturned";
+    //
+    public const string InvoiceNotFound = "Invoice.NotFound";
+    public const string InvoiceConflict = "Invoice.Conflict";
+    public const string InvoiceValidation = "Invoice.Validation";
+    public const string InvoiceDeleteFailed = "Invoice.DeleteFailed";
+    public const string InvoiceUpdateFailed = "Invoice.UpdateFailed";
+    public const string InvoiceCreateFailed = "Invoice.CreateFailed";
+    public const string InvoiceAlreadyCancelled = "Invoice.AlreadyCancelled";
+    public const string InvoiceAlreadyCompleted = "Invoice.AlreadyCompleted";
+    public const string InvoiceAlreadyProcessing = "Invoice.AlreadyProcessing";
+    //
+    public const string CustomerNotFound = "Customer.NotFound";
+    public const string CustomerConflict = "Customer.Conflict";
+    public const string CustomerValidation = "Customer.Validation";
+    public const string CustomerDeleteFailed = "Customer.DeleteFailed";
+    public const string CustomerUpdateFailed = "Customer.UpdateFailed";
+    public const string CustomerCreateFailed = "Customer.CreateFailed";
+    public const string CustomerAlreadyExists = "Customer.AlreadyExists";
 }

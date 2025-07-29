@@ -52,7 +52,7 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
 
             if (existingSupplier is not null)
             {
-                SupplierLogWarning.LogSupplierAlreadyExists(_logger, existingSupplier.Id, default);
+                SupplierLogWarning.LogSupplierAlreadyExists(_logger, command.Supplier.Name, default);
 
                 var error = new Error(
                  $"Supplier with name '{command.Supplier.Name}' already exists.",

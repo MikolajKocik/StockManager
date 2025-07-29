@@ -56,7 +56,7 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The added <see cref="InventoryItem"/> instance.</returns>
     public async Task<InventoryItem> AddInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(inventoryItem, _dbContext, cancellationToken);
+        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, inventoryItem, cancellationToken);
 
     /// <summary>
     /// Updates the specified inventory item in the database asynchronously.
@@ -70,17 +70,6 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
         return inventoryItem;
     }
-
-    /// <summary>
-    /// Begins a new database transaction asynchronously.
-    /// </summary>
-    /// <remarks>Use this method to start a transaction when performing multiple operations that need to be
-    /// executed atomically. Ensure to commit or roll back the transaction to release resources.</remarks>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests. The operation is canceled if the token is triggered.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains an <see
-    /// cref="IDbContextTransaction"/> representing the new transaction.</returns>
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
     /// <summary>
     /// Asynchronously retrieves a <see cref="BinLocation"/> by its unique identifier.
@@ -101,7 +90,7 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
     /// <returns></returns>
     public async Task<InventoryItem?> DeleteInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken)
     {
-        InventoryItem inventoryItemExist = await RepositoryQueriesHelpers.EntityFindAsync<InventoryItem, int>(inventoryItem.Id, _dbContext, cancellationToken);
+        InventoryItem inventoryItemExist = await RepositoryQueriesHelpers.EntityFindAsync<InventoryItem, int>(_dbContext, inventoryItem.Id, cancellationToken);
 
         _dbContext.InventoryItems.Remove(inventoryItemExist!);
         await _dbContext.SaveChangesAsync(cancellationToken);

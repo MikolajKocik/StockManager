@@ -3,8 +3,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.Shipment;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.CQRS.Commands.ShipmentCommands.AddShipment;
+using StockManager.Application.CQRS.Commands.ShipmentCommands.CancelShipment;
+using StockManager.Application.CQRS.Commands.ShipmentCommands.DeleteShipment;
+using StockManager.Application.CQRS.Commands.ShipmentCommands.EditShipment;
+using StockManager.Application.CQRS.Commands.ShipmentCommands.MarkAsDelivered;
+using StockManager.Application.CQRS.Commands.ShipmentCommands.MarkAsReturned;
 using StockManager.Application.CQRS.Queries.ShipmentQueries;
+using StockManager.Application.CQRS.Queries.ShipmentQueries.GetShipmentById;
 using StockManager.Application.CQRS.Queries.ShipmentQueries.GetShipments;
 using StockManager.Application.Dtos.ModelsDto.ShipmentDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
@@ -53,7 +62,12 @@ public class ShipmentController : ControllerBase
 
         Result<IEnumerable<ShipmentDto>> result = await _mediator.Send(query, cancellationToken);
 
-        return Ok(result);
+        ShipmentLogInfo.LogReturnedListOfShipments(_logger, result, default);
+
+        return Ok(new ShipmentDtoCollection 
+        {
+            Data = result.Value! 
+        });
     }
 
     /// <summary>
@@ -65,11 +79,11 @@ public class ShipmentController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<IEnumerable<ShipmentDto>>> GetShipmentById(int id, CancellationToken cancellationToken)
     {
-        Result<IEnumerable<ShipmentDto>>? result = await _mediator.Send(new GetShipmentByIdQuery(id), cancellationToken);
+        Result<ShipmentDto> result = await _mediator.Send(new GetShipmentByIdQuery(id), cancellationToken);
 
         if (result.IsSuccess)
         {
-            // log
+            ShipmentLogInfo.LogShipmentFound(_logger, id, default);
             return Ok(result);
         }
 
@@ -90,15 +104,19 @@ public class ShipmentController : ControllerBase
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns a 201 Created response with the
     /// shipment details if successful, or a 400 Bad Request if the command is <see langword="null"/>.</returns>
     [HttpPost]
-    public async Task<IActionResult> CreateShipment([FromBody] CreateShipmentCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CreateShipment([FromBody] ShipmentCreateDto createDto, CancellationToken cancellationToken)
     {
-        if (command is null)
+        Result<ShipmentDto> result = await _mediator.Send(new AddShipmentCommand(createDto), cancellationToken);
+
+        if (result.IsSuccess)
         {
-            _logger.LogError("CreateShipment command is null.");
-            return BadRequest(new ProblemDetails { Title = "Invalid request", Detail = "Command cannot be null." });
+            ShipmentLogInfo.LogShipmentCreated(_logger, result.Value!.Id, default);
+            return CreatedAtAction(nameof(GetShipmentById), new { id = result.Value.Id }, result);
         }
-        var result = await _mediator.Send(command, cancellationToken);
-        return CreatedAtAction(nameof(GetShipmentById), new { id = result.Id }, result);
+
+        return result.Error!.ToActionResult();
     }
 
     /// <summary>
@@ -110,17 +128,21 @@ public class ShipmentController : ControllerBase
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <see cref="NoContentResult"/> if
     /// the update is successful; otherwise, returns <see cref="NotFoundResult"/> if the shipment is not found, or <see
-    /// cref="BadRequestResult"/> if the command is invalid.</returns>
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateShipment(int id, [FromBody] UpdateShipmentCommand command, CancellationToken cancellationToken)
-    {
-        if (command is null || command.Id != id)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UpdateShipment([FromRoute] int id, [FromBody] ShipmentUpdateDto shipmentUpdate, CancellationToken cancellationToken)
+    {      
+        Result<Unit> result = await _mediator.Send(new EditShipmentCommand(id, shipmentUpdate), cancellationToken);
+
+        if (result.IsSuccess)
         {
-            _logger.LogError("UpdateShipment command is null or ID mismatch.");
-            return BadRequest(new ProblemDetails { Title = "Invalid request", Detail = "Command cannot be null and ID must match." });
+            ShipmentLogInfo.LogShipmentUpdated(_logger, id, default);
+            return NoContent();
         }
-        var result = await _mediator.Send(command, cancellationToken);
-        return result ? NoContent() : NotFound();
+
+        return result.Error!.ToActionResult();
     }
 
     /// <summary>
@@ -133,11 +155,19 @@ public class ShipmentController : ControllerBase
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <see cref="NoContentResult"/> if
     /// the shipment is successfully deleted; otherwise, <see cref="NotFoundResult"/> if the shipment does not exist.</returns>
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteShipment(int id, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> DeleteShipment([FromRoute] int id, CancellationToken cancellationToken)
     {
-        var command = new DeleteShipmentCommand(id);
-        var result = await _mediator.Send(command, cancellationToken);
-        return result ? NoContent() : NotFound();
+        Result<Unit> result = await _mediator.Send(new DeleteShipmentCommand(id), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            ShipmentLogInfo.LogShipmentDeleted(_logger, id, default);
+            return NoContent();
+        }
+
+        return result.Error!.ToActionResult();
     }
 
     /// <summary>
@@ -149,11 +179,19 @@ public class ShipmentController : ControllerBase
     /// the shipment is successfully canceled; otherwise, <see cref="NotFoundResult"/> if the shipment with the
     /// specified identifier does not exist.</returns>
     [HttpPost("{id}/cancel")]
-    public async Task<IActionResult> CancelShipment(int id, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> CancelShipment([FromRoute] int id, CancellationToken cancellationToken)
     {
-        var command = new CancelShipmentCommand(id);
-        var result = await _mediator.Send(command, cancellationToken);
-        return result ? NoContent() : NotFound();
+        Result<Unit> result = await _mediator.Send(new CancelShipmentCommand(id), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            ShipmentLogInfo.LogShipmentCancelled(_logger, id, default);
+            return NoContent();
+        }
+
+        return result.Error!.ToActionResult();
     }
 
     /// <summary>
@@ -166,15 +204,19 @@ public class ShipmentController : ControllerBase
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <see cref="NoContentResult"/> if
     /// the operation is successful, or <see cref="NotFoundResult"/> if the shipment is not found.</returns>
     [HttpPost("{id}/mark-delivered")]
-    public async Task<IActionResult> MarkShipmentAsDelivered(int id, [FromBody] MarkShipmentAsDeliveredCommand command, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> MarkShipmentAsDelivered([FromRoute] int id, CancellationToken cancellationToken)
     {
-        if (command is null || command.Id != id)
+        Result<Unit> result = await _mediator.Send(new MarkShipmentAsDeliveredCommand(id), cancellationToken);
+
+        if (result.IsSuccess)
         {
-            _logger.LogError("MarkShipmentAsDelivered command is null or ID mismatch.");
-            return BadRequest(new ProblemDetails { Title = "Invalid request", Detail = "Command cannot be null and ID must match." });
+            ShipmentLogInfo.LogShipmentMarkedDelivered(_logger, id, default);
+            return NoContent();
         }
-        var result = await _mediator.Send(command, cancellationToken);
-        return result ? NoContent() : NotFound();
+
+        return result.Error!.ToActionResult();
     }
 
     /// <summary>
@@ -188,10 +230,18 @@ public class ShipmentController : ControllerBase
     /// the shipment is successfully marked as returned; otherwise, <see cref="NotFoundResult"/> if the shipment does
     /// not exist.</returns>
     [HttpPost("{id}/mark-returned")]
-    public async Task<IActionResult> MarkShipmentAsReturned(int id, CancellationToken cancellationToken)
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> MarkShipmentAsReturned([FromRoute] int id, CancellationToken cancellationToken)
     {
-        var command = new MarkShipmentAsReturnedCommand(id);
-        var result = await _mediator.Send(command, cancellationToken);
-        return result ? NoContent() : NotFound();
+        Result<Unit> result = await _mediator.Send(new MarkShipmentAsReturnedCommand(id), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            ShipmentLogInfo.LogShipmentMarkedReturned(_logger, id, default);
+            return NoContent();
+        }
+
+        return result.Error!.ToActionResult();
     }
 }

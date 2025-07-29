@@ -23,4 +23,9 @@ public static class ShipmentLogEventIds
     public static readonly EventId ShipmentNotFound = new(3000, nameof(ShipmentNotFound));
     public static readonly EventId ShipmentValidationFailed = new(3001, nameof(ShipmentValidationFailed));
     public static readonly EventId ShipmentValidationFailedHandler = new(3002, nameof(ShipmentValidationFailedHandler));
+    public static readonly EventId ShipmentAlreadyExists = new(3003, nameof(ShipmentAlreadyExists));
+    public static readonly EventId ShipmentAlreadyDelivered = new(3004, nameof(ShipmentAlreadyDelivered));
+    public static readonly EventId ShipmentAlreadyCancelled = new(3005, nameof(ShipmentAlreadyCancelled));
+    public static readonly EventId ShipmentAlreadyReturned = new(3006, nameof(ShipmentAlreadyReturned));
+    public static readonly EventId ShipmentAlreadyProcessing = new(3007, nameof(ShipmentAlreadyProcessing));
 }

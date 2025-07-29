@@ -37,11 +37,11 @@ public static class SupplierLogWarning
             SupplierLogEventIds.SupplierAddedSuccesfull,
             "Removing the provided supplier:{@supplier}");
 
-    public static readonly Action<ILogger, Guid?, Exception?> LogSupplierAlreadyExists =
-        LoggerMessage.Define<Guid?>(
+    public static readonly Action<ILogger, string?, Exception?> LogSupplierAlreadyExists =
+        LoggerMessage.Define<string?>(
              LogLevel.Warning,
              SupplierLogEventIds.SupplierAlreadyExists,
-             "Supplier {SupplierId} already exists. Assigning the product to the existing supplier.");
+             "Supplier: {@supplier} already exists. Assigning the product to the existing supplier.");
 
     public static readonly Action<ILogger, Guid?, Exception?> LogSupplierNotExists =
         LoggerMessage.Define<Guid?>(

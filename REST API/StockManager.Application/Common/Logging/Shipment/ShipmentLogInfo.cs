@@ -9,17 +9,17 @@ namespace StockManager.Application.Common.Logging.Shipment;
 
 public static class ShipmentLogInfo
 {
-    public static readonly Action<ILogger, ShipmentDto, Exception?> LogShipmentCreated =
-        LoggerMessage.Define<ShipmentDto>(
+    public static readonly Action<ILogger, int, Exception?> LogShipmentCreated =
+        LoggerMessage.Define<int>(
             LogLevel.Information,
             ShipmentLogEventIds.ShipmentCreated,
-            "Shipment created: {@shipment}");
+            "Shipment created: {ShipmentId}");
 
-    public static readonly Action<ILogger, ShipmentDto, Exception?> LogShipmentUpdated =
-        LoggerMessage.Define<ShipmentDto>(
+    public static readonly Action<ILogger, int, Exception?> LogShipmentUpdated =
+        LoggerMessage.Define<int>(
             LogLevel.Information,
             ShipmentLogEventIds.ShipmentUpdated,
-            "Shipment updated: {@shipment}");
+            "Shipment updated: {ShipmentId}");
 
     public static readonly Action<ILogger, int, Exception?> LogShipmentDeleted =
         LoggerMessage.Define<int>(
@@ -51,9 +51,9 @@ public static class ShipmentLogInfo
             ShipmentLogEventIds.ReturnedListOfShipments,
             "Returned list of shipments: {@shipments}");
 
-    public static readonly Action<ILogger, Result<IEnumerable<ShipmentDto>>, Exception?> LogShipmentFound =
-        LoggerMessage.Define<Result<IEnumerable<ShipmentDto>>>(
+    public static readonly Action<ILogger, int, Exception?> LogShipmentFound =
+        LoggerMessage.Define<int>(
             LogLevel.Information,
             ShipmentLogEventIds.ShipmentFound,
-            "Shipment found: {@shipment}");
+            "Shipment found: {ShipmentId}");
 }

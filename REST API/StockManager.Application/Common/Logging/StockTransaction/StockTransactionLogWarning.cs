@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using FluentValidation.Results;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.StockTransaction;
+using StockManager.Application.Dtos.ModelsDto.StockTransactionDtos;
 
 namespace StockManager.Application.Common.Logging.StockTransaction;
 
@@ -25,4 +26,10 @@ public static class StockTransactionLogWarning
             LogLevel.Warning,
             StockTransactionLogEventIds.StockTransactionValidationFailedHandler,
             "Validation failed for stock transaction: {ValidationErrors}");
+
+    public static readonly Action<ILogger, StockTransactionCreateDto?, StockTransactionUpdateDto?, Exception?> LogStockTransactionAlreadyExists =
+        LoggerMessage.Define<StockTransactionCreateDto?, StockTransactionUpdateDto?>(
+            LogLevel.Warning,
+            StockTransactionLogEventIds.StockTransactionAlreadyExists,
+            "Stock transaction already exists: {StockTransaction}{StockTransaction}");
 }

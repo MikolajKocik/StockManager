@@ -20,6 +20,7 @@ public static class ProductLogEventIds
     public static readonly EventId ProductNotFound = new(70, "ProductNotFound");
     public static readonly EventId ProductValidationFailed = new(71, "ProductValidationFailed");
     public static readonly EventId ProductValidationFailedExtended = new(72, "ProductValidationFailedExtended");
+    public static readonly EventId ProductAlreadyExists = new(73, "ProductAlreadyExists");
 
     // Information
     public static readonly EventId AddProductSuccesfull = new(80, "AddProductSuccesfull");

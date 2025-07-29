@@ -56,8 +56,20 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
 
     public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
     {
-       try
+        try
         {
+            Product productExist = await _productRepository.FindProductByNameAsync(command.Product.Name, cancellationToken);
+
+            if (productExist is not null)
+            {
+                ProductLogWarning.LogProductAlreadyExists(_logger, command.Product.Name, default);
+                var error = new Error(
+                    $"Product with name {command.Product.Name} already exists.",
+                    ErrorCodes.ProductConflict
+                );
+                return Result<ProductDto>.Failure(error);
+            }
+
             Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
 
             if (supplier is null)

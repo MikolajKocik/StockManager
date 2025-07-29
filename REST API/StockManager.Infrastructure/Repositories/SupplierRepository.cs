@@ -32,23 +32,11 @@ public sealed class SupplierRepository : ISupplierRepository
             .FirstOrDefaultAsync(s => s.Id == supplierId, cancellationToken);
 
     public async Task<Supplier?> FindByNameAsync(string name, CancellationToken cancellationToken)
-    {
-        if(string.IsNullOrWhiteSpace(name))
-        {
-            return null;
-        }
+        => await RepositoryQueriesHelpers.FindByNameAsync<Supplier>(_dbContext, name, cancellationToken);
 
-        string normalized = name.Trim().ToUpperInvariant();
-
-        return await _dbContext.Suppliers
-            .Where(s => string.Equals(s.Name.ToUpperInvariant(), normalized))
-            .FirstOrDefaultAsync(cancellationToken);
-    }    
-        
     public async Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
-    {
-        return await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
-    }
+        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, supplier, cancellationToken);
+    
 
     public async Task<Supplier?> UpdateSupplierAsync(Supplier supplier, ISupplierService supplierService, CancellationToken cancellationToken)
     {
@@ -76,9 +64,6 @@ public sealed class SupplierRepository : ISupplierRepository
         return existingSupplier;
     }
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-      => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-
     public void AttachSupplier(Supplier supplier)
     {
         _dbContext.Suppliers.Attach(supplier);
@@ -86,7 +71,7 @@ public sealed class SupplierRepository : ISupplierRepository
 
     public async Task<Supplier?> DeleteSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
     {
-        Supplier? supplierExist = await RepositoryQueriesHelpers.EntityFindAsync<Supplier, Guid>(supplier.Id, _dbContext, cancellationToken);
+        Supplier? supplierExist = await RepositoryQueriesHelpers.EntityFindAsync<Supplier, Guid>(_dbContext, supplier.Id, cancellationToken);
 
         _dbContext.Suppliers.Remove(supplierExist!);
         await _dbContext.SaveChangesAsync(cancellationToken);

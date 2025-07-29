@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Common.Logging.EventIds.StockTransaction;
+using StockManager.Application.Dtos.ModelsDto.StockTransactionDtos;
 
 namespace StockManager.Application.Common.Logging.StockTransaction;
 
 public static class StockTransactionLogInfo
 {
-    public static readonly Action<ILogger, object, Exception?> LogStockTransactionCreated =
-        LoggerMessage.Define<object>(
+    public static readonly Action<ILogger, StockTransactionCreateDto, Exception?> LogStockTransactionCreated =
+        LoggerMessage.Define<StockTransactionCreateDto>(
             LogLevel.Information,
             StockTransactionLogEventIds.StockTransactionCreated,
             "Stock transaction created: {@stockTransaction}");
@@ -26,17 +27,17 @@ public static class StockTransactionLogInfo
             StockTransactionLogEventIds.StockTransactionDeleted,
             "Stock transaction deleted: {StockTransactionId}");
 
-    public static readonly Action<ILogger, Result<IEnumerable<object>>, Exception?> LogReturnedListOfStockTransactions =
-        LoggerMessage.Define<Result<IEnumerable<object>>>(
+    public static readonly Action<ILogger, Exception?> LogReturnedListOfStockTransactions =
+        LoggerMessage.Define(
             LogLevel.Information,
             StockTransactionLogEventIds.ReturnedListOfStockTransactions,
-            "Returned list of stock transactions: {@stockTransactions}");
+            "Returned list of stock transaction}");
 
-    public static readonly Action<ILogger, Result<IEnumerable<object>>, Exception?> LogStockTransactionFound =
-        LoggerMessage.Define<Result<IEnumerable<object>>>(
+    public static readonly Action<ILogger, int, Exception?> LogStockTransactionFound =
+        LoggerMessage.Define<int>(
             LogLevel.Information,
             StockTransactionLogEventIds.StockTransactionFound,
-            "Stock transaction found: {@stockTransaction}");
+            "Stock transaction found: {StockTransactionId}");
 
     // Domenowe operacje
     public static readonly Action<ILogger, int, Exception?> LogStockTransactionReserved =

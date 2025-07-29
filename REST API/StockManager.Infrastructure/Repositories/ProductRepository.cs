@@ -26,19 +26,16 @@ public class ProductRepository : IProductRepository
                 .ThenInclude(a => a.Address);
 
     public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
-    {
-
-        return await _dbContext.Products
+        => await _dbContext.Products
             .Include(s => s.Supplier)
             .ThenInclude(a => a.Address)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-    }
 
     public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(product, _dbContext, cancellationToken);
+        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, product, cancellationToken);
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+    public async Task<Product?> FindProductByNameAsync(string name, CancellationToken cancellationToken)
+        => await RepositoryQueriesHelpers.FindByNameAsync<Product>(_dbContext, name, cancellationToken);
 
     public async Task<Product?> UpdateProductAsync(
         IProductService productService,
@@ -82,7 +79,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken)
     {
-        Product productExist = await RepositoryQueriesHelpers.EntityFindAsync<Product, int>(product.Id, _dbContext, cancellationToken);
+        Product productExist = await RepositoryQueriesHelpers.EntityFindAsync<Product, int>(_dbContext, product.Id, cancellationToken);
 
         _dbContext.Products.Remove(productExist!);
         await _dbContext.SaveChangesAsync(cancellationToken);

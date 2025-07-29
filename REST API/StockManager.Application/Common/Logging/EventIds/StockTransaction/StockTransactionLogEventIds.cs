@@ -25,4 +25,5 @@ public static class StockTransactionLogEventIds
     public static readonly EventId StockTransactionNotFound = new(6200, nameof(StockTransactionNotFound));
     public static readonly EventId StockTransactionValidationFailed = new(6201, nameof(StockTransactionValidationFailed));
     public static readonly EventId StockTransactionValidationFailedHandler = new(6202, nameof(StockTransactionValidationFailedHandler));
+    public static readonly EventId StockTransactionAlreadyExists = new(6203, nameof(StockTransactionAlreadyExists));
 }

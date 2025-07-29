@@ -16,4 +16,5 @@ public interface IProductRepository : IBaseRepository
         ISupplierService supplierService,
         CancellationToken cancellationToken);
     Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken);
+    Task<Product?> FindProductByNameAsync(string name, CancellationToken cancellationToken);
 }

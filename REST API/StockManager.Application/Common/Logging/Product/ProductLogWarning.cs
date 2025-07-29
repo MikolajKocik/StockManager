@@ -28,4 +28,10 @@ public static class ProductLogWarning
             LogLevel.Warning,
             ProductLogEventIds.ProductValidationFailedExtended,
             "Validation failed for product:{@product}. Errors: {Errors}. Rolling back transaction");
+
+    public static readonly Action<ILogger, string, Exception?> LogProductAlreadyExists =
+        LoggerMessage.Define<string>(
+            LogLevel.Warning,
+            ProductLogEventIds.ProductAlreadyExists,
+            "Product with name:{ProductName} already exists. Rolling back transaction");
 }

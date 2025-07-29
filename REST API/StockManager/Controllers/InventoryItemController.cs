@@ -6,11 +6,14 @@ using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.AddInventoryItem;
+using StockManager.Application.CQRS.Commands.InventoryItemCommands.AddProductToInventoryItem;
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.AssignToBinLocation;
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.DecreaseQuantity;
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.DeleteInventoryItem;
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.EditInventoryItem;
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.IncreaseQuantity;
+using StockManager.Application.CQRS.Commands.InventoryItemCommands.ReleaseQuantity;
+using StockManager.Application.CQRS.Commands.InventoryItemCommands.ReserveQuantity;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.CQRS.Queries.InventoryItemQueries.GetInventoryItemById;
 using StockManager.Application.CQRS.Queries.InventoryItemQueries.GetInventoryItems;
@@ -245,6 +248,14 @@ public sealed class InventoryItemController : ControllerBase
         return result.Error!.ToActionResult();
     }
 
+    /// <summary>
+    /// Decreases the quantity of an inventory item by a specified amount.
+    /// </summary>
+    /// <param name="id">The unique identifier of the inventory item to decrease.</param>
+    /// <param name="amount">The amount by which to decrease the inventory item's quantity. Must be a positive value.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="IActionResult"/> representing the result of the operation. Returns a 200 OK status with the
+    /// updated inventory item if successful, or a 404 Not Found status if the item does not exist.</returns>
 
     [HttpPost("{id}/decrease-quantity")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -286,4 +297,72 @@ public sealed class InventoryItemController : ControllerBase
         }
         return result.Error!.ToActionResult();
     }
+
+    /// <summary>
+    /// Reserves a specified quantity of an inventory item.
+    /// </summary>
+    /// <param name="id">The unique identifier of the inventory item to reserve.</param>
+    /// <param name="amount">The quantity of the inventory item to reserve. Must be a positive value.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns a 200 OK response with the
+    /// updated inventory item details if successful, or a 404 Not Found response if the item does not exist.</returns>
+    [HttpPost("{id}/reserve-quantity")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReserveQuantity([FromRoute] int id, [FromBody] decimal amount, CancellationToken cancellationToken)
+    {
+        Result<InventoryItemDto> result = await _mediator.Send(new ReserveInventoryItemQuantityCommand(id, amount), cancellationToken);
+        if (result.IsSuccess)
+        {
+            InventoryItemLogInfo.LogInventoryItemQuantityReserved(_logger, id, amount, default);
+            return Ok(result.Value);
+        }
+        return result.Error!.ToActionResult();
+    }
+
+    /// <summary>
+    /// Adds a product to an inventory item specified by the given identifier.
+    /// </summary>
+    /// <param name="id">The identifier of the inventory item to which the product will be added.</param>
+    /// <param name="productDto">The product details to be added to the inventory item.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns the added product details if
+    /// successful, or a problem details response if the inventory item is not found.</returns>
+
+    [HttpPost("{id}/add-product-to-inventory-item")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> AddProductToInventoryItem([FromRoute] int id, [FromBody] ProductDto productDto, CancellationToken cancellationToken)
+    {
+        Result<ProductDto> result = await _mediator.Send(new AddProductToInventoryItemCommand(id, productDto), cancellationToken);
+        if (result.IsSuccess)
+        {
+            InventoryItemLogInfo.LogAddProductToInventoryItemSuccess(_logger, id, result.Value!.Id, default);
+            return Ok(result.Value);
+        }
+        return result.Error!.ToActionResult();
+    }
+
+    /// <summary>
+    /// Releases a specified quantity of an inventory item.
+    /// </summary>
+    /// <param name="id">The unique identifier of the inventory item to release quantity from.</param>
+    /// <param name="amount">The amount of quantity to release from the inventory item. Must be a positive value.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns the updated inventory item if
+    /// successful, or a <see cref="ProblemDetails"/> if the item is not found.</returns>
+    [HttpPost("{id}/release-quantity")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> ReleaseQuantity([FromRoute] int id, [FromBody] decimal amount, CancellationToken cancellationToken)
+    {
+        Result<InventoryItemDto> result = await _mediator.Send(new ReleaseInventoryItemQuantityCommand(id, amount), cancellationToken);
+        if (result.IsSuccess)
+        {
+            InventoryItemLogInfo.LogInventoryItemQuantityReleased(_logger, id, amount, default);
+            return Ok(result.Value);
+        }
+        return result.Error!.ToActionResult();
+    }
+
 }

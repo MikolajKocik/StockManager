@@ -33,4 +33,6 @@ public static class InventoryItemLogEventIds
     public static readonly EventId InventoryItemAssignedToBinLocation = new(229, "InventoryItemAssignedToBinLocation");
     public static readonly EventId InventoryItemValidationQuantityOperationFailed = new(230, "InventoryItemValidationQuantityOperationFailed");
     public static readonly EventId InventoryItemQuantityReserved = new(231, "InventoryItemQuantityReserved");
+    public static readonly EventId AddProductToInventoryItemSuccess = new(232, "AddProductToInventoryItemSuccess");
+    public static readonly EventId InventoryItemQuantityReleased  = new (233, "InventoryItemQuantityReleased");
 }

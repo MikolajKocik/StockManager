@@ -32,7 +32,6 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
     private readonly IEventBus _eventBus;
     private readonly IProductService _productService;
     private readonly ISupplierService _supplierService;
-    private readonly IValidator<ProductUpdateDto> _validator;
 
     public EditProductCommandHandler(
         IMapper mapper,
@@ -41,8 +40,7 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
         IConnectionMultiplexer redis,
         IEventBus eventBus,
         IProductService productService,
-        ISupplierService supplierService,
-        IValidator<ProductUpdateDto> validator
+        ISupplierService supplierService
         )
     {
         _mapper = mapper;
@@ -52,32 +50,12 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
         _eventBus = eventBus;
         _productService = productService;
         _supplierService = supplierService;
-        _validator = validator;
     }
 
     public async Task<Result<Unit>> Handle(EditProductCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            ProductLogWarning.LogProductValidationFailedExtended(
-                _logger,
-                command.Product,
-                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), default);
-
-            var error = new Error(
-                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                ErrorCodes.ProductValidation
-            );
-
-            return Result<Unit>.Failure(error);
-        }
-
         try
         {
-            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync(cancellationToken);
-
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
             if (product is not null)
@@ -92,8 +70,6 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
 
                 ProductDto productModified = _mapper.Map<ProductDto>(updateProduct);
 
-                await transaction.CommitAsync(cancellationToken);
-
                 await _redis.RemoveKeyAsync(
                     $"product:{command.Id}:details")
                     .ConfigureAwait(false);
@@ -106,7 +82,6 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
             }
 
             ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
-            await transaction.RollbackAsync(cancellationToken);
 
             var error = new Error(
                 $"Product with id {command.Id} not found",

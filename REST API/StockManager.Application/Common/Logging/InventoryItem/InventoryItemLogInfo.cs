@@ -77,4 +77,16 @@ public static class InventoryItemLogInfo
             LogLevel.Information,
             InventoryItemLogEventIds.InventoryItemQuantityReserved,
             "Inventory item with id:{Id} quantity reserved by {Amount} succesfully");
+
+    public static readonly Action<ILogger, int, int, Exception?> LogAddProductToInventoryItemSuccess =
+        LoggerMessage.Define<int, int>(
+            LogLevel.Information,
+            InventoryItemLogEventIds.AddProductToInventoryItemSuccess,
+            "Product with id:{ProductId} added to inventory item with id:{InventoryItemId} succesfully");
+
+    public static readonly Action<ILogger, int, decimal, Exception?> LogInventoryItemQuantityReleased =
+        LoggerMessage.Define<int, decimal>(
+            LogLevel.Information,
+            InventoryItemLogEventIds.InventoryItemQuantityReleased,
+            "Inventory item with id:{Id} quantity released by {Amount} succesfully");
 }

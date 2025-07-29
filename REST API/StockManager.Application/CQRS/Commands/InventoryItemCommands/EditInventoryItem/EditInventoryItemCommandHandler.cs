@@ -25,7 +25,6 @@ public sealed class EditInventoryItemCommandHandler : ICommandHandler<EditInvent
 {
     private readonly IInventoryItemRepository _inventoryItemRepository;
     private readonly IMapper _mapper;
-    private readonly IValidator<InventoryItemUpdateDto> _validator;
     private readonly ILogger<EditInventoryItemCommandHandler> _logger;
     private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
@@ -33,7 +32,6 @@ public sealed class EditInventoryItemCommandHandler : ICommandHandler<EditInvent
     public EditInventoryItemCommandHandler(
         IInventoryItemRepository inventoryItemRepository,
         IMapper mapper,
-        IValidator<InventoryItemUpdateDto> validator,
         ILogger<EditInventoryItemCommandHandler> logger,
         IEventBus eventBus,
         IConnectionMultiplexer redis
@@ -41,7 +39,6 @@ public sealed class EditInventoryItemCommandHandler : ICommandHandler<EditInvent
     {
         _inventoryItemRepository = inventoryItemRepository;
         _mapper = mapper;
-        _validator = validator;
         _logger = logger;
         _eventBus = eventBus;
         _redis = redis;
@@ -49,21 +46,8 @@ public sealed class EditInventoryItemCommandHandler : ICommandHandler<EditInvent
 
     public async Task<Result<Unit>> Handle(EditInventoryItemCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await _validator.ValidateAsync(command.UpdateDto, cancellationToken);
-        if (!validationResult.IsValid)
-        {
-            InventoryItemLogWarning.LogInventoryItemUpdateValidationFailed(_logger, command.UpdateDto, default);
-           
-            return Result<Unit>.Failure(
-                new Error(
-                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                    "InventoryItem.Validation"));
-        }
-
         try
         {
-            await using IDbContextTransaction transaction = await _inventoryItemRepository.BeginTransactionAsync(cancellationToken);
-
             InventoryItemLogInfo.LogModyfingInventoryItem(
                 _logger,
                 command.Id,
@@ -83,8 +67,6 @@ public sealed class EditInventoryItemCommandHandler : ICommandHandler<EditInvent
             }
 
             await _inventoryItemRepository.UpdateInventoryItemAsync(inventoryItem, cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
 
             InventoryItemDto dto =  _mapper.Map<InventoryItemDto>(inventoryItem);
 

@@ -28,7 +28,6 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
     private readonly IConnectionMultiplexer _redis;
     private readonly IEventBus _eventBus;
     private readonly ISupplierService _supplierService;
-    private readonly IValidator<SupplierUpdateDto> _validator;
 
     public EditSupplierCommandHandler(
         ISupplierRepository supplierRepository,
@@ -36,8 +35,7 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
         ILogger<EditSupplierCommandHandler> logger,
         IConnectionMultiplexer redis,
         IEventBus eventBus,
-        ISupplierService supplierService,
-        IValidator<SupplierUpdateDto> validator
+        ISupplierService supplierService
         )
     {
         _supplierRepository = supplierRepository;
@@ -46,29 +44,12 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
         _redis = redis;
         _eventBus = eventBus;
         _supplierService = supplierService;
-        _validator = validator;
     }
 
     public async Task<Result<SupplierDto>> Handle(EditSupplierCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await _validator.ValidateAsync(command.Supplier, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            SupplierLogWarning.LogSupplierValidationFailedHandler(_logger, string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), default);
-
-            var error = new Error(
-                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                ErrorCodes.SupplierValidation
-            );
-
-            return Result<SupplierDto>.Failure(error);
-        }
-
         try
         {
-            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync(cancellationToken);
-
             Supplier? supplier = await _supplierRepository.GetSupplierByIdAsync(command.Id, cancellationToken);
 
             if (supplier is not null)
@@ -78,8 +59,6 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
                 Supplier? updateSupplier = await _supplierRepository.UpdateSupplierAsync(supplier, _supplierService, cancellationToken);
 
                 SupplierDto supplierModified = _mapper.Map<SupplierDto>(updateSupplier);
-
-                await transaction.CommitAsync(cancellationToken);
 
                 await _redis.RemoveKeyAsync(
                     $"supplier:{command.Id}:details")
@@ -97,7 +76,6 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
             }
 
             SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
-            await transaction.RollbackAsync(cancellationToken);
 
             var error = new Error(
                 $"Supplier with id {command.Id} not found",

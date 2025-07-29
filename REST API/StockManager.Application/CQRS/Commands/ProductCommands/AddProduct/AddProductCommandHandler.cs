@@ -35,7 +35,6 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
     private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
     private readonly IProductService _productService;
-    private readonly IValidator<ProductCreateDto> _validator;
 
     public AddProductCommandHandler(
         IMapper mapper, IProductRepository productRepository,
@@ -43,8 +42,7 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         ILogger<AddProductCommandHandler> logger,
         IEventBus eventBus,
         IConnectionMultiplexer redis,
-        IProductService productService,
-        IValidator<ProductCreateDto> validator
+        IProductService productService
         )
     {
         _mapper = mapper;
@@ -54,36 +52,17 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         _eventBus = eventBus;
         _redis = redis;
         _productService = productService;
-        _validator = validator;
     }
 
     public async Task<Result<ProductDto>> Handle(AddProductCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await _validator.ValidateAsync(command.Product, cancellationToken);
-
-        if (!validationResult.IsValid)
+       try
         {
-            ProductLogWarning.LogProductValidationFailed(_logger, command.Product, default);
-
-            var error = new Error(
-                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                ErrorCodes.SupplierValidation
-            );
-
-            return Result<ProductDto>.Failure(error);
-        }
-
-        try
-        {
-            await using IDbContextTransaction transaction = await _productRepository.BeginTransactionAsync(cancellationToken);
-
             Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Product.SupplierId, cancellationToken);
 
             if (supplier is null)
             {
                 SupplierLogWarning.LogSupplierNotExists(_logger, command.Product.SupplierId, default);
-
-                await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
                     $"Supplier with ID {command.Product.SupplierId} not found.",
@@ -96,8 +75,6 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
             _productService.SetSupplier(product, supplier);
 
             Product newProduct = await _productRepository.AddProductAsync(product, cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
 
             ProductLogInfo.LogAddProductSuccesfull(_logger, newProduct.Id, newProduct.Name, default);
 

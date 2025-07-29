@@ -42,8 +42,6 @@ public sealed class DeleteInventoryItemCommandHandler : ICommandHandler<DeleteIn
     {
         try
         {
-            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync(cancellationToken);
-
             InventoryItem? inventoryItem = await _repository.GetInventoryItemByIdAsync(command.Id, cancellationToken);
 
             if (inventoryItem is null)
@@ -56,8 +54,6 @@ public sealed class DeleteInventoryItemCommandHandler : ICommandHandler<DeleteIn
             }
 
             await _repository.DeleteInventoryItemAsync(inventoryItem, cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
 
             await _redis.RemoveKeyAsync(
                  $"inventory-item:{command.Id}:details")

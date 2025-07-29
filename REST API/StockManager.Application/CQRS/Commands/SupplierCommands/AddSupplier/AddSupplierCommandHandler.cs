@@ -28,15 +28,13 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
     private readonly ILogger<AddSupplierCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEventBus _eventBus;
-    private readonly IValidator<SupplierCreateDto> _validator;
 
     public AddSupplierCommandHandler(
         IMapper mapper,
         ISupplierRepository supplierRepository,
         ILogger<AddSupplierCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus,
-        IValidator<SupplierCreateDto> validator
+        IEventBus eventBus
         )
     {
         _mapper = mapper;
@@ -44,28 +42,12 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
         _logger = logger;
         _redis = redis;
         _eventBus = eventBus;
-        _validator = validator;
     }
 
     public async Task<Result<SupplierDto>> Handle(AddSupplierCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await _validator.ValidateAsync(command.Supplier, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            SupplierLogWarning.LogSupplierValidationFailed(_logger, validationResult.Errors, default);
-
-            var error = new Error(
-                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                ErrorCodes.SupplierValidation);
-
-            return Result<SupplierDto>.Failure(error);
-        }
-
         try
         {
-            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync(cancellationToken);
-
             Supplier existingSupplier = await _supplierRepository.FindByNameAsync(command.Supplier.Name, cancellationToken);
 
             if (existingSupplier is not null)
@@ -73,10 +55,8 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
                 SupplierLogWarning.LogSupplierAlreadyExists(_logger, existingSupplier.Id, default);
 
                 var error = new Error(
-                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
+                 $"Supplier with name '{command.Supplier.Name}' already exists.",
                 ErrorCodes.SupplierConflict);
-
-                await transaction.RollbackAsync(cancellationToken);
 
                 return Result<SupplierDto>.Failure(error);
             }
@@ -86,8 +66,6 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
             SupplierLogInfo.LogSupplierAddedSuccesfull(_logger, newSupplier, default);
 
             Supplier addSupplier = await _supplierRepository.AddSupplierAsync(newSupplier, cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
 
             string key = $"supplier:{newSupplier.Id}:views";
 
@@ -107,7 +85,6 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
                 ).ConfigureAwait(false);
 
             return Result<SupplierDto>.Success(dto);
-
         }
         catch (Exception ex)
         {

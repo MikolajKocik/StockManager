@@ -44,16 +44,12 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
     {
         try
         {
-            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync(cancellationToken);
-
             Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Id, cancellationToken);
 
             if (supplier is not null)
             {
                 SupplierLogInfo.LogRemovingSupplier(_logger, command.Id, default);
                 Supplier remove = await _supplierRepository.DeleteSupplierAsync(supplier, cancellationToken);
-
-                await transaction.CommitAsync(cancellationToken);
 
                 await _redis.RemoveKeyAsync(
                     $"supplier:{command.Id}:views")
@@ -71,7 +67,6 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
             }
 
             SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
-            await transaction.RollbackAsync(cancellationToken);
 
             var error = new Error(
                 $"Supplier with id {command.Id} not found",

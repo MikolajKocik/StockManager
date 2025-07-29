@@ -1,18 +1,19 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using StockManager.Application.Common.Logging.InventoryItem;
+using StockManager.Application.Common.Logging.Product;
+using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
+using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
+using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
+using StockManager.Application.CQRS.Commands.ProductCommands.TrackProductView;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
-using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
-using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
-using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
-using Microsoft.AspNetCore.Authorization;
-using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
-using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Common.Logging.Product;
-using StockManager.Application.CQRS.Commands.ProductCommands.TrackProductView;
+using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Core.Domain.Enums;
-using Microsoft.AspNetCore.RateLimiting;
 
 namespace StockManager.Controllers;
 

@@ -23,41 +23,23 @@ public sealed class AssignInventoryItemToBinLocationCommandHandler : ICommandHan
     private readonly IInventoryItemService _service;
     private readonly IMapper _mapper;
     private readonly ILogger<AssignInventoryItemToBinLocationCommandHandler> _logger;
-    private readonly IValidator<AssignInventoryItemToBinLocationCommand> _validator;
 
     public AssignInventoryItemToBinLocationCommandHandler(
         IInventoryItemRepository repository,
         IInventoryItemService service,
         IMapper mapper,
-        ILogger<AssignInventoryItemToBinLocationCommandHandler> logger,
-        IValidator<AssignInventoryItemToBinLocationCommand> validator
+        ILogger<AssignInventoryItemToBinLocationCommandHandler> logger
         )
     {
         _repository = repository;
         _service = service;
         _mapper = mapper;
         _logger = logger;
-        _validator = validator;
     }
 
     public async Task<Result<InventoryItemDto>> Handle(AssignInventoryItemToBinLocationCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await _validator.ValidateAsync(command, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            InventoryItemLogWarning.LogInventoryItemValidationFailedExtended(
-                _logger,
-                string.Join(", ", validationResult.Errors),
-                default);
-
-            return Result<InventoryItemDto>.Failure(
-                new Error(
-                    "Validation failed",
-                    "InventoryItem.ValidationError"));
-        }
-
-        try
+       try
         {
             InventoryItem? inventoryItem = await _repository.GetInventoryItemByIdAsync(command.Id, cancellationToken);
 

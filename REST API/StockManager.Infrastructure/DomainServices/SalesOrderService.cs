@@ -21,9 +21,7 @@ public sealed class SalesOrderService : ISalesOrderService
     public void Confirm(SalesOrder order) => order.Confirm();
 
     public void Deliver(SalesOrder order, DateTime deliveredDate)
-    {
-        throw new NotImplementedException();
-    }
+        => order.Deliver(deliveredDate);
 
     public void Ship(SalesOrder order, DateTime shipDate)
         => order.Ship(shipDate);

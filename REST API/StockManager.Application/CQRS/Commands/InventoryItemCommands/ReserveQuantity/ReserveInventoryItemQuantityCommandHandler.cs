@@ -22,7 +22,6 @@ public sealed class ReserveInventoryItemQuantityCommandHandler : ICommandHandler
     private readonly IInventoryItemService _service;
     private readonly IMapper _mapper;
     private readonly ILogger<ReserveInventoryItemQuantityCommandHandler> _logger;
-    private readonly IValidator<ReserveInventoryItemQuantityCommand> _validator;
 
     public ReserveInventoryItemQuantityCommandHandler(
         IInventoryItemRepository repository,
@@ -36,28 +35,10 @@ public sealed class ReserveInventoryItemQuantityCommandHandler : ICommandHandler
         _service = service;
         _mapper = mapper;
         _logger = logger;
-        _validator = validator;
     }
 
     public async Task<Result<InventoryItemDto>> Handle(ReserveInventoryItemQuantityCommand command, CancellationToken cancellationToken)
     {
-
-        ValidationResult validationResult = await _validator.ValidateAsync(command, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            InventoryItemLogWarning.LogInventoryItemValidationFailedExtended(
-                _logger,
-                string.Join(", ", validationResult.Errors),
-                default
-                );
-
-            return Result<InventoryItemDto>.Failure(new Error(
-                "Inventory item validation failed",
-                "InventoryItem.ValidationFailed"
-            ));
-        }
-
         InventoryItem? inventoryItem = await _repository.GetInventoryItemByIdAsync(command.Id, cancellationToken);
 
         if (inventoryItem is null)

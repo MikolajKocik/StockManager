@@ -21,5 +21,6 @@
     <None Include="Helpers\NullConfiguration\NullCheck.cs" />
     <None Include="Helpers\ProblemDetails\ProblemDetailsHelper.cs" />
     <None Include="StockManager.Controllers\InventoryItemController.cs" />
+    <None Include="StockManager.Controllers\ShipmentController.cs" />
   </ItemGroup>
 </Project>

@@ -28,15 +28,13 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
     private readonly ILogger<DeleteProductCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEventBus _eventBus;
-    private readonly IValidator<DeleteProductCommand> _validator;
 
     public DeleteProductCommandHandler(
         IMapper mapper,
         IProductRepository repository,
         ILogger<DeleteProductCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus,
-        IValidator<DeleteProductCommand> validator
+        IEventBus eventBus
         )
     {
         _mapper = mapper;
@@ -44,39 +42,18 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
         _logger = logger;
         _redis = redis;
         _eventBus = eventBus;
-        _validator = validator;
     }
 
     public async Task<Result<Unit>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync(cancellationToken);
-
-            ValidationResult validationResult = await _validator.ValidateAsync(command, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                IFormatProvider provider = new System.Globalization.CultureInfo("en-US");
-                ProductLogWarning.LogProductValidationFailedExtended(_logger, default, command.Id.ToString(provider), default);
-
-                await transaction.RollbackAsync(cancellationToken);
-
-                var error = new Error(
-                    $"Product id {command.Id} is invalid",
-                    ErrorCodes.ProductValidation
-                );
-                return Result<Unit>.Failure(error);
-            }
-
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
             if (product is not null)
             {
                 ProductLogInfo.LogRemovingProductOperation(_logger, command.Id, default);
                 Product remove = await _repository.DeleteProductAsync(product, cancellationToken);
-
-                await transaction.CommitAsync(cancellationToken);
 
                 await _redis.RemoveKeyAsync(
                    $"product:{product.Id}:details")
@@ -95,7 +72,6 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
             else
             {
                 ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
-                await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
                     $"Product with id {command.Id} not found",

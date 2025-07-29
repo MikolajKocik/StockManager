@@ -41,7 +41,6 @@ public sealed class AddInventoryItemCommandHandler : ICommandHandler<AddInventor
     private readonly ILogger<AddInventoryItemCommandHandler> _logger;
     private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IValidator<InventoryItemCreateDto> _validator;
 
     public AddInventoryItemCommandHandler(
         IMapper mapper,
@@ -49,7 +48,6 @@ public sealed class AddInventoryItemCommandHandler : ICommandHandler<AddInventor
         ILogger<AddInventoryItemCommandHandler> logger,
         IEventBus eventBus,
         IConnectionMultiplexer redis,
-        IValidator<InventoryItemCreateDto> validator,
         IProductRepository productRepository
         )
     {
@@ -58,29 +56,12 @@ public sealed class AddInventoryItemCommandHandler : ICommandHandler<AddInventor
         _inventoryItemRepository = inventoryItemRepository;
         _logger = logger;
         _redis = redis;
-        _validator = validator;
         _productRepository = productRepository;
     }
     public async Task<Result<InventoryItemDto>> Handle(AddInventoryItemCommand command, CancellationToken cancellationToken)
     {
-        ValidationResult validationResult = await _validator.ValidateAsync(command.InventoryItem, cancellationToken);
-
-        if (!validationResult.IsValid)
-        {
-            InventoryItemLogWarning.LogInventoryItemValidationFailed(_logger, command.InventoryItem, default);
-
-            var error = new Error(
-                string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                ErrorCodes.InventoryItemValidation
-            );
-
-            return Result<InventoryItemDto>.Failure(error);
-        }
-
         try
         {
-            await using IDbContextTransaction transaction = await _inventoryItemRepository.BeginTransactionAsync(cancellationToken);
-
             // generally product may has multiple inventory items, so we can add new one
             // but we need to check if provided product not null
             Product? product = await _productRepository.GetProductByIdAsync(command.InventoryItem.ProductId, cancellationToken);
@@ -106,8 +87,6 @@ public sealed class AddInventoryItemCommandHandler : ICommandHandler<AddInventor
             InventoryItem inventoryItemEntity = _mapper.Map<InventoryItem>(command.InventoryItem);
 
             InventoryItem addedInventoryItem = await _inventoryItemRepository.AddInventoryItemAsync(inventoryItemEntity, cancellationToken);
-
-            await transaction.CommitAsync(cancellationToken);
 
             InventoryItemDto inventoryItemDto = _mapper.Map<InventoryItemDto>(addedInventoryItem);
 

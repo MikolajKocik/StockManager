@@ -19,4 +19,10 @@ public sealed class PurchaseOrderService : IPurchaseOrderService
 
     public void SetExpectedDate(PurchaseOrder order, DateTime expected)
         => order.SetExpectedDate(expected);
+
+    public void AssignReturnOrder(PurchaseOrder order, int returnOrderId)
+        => order.AssignReturnOrder(returnOrderId);
+
+    public void AssignInvoice(PurchaseOrder order, int invoiceId)
+        => order.AssignInvoice(invoiceId);
 }

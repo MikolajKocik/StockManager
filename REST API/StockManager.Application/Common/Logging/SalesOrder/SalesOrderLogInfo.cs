@@ -38,6 +38,30 @@ public static class SalesOrderLogInfo
             SalesOrderLogEventIds.SalesOrderCompleted,
             "Sales order completed: {SalesOrderId}");
 
+    public static readonly Action<ILogger, int, Exception?> LogSalesOrderDelivered =
+        LoggerMessage.Define<int>(
+            LogLevel.Information,
+            SalesOrderLogEventIds.SalesOrderDelivered,
+            "Sales order delivered: {SalesOrderId}");
+
+    public static readonly Action<ILogger, int, Exception?> LogSalesOrderReturned =
+        LoggerMessage.Define<int>(
+            LogLevel.Information,
+            SalesOrderLogEventIds.SalesOrderReturned,
+            "Sales order returned: {SalesOrderId}");
+
+    public static readonly Action<ILogger, object, Exception?> LogSalesOrderLineAdded =
+        LoggerMessage.Define<object>(
+            LogLevel.Information,
+            SalesOrderLogEventIds.SalesOrderUpdated,
+            "Sales order line added: {@Line}");
+
+    public static readonly Action<ILogger, int, Exception?> LogSalesOrderConfirmed =
+        LoggerMessage.Define<int>(
+            LogLevel.Information,
+            SalesOrderLogEventIds.SalesOrderCompleted,
+            "Sales order confirmed: {SalesOrderId}");
+
     public static readonly Action<ILogger, Result<IEnumerable<object>>, Exception?> LogReturnedListOfSalesOrders =
         LoggerMessage.Define<Result<IEnumerable<object>>>(
             LogLevel.Information,

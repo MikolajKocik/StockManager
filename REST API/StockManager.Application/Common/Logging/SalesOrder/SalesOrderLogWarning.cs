@@ -25,4 +25,10 @@ public static class SalesOrderLogWarning
             LogLevel.Warning,
             SalesOrderLogEventIds.SalesOrderValidationFailedHandler,
             "Validation failed for sales order: {ValidationErrors}");
+
+    public static readonly Action<ILogger, object, Exception?> LogSalesOrderLineNotFound =
+        LoggerMessage.Define<object>(
+            LogLevel.Warning,
+            SalesOrderLogEventIds.SalesOrderNotFound,
+            "Sales order line not found for command: {@Command}");
 }

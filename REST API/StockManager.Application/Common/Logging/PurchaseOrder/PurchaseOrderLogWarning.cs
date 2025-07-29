@@ -25,4 +25,28 @@ public static class PurchaseOrderLogWarning
             LogLevel.Warning,
             PurchaseOrderLogEventIds.PurchaseOrderValidationFailedHandler,
             "Validation failed for purchase order: {ValidationErrors}");
+
+    public static readonly Action<ILogger, object, Exception?> LogPurchaseOrderAlreadyExists =
+        LoggerMessage.Define<object>(
+            LogLevel.Warning,
+            PurchaseOrderLogEventIds.PurchaseOrderAlreadyExists,
+            "Purchase order already exists: {@purchaseOrder}");
+
+    public static readonly Action<ILogger, int, Exception?> LogPurchaseOrderAlreadyCancelled =
+        LoggerMessage.Define<int>(
+            LogLevel.Warning,
+            PurchaseOrderLogEventIds.PurchaseOrderAlreadyCancelled,
+            "Purchase order with id:{PurchaseOrderId} is already cancelled.");
+
+    public static readonly Action<ILogger, int, Exception?> LogPurchaseOrderAlreadyCompleted =
+        LoggerMessage.Define<int>(
+            LogLevel.Warning,
+            PurchaseOrderLogEventIds.PurchaseOrderAlreadyCompleted,
+            "Purchase order with id:{PurchaseOrderId} is already completed.");
+
+    public static readonly Action<ILogger, int, Exception?> LogPurchaseOrderAlreadyProcessing =
+        LoggerMessage.Define<int>(
+            LogLevel.Warning,
+            PurchaseOrderLogEventIds.PurchaseOrderAlreadyProcessing,
+            "Purchase order with id:{PurchaseOrderId} is already processing.");
 }

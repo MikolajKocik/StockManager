@@ -28,6 +28,7 @@ namespace StockManager.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/inventory-items")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class InventoryItemController : ControllerBase
 {
     private readonly IMediator _mediator;

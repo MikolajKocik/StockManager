@@ -21,4 +21,8 @@ public static class PurchaseOrderLogEventIds
     public static readonly EventId PurchaseOrderNotFound = new(5200, nameof(PurchaseOrderNotFound));
     public static readonly EventId PurchaseOrderValidationFailed = new(5201, nameof(PurchaseOrderValidationFailed));
     public static readonly EventId PurchaseOrderValidationFailedHandler = new(5202, nameof(PurchaseOrderValidationFailedHandler));
+    public static readonly EventId PurchaseOrderAlreadyExists = new(5203, nameof(PurchaseOrderAlreadyExists));
+    public static readonly EventId PurchaseOrderAlreadyCancelled = new(5204, nameof(PurchaseOrderAlreadyCancelled));
+    public static readonly EventId PurchaseOrderAlreadyCompleted = new(5205, nameof(PurchaseOrderAlreadyCompleted));
+    public static readonly EventId PurchaseOrderAlreadyProcessing = new(5206, nameof(PurchaseOrderAlreadyProcessing));
 }

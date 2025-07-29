@@ -22,6 +22,7 @@ namespace StockManager.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/products")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class ProductController : ControllerBase
 {
     private readonly IMediator _mediator;

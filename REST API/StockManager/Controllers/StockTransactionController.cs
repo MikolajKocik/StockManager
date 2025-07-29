@@ -21,6 +21,7 @@ namespace StockManager.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/stock-transactions")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class StockTransactionController : ControllerBase
 {
     private readonly IMediator _mediator;

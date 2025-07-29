@@ -13,6 +13,7 @@ namespace StockManager.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/auth")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;

@@ -36,4 +36,26 @@ public static class ErrorCodes
     public const string StockTransactionDeleteFailed = "StockTransaction.DeleteFailed";
     public const string StockTransactionUpdateFailed = "StockTransaction.UpdateFailed";
     public const string StockTransactionCreateFailed = "StockTransaction.CreateFailed";
+    //
+    public const string PurchaseOrderNotFound = "PurchaseOrder.NotFound";
+    public const string PurchaseOrderConflict = "PurchaseOrder.Conflict";
+    public const string PurchaseOrderValidation = "PurchaseOrder.Validation";
+    public const string PurchaseOrderDeleteFailed = "PurchaseOrder.DeleteFailed";
+    public const string PurchaseOrderUpdateFailed = "PurchaseOrder.UpdateFailed";
+    public const string PurchaseOrderCreateFailed = "PurchaseOrder.CreateFailed";
+    public const string PurchaseOrderAlreadyCancelled = "PurchaseOrder.AlreadyCancelled";
+    public const string PurchaseOrderAlreadyCompleted = "PurchaseOrder.AlreadyCompleted";
+    public const string PurchaseOrderAlreadyProcessing = "PurchaseOrder.AlreadyProcessing";
+    //
+    public const string SalesOrderNotFound = "SalesOrder.NotFound";
+    public const string SalesOrderConflict = "SalesOrder.Conflict";
+    public const string SalesOrderValidation = "SalesOrder.Validation";
+    public const string SalesOrderDeleteFailed = "SalesOrder.DeleteFailed";
+    public const string SalesOrderUpdateFailed = "SalesOrder.UpdateFailed";
+    public const string SalesOrderCreateFailed = "SalesOrder.CreateFailed";
+    public const string SalesOrderAlreadyCancelled = "SalesOrder.AlreadyCancelled";
+    public const string SalesOrderAlreadyCompleted = "SalesOrder.AlreadyCompleted";
+    public const string SalesOrderAlreadyProcessing = "SalesOrder.AlreadyProcessing";
+    public const string SalesOrderAlreadyDelivered = "SalesOrder.AlreadyDelivered";
+    public const string SalesOrderAlreadyReturned = "SalesOrder.AlreadyReturned";
 }

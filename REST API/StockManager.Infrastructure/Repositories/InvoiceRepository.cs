@@ -20,7 +20,7 @@ public sealed class InvoiceRepository : IInvoiceRepository
         _dbContext = dbContext;
     }
 
-    public IQueryable<Invoice> GetInvoices() => _dbContext.Invoices.AsQueryable();
+    public IQueryable<Invoice> GetInvoices() => _dbContext.Invoices;
   
     public async Task<Invoice?> GetInvoiceByIdAsync(int id, CancellationToken cancellationToken)
         => await _dbContext.Invoices

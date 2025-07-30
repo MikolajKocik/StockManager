@@ -20,7 +20,7 @@ public sealed class CustomerRepository : ICustomerRepository
         _dbContext = dbContext;
     }
 
-    public IQueryable<Customer> GetCustomers() =>  _dbContext.Customers.AsQueryable();
+    public IQueryable<Customer> GetCustomers() => _dbContext.Customers;
     
     public async Task<Customer?> GetCustomerByIdAsync(int id, CancellationToken cancellationToken)
         => await _dbContext.Customers

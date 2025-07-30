@@ -24,13 +24,27 @@ internal static class CacheExtensions
     {
         string? cachedJson = await cache.GetStringAsync(cacheKey, cancellationToken).ConfigureAwait(false);
 
-        if (cachedJson is null)
+        if (string.IsNullOrWhiteSpace(cachedJson))
         {
-            return (false, null);
+            return (false, default);
         }
 
-        T value = JsonSerializer.Deserialize<T>(cachedJson);
-        return (true, value);
+        try
+        {
+            T? value = JsonSerializer.Deserialize<T>(cachedJson);
+             
+            if(value == null)
+            {
+                return (false, default);
+            }
+
+            return (true, value);
+        }
+        catch(JsonException)
+        {
+            await cache.RemoveAsync(cacheKey, cancellationToken).ConfigureAwait(false);
+            return (false, default);
+        }
     }
 
     public static async Task SetCacheObjectAsync<T>(

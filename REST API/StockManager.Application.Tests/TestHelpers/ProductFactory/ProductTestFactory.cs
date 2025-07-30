@@ -1,5 +1,6 @@
 ﻿using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Models.ProductEntity;
+using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Application.Tests.TestHelpers.ProductFactory;
 
@@ -14,10 +15,11 @@ public static class ProductTestFactory
         Warehouse type = Warehouse.FreezerSection,
         string batchNumber = "BATCH-001",
         Guid? supplierId = null,
-        DateTime? expiration = null
+        DateTime? expiration = null,
+        string supplierName = "Test Supplier"
         )
     {
-        return new Product(
+        var product = new Product(
             id,
             name,
             genre,
@@ -26,6 +28,14 @@ public static class ProductTestFactory
             batchNumber,
             supplierId ?? Guid.NewGuid(),
             expiration ?? DateTime.UtcNow.AddDays(30)
-            );
+        );
+
+        var supplier = new Supplier(
+            supplierName,
+            Guid.NewGuid()
+        );
+        product.SetSupplier(supplier);
+
+        return product;
     }
 }

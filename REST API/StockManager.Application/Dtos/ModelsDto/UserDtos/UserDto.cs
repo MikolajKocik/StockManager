@@ -4,9 +4,9 @@ namespace StockManager.Application.Dtos.ModelsDto.UserDtos;
 
 public sealed record UserDto
 {
-    public string Id { get; }
-    public string UserName { get; }
-    public string Slug { get; }
-    public string? Email { get; }
-    public string? PhoneNumber { get; }
+    public string Id { get; init;  }
+    public string UserName { get; init; }
+    public string Slug { get; init; }
+    public string? Email { get; init; }
+    public string? PhoneNumber { get; init; }
 }

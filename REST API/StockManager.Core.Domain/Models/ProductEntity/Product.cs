@@ -67,7 +67,6 @@ public sealed partial class Product : Entity<int>
         Guard.AgainstInvalidEnumValue(genre);
         Guard.AgainstInvalidEnumValue(type);
         Guard.AgainstDefaultValue(supplierId);
-        Guard.IsValidDate(expirationDate);
         Guard.AgainstDefaultValue(expirationDate);
         Guard.AgainstDefaultValueIfProvided(isDeleted);
 
@@ -79,6 +78,7 @@ public sealed partial class Product : Entity<int>
         DeliveredAt = DateTime.UtcNow.Date;
         Type = type;
         BatchNumber = batchNumber;
+        SupplierId = supplierId;
     }
 
     private Product() : base() { }
@@ -99,7 +99,6 @@ public sealed partial class Product : Entity<int>
         Guard.AgainstInvalidEnumValue(genre);
         Guard.AgainstInvalidEnumValue(type);
         Guard.AgainstDefaultValue(supplierId);
-        Guard.IsValidDate(expirationDate);
         Guard.AgainstDefaultValue(expirationDate);
         Guard.AgainstDefaultValueIfProvided(isDeleted);
 

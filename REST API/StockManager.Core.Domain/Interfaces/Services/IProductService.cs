@@ -15,4 +15,6 @@ public interface IProductService
     void SetSupplier(Product product, Supplier newSupplier);
     void SetProductToInventoryItem(Product product, InventoryItem inventoryItem);
     void SetAsDeleted(Product product);
+    void SetExpirationDateForTest(Product product);
+        
 }

@@ -30,7 +30,7 @@ public sealed class IncreaseInventoryItemQuantityCommandHandler : ICommandHandle
         IInventoryItemRepository repository,
         IInventoryItemService service,
         IMapper mapper,
-        ILogger<IncreaseInventoryItemQuantityCommandHandler> logger,
+        ILogger<IncreaseInventoryItemQuantityCommandHandler> logger
         )
     {
         _repository = repository;

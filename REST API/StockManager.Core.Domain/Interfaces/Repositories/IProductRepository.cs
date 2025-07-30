@@ -5,7 +5,7 @@ using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface IProductRepository : IBaseRepository
+public interface IProductRepository 
 {
     IQueryable<Product> GetProducts();
     Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken);

@@ -4,14 +4,14 @@ namespace StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 
 public sealed record InventoryItemDto
 {
-    public int Id { get; }
-    public int ProductId { get; }
-    public string? ProductName { get; }
-    public int BinLocationId { get; }
-    public string? BinLocationCode { get; }
-    public string Warehouse { get; }
-    public decimal QuantityOnHand { get; }
-    public decimal QuantityReserved { get; }
-    public decimal QuantityAvailable { get; }
+    public int Id { get; init; }
+    public int ProductId { get; init; }
+    public string? ProductName { get; init; }
+    public int BinLocationId { get; init; }
+    public string? BinLocationCode { get; init; }
+    public string Warehouse { get; init; }
+    public decimal QuantityOnHand { get; init; }
+    public decimal QuantityReserved { get; init; }
+    public decimal QuantityAvailable { get; init; }
 }
 

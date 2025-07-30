@@ -19,7 +19,7 @@ public static class ProductTestDtoFactory
             BatchNumber = batch,
             Genre = genre,
             Type = warehouse, 
-            ExpirationDate = DateTime.UtcNow.AddDays(30),
+            ExpirationDate = DateTime.UtcNow.AddMinutes(-1),
             SupplierId = Guid.NewGuid()
         };
     }

@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.SalesOrderEntity;
 using StockManager.Infrastructure.Helpers;
@@ -50,4 +51,6 @@ public sealed class SalesOrderRepository : ISalesOrderRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
         return salesOrder;
     }
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+         => Task.FromResult(_dbContext.Database.BeginTransaction());
 }

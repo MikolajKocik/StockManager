@@ -43,7 +43,7 @@ public sealed class SupplierController : ControllerBase
         CancellationToken cancellationToken = default
         )
     {
-        var query = new GetSuppliersQuery(name, address, products);
+        var query = new GetSuppliersQuery(name, address);
 
         Result<IEnumerable<SupplierDto>> result = await _mediator.Send(query, cancellationToken);
 

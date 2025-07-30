@@ -5,7 +5,7 @@ using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface ISupplierRepository : IBaseRepository
+public interface ISupplierRepository 
 {
     Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken);
     Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken);

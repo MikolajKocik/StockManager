@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StockManager.Core.Domain.GuardMethods;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 
@@ -32,5 +33,10 @@ public sealed partial class Product
         }
 
         IsDeleted = true;
+    }
+
+    public void SetExpirationDateForTest(Product product)
+    {
+        ExpirationDate = DateTime.Today.AddDays(7);
     }
 }

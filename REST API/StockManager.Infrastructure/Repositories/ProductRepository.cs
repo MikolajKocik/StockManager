@@ -81,4 +81,7 @@ public class ProductRepository : IProductRepository
 
         return product;
     }
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => Task.FromResult(_dbContext.Database.BeginTransaction());
 }

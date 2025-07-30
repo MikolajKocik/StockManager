@@ -19,4 +19,8 @@ public sealed class ProductService : IProductService
         => product.SetProductToInventoryItem(inventoryItem);
     public void SetSupplier(Product product, Supplier newSupplier)
         => product.SetSupplier(newSupplier);
+
+    // reimplementation - hidden method for test
+    void IProductService.SetExpirationDateForTest(Product product)
+        => product.SetExpirationDateForTest(product);   
 }

@@ -5,16 +5,16 @@ namespace StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 public sealed record ProductDto
 {
-    public int Id { get; }
-    public bool? IsDeleted { get; }
-    public string Name { get; }
-    public string Slug { get; }
-    public string Genre { get; }
-    public string Unit { get; }
-    public DateTime ExpirationDate { get; }
-    public DateTime DeliveredAt { get; }
-    public string Type { get; }
-    public string BatchNumber { get; }
-    public Guid SupplierId { get; }
-    public string? SupplierName { get; } 
+    public int Id { get; init; }
+    public bool? IsDeleted { get; init; }
+    public string Name { get; init; }
+    public string Slug { get; init; } 
+    public string Genre { get; init; }
+    public string Unit { get; init; }
+    public DateTime ExpirationDate { get; init; }
+    public DateTime DeliveredAt { get; init; }
+    public string Type { get; init; }
+    public string BatchNumber { get; init; }
+    public Guid SupplierId { get; init; }
+    public string? SupplierName { get; init; } 
 }

@@ -4,10 +4,10 @@ namespace StockManager.Application.Dtos.ModelsDto.ReorderRuleDtos;
 
 public sealed record ReorderRuleDto
 {
-    public int Id { get; }
-    public int ProductId { get; }
-    public string? ProductName { get; }
-    public string Warehouse { get; }
-    public decimal MinLevel { get; }
-    public decimal MaxLevel { get; }
+    public int Id { get; init; }
+    public int ProductId { get; init; }
+    public string? ProductName { get; init; }
+    public string Warehouse { get; init; }
+    public decimal MinLevel { get; init; }
+    public decimal MaxLevel { get; init; }
 }

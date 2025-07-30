@@ -8,7 +8,7 @@ using StockManager.Core.Domain.Models.BinLocationEntity;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
-public interface IInventoryItemRepository : IBaseRepository
+public interface IInventoryItemRepository 
 {
     IQueryable<InventoryItem> GetInventoryItems();
     Task<InventoryItem?> GetInventoryItemByIdAsync(int id, CancellationToken cancellationToken);

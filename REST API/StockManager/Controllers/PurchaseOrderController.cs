@@ -38,7 +38,15 @@ public sealed class PurchaseOrdersController : ControllerBase
         _mediator = mediator;
         _logger = logger;
     }
-   
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetById(int id)
+    {
+       // placeholder
+       await Task.CompletedTask;
+       return NoContent();
+    }
+
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
@@ -76,7 +84,6 @@ public sealed class PurchaseOrdersController : ControllerBase
 
     [HttpDelete("{id}")]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
-
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)
     {
         Result<Unit> result = await _mediator.Send(new DeletePurchaseOrderCommand(id), cancellationToken);

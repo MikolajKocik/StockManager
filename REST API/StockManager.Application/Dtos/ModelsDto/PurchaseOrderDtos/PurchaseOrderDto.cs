@@ -4,12 +4,12 @@ namespace StockManager.Application.Dtos.ModelsDto.PurchaseOrderDtos;
 
 public sealed record PurchaseOrderDto
 {
-    public int Id { get; }
-    public Guid SupplierId { get; }
-    public string? SupplierName { get; }
-    public DateTime OrderDate { get; }
-    public DateTime? ExpectedDate { get; }
-    public string Status { get; }
-    public int? InvoiceId { get; }
-    public int? ReturnOrderId { get; }
+    public int Id { get; init; }
+    public Guid SupplierId { get; init; }
+    public string? SupplierName { get; init; }
+    public DateTime OrderDate { get; init; }
+    public DateTime? ExpectedDate { get; init; }
+    public string Status { get; init; }
+    public int? InvoiceId { get; init; }
+    public int? ReturnOrderId { get; init; }
 }

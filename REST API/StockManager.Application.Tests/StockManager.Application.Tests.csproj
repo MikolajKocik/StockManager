@@ -6,6 +6,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MockQueryable.Moq" />
     <PackageReference Include="Moq" />
+    <PackageReference Include="NSubstitute" />
     <PackageReference Include="xunit" />
     <PackageReference Include="xunit.runner.visualstudio" />
   </ItemGroup>
@@ -22,7 +23,6 @@
   <ItemGroup>
     <Folder Include="CQRS\Commands\Supplier\" />
     <Folder Include="CQRS\Commands\Product\" />
-    <Folder Include="Helpers\" />
     <Folder Include="Validations\" />
   </ItemGroup>
 

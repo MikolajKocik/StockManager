@@ -36,7 +36,13 @@ public static class ServiceCollectionExtension
 
         services.AddScoped<IAuthService, AuthService>();
 
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<ISupplierRepository, SupplierRepository>();
+        services.Scan(s =>
+        {
+            s.FromAssembliesOf(typeof(IProductRepository))
+                .FromEntryAssembly()
+                .AddClasses()
+                .AsSelfWithInterfaces()
+                .WithScopedLifetime();
+        });
     }
 }

@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderLineEntity;
-using StockManager.Infrastructure.Persistence.QueryFilters;
 
 namespace StockManager.Infrastructure.Persistence.Configurations;
 
@@ -16,6 +15,35 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
 
         builder.HasQueryFilter(p => p.IsDeleted == null || p.IsDeleted == false);
 
+        // shadow properties
+        builder.Metadata
+            .FindNavigation(nameof(Product.InventoryItems))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Metadata
+            .FindNavigation(nameof(Product.PurchaseOrderLines))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Metadata
+            .FindNavigation(nameof(Product.SalesOrderLines))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Metadata
+            .FindNavigation(nameof(Product.ReturnOrderLines))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        builder.Metadata
+            .FindNavigation(nameof(Product.ReorderRules))!
+            .SetPropertyAccessMode(PropertyAccessMode.Field);
+
+        // value conversions
+        builder.Property(p => p.Genre)
+            .HasConversion<string>();
+
+        builder.Property(p => p.Type)
+            .HasConversion<string>();
+
+        // relations
         builder.HasOne(p => p.Supplier)
             .WithMany(s => s.Products)
             .HasConstraintName("FK_Product_Supplier")

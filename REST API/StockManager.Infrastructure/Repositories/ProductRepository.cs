@@ -14,10 +14,21 @@ public class ProductRepository : IProductRepository
 {
     private readonly StockManagerDbContext _dbContext;
 
-    public ProductRepository(StockManagerDbContext dbcontext)
+    public ProductRepository(StockManagerDbContext dbContext)
     {
-        _dbContext = dbcontext;
+        _dbContext = dbContext;
     }
+
+    private static readonly Func<StockManagerDbContext, int, CancellationToken, Task<Product?>> GetProductByIdCompiled =
+        EF.CompileAsyncQuery((StockManagerDbContext dbContext, int id, CancellationToken cancellationToken) =>
+            dbContext.Products
+                    .IgnoreQueryFilters()
+                    .Include(s => s.Supplier)
+                    .ThenInclude(a => a.Address)
+                    .FirstOrDefault(p => p.Id == id));
+
+    public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
+        => await GetProductByIdCompiled(_dbContext, id, cancellationToken);
 
     public IQueryable<Product> GetProducts()
         => _dbContext.Products
@@ -25,15 +36,8 @@ public class ProductRepository : IProductRepository
                 .Include(s => s.Supplier)
                 .ThenInclude(a => a.Address);
 
-    public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
-        => await _dbContext.Products
-            .IgnoreQueryFilters()
-            .Include(s => s.Supplier)
-            .ThenInclude(a => a.Address)
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-
     public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, product, cancellationToken);
+            => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, product, cancellationToken);
 
     public async Task<Product?> FindProductByNameAsync(string name, CancellationToken cancellationToken)
         => await RepositoryQueriesHelpers.FindByNameAsync<Product>(_dbContext, name, cancellationToken);
@@ -58,7 +62,7 @@ public class ProductRepository : IProductRepository
             if (existingSupplier is not null)
             {
                 // Assign the existing supplier entity to preserve tracking and FK integrity
-                productService.SetSupplier(product, existingSupplier); 
+                productService.SetSupplier(product, existingSupplier);
 
                 if (product.Supplier?.Name is not null)
                 {
@@ -76,14 +80,5 @@ public class ProductRepository : IProductRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return product;
-    }
-
-    public async Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken)
-    {
-        Product productExist = await RepositoryQueriesHelpers.EntityFindAsync<Product, int>(_dbContext, product.Id, cancellationToken);
-
-        _dbContext.Products.Remove(productExist!);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return productExist;
     }
 }

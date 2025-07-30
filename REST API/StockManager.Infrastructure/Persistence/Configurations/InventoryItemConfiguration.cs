@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 
-namespace StockManager.Infrastructure.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 internal sealed class InventoryItemConfiguration : IEntityTypeConfiguration<InventoryItem>
 {

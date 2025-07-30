@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
 
-namespace StockManager.Infrastructure.Data.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 public class StockTransactionConfiguration : IEntityTypeConfiguration<StockTransaction>
 {

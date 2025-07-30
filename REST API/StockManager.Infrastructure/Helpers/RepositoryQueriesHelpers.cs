@@ -4,7 +4,7 @@ using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Models.SupplierEntity;
-using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Helpers;
 

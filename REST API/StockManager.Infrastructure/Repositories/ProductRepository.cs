@@ -4,8 +4,8 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
-using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Persistence.Data;
 using System.Linq.Expressions;
 
 namespace StockManager.Infrastructure.Repositories;
@@ -27,6 +27,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
         => await _dbContext.Products
+            .IgnoreQueryFilters()
             .Include(s => s.Supplier)
             .ThenInclude(a => a.Address)
             .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);

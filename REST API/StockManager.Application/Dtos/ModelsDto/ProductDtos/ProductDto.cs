@@ -6,6 +6,7 @@ namespace StockManager.Application.Dtos.ModelsDto.ProductDtos;
 public sealed record ProductDto
 {
     public int Id { get; }
+    public bool? IsDeleted { get; }
     public string Name { get; }
     public string Slug { get; }
     public string Genre { get; }

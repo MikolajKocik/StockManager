@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using StockManager.Application.Services;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.UserEntity;
-using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.Persistence.Data;
 using StockManager.Infrastructure.Repositories;
 using StockManager.Infrastructure.Services.Auth;
 using StockManager.Infrastructure.Settings;

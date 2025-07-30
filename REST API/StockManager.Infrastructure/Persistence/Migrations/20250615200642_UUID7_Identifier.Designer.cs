@@ -5,15 +5,15 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.Persistence.Data;
 
 #nullable disable
 
 namespace StockManager.Infrastructure.Migrations
 {
     [DbContext(typeof(StockManagerDbContext))]
-    [Migration("20250616160353_uuidv7_user")]
-    partial class uuidv7_user
+    [Migration("20250615200642_UUID7_Identifier")]
+    partial class UUID7_Identifier
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -201,10 +201,6 @@ namespace StockManager.Infrastructure.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("SecurityStamp")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")

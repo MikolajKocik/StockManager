@@ -2,8 +2,9 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderLineEntity;
+using StockManager.Infrastructure.Persistence.QueryFilters;
 
-namespace StockManager.Infrastructure.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
 {
@@ -12,6 +13,8 @@ internal sealed class ProductConfigurations : IEntityTypeConfiguration<Product>
         builder.HasKey(p => p.Id);
 
         builder.HasIndex(p => p.Slug).IsUnique();
+
+        builder.HasQueryFilter(p => p.IsDeleted == null || p.IsDeleted == false);
 
         builder.HasOne(p => p.Supplier)
             .WithMany(s => s.Products)

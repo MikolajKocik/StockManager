@@ -23,4 +23,14 @@ public sealed partial class Product
         Guard.AgainstNull(inventoryItem);
         Id = inventoryItem.Id;
     }
+
+    public void SetAsDeleted()
+    {
+        if (IsDeleted == true)
+        {
+            return;
+        }
+
+        IsDeleted = true;
+    }
 }

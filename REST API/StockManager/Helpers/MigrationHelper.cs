@@ -1,6 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using StockManager.Infrastructure.Data;
+using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Helpers;
 

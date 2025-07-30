@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Core.Domain.Models.AddressEntity;
 using StockManager.Core.Domain.Models.CustomerEntity;
 
-namespace StockManager.Infrastructure.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 internal sealed class AddressConfiguration : IEntityTypeConfiguration<Address>
 {

@@ -22,7 +22,7 @@ using StockManager.Core.Domain.Models.StockTransactionEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using StockManager.Core.Domain.Models.UserEntity;
 
-namespace StockManager.Infrastructure.Data;
+namespace StockManager.Infrastructure.Persistence.Data;
 
 public sealed class StockManagerDbContext(DbContextOptions<StockManagerDbContext> options) 
     : IdentityDbContext<User>(options)

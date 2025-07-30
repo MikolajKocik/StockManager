@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ShipmentEntity;
-using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 public sealed class ShipmentRepository : IShipmentRepository

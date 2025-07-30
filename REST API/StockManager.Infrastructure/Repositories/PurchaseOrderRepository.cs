@@ -2,8 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
-using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 

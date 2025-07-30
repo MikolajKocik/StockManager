@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 
-namespace StockManager.Infrastructure.Data;
+namespace StockManager.Infrastructure.Persistence.Data;
 public sealed class StockManagerDbContextFactory : IDesignTimeDbContextFactory<StockManagerDbContext>
 {
     // EF CLI local

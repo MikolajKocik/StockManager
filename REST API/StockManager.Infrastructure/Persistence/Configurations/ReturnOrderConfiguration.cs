@@ -9,7 +9,7 @@ using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 using StockManager.Core.Domain.Models.ReturnOrderEntity;
 using StockManager.Core.Domain.Models.SalesOrderEntity;
 
-namespace StockManager.Infrastructure.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 internal sealed class ReturnOrderConfiguration : IEntityTypeConfiguration<ReturnOrder>
 {

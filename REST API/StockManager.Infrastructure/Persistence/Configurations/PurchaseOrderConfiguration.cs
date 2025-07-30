@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Core.Domain.Models.InvoiceEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 
-namespace StockManager.Infrastructure.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 internal sealed class PurchaseOrderConfiguration : IEntityTypeConfiguration<PurchaseOrder>
 {

@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.UserEntity;
 
-namespace StockManager.Infrastructure.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
 {

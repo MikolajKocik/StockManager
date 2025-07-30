@@ -12,6 +12,9 @@ namespace StockManager.Infrastructure.DomainServices;
 
 public sealed class ProductService : IProductService
 {
+    public void SetAsDeleted(Product product)
+        => product.SetAsDeleted();
+
     public void SetProductToInventoryItem(Product product, InventoryItem inventoryItem)
         => product.SetProductToInventoryItem(inventoryItem);
     public void SetSupplier(Product product, Supplier newSupplier)

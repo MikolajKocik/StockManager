@@ -9,7 +9,7 @@ using StockManager.Core.Domain.Models.PermissionEntity;
 using StockManager.Core.Domain.Models.RoleEntity;
 using StockManager.Core.Domain.SharedModels.RolePermissionsEntity;
 
-namespace StockManager.Infrastructure.Configurations;
+namespace StockManager.Infrastructure.Persistence.Configurations;
 
 internal sealed class RoleConfiguration : IEntityTypeConfiguration<Role>
 {

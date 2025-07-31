@@ -36,6 +36,13 @@ public sealed class DeleteProductTests
         _repository = new Mock<IProductRepository>();
     }
 
+    /// <summary>
+    /// Verifies that a product is correctly flagged as deleted when the delete operation is performed.
+    /// </summary>
+    /// <remarks>This test ensures that the product is marked as deleted in the database, the associated cache
+    /// entry is removed,  and a corresponding integration event is published. It validates the behavior of the <see
+    /// cref="DeleteProductCommandHandler"/>  when handling a <see cref="DeleteProductCommand"/>.</remarks>
+    /// <returns></returns>
     [Fact]
     public async Task ShouldFlagProductAsDeleted()
     {
@@ -75,8 +82,10 @@ public sealed class DeleteProductTests
 
         var command = new DeleteProductCommand(1);
 
+        //
         Result<Unit> result = await handler.Handle(command, CancellationToken.None);
 
+        //
         result.IsSuccess.Should().BeTrue();
     }
 }

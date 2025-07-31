@@ -6,7 +6,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.Common.Logging.EventIds.Product;
 
@@ -20,6 +20,7 @@ public static class ProductLogEventIds
     public static readonly EventId ProductNotFound = new(70, "ProductNotFound");
     public static readonly EventId ProductValidationFailed = new(71, "ProductValidationFailed");
     public static readonly EventId ProductValidationFailedExtended = new(72, "ProductValidationFailedExtended");
+    public static readonly EventId ProductAlreadyExists = new(73, "ProductAlreadyExists");
 
     // Information
     public static readonly EventId AddProductSuccesfull = new(80, "AddProductSuccesfull");
@@ -29,5 +30,4 @@ public static class ProductLogEventIds
     public static readonly EventId ProductFoundSuccess = new(84, "ProductFoundSuccess");
     public static readonly EventId ProductModifiedSuccess = new(85, "ProductsModifiedSuccess");
     public static readonly EventId ProductDeletedSuccess = new(86, "ProductDeletedSuccess");
-
 }

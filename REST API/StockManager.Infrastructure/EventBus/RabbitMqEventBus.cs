@@ -17,14 +17,23 @@ public class RabbitMqEventBus : IEventBus, IAsyncDisposable
     private readonly IChannel _channel;
     private readonly RabbitMqSettings _settings;
 
-    public RabbitMqEventBus(IConnection connection, IOptions<RabbitMqSettings> opts)
+    public RabbitMqEventBus(IOptions<RabbitMqSettings> opts)
     {
-        _connection = connection;
         _settings = opts.Value;
 
         NullCheck.IsConfigured(_settings);
-        
+
+        var factory = new ConnectionFactory
+        {
+            HostName = _settings.HostName,
+            Port = _settings.Port,
+            UserName = _settings.UserName,
+            Password = _settings.Password
+        };
+
+        _connection = factory.CreateConnectionAsync().GetAwaiter().GetResult();
         _channel = _connection.CreateChannelAsync().GetAwaiter().GetResult();
+
         _channel.ExchangeDeclareAsync(opts.Value.Exchange, ExchangeType.Topic, durable: true)
             .GetAwaiter()
             .GetResult();

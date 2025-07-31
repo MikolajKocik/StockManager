@@ -5,12 +5,19 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<!-- Health checks -->  
     <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
+	<!-- Azure monitor -->
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.AspNetCore" />
+    <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" />
+	<!-- Grafana -->  
     <PackageReference Include="Grafana.OpenTelemetry" />
+	<!-- JWT -->  
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+	<!-- EF -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
@@ -24,11 +31,16 @@
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
+	<!-- RabbitMQ -->
     <PackageReference Include="RabbitMQ.Client" />
-    <!-- ...-->
+    <!-- Scrutor -->
 	<PackageReference Include="Scrutor" />
+	<!-- Serilog -->  
     <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.OpenTelemetry" />
+	<!-- Swagger -->
     <PackageReference Include="Swashbuckle.AspNetCore" />
+
   </ItemGroup>
 
 	<!-- Dependencies -->

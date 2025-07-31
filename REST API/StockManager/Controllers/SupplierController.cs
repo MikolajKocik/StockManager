@@ -10,9 +10,9 @@ using StockManager.Application.CQRS.Commands.SupplierCommands.DeleteSupplier;
 using StockManager.Application.CQRS.Commands.SupplierCommands.EditSupplier;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
-using StockManager.Application.Dtos.ModelsDto.Address;
-using StockManager.Application.Dtos.ModelsDto.Product;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.AddressDtos;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
 
 namespace StockManager.Controllers;
@@ -22,6 +22,7 @@ namespace StockManager.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/suppliers")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class SupplierController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -42,7 +43,7 @@ public sealed class SupplierController : ControllerBase
         CancellationToken cancellationToken = default
         )
     {
-        var query = new GetSuppliersQuery(name, address, products);
+        var query = new GetSuppliersQuery(name, address);
 
         Result<IEnumerable<SupplierDto>> result = await _mediator.Send(query, cancellationToken);
 
@@ -83,7 +84,7 @@ public sealed class SupplierController : ControllerBase
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<SupplierDto>> AddSupplier(
-        [FromBody] SupplierDto supplierDto,
+        [FromBody] SupplierCreateDto supplierDto,
         CancellationToken cancellationToken)
     {
         Result<SupplierDto> result = await _mediator.Send(new AddSupplierCommand(supplierDto), cancellationToken);
@@ -109,7 +110,7 @@ public sealed class SupplierController : ControllerBase
 
     public async Task<IActionResult> UpdateSupplier(
         [FromRoute] Guid id,
-        [FromBody] SupplierDto supplierDto,
+        [FromBody] SupplierUpdateDto supplierDto,
         CancellationToken cancellationToken)
     {
         Result<SupplierDto> result = await _mediator.Send(new EditSupplierCommand(id, supplierDto), cancellationToken);
@@ -137,7 +138,7 @@ public sealed class SupplierController : ControllerBase
         [FromRoute] Guid id,
         CancellationToken cancellationToken)
     {
-        Result<SupplierDto> result = await _mediator.Send(new DeleteSupplierCommand(id), cancellationToken);
+        Result<Unit> result = await _mediator.Send(new DeleteSupplierCommand(id), cancellationToken);
 
         if (result.IsSuccess)
         {

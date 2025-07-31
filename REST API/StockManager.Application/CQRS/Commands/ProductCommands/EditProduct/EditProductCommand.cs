@@ -1,16 +1,11 @@
-﻿using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Dtos.ModelsDto.Product;
+﻿using MediatR;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 
-public sealed class EditProductCommand : ICommand<ProductDto>
-{
-    public int Id { get; }
-    public ProductDto Product { get; }
+public sealed record EditProductCommand(
+    int Id, 
+    ProductUpdateDto Product)
+    : ICommand<Unit>;
 
-    public EditProductCommand(int id, ProductDto product) 
-    {
-        Id = id;
-        Product = product;
-    }
-}

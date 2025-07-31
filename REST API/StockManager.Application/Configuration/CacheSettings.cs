@@ -18,5 +18,9 @@ public sealed class CacheSettings
     //
     public int SupplierAbsoluteTtlHours { get; } = AbsoluteTtlHours;
     public int SupplierSlidingTtlMinutes { get; } = SlidingTtlMinutes;
-  
+
+    //
+    public int InventoryItemAbsoluteTtlHours { get; } = AbsoluteTtlHours;
+    public int InventoryItemSlidingTtlMinutes { get; } = SlidingTtlMinutes;
+
 }

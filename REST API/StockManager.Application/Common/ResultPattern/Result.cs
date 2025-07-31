@@ -34,19 +34,4 @@ public sealed class Result<T> : IResult
     /// <param name="onSuccess">Function to apply if the result is successful.</param>
     /// <param name="onFailure">Function to apply if the result is a failure.</param>
     /// <returns>The result of either the success or failure function.</returns>
-
-    public TResult Map<TResult>(Func<T, TResult> onSuccess, Func<Error, TResult> onFailure) 
-    {
-        ThrowIfAnyNull(onSuccess, onFailure);
-
-        return IsSuccess ? onSuccess(Value!) : onFailure(Error!);
-    }
-
-    private static void ThrowIfAnyNull(params object[] args)
-    {
-        foreach(object arg in args)
-        {
-            ArgumentNullException.ThrowIfNull(arg);
-        }
-    }
 }

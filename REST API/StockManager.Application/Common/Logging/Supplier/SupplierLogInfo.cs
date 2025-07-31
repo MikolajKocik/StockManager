@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.Supplier;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 
 namespace StockManager.Application.Common.Logging.Supplier;
 
@@ -42,8 +42,8 @@ public static class SupplierLogInfo
             SupplierLogEventIds.SupplierRemovedSuccessfull,
             "Supplier with ID: {Id} deleted successfully");
 
-    public static readonly Action<ILogger, SupplierDto, Exception?> LogReturningNewSupplier =
-        LoggerMessage.Define<SupplierDto>(
+    public static readonly Action<ILogger, SupplierCreateDto, Exception?> LogReturningNewSupplier =
+        LoggerMessage.Define<SupplierCreateDto>(
             LogLevel.Information,
             SupplierLogEventIds.ReturningNewSupplier,
             "Returning a new supplier: {@supplier}");
@@ -54,8 +54,8 @@ public static class SupplierLogInfo
            SupplierLogEventIds.RemovingSupplier,
            "Removing supplier: {SupplierId}");
 
-    public static readonly Action<ILogger, Guid, SupplierDto, Exception?> LogModyfingSupplier =
-      LoggerMessage.Define<Guid, SupplierDto>(
+    public static readonly Action<ILogger, Guid, SupplierUpdateDto, Exception?> LogModyfingSupplier =
+      LoggerMessage.Define<Guid, SupplierUpdateDto>(
           LogLevel.Information,
           SupplierLogEventIds.ModyfingSupplier,
           "Modyfing the provided supplier: {@supplierId} with modified {@modifiedSupplier}");

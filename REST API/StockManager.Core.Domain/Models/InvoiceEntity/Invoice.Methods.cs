@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.GuardMethods;
 
 namespace StockManager.Core.Domain.Models.InvoiceEntity;
 

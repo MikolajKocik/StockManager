@@ -13,7 +13,8 @@ namespace StockManager.Controllers;
 [EnableRateLimiting("fixed")]
 [Route("api/auth")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-public class AuthController : ControllerBase
+[ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
+public sealed class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ILogger<AuthController> _logger;
@@ -24,7 +25,6 @@ public class AuthController : ControllerBase
         _logger = logger;          
     }
 
-    // for page where suppliers can tracking their deliveries
     [HttpPost("register")]
     [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(RegisterDto), StatusCodes.Status400BadRequest)]

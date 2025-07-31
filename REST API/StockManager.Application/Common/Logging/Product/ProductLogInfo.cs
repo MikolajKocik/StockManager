@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.Product;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.Common.Logging.Product;
 public static class ProductLogInfo 
@@ -23,8 +23,8 @@ public static class ProductLogInfo
             ProductLogEventIds.RemovingProductOperation,
             "Removing the provided product:{@product}");
 
-    public static readonly Action<ILogger, int, ProductDto, Exception?> LogModyfingProduct =
-        LoggerMessage.Define<int, ProductDto>(
+    public static readonly Action<ILogger, int, ProductUpdateDto, Exception?> LogModyfingProduct =
+        LoggerMessage.Define<int, ProductUpdateDto>(
             LogLevel.Information,
             ProductLogEventIds.ModyfingProduct,
             "Modifying the provided product:{@productId} with {@modifiedProduct}");

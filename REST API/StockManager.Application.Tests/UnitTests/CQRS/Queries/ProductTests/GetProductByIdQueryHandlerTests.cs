@@ -11,10 +11,10 @@ using StockManager.Application.Configuration;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Mappings.ProductProfile;
-using StockManager.Application.Tests.TestHelpers.ProductFactory;
+using StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
-namespace StockManager.Application.Tests.CQRS.Queries.Product;
+namespace StockManager.Application.Tests.UnitTests.CQRS.Queries.ProductTests;
 
 public sealed class GetProductByIdQueryHandlerTests
 {

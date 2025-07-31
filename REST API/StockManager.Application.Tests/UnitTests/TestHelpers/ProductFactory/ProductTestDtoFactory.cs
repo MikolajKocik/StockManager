@@ -1,6 +1,6 @@
 ﻿using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
-namespace StockManager.Application.Tests.TestHelpers.ProductFactory;
+namespace StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 
 public static class ProductTestDtoFactory
 {

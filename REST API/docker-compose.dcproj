@@ -17,10 +17,5 @@
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>
     <None Include="docker-compose.yml" />
-    <None Include="Helpers\Error\ErrorCodes.cs" />
-    <None Include="Helpers\NullConfiguration\NullCheck.cs" />
-    <None Include="Helpers\ProblemDetails\ProblemDetailsHelper.cs" />
-    <None Include="StockManager.Controllers\InventoryItemController.cs" />
-    <None Include="StockManager.Controllers\ShipmentController.cs" />
   </ItemGroup>
 </Project>

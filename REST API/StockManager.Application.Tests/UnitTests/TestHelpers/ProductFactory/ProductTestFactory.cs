@@ -2,7 +2,7 @@
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 
-namespace StockManager.Application.Tests.TestHelpers.ProductFactory;
+namespace StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 
 public static class ProductTestFactory
 {

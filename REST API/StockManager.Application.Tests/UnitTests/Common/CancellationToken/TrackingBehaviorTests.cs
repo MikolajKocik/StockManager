@@ -15,10 +15,10 @@ using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
-using StockManager.Application.Tests.TestHelpers.ProductFactory;
+using StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 
-namespace StockManager.Application.Tests.Common.PipelineBehavior;
+namespace StockManager.Application.Tests.UnitTests.Common.CancellationToken;
 
 public sealed class TrackingBehaviorTests
 {

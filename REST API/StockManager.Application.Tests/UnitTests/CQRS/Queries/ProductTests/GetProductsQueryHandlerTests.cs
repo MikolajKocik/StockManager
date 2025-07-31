@@ -7,7 +7,7 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Mappings.ProductProfile;
-using StockManager.Application.Tests.TestHelpers.ProductFactory;
+using StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
@@ -16,7 +16,7 @@ using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using Xunit.Sdk;
 
-namespace StockManager.Application.Tests;
+namespace StockManager.Application.Tests.UnitTests.CQRS.Queries.ProductTests;
 
 public sealed class GetProductsQueryHandlerTests
 {

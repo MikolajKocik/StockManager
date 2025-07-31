@@ -1,5 +1,18 @@
 ﻿namespace StockManager.Application.Helpers.Error;
 
+/// <summary>
+/// Provides a centralized collection of error codes used throughout the application to represent specific error
+/// conditions for various entities and operations.
+/// </summary>
+/// <remarks>The <see cref="ErrorCodes"/> class defines a set of constant string values that represent error codes
+/// for different entities and operations, such as products, suppliers, users, inventory, shipments, stock transactions,
+/// purchase orders, sales orders, invoices, and customers. These error codes are typically used in exception handling,
+/// logging, and API responses to provide consistent and meaningful error information to clients or users.  Each error
+/// code follows a structured naming convention in the format: <c>[Entity].[ErrorType]</c>, where: <list type="bullet">
+/// <item> <description><c>[Entity]</c> represents the domain entity (e.g., Product, Supplier, Shipment).</description>
+/// </item> <item> <description><c>[ErrorType]</c> represents the type of error (e.g., NotFound, Conflict,
+/// Validation).</description> </item> </list>  Example usage: <code> if (product == null) {     throw new
+/// NotFoundException(ErrorCodes.ProductNotFound, "The specified product was not found."); } </code></remarks>
 public static class ErrorCodes
 {
     public const string ProductNotFound = "Product.NotFound";

@@ -6,6 +6,16 @@ using System.Threading.Tasks;
 
 namespace StockManager.Core.Domain.Common;
 
+/// <summary>
+/// Represents a base class for domain entities with a unique identifier.
+/// </summary>
+/// <remarks>This class provides a foundation for implementing domain entities in a Domain-Driven Design (DDD)
+/// context. It enforces the concept of entity identity by requiring a unique identifier of type <typeparamref
+/// name="TId"/>.  Equality for entities is based on their unique identifier and exact runtime type. This ensures that
+/// two entities are considered equal only if they share the same identifier and are of the same precise type.  The
+/// class also provides operator overloads for equality (<c>==</c> and <c>!=</c>) to simplify comparisons between
+/// entities, ensuring that equality checks are consistent with the domain's identity rules.</remarks>
+/// <typeparam name="TId">The type of the unique identifier for the entity. Must implement <see cref="IEquatable{T}"/>.</typeparam>
 public abstract class Entity<TId> where TId : IEquatable<TId>
 {
     public TId Id { get; protected set; }

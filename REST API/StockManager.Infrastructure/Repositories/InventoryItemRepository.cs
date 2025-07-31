@@ -44,6 +44,7 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
     /// <returns>An <see cref="IQueryable{T}"/> of <see cref="InventoryItem"/> representing the inventory items.</returns>
     public IQueryable<InventoryItem> GetInventoryItems()
         => _dbContext.InventoryItems
+                .IgnoreQueryFilters()
                 .Include(i => i.Product)
                 .Include(i => i.BinLocation)
                 .AsNoTracking();

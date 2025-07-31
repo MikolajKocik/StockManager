@@ -15,6 +15,9 @@ internal sealed class InventoryItemConfiguration : IEntityTypeConfiguration<Inve
     {
         builder.HasKey(ii => ii.Id);
 
+        builder.HasQueryFilter(ii => ii.Product.IsDeleted == null || 
+             ii.Product.IsDeleted == false);
+
         builder.HasOne(ii => ii.BinLocation)
             .WithMany(bl => bl.InventoryItems)
             .HasConstraintName("FK_InvetoryItem_BinLocation")
@@ -26,5 +29,14 @@ internal sealed class InventoryItemConfiguration : IEntityTypeConfiguration<Inve
             .HasConstraintName("FK_InventoryItem_StockTransaction")
             .HasForeignKey(st => st.InventoryItemId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(li => li.QuantityOnHand)
+            .HasPrecision(18, 2);
+
+        builder.Property(li => li.QuantityReserved)
+          .HasPrecision(18, 2);
+
+        builder.Property(li => li.Warehouse)
+            .HasConversion<string>();
     }
 }

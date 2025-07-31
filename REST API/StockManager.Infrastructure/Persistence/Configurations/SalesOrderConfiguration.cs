@@ -39,5 +39,8 @@ internal sealed class SalesOrderConfiguration : IEntityTypeConfiguration<SalesOr
             .HasConstraintName("FK_SalesOrder_Invoice")
             .HasForeignKey<Invoice>(i => i.SalesOrderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(so => so.Status)
+            .HasConversion<string>();
     }
 }

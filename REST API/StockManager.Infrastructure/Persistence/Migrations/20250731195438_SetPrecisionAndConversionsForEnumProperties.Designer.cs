@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StockManager.Infrastructure.Persistence.Data;
 
@@ -11,9 +12,11 @@ using StockManager.Infrastructure.Persistence.Data;
 namespace StockManager.Infrastructure.Migrations
 {
     [DbContext(typeof(StockManagerDbContext))]
-    partial class StockManagerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250731195438_SetPrecisionAndConversionsForEnumProperties")]
+    partial class SetPrecisionAndConversionsForEnumProperties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,17 +346,14 @@ namespace StockManager.Infrastructure.Migrations
                     b.Property<int?>("SalesOrderId")
                         .HasColumnType("int");
 
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
 
                     b.Property<decimal>("TotalAmount")
-                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

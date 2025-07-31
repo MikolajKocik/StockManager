@@ -33,5 +33,8 @@ internal sealed class PurchaseOrderConfiguration : IEntityTypeConfiguration<Purc
             .HasConstraintName("FK_PurchaseOrder_Invoice")
             .HasForeignKey<Invoice>(i => i.PurchaseOrderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(po => po.Status)
+            .HasConversion<string>();
     }
 }

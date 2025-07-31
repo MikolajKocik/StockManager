@@ -34,5 +34,11 @@ internal sealed class ReturnOrderConfiguration : IEntityTypeConfiguration<Return
             .HasConstraintName("FK_ReturnOrder_ReturnOrderLine")
             .HasForeignKey(rol => rol.ReturnOrderId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        builder.Property(ro => ro.Type)
+            .HasConversion<string>();
+
+        builder.Property(ro => ro.Status)
+            .HasConversion<string>();
     }
 }

@@ -9,8 +9,9 @@ public class InventoryItemMappingProfile : Profile
 {
     public InventoryItemMappingProfile()
     {
+        // no longer .ToString() on enum needed due to hasConversion configuration
         CreateMap<InventoryItem, InventoryItemDto>()
-            .ForMember(dest => dest.Warehouse, opt => opt.MapFrom(src => src.Warehouse.ToString()));
+            .ForMember(dest => dest.Warehouse, opt => opt.MapFrom(src => src.Warehouse));
         CreateMap<InventoryItemDto, InventoryItem>()
             .ForMember(dest => dest.Warehouse, opt => opt.MapFrom(src => src.Warehouse != null ? Enum.Parse<Warehouse>(src.Warehouse) : default));
         CreateMap<InventoryItemCreateDto, InventoryItem>()

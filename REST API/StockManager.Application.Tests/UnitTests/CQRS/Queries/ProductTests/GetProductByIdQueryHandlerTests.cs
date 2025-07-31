@@ -39,6 +39,14 @@ public sealed class GetProductByIdQueryHandlerTests
             logger);
     }
 
+    /// <summary>
+    /// Tests whether the <see cref="GetProductByIdQueryHandler"/> correctly returns a <see cref="ProductDto"/>  when a
+    /// product exists in the repository.
+    /// </summary>
+    /// <remarks>This test verifies the behavior of the query handler by mocking dependencies such as the
+    /// product repository,  caching service, and logger. It ensures that the handler successfully maps the retrieved
+    /// product entity  to a <see cref="ProductDto"/> and returns a successful result.</remarks>
+    /// <returns></returns>
     [Fact]
     public async Task Handle_ShouldReturnProductDto_WhenProductsExists()
     {
@@ -91,6 +99,13 @@ public sealed class GetProductByIdQueryHandlerTests
             .Excluding(x => x.SupplierId));
     }
 
+    /// <summary>
+    /// Tests that the <see cref="GetProductByIdQueryHandler.Handle"/> method returns a failure result  when the
+    /// specified product does not exist in the repository.
+    /// </summary>
+    /// <remarks>This test verifies that the handler correctly identifies the absence of a product and returns
+    /// an appropriate error result with the error code "Product.NotFound".</remarks>
+    /// <returns></returns>
     [Fact]
     public async Task Handle_ShouldReturnFailure_WhenProductDoesNotExist()
     {

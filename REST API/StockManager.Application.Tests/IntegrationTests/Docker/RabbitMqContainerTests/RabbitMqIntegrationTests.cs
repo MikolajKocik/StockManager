@@ -25,6 +25,13 @@ public sealed class RabbitMqIntegrationTests : IAsyncLifetime, IAsyncDisposable
         return _rabbitMqContainer.DisposeAsync();
     }
 
+    /// <summary>
+    /// Verifies that the connection is open after being successfully created.
+    /// </summary>
+    /// <remarks>This test ensures that the <see cref="IConnection.IsOpen"/> property returns <see
+    /// langword="true"/> when a connection is established using the <see
+    /// cref="ConnectionFactory.CreateConnectionAsync"/> method.</remarks>
+    /// <returns></returns>
     [Fact]
     public async Task IsOpenReturnsTrue()
     {

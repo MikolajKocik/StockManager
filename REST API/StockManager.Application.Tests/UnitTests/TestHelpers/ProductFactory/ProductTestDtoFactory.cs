@@ -2,6 +2,12 @@
 
 namespace StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 
+/// <summary>
+/// Provides factory methods for creating test instances of <see cref="ProductCreateDto"/>.
+/// </summary>
+/// <remarks>This class is intended for use in testing scenarios where pre-configured instances of  <see
+/// cref="ProductCreateDto"/> are required. The default parameter values can be overridden  to customize the generated
+/// test data.</remarks>
 public static class ProductTestDtoFactory
 {
     public static ProductCreateDto CreateTestDto(

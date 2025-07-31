@@ -31,9 +31,18 @@ public sealed class TrackingBehaviorTests
         _baseRepository = new Mock<IBaseRepository>();
     }
 
+    /// <summary>
+    /// Verifies that the <see cref="TrackingBehavior{TRequest, TResponse}.Handle"/> method throws an  <see
+    /// cref="OperationCanceledException"/> when a cancellation is requested via the provided <see
+    /// cref="CancellationToken"/>.
+    /// </summary>
+    /// <remarks>This test ensures that the behavior correctly respects the cancellation token and halts
+    /// execution  when a cancellation is signaled. It uses a mock setup for validators and a test query to simulate 
+    /// the scenario.</remarks>
+    /// <returns></returns>
     [Fact]
-    public async Task Handle_ShouldThrow_WhenCancellationRequested()
-    {
+    public async Task HandleShouldThrowWhenCancellationRequested()
+    {   
         //
         _validators.Setup(v => v.GetEnumerator())
             .Returns(Enumerable.Empty<IValidator<GetProductByIdQuery>>().GetEnumerator());
@@ -45,8 +54,8 @@ public sealed class TrackingBehaviorTests
             logger, _validators.Object, _baseRepository.Object
             );
 
-        using var cts = new CancellationTokenSource();
-        await cts.CancelAsync();
+        using var cancellationToken = new CancellationTokenSource();
+        await cancellationToken.CancelAsync();
 
         var query = new GetProductByIdQuery(1);
         ProductCreateDto data = ProductTestDtoFactory.CreateTestDto();
@@ -54,7 +63,7 @@ public sealed class TrackingBehaviorTests
         //
         var next = new RequestHandlerDelegate<Result<ProductCreateDto>>(() => Task.FromResult(Result<ProductCreateDto>.Success(data)));
 
-        Func<Task> act = async () => await behavior.Handle(query, next, cts.Token);
+        Func<Task> act = async () => await behavior.Handle(query, next, cancellationToken.Token);
 
         //
         await act.Should().ThrowAsync<OperationCanceledException>();

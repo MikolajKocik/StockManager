@@ -26,6 +26,14 @@ public sealed class MsSqlIntegrationTests : IAsyncLifetime
         return _db.DisposeAsync();
     }
 
+    /// <summary>
+    /// Verifies that the connection state of a <see cref="SqlConnection"/> is <see cref="ConnectionState.Open"/> after
+    /// opening the connection.
+    /// </summary>
+    /// <remarks>This test ensures that a <see cref="SqlConnection"/> transitions to the <see
+    /// cref="ConnectionState.Open"/> state  after calling <see cref="SqlConnection.OpenAsync(CancellationToken)"/> with
+    /// a valid connection string.</remarks>
+    /// <returns></returns>
     [Fact]
     public async Task ConnectionStateReturnsOpen()
     {
@@ -42,6 +50,13 @@ public sealed class MsSqlIntegrationTests : IAsyncLifetime
         result.Should().BeTrue();
     }
 
+    /// <summary>
+    /// Verifies that a SQL query returning a scalar value executes successfully and returns the expected result.
+    /// </summary>
+    /// <remarks>This test method connects to the database, executes a simple SQL query ("SELECT 1"), and
+    /// asserts that the result is the integer value 1. It uses a cancellation token with a 10-second timeout to ensure
+    /// the operation does not hang indefinitely.</remarks>
+    /// <returns></returns>
     [Fact]
     public async Task SelectOne_Works()
     {

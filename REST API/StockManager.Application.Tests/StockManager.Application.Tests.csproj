@@ -3,6 +3,7 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MockQueryable.Moq" />
     <PackageReference Include="Moq" />
@@ -30,7 +31,6 @@
 
   <ItemGroup>
     <Folder Include="IntegrationTests\Docker\RedisContainer\" />
-    <Folder Include="IntegrationTests\Docker\SqlContainer\" />
     <Folder Include="UnitTests\CQRS\Commands\Product\" />
   </ItemGroup>
 

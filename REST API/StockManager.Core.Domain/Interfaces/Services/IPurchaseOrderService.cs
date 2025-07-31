@@ -13,4 +13,6 @@ public interface IPurchaseOrderService
     void SetExpectedDate(PurchaseOrder order, DateTime expected);
     void AddLine(PurchaseOrder order, PurchaseOrderLine line);
     void Confirm(PurchaseOrder order);
+    void AssignReturnOrder(PurchaseOrder order, int returnOrderId);
+    void AssignInvoice(PurchaseOrder order, int invoiceId);
 }

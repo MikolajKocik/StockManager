@@ -6,10 +6,16 @@ using System.Threading.Tasks;
 
 namespace StockManager.Application.Common.Logging.Categories;
 
-public static class LoggingCategories
+public enum LoggingCategories
 {
-    public const string Product = "StockManager.Product";
-    public const string Supplier = "StockManager.Supplier";
-    public const string General = "StockManager.General";
-    public const string RedisCache = "StockManager.Redis";
+    [System.ComponentModel.Description("StockManager.Product")]
+    Product,
+    [System.ComponentModel.Description("StockManager.Supplier")]
+    Supplier,
+    [System.ComponentModel.Description("StockManager.InventoryItem")]
+    InventoryItem,
+    [System.ComponentModel.Description("StockManager.General")]
+    General,
+    [System.ComponentModel.Description("StockManager.RedisCache")]
+    RedisCache
 }

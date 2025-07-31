@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using StockManager.Application.Dtos.ModelsDto.Address;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.AddressDtos;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.Common.Events.Supplier;
 
@@ -12,7 +12,6 @@ public sealed record SupplierAddedIntegrationEvent(
     Guid SupplierId,
     string Name,
     AddressDto? Address,
-    Guid? AddressId,
-    List<ProductDto>? Products
+    Guid? AddressId
 ) : IIntegrationEvent;
 

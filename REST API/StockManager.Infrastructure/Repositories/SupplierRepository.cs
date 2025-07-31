@@ -1,10 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.SupplierEntity;
-using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
@@ -24,17 +26,17 @@ public sealed class SupplierRepository : ISupplierRepository
             .Include(s => s.Address)
             .Include(s => s.Products);
 
-    public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Suppliers
+    public async Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken cancellationToken) 
+        => await _dbContext.Suppliers
             .Include(s => s.Address)
             .FirstOrDefaultAsync(s => s.Id == supplierId, cancellationToken);
-    }
+
+    public async Task<Supplier?> FindByNameAsync(string name, CancellationToken cancellationToken)
+        => await RepositoryQueriesHelpers.FindByNameAsync<Supplier>(_dbContext, name, cancellationToken);
 
     public async Task<Supplier> AddSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
-    {
-        return await RepositoryQueriesHelpers.AddEntityAsync(supplier, _dbContext, cancellationToken);
-    }
+        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, supplier, cancellationToken);
+    
 
     public async Task<Supplier?> UpdateSupplierAsync(Supplier supplier, ISupplierService supplierService, CancellationToken cancellationToken)
     {
@@ -62,9 +64,6 @@ public sealed class SupplierRepository : ISupplierRepository
         return existingSupplier;
     }
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync()
-      => await _dbContext.Database.BeginTransactionAsync();
-
     public void AttachSupplier(Supplier supplier)
     {
         _dbContext.Suppliers.Attach(supplier);
@@ -72,11 +71,14 @@ public sealed class SupplierRepository : ISupplierRepository
 
     public async Task<Supplier?> DeleteSupplierAsync(Supplier supplier, CancellationToken cancellationToken)
     {
-        Supplier? supplierExist = await RepositoryQueriesHelpers.EntityFindAsync<Supplier, Guid>(supplier.Id, _dbContext, cancellationToken);
+        Supplier? supplierExist = await RepositoryQueriesHelpers.EntityFindAsync<Supplier, Guid>(_dbContext, supplier.Id, cancellationToken);
 
         _dbContext.Suppliers.Remove(supplierExist!);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return supplierExist;
     }
+
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => Task.FromResult(_dbContext.Database.BeginTransaction());
 }

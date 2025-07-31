@@ -1,4 +1,7 @@
 ﻿using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
+using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -9,53 +12,51 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
+using StockManager.Application.Validations.ProductValidation;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 
-public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, ProductDto>
+public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand, Unit>
 {
-    private readonly IMapper _mapper;
     private readonly IProductRepository _repository;
     private readonly ILogger<DeleteProductCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
     private readonly IEventBus _eventBus;
-
+    private readonly IProductService _service;
 
     public DeleteProductCommandHandler(
-        IMapper mapper,
         IProductRepository repository,
         ILogger<DeleteProductCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus)
+        IEventBus eventBus,
+        IProductService service
+        )
     {
-        _mapper = mapper;
         _repository = repository;
         _logger = logger;
         _redis = redis;
         _eventBus = eventBus;
+        _service = service;
     }
 
-    public async Task<Result<ProductDto>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync();
-
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
             if (product is not null)
             {
                 ProductLogInfo.LogRemovingProductOperation(_logger, command.Id, default);
-                Product remove = await _repository.DeleteProductAsync(product, cancellationToken);
 
-                ProductDto dto = _mapper.Map<ProductDto>(remove);         
-
-                await transaction.CommitAsync(cancellationToken);
+                _service.SetAsDeleted(product);
+                ProductLogInfo.LogProductDeletedSuccess(_logger, product.Id, default);
 
                 await _redis.RemoveKeyAsync(
                    $"product:{product.Id}:details")
@@ -69,19 +70,18 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
                     command.Id)
                     ).ConfigureAwait(false);
 
-                return Result<ProductDto>.Success(dto);
+                return Result<Unit>.Success(Unit.Value);
             }
             else
             {
                 ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
-                await transaction.RollbackAsync(cancellationToken);
 
                 var error = new Error(
                     $"Product with id {command.Id} not found",
                     ErrorCodes.ProductNotFound
                 );
 
-                return Result<ProductDto>.Failure(error);
+                return Result<Unit>.Failure(error);
             }
         }
         catch (Exception ex)

@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using FluentValidation.Results;
+using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -10,17 +12,18 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Product;
+using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
+using StockManager.Application.Validations.ProductValidation;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 
-public class EditProductCommandHandler : ICommandHandler<EditProductCommand, ProductDto>
+public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Unit>
 {
     private readonly IMapper _mapper;
     private readonly IProductRepository _repository;
@@ -32,12 +35,13 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
 
     public EditProductCommandHandler(
         IMapper mapper,
-        IProductRepository repository, 
+        IProductRepository repository,
         ILogger<EditProductCommandHandler> logger,
         IConnectionMultiplexer redis,
         IEventBus eventBus,
         IProductService productService,
-        ISupplierService supplierService)
+        ISupplierService supplierService
+        )
     {
         _mapper = mapper;
         _repository = repository;
@@ -48,12 +52,10 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
         _supplierService = supplierService;
     }
 
-    public async Task<Result<ProductDto>> Handle(EditProductCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(EditProductCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            await using IDbContextTransaction transaction = await _repository.BeginTransactionAsync();
-
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
             if (product is not null)
@@ -68,50 +70,25 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Pro
 
                 ProductDto productModified = _mapper.Map<ProductDto>(updateProduct);
 
-                var validate = new ProductValidator();
-                ValidationResult validationResult = await validate.ValidateAsync(productModified, cancellationToken);
+                await _redis.RemoveKeyAsync(
+                    $"product:{command.Id}:details")
+                    .ConfigureAwait(false);
 
-                if (validationResult.IsValid)
-                {                   
-                    await transaction.CommitAsync(cancellationToken);
+                await _eventBus.PublishAsync(new ProductUpdatedIntegrationEvent(
+                    productModified.Id, productModified.Name, productModified.SupplierId))
+                    .ConfigureAwait(false);
 
-                    await _redis.RemoveKeyAsync(
-                        $"product:{command.Id}:details")
-                        .ConfigureAwait(false);
-
-                    await _eventBus.PublishAsync(new ProductUpdatedIntegrationEvent(
-                        command.Id, command.Product.Name, command.Product.SupplierId))
-                        .ConfigureAwait(false);
-
-                    return Result<ProductDto>.Success(productModified);
-                }
-                else
-                {
-                    ProductLogWarning.LogProductValidationFailedExtended(
-                        _logger,
-                        product,
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)), default);
-
-                    var error = new Error(
-                        string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                        ErrorCodes.ProductValidation
-                    );
-
-                    return Result<ProductDto>.Failure(error);
-                }
+                return Result<Unit>.Success(Unit.Value);
             }
-            else
-            {
-                ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
-                await transaction.RollbackAsync(cancellationToken);
 
-                var error = new Error(
-                    $"Product with id {command.Id} not found",
-                    ErrorCodes.ProductNotFound
-                );
+            ProductLogWarning.LogProductNotFound(_logger, command.Id, default);
 
-                return Result<ProductDto>.Failure(error);
-            }
+            var error = new Error(
+                $"Product with id {command.Id} not found",
+                ErrorCodes.ProductNotFound
+            );
+
+            return Result<Unit>.Failure(error);
         }
         catch (Exception ex)
         {

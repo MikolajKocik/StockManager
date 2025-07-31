@@ -17,6 +17,7 @@ public sealed partial class Product : Entity<int>
     public string Slug { get; private set; } 
     public Genre Genre { get; private set; }
     public string Unit { get; private set; } 
+    public bool? IsDeleted { get; private set; }
     public DateTime ExpirationDate { get; private set; }
     public DateTime DeliveredAt { get; private set; }
     public Warehouse Type { get; private set; }
@@ -58,15 +59,16 @@ public sealed partial class Product : Entity<int>
         Warehouse type,
         string batchNumber,
         Guid supplierId,
-        DateTime expirationDate
+        DateTime expirationDate,
+        bool? isDeleted = null
         ) : base()
     {
         Guard.AgainstNullOrWhiteSpace(name, unit, batchNumber);
         Guard.AgainstInvalidEnumValue(genre);
         Guard.AgainstInvalidEnumValue(type);
         Guard.AgainstDefaultValue(supplierId);
-        Guard.IsValidDate(expirationDate);
         Guard.AgainstDefaultValue(expirationDate);
+        Guard.AgainstDefaultValueIfProvided(isDeleted);
 
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
@@ -89,15 +91,16 @@ public sealed partial class Product : Entity<int>
         Warehouse type,
         string batchNumber,
         Guid supplierId,
-        DateTime expirationDate
+        DateTime expirationDate,
+        bool? isDeleted = null
         ) : base(id)
     {
         Guard.AgainstNullOrWhiteSpace(name, unit, batchNumber);
         Guard.AgainstInvalidEnumValue(genre);
         Guard.AgainstInvalidEnumValue(type);
         Guard.AgainstDefaultValue(supplierId);
-        Guard.IsValidDate(expirationDate);
         Guard.AgainstDefaultValue(expirationDate);
+        Guard.AgainstDefaultValueIfProvided(isDeleted);
 
         Name = name;
         Slug = $"p_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";

@@ -10,12 +10,4 @@ using StockManager.Application.Common.ResultPattern;
 
 namespace StockManager.Application.CQRS.Commands.ProductCommands.TrackProductView;
 
-public class TrackProductViewCommand : ICommand<Unit>
-{
-    public Guid ProductId { get; }
-
-    public TrackProductViewCommand(Guid productId)
-    {
-        ProductId = productId;
-    }
-}
+public sealed record TrackProductViewCommand(Guid ProductId) : ICommand<Unit>;

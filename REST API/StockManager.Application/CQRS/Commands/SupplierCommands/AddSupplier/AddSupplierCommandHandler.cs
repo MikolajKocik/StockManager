@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
+using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -10,7 +12,7 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
@@ -32,7 +34,8 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
         ISupplierRepository supplierRepository,
         ILogger<AddSupplierCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus)
+        IEventBus eventBus
+        )
     {
         _mapper = mapper;
         _supplierRepository = supplierRepository;
@@ -45,66 +48,43 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
     {
         try
         {
-            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync();
+            Supplier existingSupplier = await _supplierRepository.FindByNameAsync(command.Supplier.Name, cancellationToken);
 
-            var validate = new SupplierValidator();
-            ValidationResult validationResult = await validate.ValidateAsync(command.Supplier, cancellationToken);
-
-            if(validationResult.IsValid)
+            if (existingSupplier is not null)
             {
-                Supplier existingSupplier = await _supplierRepository.GetSupplierByIdAsync(command.Supplier.Id, cancellationToken);
-
-                if (existingSupplier is not null)
-                {
-                    SupplierLogWarning.LogSupplierAlreadyExists(_logger, existingSupplier.Id, default);
-
-                    SupplierDto dto = _mapper.Map<SupplierDto>(existingSupplier);
-
-                    return Result<SupplierDto>.Success(dto);
-                }
-                else
-                {
-                    Supplier newSupplier = _mapper.Map<Supplier>(command.Supplier);
-
-                    SupplierLogInfo.LogSupplierAddedSuccesfull(_logger, newSupplier, default);
-
-                    Supplier addSupplier = await _supplierRepository.AddSupplierAsync(newSupplier, cancellationToken);
-
-                    await transaction.CommitAsync(cancellationToken);
-
-                    string key = $"supplier:{command.Supplier.Id}:views";
-
-                    await _redis.IncrementKeyAsync(
-                        key,
-                        TimeSpan.FromHours(24),
-                        cancellationToken)
-                        .ConfigureAwait(false);
-
-                    SupplierDto dto = _mapper.Map<SupplierDto>(addSupplier);
-
-                    await _eventBus.PublishAsync(new SupplierAddedIntegrationEvent(
-                        command.Supplier.Id,
-                        command.Supplier.Name,
-                        command.Supplier.Address,
-                        command.Supplier.AddressId,
-                        command.Supplier.Products)
-                        ).ConfigureAwait(false);
-
-                    return Result<SupplierDto>.Success(dto);
-                }               
-            }
-            else
-            {
-                SupplierLogWarning.LogSupplierValidationFailed(_logger, validationResult.Errors, default);
-
-                await transaction.RollbackAsync(cancellationToken);
+                SupplierLogWarning.LogSupplierAlreadyExists(_logger, command.Supplier.Name, default);
 
                 var error = new Error(
-                    string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage)),
-                    ErrorCodes.SupplierValidation);
+                 $"Supplier with name '{command.Supplier.Name}' already exists.",
+                ErrorCodes.SupplierConflict);
 
                 return Result<SupplierDto>.Failure(error);
             }
+
+            Supplier newSupplier = _mapper.Map<Supplier>(command.Supplier);
+
+            SupplierLogInfo.LogSupplierAddedSuccesfull(_logger, newSupplier, default);
+
+            Supplier addSupplier = await _supplierRepository.AddSupplierAsync(newSupplier, cancellationToken);
+
+            string key = $"supplier:{newSupplier.Id}:views";
+
+            await _redis.IncrementKeyAsync(
+                key,
+                TimeSpan.FromHours(24),
+                cancellationToken)
+                .ConfigureAwait(false);
+
+            SupplierDto dto = _mapper.Map<SupplierDto>(addSupplier);
+
+            await _eventBus.PublishAsync(new SupplierAddedIntegrationEvent(
+                dto.Id,
+                dto.Name,
+                dto.Address,
+                dto.AddressId)
+                ).ConfigureAwait(false);
+
+            return Result<SupplierDto>.Success(dto);
         }
         catch (Exception ex)
         {

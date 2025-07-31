@@ -3,11 +3,22 @@
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.Data.SqlClient" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MockQueryable.Moq" />
     <PackageReference Include="Moq" />
-    <PackageReference Include="xunit" />
+    <PackageReference Include="NSubstitute" />
+    <PackageReference Include="RabbitMQ.Client" />
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="xunit.analyzers">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio" />
+	<PackageReference Include="Testcontainers.MsSql" />
+	<PackageReference Include="Testcontainers.RabbitMq" />
+	<PackageReference Include="Testcontainers.Redis" />
+	<PackageReference Include="xunit.v3" />
   </ItemGroup>
 
   <!-- Dependencies -->
@@ -17,13 +28,6 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="CQRS\Commands\Supplier\" />
-    <Folder Include="CQRS\Commands\Product\" />
-    <Folder Include="Helpers\" />
-    <Folder Include="Validations\" />
   </ItemGroup>
 
 </Project>

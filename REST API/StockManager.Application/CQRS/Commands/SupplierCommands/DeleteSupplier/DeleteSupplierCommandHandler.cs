@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using MediatR;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
@@ -9,7 +10,7 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.Supplier;
+using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -17,7 +18,7 @@ using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Application.CQRS.Commands.SupplierCommands.DeleteSupplier;
 
-public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplierCommand, SupplierDto>
+public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplierCommand, Unit>
 {
     private readonly IMapper _mapper;
     private readonly ISupplierRepository _supplierRepository;
@@ -39,22 +40,16 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
         _eventBus = eventBus;
     }
 
-    public async Task<Result<SupplierDto>> Handle(DeleteSupplierCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(DeleteSupplierCommand command, CancellationToken cancellationToken)
     {
         try
         {
-            await using IDbContextTransaction transaction = await _supplierRepository.BeginTransactionAsync();
-
             Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Id, cancellationToken);
 
             if (supplier is not null)
             {
                 SupplierLogInfo.LogRemovingSupplier(_logger, command.Id, default);
                 Supplier remove = await _supplierRepository.DeleteSupplierAsync(supplier, cancellationToken);
-
-                SupplierDto dto = _mapper.Map<SupplierDto>(remove);
-
-                await transaction.CommitAsync(cancellationToken);
 
                 await _redis.RemoveKeyAsync(
                     $"supplier:{command.Id}:views")
@@ -68,20 +63,17 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
                     command.Id)
                     ).ConfigureAwait(false);
 
-                return Result<SupplierDto>.Success(dto);
+                return Result<Unit>.Success(Unit.Value);
             }
-            else
-            {
-                SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
-                await transaction.RollbackAsync(cancellationToken);
 
-                var error = new Error(
-                    $"Supplier with id {command.Id} not found",
-                    ErrorCodes.SupplierNotFound
-                );
+            SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
 
-                return Result<SupplierDto>.Failure(error);
-            }
+            var error = new Error(
+                $"Supplier with id {command.Id} not found",
+                ErrorCodes.SupplierNotFound
+            );
+
+            return Result<Unit>.Failure(error);
         }
         catch (Exception ex)
         {

@@ -4,8 +4,8 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
-using StockManager.Infrastructure.Data;
 using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Persistence.Data;
 using System.Linq.Expressions;
 
 namespace StockManager.Infrastructure.Repositories;
@@ -14,10 +14,21 @@ public class ProductRepository : IProductRepository
 {
     private readonly StockManagerDbContext _dbContext;
 
-    public ProductRepository(StockManagerDbContext dbcontext)
+    public ProductRepository(StockManagerDbContext dbContext)
     {
-        _dbContext = dbcontext;
+        _dbContext = dbContext;
     }
+
+    private static readonly Func<StockManagerDbContext, int, CancellationToken, Task<Product?>> GetProductByIdCompiled =
+        EF.CompileAsyncQuery((StockManagerDbContext dbContext, int id, CancellationToken cancellationToken) =>
+            dbContext.Products
+                    .IgnoreQueryFilters()
+                    .Include(s => s.Supplier)
+                    .ThenInclude(a => a.Address)
+                    .FirstOrDefault(p => p.Id == id));
+
+    public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
+        => await GetProductByIdCompiled(_dbContext, id, cancellationToken);
 
     public IQueryable<Product> GetProducts()
         => _dbContext.Products
@@ -25,22 +36,11 @@ public class ProductRepository : IProductRepository
                 .Include(s => s.Supplier)
                 .ThenInclude(a => a.Address);
 
-    public async Task<Product?> GetProductByIdAsync(int id, CancellationToken cancellationToken)
-    {
-
-        return await _dbContext.Products
-            .Include(s => s.Supplier)
-            .ThenInclude(a => a.Address)
-            .FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
-    }
-
     public async Task<Product> AddProductAsync(Product product, CancellationToken cancellationToken)
-    {
-        return await RepositoryQueriesHelpers.AddEntityAsync(product, _dbContext, cancellationToken);
-    }
+            => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, product, cancellationToken);
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync()
-        => await _dbContext.Database.BeginTransactionAsync();
+    public async Task<Product?> FindProductByNameAsync(string name, CancellationToken cancellationToken)
+        => await RepositoryQueriesHelpers.FindByNameAsync<Product>(_dbContext, name, cancellationToken);
 
     public async Task<Product?> UpdateProductAsync(
         IProductService productService,
@@ -62,7 +62,7 @@ public class ProductRepository : IProductRepository
             if (existingSupplier is not null)
             {
                 // Assign the existing supplier entity to preserve tracking and FK integrity
-                productService.SetSupplier(product, existingSupplier); 
+                productService.SetSupplier(product, existingSupplier);
 
                 if (product.Supplier?.Name is not null)
                 {
@@ -82,13 +82,6 @@ public class ProductRepository : IProductRepository
         return product;
     }
 
-    public async Task<Product?> DeleteProductAsync(Product product, CancellationToken cancellationToken)
-    {
-        Product productExist = await RepositoryQueriesHelpers.EntityFindAsync<Product, int>(product.Id, _dbContext, cancellationToken);
-
-        _dbContext.Products.Remove(productExist!);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-
-        return productExist;
-    }
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => Task.FromResult(_dbContext.Database.BeginTransaction());
 }

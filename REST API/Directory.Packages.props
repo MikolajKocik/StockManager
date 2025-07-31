@@ -16,13 +16,15 @@
     <PackageVersion Include="Grafana.OpenTelemetry" Version="1.2.0" />
     <!-- JWT -->
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Data.SqlClient" Version="6.1.0" />
     <!-- Entity Framework -->
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.0" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.0" />
     <!-- Redis -->
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.6" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
     <PackageVersion Include="Serilog.Sinks.OpenTelemetry" Version="4.2.0" />
-    <PackageVersion Include="StackExchange.Redis" Version="2.8.41" />
+    <PackageVersion Include="StackExchange.Redis" Version="2.8.58" />
     <!-- Azure containers -->
     <PackageVersion Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <!-- MockQueryable tests -->
@@ -41,6 +43,12 @@
     <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
     <!-- Swagger -->
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <!-- Test Containers-->
+    <PackageVersion Include="Testcontainers.MsSql" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.RabbitMq" Version="4.6.0" />
+    <PackageVersion Include="Testcontainers.Redis" Version="4.6.0" />
+    <PackageVersion Include="xunit.analyzers" Version="1.23.0" />
+    <PackageVersion Include="xunit.v3" Version="3.0.0" />
   </ItemGroup>
   <!-- Domain layer -->
   <ItemGroup>
@@ -59,7 +67,7 @@
     <PackageVersion Include="MediatR" Version="12.4.1" />
     <PackageVersion Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <!-- DI -->
-    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
     <!-- Identity JWT -->
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.6.0" />
   </ItemGroup>

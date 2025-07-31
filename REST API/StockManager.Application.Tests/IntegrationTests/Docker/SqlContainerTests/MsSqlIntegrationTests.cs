@@ -11,7 +11,7 @@ using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
 using Xunit.Sdk;
 
-namespace StockManager.Application.Tests.IntegrationTests.Docker.SqlContainer;
+namespace StockManager.Application.Tests.IntegrationTests.Docker.SqlContainerTests;
 public sealed class MsSqlIntegrationTests : IAsyncLifetime
 {
     private readonly MsSqlContainer _db = new MsSqlBuilder().Build();

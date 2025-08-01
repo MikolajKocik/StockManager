@@ -38,6 +38,8 @@ public sealed class AddPurchaseOrderLineCommandHandler : ICommandHandler<AddPurc
 
     public async Task<Result<Unit>> Handle(AddPurchaseOrderLineCommand command, CancellationToken cancellationToken)
     {
+        ArgumentNullException.ThrowIfNull(command, nameof(command));
+
         Core.Domain.Models.PurchaseOrderEntity.PurchaseOrder? purchaseOrder = await _repository.GetPurchaseOrderByIdAsync(command.PurchaseOrderId, cancellationToken);
         if (purchaseOrder is null)
         {
@@ -51,7 +53,7 @@ public sealed class AddPurchaseOrderLineCommandHandler : ICommandHandler<AddPurc
         try
         {
             PurchaseOrderLine line = _mapper.Map<PurchaseOrderLine>(command.Line);
-            purchaseOrder.AddLine(line);
+            _service.AddLine(purchaseOrder, line);
 
             await _repository.UpdatePurchaseOrderAsync(purchaseOrder, cancellationToken);
             PurchaseOrderLogInfo.LogPurchaseOrderUpdated(_logger, purchaseOrder.Id, default);

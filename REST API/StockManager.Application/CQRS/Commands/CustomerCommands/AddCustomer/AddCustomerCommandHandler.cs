@@ -13,6 +13,7 @@ using StockManager.Application.Common.Logging.Customer;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.CustomerDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.CustomerEntity;
@@ -40,6 +41,8 @@ public sealed class AddCustomerCommandHandler : ICommandHandler<AddCustomerComma
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
+
             Customer customer = _mapper.Map<Customer>(command.CreateDto);
 
             Customer created = await _repository.AddCustomerAsync(customer, cancellationToken);

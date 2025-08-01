@@ -15,6 +15,7 @@ using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Application.Validations.ProductValidation;
@@ -58,6 +59,8 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.Product.Name);
+
             Product productExist = await _productRepository.FindProductByNameAsync(command.Product.Name, cancellationToken);
 
             if (productExist is not null)

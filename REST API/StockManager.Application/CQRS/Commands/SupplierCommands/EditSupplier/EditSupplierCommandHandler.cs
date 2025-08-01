@@ -12,6 +12,7 @@ using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.Redis;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -50,6 +51,8 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
             Supplier? supplier = await _supplierRepository.GetSupplierByIdAsync(command.Id, cancellationToken);
 
             if (supplier is not null)

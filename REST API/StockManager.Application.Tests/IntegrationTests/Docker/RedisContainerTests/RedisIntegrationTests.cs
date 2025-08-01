@@ -29,7 +29,7 @@ public sealed class RedisIntegrationTests : IAsyncLifetime
     /// <remarks>This test ensures that the Redis connection is successfully created and is in a connected
     /// state.</remarks>
     [Fact]
-    public void ConnectionStateRetursOpen()
+    public void ConnectionState_Returns_Open()
     {
         //
         using var connection = ConnectionMultiplexer.Connect(_redisContainer.GetConnectionString());
@@ -48,7 +48,7 @@ public sealed class RedisIntegrationTests : IAsyncLifetime
     /// the <see cref="_redisContainer.ExecScriptAsync"/> method.</remarks>
     /// <returns></returns>
     [Fact]
-    public async Task ExecScriptReturnsSuccessful()
+    public async Task ExecScript_Returns_Successful()
     {
         //
         const string scriptContent = "return 'Hello, scripting!'";

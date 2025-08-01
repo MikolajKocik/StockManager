@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.Logging.Product.ProductCache;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Configuration;
+using StockManager.Application.Configurations;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
 using StockManager.Application.Helpers.Error;

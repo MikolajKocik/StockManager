@@ -6,6 +6,7 @@ using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
@@ -39,6 +40,8 @@ public sealed class AddProductToInventoryItemCommandHandler : ICommandHandler<Ad
 
     public async Task<Result<ProductDto>> Handle(AddProductToInventoryItemCommand command, CancellationToken cancellationToken)
     {
+        ResultFailureHelper.IfProvidedNullArgument(command.InventoryItemId);
+
         InventoryItem? inventoryItem = await _inventoryItemRepository.GetInventoryItemByIdAsync(command.InventoryItemId, cancellationToken);
         if (inventoryItem is null)
         {

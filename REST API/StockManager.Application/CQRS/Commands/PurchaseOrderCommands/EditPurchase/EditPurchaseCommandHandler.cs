@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.PurchaseOrder;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
@@ -36,7 +37,11 @@ public sealed class EditPurchaseOrderCommandHandler : ICommandHandler<EditPurcha
     {
         try
         {
-            Core.Domain.Models.PurchaseOrderEntity.PurchaseOrder? purchaseOrder = await _repository.GetPurchaseOrderByIdAsync(command.Id, cancellationToken);
+            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
+            Core.Domain.Models.PurchaseOrderEntity
+                .PurchaseOrder? purchaseOrder = await _repository.GetPurchaseOrderByIdAsync(command.Id, cancellationToken);
+
             if (purchaseOrder is null)
             {
                 PurchaseOrderLogWarning.LogPurchaseOrderNotFound(_logger, command.Id, default);

@@ -13,6 +13,7 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Invoice;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.InvoiceDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.InvoiceEntity;
@@ -38,6 +39,8 @@ public sealed class AddInvoiceCommandHandler : ICommandHandler<AddInvoiceCommand
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
+
             Invoice entity = _mapper.Map<Invoice>(command.CreateDto);
 
             Invoice created = await _repository.AddInvoiceAsync(entity, cancellationToken);

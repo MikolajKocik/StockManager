@@ -33,7 +33,7 @@ public sealed class RabbitMqIntegrationTests : IAsyncLifetime, IAsyncDisposable
     /// cref="ConnectionFactory.CreateConnectionAsync"/> method.</remarks>
     /// <returns></returns>
     [Fact]
-    public async Task IsOpenReturnsTrue()
+    public async Task IsOpen_Returns_True()
     {
         //
         using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(10));

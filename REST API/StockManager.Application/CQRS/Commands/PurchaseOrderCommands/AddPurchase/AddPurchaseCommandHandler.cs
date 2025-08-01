@@ -13,6 +13,7 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.PurchaseOrder.AddPurchase;
 using StockManager.Application.Dtos.ModelsDto.PurchaseOrderDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
@@ -38,6 +39,8 @@ public sealed class AddPurchaseOrderCommandHandler : ICommandHandler<AddPurchase
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
+
             Core.Domain.Models.PurchaseOrderEntity.PurchaseOrder purchaseOrder = 
                 _mapper.Map<Core.Domain.Models.PurchaseOrderEntity.PurchaseOrder>(command.CreateDto);
 

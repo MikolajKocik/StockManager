@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.Invoice;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
@@ -33,6 +34,8 @@ public sealed class IssueInvoiceCommandHandler : ICommandHandler<IssueInvoiceCom
 
     public async Task<Result<Unit>> Handle(IssueInvoiceCommand command, CancellationToken cancellationToken)
     {
+        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
         Invoice? invoice = await _repository.GetInvoiceByIdAsync(command.Id, cancellationToken);
         if (invoice is null)
         {

@@ -23,6 +23,7 @@ using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations.InventoryItemValidation;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -62,6 +63,8 @@ public sealed class AddInventoryItemCommandHandler : ICommandHandler<AddInventor
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.InventoryItem.ProductId);
+
             // generally product may has multiple inventory items, so we can add new one
             // but we need to check if provided product not null
             Product? product = await _productRepository.GetProductByIdAsync(command.InventoryItem.ProductId, cancellationToken);

@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.Shipment;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -33,9 +34,11 @@ public sealed class MarkShipmentAsReturnedCommandHandler : ICommandHandler<MarkS
         _shipmentService = shipmentService;
     }
 
-    public async Task<Result<Unit>> Handle(MarkShipmentAsReturnedCommand command, CancellationToken ct)
+    public async Task<Result<Unit>> Handle(MarkShipmentAsReturnedCommand command, CancellationToken cancellationToken)
     {
-        Shipment? shipment = await _repository.GetShipmentByIdAsync(command.Id, ct);
+        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
+        Shipment? shipment = await _repository.GetShipmentByIdAsync(command.Id, cancellationToken);
         if (shipment is null)
         {
             ShipmentLogWarning.LogShipmentNotFound(_logger, command.Id, default);
@@ -75,7 +78,7 @@ public sealed class MarkShipmentAsReturnedCommandHandler : ICommandHandler<MarkS
 
         _shipmentService.MarkReturned(shipment);
 
-        await _repository.UpdateShipmentAsync(shipment, ct);
+        await _repository.UpdateShipmentAsync(shipment, cancellationToken);
 
         ShipmentLogInfo.LogShipmentMarkedReturned(_logger, command.Id, default);
         return Result<Unit>.Success(Unit.Value);

@@ -7,6 +7,7 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.StockTransaction;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.StockTransactionDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
@@ -33,6 +34,8 @@ public class EditStockTransactionCommandHandler : IRequestHandler<EditStockTrans
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
             StockTransaction? stockTransaction = await _repository.GetStockTransactionByIdAsync(command.Id, cancellationToken);
             if (stockTransaction is null)
             {

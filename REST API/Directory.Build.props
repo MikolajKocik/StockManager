@@ -14,4 +14,12 @@
 		<TreatWarningsAsErrors>false</TreatWarningsAsErrors>
 		<CodeAnalysisTreatWarningsAsErrors>false</CodeAnalysisTreatWarningsAsErrors>
 	</PropertyGroup>
+
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CA2007</NoWarn>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CA1062</NoWarn>
+	</PropertyGroup>
 </Project>

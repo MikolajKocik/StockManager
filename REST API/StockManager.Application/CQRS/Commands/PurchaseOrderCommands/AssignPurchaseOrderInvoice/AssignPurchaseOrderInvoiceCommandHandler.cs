@@ -9,6 +9,7 @@ using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.PurchaseOrder;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.PurchaseOrder.AssignPurchaseOrderInvoice;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
@@ -35,6 +36,8 @@ public sealed class AssignPurchaseOrderInvoiceCommandHandler
 
     public async Task<Result<Unit>> Handle(AssignPurchaseOrderInvoiceCommand command, CancellationToken cancellationToken)
     {
+        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
         Core.Domain.Models.PurchaseOrderEntity.PurchaseOrder? purchaseOrder = await _repository.GetPurchaseOrderByIdAsync(command.Id, cancellationToken);
         if (purchaseOrder is null)
         {

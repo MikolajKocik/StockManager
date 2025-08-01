@@ -1,20 +1,33 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
-# some test to fix trigger
 trigger:
 - main
+- develop
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+# publish report trx in azure pipeline
+- task: DotNetCoreCLI@2
+  displayName: 'Run unit and integration tests'
+  inputs: 
+    command: test
+    projects: '**/*.csproj'
+    arguments: '--logger trx'
+
+# Unit tests
+- task: PublishTestResults@1
+  displayName: 'Publish test results'
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+    testRunTitle: 'All Test Results'
+    publishRunAttachments: true
+
+# generator report of tests
+- script: dotnet run "../Azure/Scripts/ReportGenerator.csx"
+  displayName: 'Run report generator script'
+
+# check sensitive data 
+- script: dotnet run "../Azure/Scripts/CheckSecrets.csx"
+  displayName: 'Run script to find sensitive data in code'

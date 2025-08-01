@@ -6,6 +6,7 @@ using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.StockTransaction;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
@@ -29,6 +30,8 @@ public sealed class DeleteStockTransactionCommandHandler : ICommandHandler<Delet
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
             StockTransaction? stockTransaction = await _repository.GetStockTransactionByIdAsync(command.Id, cancellationToken);
             if (stockTransaction is null)
             {

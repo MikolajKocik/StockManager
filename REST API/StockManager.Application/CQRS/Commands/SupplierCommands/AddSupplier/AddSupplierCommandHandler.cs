@@ -14,6 +14,7 @@ using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.Redis;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -48,6 +49,8 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.Supplier.Name);
+
             Supplier existingSupplier = await _supplierRepository.FindByNameAsync(command.Supplier.Name, cancellationToken);
 
             if (existingSupplier is not null)

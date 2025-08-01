@@ -35,7 +35,7 @@ public sealed class MsSqlIntegrationTests : IAsyncLifetime
     /// a valid connection string.</remarks>
     /// <returns></returns>
     [Fact]
-    public async Task ConnectionStateReturnsOpen()
+    public async Task ConnectionState_Returns_Open()
     {
         //
         using var cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(10));

@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
@@ -36,7 +37,11 @@ public sealed class EditSalesOrderCommandHandler : ICommandHandler<EditSalesOrde
     {
         try
         {
-            Core.Domain.Models.SalesOrderEntity.SalesOrder? salesOrder = await _repository.GetSalesOrderByIdAsync(command.Id, cancellationToken);
+            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
+            Core.Domain.Models.SalesOrderEntity
+                .SalesOrder? salesOrder = await _repository.GetSalesOrderByIdAsync(command.Id, cancellationToken);
+
             if (salesOrder is null)
             {
                 return Result<Unit>.Failure(new Error($"SalesOrder {command.Id} not found", ErrorCodes.SalesOrderNotFound));

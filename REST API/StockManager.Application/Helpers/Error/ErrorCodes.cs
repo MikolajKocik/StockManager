@@ -15,6 +15,7 @@
 /// NotFoundException(ErrorCodes.ProductNotFound, "The specified product was not found."); } </code></remarks>
 public static class ErrorCodes
 {
+    public const string GeneralBadRequest = "General.BadRequest";
     public const string ProductNotFound = "Product.NotFound";
     public const string ProductConflict = "Product.Conflict";
     public const string ProductValidation = "Product.Validation";

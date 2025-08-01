@@ -1,18 +1,19 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using FluentValidation;
+using FluentValidation.Results;
+using MediatR;
 using Microsoft.Extensions.Logging;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
-using MediatR;
-using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
-using StockManager.Application.Common.Logging.General;
-using FluentValidation.Results;
-using FluentValidation;
 
 namespace StockManager.Application.CQRS.Commands.InventoryItemCommands.ReserveQuantity;
 
@@ -39,6 +40,8 @@ public sealed class ReserveInventoryItemQuantityCommandHandler : ICommandHandler
 
     public async Task<Result<InventoryItemDto>> Handle(ReserveInventoryItemQuantityCommand command, CancellationToken cancellationToken)
     {
+        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
         InventoryItem? inventoryItem = await _repository.GetInventoryItemByIdAsync(command.Id, cancellationToken);
 
         if (inventoryItem is null)

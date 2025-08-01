@@ -12,6 +12,7 @@ using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.Shipment;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.ShipmentDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ShipmentEntity;
@@ -38,6 +39,8 @@ public sealed class AddShipmentCommandHandler : ICommandHandler<AddShipmentComma
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
+
             Shipment shipment = _mapper.Map<Shipment>(command.CreateDto);
 
             Shipment created = await _repository.AddShipmentAsync(shipment, cancellationToken);

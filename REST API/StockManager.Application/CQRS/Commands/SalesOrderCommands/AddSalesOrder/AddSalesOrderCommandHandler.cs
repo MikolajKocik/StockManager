@@ -12,6 +12,7 @@ using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.SalesOrderDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.SalesOrderEntity;
@@ -37,6 +38,8 @@ public sealed class AddSalesOrderCommandHandler : ICommandHandler<AddSalesOrderC
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
+
             SalesOrder salesOrder = _mapper.Map<SalesOrder>(command.CreateDto);
 
             SalesOrder created = await _repository.AddSalesOrderAsync(salesOrder, cancellationToken);

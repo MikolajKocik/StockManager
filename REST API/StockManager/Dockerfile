@@ -4,7 +4,6 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
 # project compile service
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
@@ -30,18 +29,17 @@ RUN dotnet build "./StockManager.csproj" -c $BUILD_CONFIGURATION -o /app/build /
 # build application tests
 FROM build AS test
 WORKDIR /src
-COPY ["Tests/StockManager.Application.Tests/StockManager.Application.Tests.csproj", "StockManager.Application.Tests/"]
-COPY ./Tests/StockManager.Application.Tests ./StockManager.Application.Tests
+COPY ./StockManager.Application.Tests/. ./StockManager.Application.Tests/
 RUN dotnet test "StockManager.Application.Tests/StockManager.Application.Tests.csproj" --no-restore --verbosity normal
 
-# This stage is used to publish the service design to be copied to the final stage
+# This stage is used to publish the service design to be copied to the final stages
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src/StockManager
 RUN dotnet publish "StockManager.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BuildingInsideDocker=true
 
-COPY StockManager/appsettings.json /app/publish/
-COPY StockManager/appsettings.Development.json /app/publish/
+COPY ./StockManager/appsettings.json /app/publish/
+COPY ./StockManager/appsettings.Development.json /app/publish/
 
 RUN ls -la /app/publish
 

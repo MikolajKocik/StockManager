@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.Product.ProductCache;
-using StockManager.Application.Configuration;
+using StockManager.Application.Configurations;
 
 namespace StockManager.Application.Common.Logging.Product.ProductCache;
 

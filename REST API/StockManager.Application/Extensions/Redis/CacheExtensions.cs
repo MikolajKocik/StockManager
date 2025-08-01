@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using StockManager.Application.Common.Logging.Supplier.SupplierCache;
-using StockManager.Application.Configuration;
+using StockManager.Application.Configurations;
 using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 
 namespace StockManager.Application.Extensions.Redis;

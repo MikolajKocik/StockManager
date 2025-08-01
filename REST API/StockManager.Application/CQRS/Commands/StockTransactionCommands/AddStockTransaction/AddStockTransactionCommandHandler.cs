@@ -1,14 +1,15 @@
 using AutoMapper;
 using MediatR;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using StockManager.Application.Common.Logging.StockTransaction;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.StockTransactionDtos;
+using StockManager.Application.Helpers.CQRS.NullResult;
+using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
-using StockManager.Application.Common.Logging.StockTransaction;
-using StockManager.Application.Helpers.Error;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Data.SqlClient;
 
 namespace StockManager.Application.CQRS.Commands.StockTransactionCommands.AddStockTransaction;
 
@@ -30,10 +31,11 @@ public class AddStockTransactionCommandHandler : IRequestHandler<AddStockTransac
 
     public async Task<Result<StockTransactionDto>> Handle(AddStockTransactionCommand command, CancellationToken cancellationToken)
     {
-        StockTransaction stockTransaction = _mapper.Map<StockTransaction>(command.CreateDto);
-
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
+
+            StockTransaction stockTransaction = _mapper.Map<StockTransaction>(command.CreateDto);
             StockTransaction created = await _repository.AddStockTransactionAsync(stockTransaction, cancellationToken);
 
             StockTransactionLogInfo.LogStockTransactionCreated(_logger, command.CreateDto, default);

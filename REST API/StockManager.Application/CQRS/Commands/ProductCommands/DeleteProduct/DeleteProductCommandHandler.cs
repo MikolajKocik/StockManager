@@ -14,6 +14,7 @@ using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Application.Validations.ProductValidation;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -49,6 +50,8 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
             Product product = await _repository.GetProductByIdAsync(command.Id, cancellationToken);
 
             if (product is not null)

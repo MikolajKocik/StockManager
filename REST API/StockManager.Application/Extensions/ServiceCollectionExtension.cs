@@ -6,6 +6,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using StockManager.Application.Common.PipelineBehavior;
+using StockManager.Application.Configurations;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
@@ -16,7 +17,7 @@ namespace StockManager.Application.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddApplication(this IServiceCollection services)
+    public static void AddApplication(this IServiceCollection services, IConfiguration config)
     {
         Assembly applicationAssembly = typeof(ServiceCollectionExtensions).Assembly;
 
@@ -26,6 +27,9 @@ public static class ServiceCollectionExtensions
 
         services.AddValidatorsFromAssembly(applicationAssembly)
             .AddFluentValidationAutoValidation();
+
+        services.Configure<CacheSettings>(
+            config.GetSection("CacheSettings"));
 
         services.AddHttpContextAccessor();
 

@@ -12,6 +12,7 @@ using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Shipment;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ShipmentEntity;
@@ -38,6 +39,8 @@ public sealed class EditShipmentCommandHandler : ICommandHandler<EditShipmentCom
     {
         try
         {
+            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
             Shipment? shipment = await _repository.GetShipmentByIdAsync(command.Id, cancellationToken);
             if (shipment is null)
             {

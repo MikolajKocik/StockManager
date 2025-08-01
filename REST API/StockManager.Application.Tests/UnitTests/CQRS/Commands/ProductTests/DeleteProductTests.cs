@@ -44,7 +44,7 @@ public sealed class DeleteProductTests
     /// cref="DeleteProductCommandHandler"/>  when handling a <see cref="DeleteProductCommand"/>.</remarks>
     /// <returns></returns>
     [Fact]
-    public async Task ShouldFlagProductAsDeleted()
+    public async Task Should_Flag_Product_As_Deleted()
     {
         //
         Product product = ProductTestFactory.CreateTestProduct();

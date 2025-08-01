@@ -17,7 +17,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Src", "Src", "{02EA681E-C7D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D79174D1-6821-482A-B24D-B15902837927}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution configuration", "Solution configuration", "{533CE36F-3D97-4DCA-BD4D-A1E9B3FC6F99}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionConfiguration", "SolutionConfiguration", "{533CE36F-3D97-4DCA-BD4D-A1E9B3FC6F99}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		Directory.Build.props = Directory.Build.props
@@ -31,13 +31,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Azure", "Azure", "{8FB176BD
 		Azure\azure-pipelines.yml = Azure\azure-pipelines.yml
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{BF80A70B-A00A-4BB2-945A-9A9BFA4E64B3}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{BD8B69E8-C7F7-485A-95CE-EDFFE70210C9}"
 	ProjectSection(SolutionItems) = preProject
 		..\..\..\..\OneDrive - Office 365\Pulpit\Skrypty\CheckSecrets.csx = ..\..\..\..\OneDrive - Office 365\Pulpit\Skrypty\CheckSecrets.csx
 		..\..\..\..\OneDrive - Office 365\Pulpit\Skrypty\ReportGenerator.csx = ..\..\..\..\OneDrive - Office 365\Pulpit\Skrypty\ReportGenerator.csx
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StockManager.Tests", "..\StockManager.Tests\StockManager.Tests.csproj", "{8C0B5592-E7D1-4BA4-8423-5D17E8CA7C7B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -69,6 +69,10 @@ Global
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{81DDED9D-158B-E303-5F62-77A2896D2A5A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C0B5592-E7D1-4BA4-8423-5D17E8CA7C7B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C0B5592-E7D1-4BA4-8423-5D17E8CA7C7B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C0B5592-E7D1-4BA4-8423-5D17E8CA7C7B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C0B5592-E7D1-4BA4-8423-5D17E8CA7C7B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -79,8 +83,8 @@ Global
 		{3167737A-773C-49DC-8FCD-605CFB095969} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{C3B25CB0-5E3E-4DAA-B34B-6162ADDD160F} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{FC8DCB3C-A8EE-4BC9-B0A5-73B5537ACF89} = {D79174D1-6821-482A-B24D-B15902837927}
-		{BF80A70B-A00A-4BB2-945A-9A9BFA4E64B3} = {8FB176BD-0036-D269-15EA-F86E90622887}
 		{BD8B69E8-C7F7-485A-95CE-EDFFE70210C9} = {8FB176BD-0036-D269-15EA-F86E90622887}
+		{8C0B5592-E7D1-4BA4-8423-5D17E8CA7C7B} = {D79174D1-6821-482A-B24D-B15902837927}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DC5BA64D-B24D-48F7-B8F0-30491FF0A990}

@@ -9,6 +9,7 @@ using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.SalesOrder;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
@@ -34,7 +35,11 @@ public sealed class ConfirmSalesOrderCommandHandler : ICommandHandler<ConfirmSal
 
     public async Task<Result<Unit>> Handle(ConfirmSalesOrderCommand command, CancellationToken cancellationToken)
     {
-        Core.Domain.Models.SalesOrderEntity.SalesOrder? salesOrder = await _repository.GetSalesOrderByIdAsync(command.Id, cancellationToken);
+        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+
+        Core.Domain.Models.SalesOrderEntity
+            .SalesOrder? salesOrder = await _repository.GetSalesOrderByIdAsync(command.Id, cancellationToken);
+
         if (salesOrder is null)
         {
             SalesOrderLogWarning.LogSalesOrderNotFound(_logger, command.Id, default);

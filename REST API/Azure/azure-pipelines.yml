@@ -1,0 +1,33 @@
+trigger:
+- main
+- develop
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+
+# publish report trx in azure pipeline
+- task: DotNetCoreCLI@2
+  displayName: 'Run unit and integration tests'
+  inputs: 
+    command: test
+    projects: '**/*.csproj'
+    arguments: '--logger trx'
+
+# Unit tests
+- task: PublishTestResults@1
+  displayName: 'Publish test results'
+  inputs:
+    testRunner: VSTest
+    testResultsFiles: '**/*.trx'
+    testRunTitle: 'All Test Results'
+    publishRunAttachments: true
+
+# generator report of tests
+- script: dotnet run "../Azure/Scripts/ReportGenerator.csx"
+  displayName: 'Run report generator script'
+
+# check sensitive data 
+- script: dotnet run "../Azure/Scripts/CheckSecrets.csx"
+  displayName: 'Run script to find sensitive data in code'

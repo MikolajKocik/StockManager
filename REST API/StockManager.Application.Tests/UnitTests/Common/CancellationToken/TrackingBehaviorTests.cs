@@ -41,7 +41,7 @@ public sealed class TrackingBehaviorTests
     /// the scenario.</remarks>
     /// <returns></returns>
     [Fact]
-    public async Task HandleShouldThrowWhenCancellationRequested()
+    public async Task Handle_Should_Throw_When_Cancellation_Requested()
     {   
         //
         _validators.Setup(v => v.GetEnumerator())

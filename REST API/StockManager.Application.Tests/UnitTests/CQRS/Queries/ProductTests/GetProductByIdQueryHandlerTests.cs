@@ -48,7 +48,7 @@ public sealed class GetProductByIdQueryHandlerTests
     /// product entity  to a <see cref="ProductDto"/> and returns a successful result.</remarks>
     /// <returns></returns>
     [Fact]
-    public async Task Handle_ShouldReturnProductDto_WhenProductsExists()
+    public async Task Handle_Should_Return_ProductDto_When_Products_Exists()
     {
         // 
         Core.Domain.Models.ProductEntity.
@@ -107,7 +107,7 @@ public sealed class GetProductByIdQueryHandlerTests
     /// an appropriate error result with the error code "Product.NotFound".</remarks>
     /// <returns></returns>
     [Fact]
-    public async Task Handle_ShouldReturnFailure_WhenProductDoesNotExist()
+    public async Task Handle_Should_Return_Failure_When_Product_Does_Not_Exist()
     {
         //
         var query = new GetProductByIdQuery(1);

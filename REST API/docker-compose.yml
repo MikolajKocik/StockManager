@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   stockmanager:
     container_name: stockmanager
@@ -6,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: StockManager/Dockerfile
+      target: final
     ports:
       - "5000:8080"
       - "5001:8081"
@@ -79,6 +79,16 @@ services:
      - "3000:3000"
     volumes:
      - grafana-storage:/var/lib/grafana
+
+  tests:
+    container_name: stockmanager-tests
+    build:
+      context: .
+      dockerfile: ./StockManager/Dockerfile
+      target: test
+    depends_on:
+     - stockmanager
+     - sqlserver
 
 volumes:
     sql-data: {}

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Configuration;
+using StockManager.Application.Configurations;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Mappings.ProductProfile;

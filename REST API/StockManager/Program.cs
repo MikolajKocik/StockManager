@@ -16,7 +16,7 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddPresentation(builder.Services);
 builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
+builder.Services.AddApplication(builder.Configuration);
 
 WebApplication app = builder.Build();
 

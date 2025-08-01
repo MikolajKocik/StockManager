@@ -6,11 +6,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.Logging.InventoryItem.InventoryItemCache;
 using StockManager.Application.Common.Logging.Product.ProductCache;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Configuration;
+using StockManager.Application.Configurations;
 using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.Redis;
@@ -24,14 +25,14 @@ public sealed class GetInventoryItemByIdQueryHandler : IQueryHandler<GetInventor
     private readonly IInventoryItemRepository _inventoryItemRepository;
     private readonly IMapper _mapper;
     private readonly IDistributedCache _cache;
-    private readonly CacheSettings _cacheSettings;
+    private readonly IOptions<CacheSettings> _cacheSettings;
     private readonly ILogger<GetInventoryItemByIdQueryHandler> _logger;
 
     public GetInventoryItemByIdQueryHandler(
         IInventoryItemRepository inventoryItemRepository,
         IMapper mapper,
         IDistributedCache cache,
-        CacheSettings cacheSettings,
+        IOptions<CacheSettings> cacheSettings,
         ILogger<GetInventoryItemByIdQueryHandler> logger
         )
     {
@@ -70,15 +71,15 @@ public sealed class GetInventoryItemByIdQueryHandler : IQueryHandler<GetInventor
         await _cache.SetCacheObjectAsync(
             cacheKey, 
             inventoryItemDto,
-            _cacheSettings.InventoryItemAbsoluteTtlHours,
-            _cacheSettings.InventoryItemSlidingTtlMinutes,
+            _cacheSettings.Value.InventoryItemAbsoluteTtlHours,
+            _cacheSettings.Value.InventoryItemSlidingTtlMinutes,
             cancellationToken);
 
         InventoryItemCacheLog.StoredKeys(
           _logger,
           cacheKey,
-          _cacheSettings.InventoryItemAbsoluteTtlHours,
-          _cacheSettings.InventoryItemSlidingTtlMinutes,
+          _cacheSettings.Value.InventoryItemAbsoluteTtlHours,
+          _cacheSettings.Value.InventoryItemSlidingTtlMinutes,
           default);
 
         return Result<InventoryItemDto>.Success(inventoryItemDto);

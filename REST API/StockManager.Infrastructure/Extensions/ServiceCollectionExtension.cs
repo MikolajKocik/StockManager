@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StockManager.Application.Configurations;
 using StockManager.Application.Services;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.UserEntity;
@@ -36,12 +38,13 @@ public static class ServiceCollectionExtension
 
         services.AddScoped<IAuthService, AuthService>();
 
+        // repositories with interfaces
+        var infrastructureAssembly = Assembly.Load("StockManager.Infrastructure");
         services.Scan(s =>
         {
-            s.FromAssembliesOf(typeof(IProductRepository))
-                .FromEntryAssembly()
-                .AddClasses()
-                .AsSelfWithInterfaces()
+            s.FromAssemblies(infrastructureAssembly)
+                .AddClasses(c => c.Where(t => t.Name.EndsWith("Repository", StringComparison.OrdinalIgnoreCase))) 
+                .AsImplementedInterfaces()
                 .WithScopedLifetime();
         });
     }

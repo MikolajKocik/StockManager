@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Product;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.PipelineBehavior;
@@ -30,7 +28,6 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
     private readonly IProductRepository _repository;
     private readonly ILogger<EditProductCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IEventBus _eventBus;
     private readonly IProductService _productService;
     private readonly ISupplierService _supplierService;
 
@@ -39,7 +36,6 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
         IProductRepository repository,
         ILogger<EditProductCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus,
         IProductService productService,
         ISupplierService supplierService
         )
@@ -48,7 +44,6 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
         _repository = repository;
         _logger = logger;
         _redis = redis;
-        _eventBus = eventBus;
         _productService = productService;
         _supplierService = supplierService;
     }
@@ -75,10 +70,6 @@ public class EditProductCommandHandler : ICommandHandler<EditProductCommand, Uni
 
                 await _redis.RemoveKeyAsync(
                     $"product:{command.Id}:details")
-                    .ConfigureAwait(false);
-
-                await _eventBus.PublishAsync(new ProductUpdatedIntegrationEvent(
-                    productModified.Id, productModified.Name, productModified.SupplierId))
                     .ConfigureAwait(false);
 
                 return Result<Unit>.Success(Unit.Value);

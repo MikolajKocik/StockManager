@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Supplier;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
@@ -25,20 +23,17 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
     private readonly ISupplierRepository _supplierRepository;
     private readonly ILogger<DeleteSupplierCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IEventBus _eventBus;
 
     public DeleteSupplierCommandHandler(
         IMapper mapper,
         ISupplierRepository repository,
         ILogger<DeleteSupplierCommandHandler> logger,
-          IConnectionMultiplexer redis,
-          IEventBus eventBus)
+          IConnectionMultiplexer redis)
     {
         _mapper = mapper;
         _supplierRepository = repository;
         _logger = logger;
         _redis = redis;
-        _eventBus = eventBus;
     }
 
     public async Task<Result<Unit>> Handle(DeleteSupplierCommand command, CancellationToken cancellationToken)
@@ -61,10 +56,6 @@ public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplie
                 await _redis.RemoveKeyAsync(
                     $"suppleir:{command.Id}:details")
                     .ConfigureAwait(false);
-
-                await _eventBus.PublishAsync(new SupplierDeletedIntegrationEvent(
-                    command.Id)
-                    ).ConfigureAwait(false);
 
                 return Result<Unit>.Success(Unit.Value);
             }

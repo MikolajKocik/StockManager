@@ -6,8 +6,6 @@ using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Product;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.Logging.Supplier;
@@ -33,7 +31,6 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
     private readonly IProductRepository _productRepository;
     private readonly ISupplierRepository _supplierRepository;
     private readonly ILogger<AddProductCommandHandler> _logger;
-    private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
     private readonly IProductService _productService;
 
@@ -41,7 +38,6 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         IMapper mapper, IProductRepository productRepository,
         ISupplierRepository supplierRepository,
         ILogger<AddProductCommandHandler> logger,
-        IEventBus eventBus,
         IConnectionMultiplexer redis,
         IProductService productService
         )
@@ -50,7 +46,6 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
         _productRepository = productRepository;
         _supplierRepository = supplierRepository;
         _logger = logger;
-        _eventBus = eventBus;
         _redis = redis;
         _productService = productService;
     }
@@ -102,10 +97,6 @@ public class AddProductCommandHandler : ICommandHandler<AddProductCommand, Produ
                 .ConfigureAwait(false);
 
             ProductDto dto = _mapper.Map<ProductDto>(newProduct);
-
-            await _eventBus.PublishAsync(new ProductAddedIntegrationEvent(
-               newProduct.Id, newProduct.Name, supplier.Id)
-                ).ConfigureAwait(false);
 
             return Result<ProductDto>.Success(dto);
         }

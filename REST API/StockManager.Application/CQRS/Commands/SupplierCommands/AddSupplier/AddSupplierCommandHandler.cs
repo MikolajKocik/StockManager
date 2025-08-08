@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Supplier;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.PipelineBehavior;
@@ -28,21 +26,18 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
     private readonly ISupplierRepository _supplierRepository;
     private readonly ILogger<AddSupplierCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IEventBus _eventBus;
 
     public AddSupplierCommandHandler(
         IMapper mapper,
         ISupplierRepository supplierRepository,
         ILogger<AddSupplierCommandHandler> logger,
-        IConnectionMultiplexer redis,
-        IEventBus eventBus
+        IConnectionMultiplexer redis
         )
     {
         _mapper = mapper;
         _supplierRepository = supplierRepository;
         _logger = logger;
         _redis = redis;
-        _eventBus = eventBus;
     }
 
     public async Task<Result<SupplierDto>> Handle(AddSupplierCommand command, CancellationToken cancellationToken)
@@ -79,13 +74,6 @@ public sealed class AddSupplierCommandHandler : ICommandHandler<AddSupplierComma
                 .ConfigureAwait(false);
 
             SupplierDto dto = _mapper.Map<SupplierDto>(addSupplier);
-
-            await _eventBus.PublishAsync(new SupplierAddedIntegrationEvent(
-                dto.Id,
-                dto.Name,
-                dto.Address,
-                dto.AddressId)
-                ).ConfigureAwait(false);
 
             return Result<SupplierDto>.Success(dto);
         }

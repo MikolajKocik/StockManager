@@ -2,16 +2,11 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Serilog;
 using StockManager.Application.Helpers.NullConfiguration;
 using StockManager.Extensions.WebAppBuilderExtensions.Cors;
 using StockManager.Extensions.WebAppBuilderExtensions.JWT;
 using StockManager.Extensions.WebAppBuilderExtensions.OpenTelemetry;
-using StockManager.Extensions.WebAppBuilderExtensions.RabbitMQ;
 using StockManager.Extensions.WebAppBuilderExtensions.RedisAndHealthChecks;
 using StockManager.Extensions.WebAppBuilderExtensions.Serilog;
 using StockManager.Extensions.WebAppBuilderExtensions.Services;
@@ -62,9 +57,6 @@ public static class PresentationLayer
 
         // OpenTelemetry
         OpenTelemetryConfiguration.AddOpenTelemetryConfiguration(builder);
-
-        // RabbitMq
-        RabbitMqConfiguration.AddRabbitMqConfiguration(builder);
 
         // Redis & health checks
         RedisAndHealthChecksConfiguration.AddConfigurations(builder);

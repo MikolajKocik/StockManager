@@ -8,8 +8,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.InventoryItem;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.ResultPattern;
@@ -27,21 +25,18 @@ public sealed class EditInventoryItemCommandHandler : ICommandHandler<EditInvent
     private readonly IInventoryItemRepository _inventoryItemRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<EditInventoryItemCommandHandler> _logger;
-    private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
 
     public EditInventoryItemCommandHandler(
         IInventoryItemRepository inventoryItemRepository,
         IMapper mapper,
         ILogger<EditInventoryItemCommandHandler> logger,
-        IEventBus eventBus,
         IConnectionMultiplexer redis
         )
     {
         _inventoryItemRepository = inventoryItemRepository;
         _mapper = mapper;
         _logger = logger;
-        _eventBus = eventBus;
         _redis = redis;
     }
 
@@ -78,15 +73,6 @@ public sealed class EditInventoryItemCommandHandler : ICommandHandler<EditInvent
             await _redis.RemoveKeyAsync(
                 $"inventory-item:{command.Id}:details")
                 .ConfigureAwait(false);
-
-            await _eventBus.PublishAsync(
-                new InventoryItemAddedIntegrationEvent(
-                    dto.Id,
-                    dto.ProductId,
-                    dto.ProductName,
-                    dto.BinLocationId,
-                    cancellationToken
-                )).ConfigureAwait(false);
 
             return Result<Unit>.Success(Unit.Value);
         }

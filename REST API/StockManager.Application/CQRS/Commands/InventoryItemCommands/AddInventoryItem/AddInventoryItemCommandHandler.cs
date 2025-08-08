@@ -12,9 +12,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.InventoryItem;
-using StockManager.Application.Common.Events.Product;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.Logging.Product;
@@ -40,19 +37,16 @@ public sealed class AddInventoryItemCommandHandler : ICommandHandler<AddInventor
     private readonly IInventoryItemRepository _inventoryItemRepository;
     private readonly IProductRepository _productRepository;
     private readonly ILogger<AddInventoryItemCommandHandler> _logger;
-    private readonly IEventBus _eventBus;
     private readonly IConnectionMultiplexer _redis;
 
     public AddInventoryItemCommandHandler(
         IMapper mapper,
         IInventoryItemRepository inventoryItemRepository,
         ILogger<AddInventoryItemCommandHandler> logger,
-        IEventBus eventBus,
         IConnectionMultiplexer redis,
         IProductRepository productRepository
         )
     {
-        _eventBus = eventBus;
         _mapper = mapper;
         _inventoryItemRepository = inventoryItemRepository;
         _logger = logger;
@@ -102,13 +96,6 @@ public sealed class AddInventoryItemCommandHandler : ICommandHandler<AddInventor
                TimeSpan.FromHours(24),
                cancellationToken)
                .ConfigureAwait(false);
-
-            await _eventBus.PublishAsync(new InventoryItemAddedIntegrationEvent(
-               inventoryItemDto.Id, 
-               inventoryItemDto.ProductId,
-               inventoryItemDto.ProductName, 
-               inventoryItemDto.BinLocationId)
-                ).ConfigureAwait(false);
 
             return Result<InventoryItemDto>.Success(inventoryItemDto);
         }

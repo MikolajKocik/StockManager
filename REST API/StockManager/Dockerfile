@@ -38,8 +38,8 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src/StockManager
 RUN dotnet publish "StockManager.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BuildingInsideDocker=true
 
-COPY appsettings.json /app/publish/
-COPY appsettings.Development.json /app/publish/
+COPY --from=build  /src/StockManager/appsettings.json /app/publish/
+COPY --from=build /src/StockManager/appsettings.Development.json /app/publish/
 
 RUN ls -la /app/publish
 

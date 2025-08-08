@@ -34,3 +34,7 @@ README.md
 !Directory.Build.props
 !Directory.Packages.props
 !StockManager/appsettings*.json
+!REST API/
+!REST API/StockManager/
+!REST API/StockManager/**
+!REST API/StockManager/Dockerfile

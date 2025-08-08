@@ -29,6 +29,7 @@ public sealed class DeleteProductTests
     {
         _service = new Mock<IProductService>();
         _repository = new Mock<IProductRepository>();
+        _redis = new Mock<IConnectionMultiplexer>(); 
     }
 
     /// <summary>

@@ -11,8 +11,6 @@ services:
       - "5001:8081"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-    env_file:
-      - .env
     depends_on:
         redis:
             condition: service_healthy

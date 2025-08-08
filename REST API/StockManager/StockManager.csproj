@@ -6,7 +6,6 @@
 
   <ItemGroup>
 	<!-- Health checks -->  
-    <PackageReference Include="AspNetCore.HealthChecks.Rabbitmq" />
     <PackageReference Include="AspNetCore.HealthChecks.Redis" />
     <PackageReference Include="AspNetCore.HealthChecks.SqlServer" />
     <PackageReference Include="AspNetCore.HealthChecks.UI.Client" />
@@ -31,8 +30,6 @@
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" />
     <PackageReference Include="OpenTelemetry.Instrumentation.Http" />
-	<!-- RabbitMQ -->
-    <PackageReference Include="RabbitMQ.Client" />
     <!-- Scrutor -->
 	<PackageReference Include="Scrutor" />
 	<!-- Serilog -->  

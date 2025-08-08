@@ -34,8 +34,6 @@ internal static class RedisAndHealthChecksConfiguration
 
         builder.Services.AddHealthChecks()
             .AddRedis($"{redisHost}:{redisPort}", name: HealthCheckNames.Redis)
-            .AddSqlServer(sqlConn, name: HealthCheckNames.SqlServer)
-            // for RabbitMQ is used IConnection from DI
-            .AddRabbitMQ(name: HealthCheckNames.RabbitMq);
+            .AddSqlServer(sqlConn, name: HealthCheckNames.SqlServer);
     }
 }

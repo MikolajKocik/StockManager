@@ -7,8 +7,8 @@ internal static class RedisAndHealthChecksConfiguration
     public static void AddConfigurations(WebApplicationBuilder builder)
     {
         // Redis
-        string redisHost = Environment.GetEnvironmentVariable("redis-host")!;
-        string redisPort = Environment.GetEnvironmentVariable("redis-port")!;
+        string redisHost = builder.Configuration["redis-host"]!;
+        string redisPort = builder.Configuration["redis-port"]!;
 
         builder.Services.AddStackExchangeRedisCache(options =>
         {
@@ -29,7 +29,7 @@ internal static class RedisAndHealthChecksConfiguration
         });
 
         // health checks
-        string sqlConn = Environment.GetEnvironmentVariable("ConnectionStrings-DockerConnection")
+        string sqlConn = builder.Configuration["ConnectionStrings-DockerConnection"]
                       ?? throw new ArgumentException("Empty variable ConnectionStrings-DockerConnection");
 
         builder.Services.AddHealthChecks()

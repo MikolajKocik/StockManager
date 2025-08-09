@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using StockManager.Application.Helpers.NullConfiguration;
+using StockManager.Extensions.WebAppBuilderExtensions.Azure;
 using StockManager.Extensions.WebAppBuilderExtensions.Cors;
 using StockManager.Extensions.WebAppBuilderExtensions.JWT;
 using StockManager.Extensions.WebAppBuilderExtensions.OpenTelemetry;
@@ -60,5 +61,8 @@ public static class PresentationLayer
 
         // Redis & health checks
         RedisAndHealthChecksConfiguration.AddConfigurations(builder);
+
+        // azure key-vault
+        AzureKeyVault.AzureConfigure(builder);
     }
 }

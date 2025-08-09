@@ -13,7 +13,7 @@ internal static class OpenTelemetryConfiguration
     public static void AddOpenTelemetryConfiguration(WebApplicationBuilder builder)
     {
         // otlp debug
-        string otlLogLevel = Environment.GetEnvironmentVariable("OTEL_LOG_LEVEL")
+        string otlLogLevel = Environment.GetEnvironmentVariable("otel-log-level")
             ?? "Information";
 
         builder.Logging.SetMinimumLevel(otlLogLevel.ToLower() switch
@@ -53,7 +53,7 @@ internal static class OpenTelemetryConfiguration
         // azure config
         builder.Services.Configure<AzureMonitorExporterOptions>(a =>
         {
-            a.ConnectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
+            a.ConnectionString = Environment.GetEnvironmentVariable("applicationinsights-connection-string");
         });
 
         builder.Logging.ClearProviders();
@@ -66,8 +66,8 @@ internal static class OpenTelemetryConfiguration
             logging.IncludeFormattedMessage = true;
             logging.ParseStateValues = true;
 
-            string baseUrl = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")!;
-            string headers = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS")!;
+            string baseUrl = Environment.GetEnvironmentVariable("otel-exporter-otlp-endpoint")!;
+            string headers = Environment.GetEnvironmentVariable("otel-exporter-otlp-headers")!;
 
             logging.AddOtlpExporter(opt =>
             {

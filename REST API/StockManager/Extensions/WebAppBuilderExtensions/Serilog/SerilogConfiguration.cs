@@ -13,7 +13,7 @@ internal static class SerilogConfiguration
                 .ReadFrom.Configuration(context.Configuration)
                 .WriteTo.OpenTelemetry(options =>
                 {
-                    options.Endpoint = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT");
+                    options.Endpoint = Environment.GetEnvironmentVariable("otel-exporter-otlp-endpoint");
                     options.Protocol = OtlpProtocol.Grpc;
                     options.ResourceAttributes = new Dictionary<string, object>
                     {

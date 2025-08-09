@@ -8,7 +8,6 @@ public static class AzureKeyVault
     {
         string? kvUri = Environment.GetEnvironmentVariable("KEYVAULT_URI")
             ?? throw new ArgumentException(nameof(kvUri));
-        ;
 
         if(!string.IsNullOrWhiteSpace(kvUri))
         {

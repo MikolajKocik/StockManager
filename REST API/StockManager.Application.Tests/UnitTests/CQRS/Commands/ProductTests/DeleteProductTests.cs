@@ -12,7 +12,6 @@ using Moq;
 using StackExchange.Redis;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
-using StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;

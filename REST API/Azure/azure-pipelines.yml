@@ -1,33 +1,55 @@
 trigger:
 - main
-- develop
+- development
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
 
-# publish report trx in azure pipeline
+# unit tests
 - task: DotNetCoreCLI@2
-  displayName: 'Run unit and integration tests'
+  displayName: 'Run unit tests'
   inputs: 
     command: test
-    projects: '**/*.csproj'
-    arguments: '--logger trx'
+    projects: '**/*Tests/*.csproj'
+    arguments: '--logger trx --filter "Category!=IntegrationTests"'
+    publishTestResults: false
 
-# Unit tests
+# tests
 - task: PublishTestResults@1
   displayName: 'Publish test results'
   inputs:
-    testRunner: VSTest
+    testResultsFormat: VSTest
     testResultsFiles: '**/*.trx'
-    testRunTitle: 'All Test Results'
+    testRunTitle: 'Unit tests results'
     publishRunAttachments: true
 
-# generator report of tests
-- script: dotnet run "../Azure/Scripts/ReportGenerator.csx"
-  displayName: 'Run report generator script'
+# azure login with shell
+- task: AzureCLI@2
+  displayName: 'Login to Azure (OIDC)'
+  inputs: 
+    azureSubscription: 'azure-oidc-conn'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+        echo "logged in."
+
+# integration tests
+- task: DotNetCoreCLI@2
+  displayName: 'Run integration tests (KV)'
+  env:
+    KEYVAULT_URI: 'https://stockmanager-keyvault.vault.azure.net/'
+  inputs:
+    command: test
+    projects: 'StockManager.Tests/StockManager.Tests.csproj'
+    arguments: '--logger trx --filter "Category=IntegrationTests"'
 
 # check sensitive data 
-- script: dotnet run "../Azure/Scripts/CheckSecrets.csx"
+- script: dotnet script Azure/Scripts/CheckSecrets.csx
+  displayName: 'Scan code for obvious secrets'
+  continueOnError: false 
+
+# generate report 
+- script: dotnet script Azure/Scripts/CheckSecrets.csx
   displayName: 'Run script to find sensitive data in code'

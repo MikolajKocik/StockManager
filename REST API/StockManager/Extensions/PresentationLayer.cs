@@ -20,6 +20,9 @@ public static class PresentationLayer
 {
     public static void AddPresentation(this WebApplicationBuilder builder, IServiceCollection services)
     {
+        // azure key-vault
+        AzureKeyVault.AzureConfigure(builder);
+
         // rate limitting
         builder.Services.AddRateLimiter(opts =>
         {
@@ -61,8 +64,5 @@ public static class PresentationLayer
 
         // Redis & health checks
         RedisAndHealthChecksConfiguration.AddConfigurations(builder);
-
-        // azure key-vault
-        AzureKeyVault.AzureConfigure(builder);
     }
 }

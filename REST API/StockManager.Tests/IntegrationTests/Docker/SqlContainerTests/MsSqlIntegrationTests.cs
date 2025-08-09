@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.ComponentModel;
 using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DotNet.Testcontainers.Builders;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
-using Xunit.Sdk;
 
 namespace StockManager.Application.Tests.IntegrationTests.Docker.SqlContainerTests;
+
+[Category("IntegrationTests")]
 public sealed class MsSqlIntegrationTests : IAsyncLifetime
 {
     private readonly MsSqlContainer _db = new MsSqlBuilder().Build();
@@ -69,7 +64,7 @@ public sealed class MsSqlIntegrationTests : IAsyncLifetime
         await using SqlCommand cmd = conn.CreateCommand();
         cmd.CommandText = "SELECT 1";
 
-        IFormatProvider format = default;
+        IFormatProvider format = default!;
         //
         object? scalar = await cmd.ExecuteScalarAsync(cancellationToken.Token);
 

@@ -1,6 +1,6 @@
 ﻿using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
-namespace StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
+namespace TestHelpers.ProductFactory;
 
 /// <summary>
 /// Provides factory methods for creating test instances of <see cref="ProductCreateDto"/>.

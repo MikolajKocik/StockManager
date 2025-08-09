@@ -2,7 +2,7 @@
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 
-namespace StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
+namespace TestHelpers.ProductFactory;
 
 /// <summary>
 /// Provides factory methods for creating test instances of the <see cref="Product"/> class.

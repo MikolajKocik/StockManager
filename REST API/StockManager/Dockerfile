@@ -29,8 +29,16 @@ RUN dotnet build "./StockManager.csproj" -c $BUILD_CONFIGURATION -o /app/build /
 # build application tests
 FROM build AS test
 WORKDIR /src
+
+COPY ./TestHelpers/. ./TestHelpers/
 COPY ./StockManager.Application.Tests/. ./StockManager.Application.Tests/
-RUN dotnet test "StockManager.Application.Tests/StockManager.Application.Tests.csproj" --no-restore --verbosity normal
+COPY ./StockManager.Tests/. ./StockManager.Tests/
+
+RUN dotnet restore "./StockManager.Application.Tests/StockManager.Application.Tests.csproj"
+RUN dotnet restore "./StockManager.Tests/StockManager.Tests.csproj"
+
+RUN dotnet test "./StockManager.Application.Tests/StockManager.Application.Tests.csproj" --no-restore --verbosity normal
+RUN dotnet test "./StockManager.Tests/StockManager.Tests.csproj" --no-restore --verbosity normal
 
 # This stage is used to publish the service design to be copied to the final stages
 FROM build AS publish

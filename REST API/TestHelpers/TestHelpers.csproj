@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StockManager.Application\StockManager.Application.csproj" />
+    <ProjectReference Include="..\StockManager.Core.Domain\StockManager.Core.Domain.csproj" />
+    <ProjectReference Include="..\StockManager.Infrastructure\StockManager.Infrastructure.csproj" />
+    <ProjectReference Include="..\StockManager\StockManager.csproj" />
+  </ItemGroup>
+
+</Project>

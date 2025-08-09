@@ -53,10 +53,12 @@ internal static class OpenTelemetryConfiguration
         // azure config
         builder.Services.Configure<AzureMonitorExporterOptions>(a =>
         {
-            a.ConnectionString = builder.Configuration["applicationinsights-connection-string"];
+            a.ConnectionString = builder.Configuration["applicationinsights-connection-string"]
+                ?? throw new ArgumentException(nameof(a.ConnectionString));
         });
 
         builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
 
         builder.Logging.AddOpenTelemetry(logging =>
         {
@@ -66,8 +68,11 @@ internal static class OpenTelemetryConfiguration
             logging.IncludeFormattedMessage = true;
             logging.ParseStateValues = true;
 
-            string baseUrl = builder.Configuration["otel-exporter-otlp-endpoint"]!;
-            string headers = builder.Configuration["otel-exporter-otlp-headers"]!;
+            string baseUrl = builder.Configuration["otel-exporter-otlp-endpoint"]
+                ?? throw new ArgumentException(nameof(baseUrl));
+
+            string headers = builder.Configuration["otel-exporter-otlp-headers"]
+                ?? throw new ArgumentException(nameof(headers));
 
             logging.AddOtlpExporter(opt =>
             {
@@ -76,6 +81,5 @@ internal static class OpenTelemetryConfiguration
                 opt.Headers = headers;
             });
         });
-
     }
 }

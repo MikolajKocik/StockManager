@@ -20,9 +20,9 @@ namespace StockManager.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void AddInfrastructure(this IServiceCollection services, IConfiguration config)
+    public static void AddInfrastructure(this IServiceCollection services, IConfiguration cfg)
     {
-        string? connectionString = config.GetConnectionString("DockerConnection")
+        string? connectionString = cfg["ConnectionStrings-DockerConnection"]
             ?? throw new ArgumentException("Connection string is empty for local database");
         ArgumentException.ThrowIfNullOrEmpty(connectionString);
 

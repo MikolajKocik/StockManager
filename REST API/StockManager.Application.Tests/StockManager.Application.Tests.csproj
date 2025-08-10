@@ -7,8 +7,6 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" />
     <PackageReference Include="MockQueryable.Moq" />
     <PackageReference Include="Moq" />
-    <PackageReference Include="NSubstitute" />
-    <PackageReference Include="RabbitMQ.Client" />
     <PackageReference Include="StackExchange.Redis" />
     <PackageReference Include="xunit.analyzers">
       <PrivateAssets>all</PrivateAssets>
@@ -16,7 +14,6 @@
     </PackageReference>
     <PackageReference Include="xunit.runner.visualstudio" />
 	<PackageReference Include="Testcontainers.MsSql" />
-	<PackageReference Include="Testcontainers.RabbitMq" />
 	<PackageReference Include="Testcontainers.Redis" />
 	<PackageReference Include="xunit.v3" />
   </ItemGroup>
@@ -24,6 +21,10 @@
   <!-- Dependencies -->
   <ItemGroup>
     <ProjectReference Include="..\StockManager.Application\StockManager.Application.csproj" />
+    <ProjectReference Include="..\StockManager.Core.Domain\StockManager.Core.Domain.csproj" />
+    <ProjectReference Include="..\StockManager.Infrastructure\StockManager.Infrastructure.csproj" />
+    <ProjectReference Include="..\StockManager\StockManager.csproj" />
+	<ProjectReference Include="..\TestHelpers\TestHelpers.csproj" />
   </ItemGroup>
 
   <ItemGroup>

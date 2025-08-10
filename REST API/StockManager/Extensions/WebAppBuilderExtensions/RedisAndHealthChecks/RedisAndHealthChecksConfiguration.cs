@@ -7,8 +7,8 @@ internal static class RedisAndHealthChecksConfiguration
     public static void AddConfigurations(WebApplicationBuilder builder)
     {
         // Redis
-        string redisHost = Environment.GetEnvironmentVariable("REDIS_HOST")!;
-        string redisPort = Environment.GetEnvironmentVariable("REDIS_PORT")!;
+        string redisHost = builder.Configuration["redis-host"]!;
+        string redisPort = builder.Configuration["redis-port"]!;
 
         builder.Services.AddStackExchangeRedisCache(options =>
         {
@@ -29,13 +29,11 @@ internal static class RedisAndHealthChecksConfiguration
         });
 
         // health checks
-        string sqlConn = Environment.GetEnvironmentVariable("ConnectionStrings__DockerConnection")
-                      ?? throw new ArgumentException("Empty variable ConnectionStrings__DockerConnection");
+        string sqlConn = builder.Configuration["ConnectionStrings-DockerConnection"]
+                      ?? throw new ArgumentException("Empty variable ConnectionStrings-DockerConnection");
 
         builder.Services.AddHealthChecks()
             .AddRedis($"{redisHost}:{redisPort}", name: HealthCheckNames.Redis)
-            .AddSqlServer(sqlConn, name: HealthCheckNames.SqlServer)
-            // for RabbitMQ is used IConnection from DI
-            .AddRabbitMQ(name: HealthCheckNames.RabbitMq);
+            .AddSqlServer(sqlConn, name: HealthCheckNames.SqlServer);
     }
 }

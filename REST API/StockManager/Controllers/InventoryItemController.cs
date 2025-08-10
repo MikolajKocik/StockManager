@@ -85,7 +85,7 @@ public sealed class InventoryItemController : ControllerBase
 
         return Ok(new InventoryItemsDtoCollection
         {
-            Data = result.Value!
+            Data = result.Value!.ToList().AsReadOnly()
         });
     }
 

@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Product;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.ResultPattern;
@@ -24,19 +22,16 @@ public sealed class DeleteInventoryItemCommandHandler : ICommandHandler<DeleteIn
     private readonly IInventoryItemRepository _repository;
     private readonly ILogger<DeleteInventoryItemCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IEventBus _eventBus;
 
     public DeleteInventoryItemCommandHandler(
         IInventoryItemRepository repository,
         ILogger<DeleteInventoryItemCommandHandler> logger,
-        IConnectionMultiplexer redis,
-        IEventBus eventBus
+        IConnectionMultiplexer redis
         )
     {
         _repository = repository;
         _logger = logger;
         _redis = redis;
-        _eventBus = eventBus;
     }
 
     public async Task<Result<Unit>> Handle(DeleteInventoryItemCommand command, CancellationToken cancellationToken)
@@ -65,11 +60,6 @@ public sealed class DeleteInventoryItemCommandHandler : ICommandHandler<DeleteIn
             await _redis.RemoveKeyAsync(
                 $"inventory-item:{command.Id}:views")
                 .ConfigureAwait(false);
-
-            await _eventBus.PublishAsync(
-                new ProductDeletedIntegrationEvent(
-                command.Id)
-                ).ConfigureAwait(false);
 
             InventoryItemLogInfo.LogInventoryItemDeletedSuccess(_logger, command.Id, default);
             return Result<Unit>.Success(Unit.Value);

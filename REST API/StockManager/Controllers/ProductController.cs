@@ -72,7 +72,7 @@ public sealed class ProductController : ControllerBase
 
         return Ok(new ProductDtoCollection 
         { 
-            Data = result.Value! 
+            Data = result.Value!.ToList().AsReadOnly()
         });
     }
 

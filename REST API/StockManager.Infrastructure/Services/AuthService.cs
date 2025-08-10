@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -19,11 +20,17 @@ public class AuthService : IAuthService
 {
     private readonly ILogger<AuthService> _logger;
     private readonly UserManager<User> _userManager;
+    private readonly IConfiguration _configuration;
 
-    public AuthService(ILogger<AuthService> logger, UserManager<User> userManager)
+    public AuthService(
+        ILogger<AuthService> logger,
+        UserManager<User> userManager,
+        IConfiguration configuration
+        )
     {
         _logger = logger;
         _userManager = userManager;
+        _configuration = configuration;
     }
 
     public async Task<Result<RegisterDto>> RegisterUser(RegisterDto register)
@@ -82,9 +89,9 @@ public class AuthService : IAuthService
 
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        byte[] key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT__Key")!);
-        string? issuer = Environment.GetEnvironmentVariable("JWT__Issuer")!;
-        string? audience = Environment.GetEnvironmentVariable("JWT__Audience")!;
+        byte[] key = Encoding.UTF8.GetBytes(_configuration["jwt-key"]!);
+        string? issuer = _configuration["jwt-issuer"]!;
+        string? audience = _configuration["jwt-audience"]!;
 
         NullCheck.IsConfigured(key, issuer, audience);
 

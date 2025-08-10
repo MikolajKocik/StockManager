@@ -1,5 +1,6 @@
 ﻿namespace StockManager.Application.Dtos.ModelsDto.ShipmentDtos;
-public sealed class ShipmentDtoCollection
+public sealed record ShipmentDtoCollection
 {
-    public IEnumerable<ShipmentDto> Data { get; set; }
+    public required IReadOnlyCollection<ShipmentDto> Data { get; init; } 
+        = Array.Empty<ShipmentDto>();
 }

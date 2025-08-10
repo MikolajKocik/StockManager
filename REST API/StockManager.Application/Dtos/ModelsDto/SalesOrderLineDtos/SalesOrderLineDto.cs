@@ -9,7 +9,7 @@ public sealed record SalesOrderLineDto
     public int ProductId { get; init; }
     public string? ProductName { get; init; }
     public decimal Quantity { get; init; }
-    public string UoM { get; init; }
+    public required string UoM { get; init; }
     public decimal UnitPrice { get; init; }
     public decimal LineTotal { get; init; }
 }

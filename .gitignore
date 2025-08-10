@@ -5,6 +5,7 @@
 
 # env file
 **/.env
+!**/.env_template
 
 # User-specific files
 *.rsuser

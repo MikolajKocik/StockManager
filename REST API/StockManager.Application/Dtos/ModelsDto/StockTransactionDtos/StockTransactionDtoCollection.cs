@@ -1,7 +1,8 @@
 ﻿using StockManager.Application.Dtos.ModelsDto.StockTransactionDtos;
 
 namespace StockManager.Controllers;
-public sealed class StockTransactionDtoCollection
+public sealed record StockTransactionDtoCollection
 {
-    public IEnumerable<StockTransactionDto> Data { get; set; }
+    public required IReadOnlyCollection<StockTransactionDto> Data { get; init; }
+        = Array.Empty<StockTransactionDto>();
 }

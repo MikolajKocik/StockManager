@@ -1,33 +1,84 @@
 trigger:
 - main
-- develop
+- development
 
 pool:
   vmImage: ubuntu-latest
 
 steps:
 
-# publish report trx in azure pipeline
+# unit tests
 - task: DotNetCoreCLI@2
-  displayName: 'Run unit and integration tests'
+  displayName: Run unit tests
   inputs: 
     command: test
-    projects: '**/*.csproj'
-    arguments: '--logger trx'
+    projects: '**/*Tests/*.csproj'
+    arguments: '--logger trx --filter "Category!=IntegrationTests"'
+    publishTestResults: false
 
-# Unit tests
 - task: PublishTestResults@1
-  displayName: 'Publish test results'
+  displayName: Publish unit test results
   inputs:
-    testRunner: VSTest
+    testResultsFormat: VSTest
     testResultsFiles: '**/*.trx'
-    testRunTitle: 'All Test Results'
+    testRunTitle: 'Unit Tests'
     publishRunAttachments: true
 
-# generator report of tests
-- script: dotnet run "../Azure/Scripts/ReportGenerator.csx"
-  displayName: 'Run report generator script'
+# azure login with shell
+- task: AzureCLI@2
+  displayName: Login to Azure (OIDC)
+  inputs: 
+    azureSubscription: '$(AZ_SC)'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+       az account show -o table
+
+# integration tests
+- task: DotNetCoreCLI@2
+  displayName: Run integration tests (KV)
+  env:
+    KEYVAULT_URI: '$(KEYVAULT_URI)'
+  inputs:
+    command: test
+    projects: 'StockManager.Tests/StockManager.Tests.csproj'
+    arguments: '--logger trx --filter "Category=IntegrationTests"'
+    publishTestResults: false
+
+- task: PublishTestResults@1
+  displayName: Publish integration test results
+  inputs:
+    testResultsFormat: VSTest
+    testResultsFiles: '**/*.trx'
+    testRunTitle: 'Integration Tests'
+    publishRunAttachments: true
 
 # check sensitive data 
-- script: dotnet run "../Azure/Scripts/CheckSecrets.csx"
-  displayName: 'Run script to find sensitive data in code'
+- script: dotnet script Azure/Scripts/CheckSecrets.csx
+  displayName: 'Scan code for obvious secrets'
+  continueOnError: false 
+
+# build & push image
+- task: Docker@2
+  displayName: Build & push image
+  inputs:
+    containerRegistry: '$(ACR_SC)' 
+    repository: '$(REPOSITORY)'
+    command: 'buildAndPush'
+    Dockerfile: 'StockManager/Dockerfile'
+    tags: |
+      $(IMAGE_TAG)
+      latest
+
+# deploy to ACA
+- task: AzureCLI@2
+  displayName: Deploy to Azure Container Apps
+  inputs:
+    azureSubscription: '$(AZ_SC)'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      az containerapp update \
+        --name $(APP_NAME) \
+        --resource-group $(RG) \
+        --image $(REGISTRY)/$(REPOSITORY):$(IMAGE_TAG)

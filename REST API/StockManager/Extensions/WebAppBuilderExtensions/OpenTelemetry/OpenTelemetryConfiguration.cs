@@ -1,5 +1,6 @@
 ﻿using Azure.Monitor.OpenTelemetry.Exporter;
 using Grafana.OpenTelemetry;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -13,7 +14,7 @@ internal static class OpenTelemetryConfiguration
     public static void AddOpenTelemetryConfiguration(WebApplicationBuilder builder)
     {
         // otlp debug
-        string otlLogLevel = Environment.GetEnvironmentVariable("OTEL_LOG_LEVEL")
+        string otlLogLevel = builder.Configuration["otel-log-level"]
             ?? "Information";
 
         builder.Logging.SetMinimumLevel(otlLogLevel.ToLower() switch
@@ -40,23 +41,16 @@ internal static class OpenTelemetryConfiguration
             .WithTracing(t =>
             {
                 t.UseGrafana()
-                .AddConsoleExporter()
-                .AddAzureMonitorTraceExporter();
+                .AddConsoleExporter();
             })
             .WithMetrics(m =>
             {
                 m.UseGrafana()
-                .AddConsoleExporter()
-                .AddAzureMonitorMetricExporter();
+                .AddConsoleExporter();
             });
 
-        // azure config
-        builder.Services.Configure<AzureMonitorExporterOptions>(a =>
-        {
-            a.ConnectionString = Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING");
-        });
-
         builder.Logging.ClearProviders();
+        builder.Logging.AddConsole();
 
         builder.Logging.AddOpenTelemetry(logging =>
         {
@@ -66,8 +60,11 @@ internal static class OpenTelemetryConfiguration
             logging.IncludeFormattedMessage = true;
             logging.ParseStateValues = true;
 
-            string baseUrl = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_ENDPOINT")!;
-            string headers = Environment.GetEnvironmentVariable("OTEL_EXPORTER_OTLP_HEADERS")!;
+            string baseUrl = builder.Configuration["otel-exporter-otlp-endpoint"]
+                ?? throw new ArgumentException(nameof(baseUrl));
+
+            string headers = builder.Configuration["otel-exporter-otlp-headers"]
+                ?? throw new ArgumentException(nameof(headers));
 
             logging.AddOtlpExporter(opt =>
             {
@@ -76,6 +73,5 @@ internal static class OpenTelemetryConfiguration
                 opt.Headers = headers;
             });
         });
-
     }
 }

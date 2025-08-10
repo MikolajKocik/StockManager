@@ -6,8 +6,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Product;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.PipelineBehavior;
@@ -28,21 +26,18 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
     private readonly IProductRepository _repository;
     private readonly ILogger<DeleteProductCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IEventBus _eventBus;
     private readonly IProductService _service;
 
     public DeleteProductCommandHandler(
         IProductRepository repository,
         ILogger<DeleteProductCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus,
         IProductService service
         )
     {
         _repository = repository;
         _logger = logger;
         _redis = redis;
-        _eventBus = eventBus;
         _service = service;
     }
 
@@ -68,10 +63,6 @@ public class DeleteProductCommandHandler : ICommandHandler<DeleteProductCommand,
                 await _redis.RemoveKeyAsync(
                     $"product:{product.Id}:views")
                     .ConfigureAwait(false);
-
-                await _eventBus.PublishAsync(new ProductDeletedIntegrationEvent(
-                    command.Id)
-                    ).ConfigureAwait(false);
 
                 return Result<Unit>.Success(Unit.Value);
             }

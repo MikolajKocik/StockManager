@@ -4,5 +4,5 @@ namespace StockManager.Application.Dtos.ModelsDto.RoleDtos;
 
 public sealed record RoleCreateDto
 {
-    public string Name { get; init; }
+    public required string Name { get; init; }
 }

@@ -5,8 +5,6 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Supplier;
 using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Application.Common.ResultPattern;
@@ -27,7 +25,6 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
     private readonly IMapper _mapper;
     private readonly ILogger<EditSupplierCommandHandler> _logger;
     private readonly IConnectionMultiplexer _redis;
-    private readonly IEventBus _eventBus;
     private readonly ISupplierService _supplierService;
 
     public EditSupplierCommandHandler(
@@ -35,7 +32,6 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
         IMapper mapper,
         ILogger<EditSupplierCommandHandler> logger,
         IConnectionMultiplexer redis,
-        IEventBus eventBus,
         ISupplierService supplierService
         )
     {
@@ -43,7 +39,6 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
         _mapper = mapper;
         _logger = logger;
         _redis = redis;
-        _eventBus = eventBus;
         _supplierService = supplierService;
     }
 
@@ -66,13 +61,6 @@ public sealed class EditSupplierCommandHandler : ICommandHandler<EditSupplierCom
                 await _redis.RemoveKeyAsync(
                     $"supplier:{command.Id}:details")
                     .ConfigureAwait(false);
-
-                await _eventBus.PublishAsync(new SupplierUpdatedIntegrationEvent(
-                    supplierModified.Id,
-                    supplierModified.Name,
-                    supplierModified.Address,
-                    supplierModified.AddressId)
-                    ).ConfigureAwait(false);
 
                 return Result<SupplierDto>.Success(supplierModified);
 

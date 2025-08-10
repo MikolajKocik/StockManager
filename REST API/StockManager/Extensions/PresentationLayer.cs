@@ -2,16 +2,12 @@
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Models;
-using Serilog;
 using StockManager.Application.Helpers.NullConfiguration;
+using StockManager.Extensions.WebAppBuilderExtensions.Azure;
 using StockManager.Extensions.WebAppBuilderExtensions.Cors;
 using StockManager.Extensions.WebAppBuilderExtensions.JWT;
 using StockManager.Extensions.WebAppBuilderExtensions.OpenTelemetry;
-using StockManager.Extensions.WebAppBuilderExtensions.RabbitMQ;
 using StockManager.Extensions.WebAppBuilderExtensions.RedisAndHealthChecks;
 using StockManager.Extensions.WebAppBuilderExtensions.Serilog;
 using StockManager.Extensions.WebAppBuilderExtensions.Services;
@@ -22,9 +18,12 @@ namespace StockManager.Extensions;
 
 public static class PresentationLayer
 {
-    public static void AddPresentation(this WebApplicationBuilder builder, IServiceCollection services)
+    public static void AddPresentation(this WebApplicationBuilder builder)
     {
-        // rate limitting
+        // Azure key-vault
+        AzureKeyVault.AzureConfigure(builder);
+
+        // Rate limitting
         builder.Services.AddRateLimiter(opts =>
         {
             opts.AddFixedWindowLimiter("fixed", opt =>
@@ -50,21 +49,21 @@ public static class PresentationLayer
         JsonWebTokenConfig.AddJWT(builder);
 
         // Services - cqrs, domain
-        ServiceRegistration.AddServices(services);
+        ServiceRegistration.AddServices(builder.Services);
 
         builder.Services
             .AddControllers()
             .AddJsonOptions(opts =>
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-        //serilog
+        // Serilog
         SerilogConfiguration.AddSerilogConfiguration(builder);
+
+        // Azure application-insights
+        ApplicationInsightConfiguration.ConfigureApplicationInsight(builder);
 
         // OpenTelemetry
         OpenTelemetryConfiguration.AddOpenTelemetryConfiguration(builder);
-
-        // RabbitMq
-        RabbitMqConfiguration.AddRabbitMqConfiguration(builder);
 
         // Redis & health checks
         RedisAndHealthChecksConfiguration.AddConfigurations(builder);

@@ -10,30 +10,26 @@ using MediatR;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using StackExchange.Redis;
-using StockManager.Application.Common.Events;
-using StockManager.Application.Common.Events.Product;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
-using StockManager.Application.Tests.UnitTests.TestHelpers.ProductFactory;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
 using Testcontainers.Redis;
+using TestHelpers.ProductFactory;
 
 namespace StockManager.Application.Tests.UnitTests.CQRS.Commands.ProductTests;
 public sealed class DeleteProductTests
 {
     private readonly Mock<IProductRepository> _repository;
     private readonly Mock<IConnectionMultiplexer> _redis;
-    private readonly Mock<IEventBus> _eventBus;
     private readonly Mock<IProductService> _service;
 
     public DeleteProductTests()
     {
-        _redis = new Mock<IConnectionMultiplexer>();
-        _eventBus = new Mock<IEventBus>();
         _service = new Mock<IProductService>();
         _repository = new Mock<IProductRepository>();
+        _redis = new Mock<IConnectionMultiplexer>(); 
     }
 
     /// <summary>
@@ -69,16 +65,12 @@ public sealed class DeleteProductTests
             .Setup(d => d.KeyDeleteAsync(It.IsAny<RedisKey>(), It.IsAny<CommandFlags>()))
             .ReturnsAsync(true);
 
-        _eventBus
-            .Setup(e => e.PublishAsync(It.IsAny<ProductDeletedIntegrationEvent>()))
-            .Returns(Task.CompletedTask);
-
         var handler = new DeleteProductCommandHandler(
             _repository.Object,
             logger,
             _redis.Object,
-            _eventBus.Object,
-            _service.Object);
+            _service.Object
+            );
 
         var command = new DeleteProductCommand(1);
 

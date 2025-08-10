@@ -8,5 +8,6 @@ using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 namespace StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 public sealed record InventoryItemsDtoCollection
 {
-    public required IEnumerable<InventoryItemDto> Data { get; init; }
+    public required IReadOnlyCollection<InventoryItemDto> Data { get; init; } 
+        = Array.Empty<InventoryItemDto>();
 }

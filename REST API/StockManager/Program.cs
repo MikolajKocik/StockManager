@@ -14,8 +14,8 @@ using StockManager.Middlewares;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.AddPresentation(builder.Services);
-builder.Services.AddInfrastructure(builder.Configuration);
+builder.AddPresentation();
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddApplication(builder.Configuration);
 
 WebApplication app = builder.Build();
@@ -54,6 +54,15 @@ app.MapControllers();
 app.MapHealthChecks("/health", new HealthCheckOptions
 {
     ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+});
+
+// check secret from azure key vault
+app.MapGet("/dbdev-check", (IConfiguration cfg) =>
+{
+    string conn = cfg["ConnectionStrings-DockerConnection"];
+    return string.IsNullOrEmpty(conn)
+        ? Results.NotFound($"Empty secret {nameof(conn)}")
+        : Results.Ok($"Conn length: {conn.Length}");
 });
 
 await app.RunAsync();

@@ -1,5 +1,6 @@
 ﻿using Azure.Monitor.OpenTelemetry.Exporter;
 using Grafana.OpenTelemetry;
+using Microsoft.Extensions.Logging.ApplicationInsights;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
@@ -40,22 +41,13 @@ internal static class OpenTelemetryConfiguration
             .WithTracing(t =>
             {
                 t.UseGrafana()
-                .AddConsoleExporter()
-                .AddAzureMonitorTraceExporter();
+                .AddConsoleExporter();
             })
             .WithMetrics(m =>
             {
                 m.UseGrafana()
-                .AddConsoleExporter()
-                .AddAzureMonitorMetricExporter();
+                .AddConsoleExporter();
             });
-
-        // azure config
-        builder.Services.Configure<AzureMonitorExporterOptions>(a =>
-        {
-            a.ConnectionString = builder.Configuration["applicationinsights-connection-string"]
-                ?? throw new ArgumentException(nameof(a.ConnectionString));
-        });
 
         builder.Logging.ClearProviders();
         builder.Logging.AddConsole();

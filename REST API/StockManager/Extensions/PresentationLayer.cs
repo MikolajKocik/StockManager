@@ -20,10 +20,10 @@ public static class PresentationLayer
 {
     public static void AddPresentation(this WebApplicationBuilder builder, IServiceCollection services)
     {
-        // azure key-vault
+        // Azure key-vault
         AzureKeyVault.AzureConfigure(builder);
 
-        // rate limitting
+        // Rate limitting
         builder.Services.AddRateLimiter(opts =>
         {
             opts.AddFixedWindowLimiter("fixed", opt =>
@@ -56,8 +56,11 @@ public static class PresentationLayer
             .AddJsonOptions(opts =>
                 opts.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
-        //serilog
+        // Serilog
         SerilogConfiguration.AddSerilogConfiguration(builder);
+
+        // Azure application-insights
+        ApplicationInsightConfiguration.ConfigureApplicationInsight(builder);
 
         // OpenTelemetry
         OpenTelemetryConfiguration.AddOpenTelemetryConfiguration(builder);

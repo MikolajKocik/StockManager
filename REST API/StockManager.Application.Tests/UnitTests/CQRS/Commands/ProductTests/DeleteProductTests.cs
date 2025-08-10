@@ -16,6 +16,7 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
 using Testcontainers.Redis;
+using TestHelpers.ProductFactory;
 
 namespace StockManager.Application.Tests.UnitTests.CQRS.Commands.ProductTests;
 public sealed class DeleteProductTests

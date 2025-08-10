@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using StockManager.Application.Configurations;
 using StockManager.Application.Services;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -20,16 +21,35 @@ namespace StockManager.Infrastructure.Extensions;
 
 public static class ServiceCollectionExtension
 {
-    public static void AddInfrastructure(this IServiceCollection services, IConfiguration cfg)
+    public static void AddInfrastructure(this IServiceCollection services, IConfiguration cfg, IHostEnvironment env)
     {
-        string? connectionString = cfg["ConnectionStrings-DockerConnection"]
-            ?? throw new ArgumentException("Connection string is empty for local database");
-        ArgumentException.ThrowIfNullOrEmpty(connectionString);
+        string? connectionString; 
 
-        services.AddDbContext<StockManagerDbContext>(options =>
-            options
-                .UseSqlServer(connectionString)
-                .EnableSensitiveDataLogging());
+        if (env.IsDevelopment())
+        {
+            connectionString = cfg["ConnectionStrings-DockerConnection"]
+                ?? throw new ArgumentException("Connection string is empty for local database");
+            ArgumentException.ThrowIfNullOrEmpty(connectionString);
+
+            services.AddDbContext<StockManagerDbContext>(options =>
+                options
+                    .UseSqlServer(connectionString)
+                    .EnableSensitiveDataLogging());
+        }
+        else
+        {
+            connectionString = cfg["ConnectionStrings-DefaultConnection"]
+                ?? throw new ArgumentException("Connection string is empty for azure database");
+            ArgumentException.ThrowIfNullOrEmpty(connectionString);
+
+            services.AddDbContext<StockManagerDbContext>(options =>
+                options.UseSqlServer(connectionString, sql =>
+                {
+                    sql.UseAzureSqlDefaults();
+                    sql.CommandTimeout(60);
+                    sql.EnableRetryOnFailure();
+                }));
+        }
 
         services.AddIdentityApiEndpoints<User>()
             .AddRoles<IdentityRole>()
@@ -43,7 +63,7 @@ public static class ServiceCollectionExtension
         services.Scan(s =>
         {
             s.FromAssemblies(infrastructureAssembly)
-                .AddClasses(c => c.Where(t => t.Name.EndsWith("Repository", StringComparison.OrdinalIgnoreCase))) 
+                .AddClasses(c => c.Where(t => t.Name.EndsWith("Repository", StringComparison.OrdinalIgnoreCase)))
                 .AsImplementedInterfaces()
                 .WithScopedLifetime();
         });

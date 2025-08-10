@@ -71,6 +71,7 @@ public class ProductMappingProfile : Profile
                 Name = src.Name,
                 Genre = src.Genre,
                 Unit = src.Unit,
+                Slug = src.Name.Trim().ToLowerInvariant().Replace(" ", "-"),
                 Type = src.Type,
                 BatchNumber = src.BatchNumber,
                 SupplierId = src.SupplierId,

@@ -67,7 +67,7 @@ public class ShipmentController : ControllerBase
 
         return Ok(new ShipmentDtoCollection 
         {
-            Data = result.Value! 
+            Data = result.Value!.ToList().AsReadOnly()
         });
     }
 

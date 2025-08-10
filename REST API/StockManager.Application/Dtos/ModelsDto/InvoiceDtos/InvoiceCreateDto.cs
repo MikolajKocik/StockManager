@@ -4,7 +4,7 @@ namespace StockManager.Application.Dtos.ModelsDto.InvoiceDtos;
 
 public sealed record InvoiceCreateDto
 {
-    public string Type { get; init; }
+    public required string Type { get; init; }
     public DateTime InvoiceDate { get; init; }
     public decimal TotalAmount { get; init; }
     public DateTime? DueDate { get; init; }

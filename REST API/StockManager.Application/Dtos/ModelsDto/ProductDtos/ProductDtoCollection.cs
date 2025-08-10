@@ -2,5 +2,6 @@
 
 public sealed record ProductDtoCollection
 {
-    public required IEnumerable<ProductDto> Data { get; init; }
+    public required IReadOnlyCollection<ProductDto> Data { get; init; }
+        = Array.Empty<ProductDto>();
 }

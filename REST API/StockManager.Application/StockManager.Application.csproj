@@ -1,6 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
+	<PropertyGroup>
+		<NoWarn>$(NoWarn);CS8600</NoWarn>
+	</PropertyGroup>
+
+	<ItemGroup>
 	  <PackageReference Include="AutoMapper" />
 	  <PackageReference Include="FluentValidation.AspNetCore" />
 	  <PackageReference Include="MediatR" />

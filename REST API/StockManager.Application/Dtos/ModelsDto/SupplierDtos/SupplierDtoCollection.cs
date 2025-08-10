@@ -2,6 +2,7 @@
 
 public sealed record SupplierDtoCollection
 {
-    public required IEnumerable<SupplierDto> Data { get; init; }
+    public required IReadOnlyCollection<SupplierDto> Data { get; init; }
+        = Array.Empty<SupplierDto>();
 }
 

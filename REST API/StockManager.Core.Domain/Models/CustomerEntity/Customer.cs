@@ -71,7 +71,7 @@ public sealed class Customer : Entity<int>
 
     private static void IsValidEmail(string email)
     {
-        if (!email.Contains('@'))
+        if (!email.Contains('@', StringComparison.Ordinal) || !email.Contains('.', StringComparison.Ordinal))
         {
             throw new ArgumentException("E‑mail bad format");
         }

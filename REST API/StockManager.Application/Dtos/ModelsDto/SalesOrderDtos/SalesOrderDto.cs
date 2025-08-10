@@ -11,7 +11,7 @@ public sealed record SalesOrderDto
     public DateTime? ShipDate { get; init; }
     public DateTime? DeliveredDate { get; init; }
     public DateTime? CancelDate { get; init; }
-    public string Status { get; init; }
+    public required string Status { get; init; }
     public int InvoiceId { get; init; }
     public int? ReturnOrderId { get; init; }
 }

@@ -63,7 +63,7 @@ public sealed class StockTransactionController : ControllerBase
 
         return Ok(new StockTransactionDtoCollection 
         { 
-            Data = result.Value! 
+            Data = result.Value!.ToList().AsReadOnly()
         });
     }
 

@@ -51,7 +51,7 @@ public sealed class SupplierController : ControllerBase
 
         return Ok(new SupplierDtoCollection
         {
-            Data = result.Value!
+            Data = result.Value!.ToList().AsReadOnly()
         });
     }
 

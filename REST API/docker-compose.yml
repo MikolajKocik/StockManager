@@ -10,7 +10,11 @@ services:
       - "5000:8080"
       - "5001:8081"
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      ASPNETCORE_ENVIRONMENT: Development
+      AZURE_TENANT_ID: ${AZURE_TENANT_ID}
+      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
+      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
+      KEYVAULT_URI: ${KEYVAULT_URI}
     depends_on:
         redis:
             condition: service_healthy

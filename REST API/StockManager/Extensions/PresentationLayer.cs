@@ -18,7 +18,7 @@ namespace StockManager.Extensions;
 
 public static class PresentationLayer
 {
-    public static void AddPresentation(this WebApplicationBuilder builder, IServiceCollection services)
+    public static void AddPresentation(this WebApplicationBuilder builder)
     {
         // Azure key-vault
         AzureKeyVault.AzureConfigure(builder);
@@ -49,7 +49,7 @@ public static class PresentationLayer
         JsonWebTokenConfig.AddJWT(builder);
 
         // Services - cqrs, domain
-        ServiceRegistration.AddServices(services);
+        ServiceRegistration.AddServices(builder.Services);
 
         builder.Services
             .AddControllers()

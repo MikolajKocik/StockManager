@@ -6,8 +6,7 @@ public static class AzureKeyVault
 {
     public static void AzureConfigure(this WebApplicationBuilder builder)
     {
-        string? kvUri = Environment.GetEnvironmentVariable("KEYVAULT_URI")
-            ?? throw new ArgumentException(nameof(kvUri));
+        string? kvUri = Environment.GetEnvironmentVariable("KEYVAULT_URI");
 
         if(!string.IsNullOrWhiteSpace(kvUri))
         {

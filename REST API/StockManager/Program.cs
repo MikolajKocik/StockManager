@@ -14,7 +14,7 @@ using StockManager.Middlewares;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.AddPresentation(builder.Services);
+builder.AddPresentation();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddApplication(builder.Configuration);
 

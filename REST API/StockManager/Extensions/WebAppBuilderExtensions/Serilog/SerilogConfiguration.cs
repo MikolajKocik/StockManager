@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using System.Globalization;
+using Serilog;
 using Serilog.Sinks.OpenTelemetry;
 
 namespace StockManager.Extensions.WebAppBuilderExtensions.Serilog;
@@ -9,18 +10,28 @@ internal static class SerilogConfiguration
     {
         builder.Host.UseSerilog((context, configuration) =>
         {
-            configuration
-                .ReadFrom.Configuration(context.Configuration)
-                .WriteTo.OpenTelemetry(options =>
-                {
-                    options.Endpoint = builder.Configuration["otel-exporter-otlp-endpoint"];
-                    options.Protocol = OtlpProtocol.Grpc;
-                    options.ResourceAttributes = new Dictionary<string, object>
+            if (builder.Environment.IsDevelopment())
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .WriteTo.Console();
+
+            }
+            else
+            {
+                configuration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .WriteTo.OpenTelemetry(options =>
                     {
-                        ["service.name"] = "StockManager",
-                        ["deployment.environment"] = "production"
-                    };
-                });
-        });   
+                        options.Endpoint = builder.Configuration["otel-exporter-otlp-endpoint"];
+                        options.Protocol = OtlpProtocol.Grpc;
+                        options.ResourceAttributes = new Dictionary<string, object>
+                        {
+                            ["service.name"] = "StockManager",
+                            ["deployment.environment"] = "production"
+                        };
+                    });
+            }
+        });
     }
 }

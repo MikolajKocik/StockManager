@@ -8,7 +8,7 @@ internal static class RedisAndHealthChecksConfiguration
     {  
         if (builder.Environment.IsDevelopment())
         {
-            string? sqlConn = builder.Configuration["ConnectionStrings-DockerConnection"];
+            string? sqlConn = builder.Configuration.GetConnectionString("DockerConnection");
                  
             if(!string.IsNullOrWhiteSpace(sqlConn))
             {
@@ -16,8 +16,8 @@ internal static class RedisAndHealthChecksConfiguration
                     .AddSqlServer(sqlConn, name: HealthCheckNames.SqlServer);
             }
 
-            string? redisHost = builder.Configuration["redis-host"];
-            string? redisPort = builder.Configuration["redis-port"];
+            string? redisHost = builder.Configuration["Redis:Host"];
+            string? redisPort = builder.Configuration["Redis:Port"];
 
             if (!string.IsNullOrWhiteSpace(redisHost) && !string.IsNullOrWhiteSpace(redisPort))
             {

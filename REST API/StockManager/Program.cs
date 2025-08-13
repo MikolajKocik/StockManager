@@ -16,10 +16,24 @@ using StockManager.Middlewares;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.AddPresentation();
+bool runMigrations = builder.Configuration.GetValue("RUN_MIGRATIONS", true);
+
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddApplication(builder.Configuration);
 
 WebApplication app = builder.Build();
+
+if (runMigrations)
+{
+    try
+    {
+        await app.AddAutomateMigrations();
+    }
+    catch (Exception ex)
+    {
+        Log.Error(ex, "Migrations failed on startup – skipping in Production");
+    }
+}
 
 // rate limit middleware
 app.UseRateLimiter();
@@ -34,6 +48,11 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
+    });
+
     app.UseHsts();
     app.UseHttpsRedirection();
 }
@@ -62,7 +81,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 // check secret from azure key vault
 app.MapGet("/dbdev-check", (IConfiguration cfg) =>
 {
-    string conn = cfg.GetConnectionString("DockerConnection");
+    string conn = cfg.GetConnectionString("DefaultConnection");
     return string.IsNullOrEmpty(conn)
         ? Results.NotFound($"Empty secret {nameof(conn)}")
         : Results.Ok($"Conn length: {conn.Length}");

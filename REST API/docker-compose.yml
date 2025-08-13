@@ -8,12 +8,19 @@ services:
       target: final
     ports:
       - "5000:8080"
+    env_file: .env
     environment:
       ASPNETCORE_ENVIRONMENT: Development
-      AZURE_TENANT_ID: ${AZURE_TENANT_ID}
-      AZURE_CLIENT_ID: ${AZURE_CLIENT_ID}
-      AZURE_CLIENT_SECRET: ${AZURE_CLIENT_SECRET}
-      KEYVAULT_URI: ${KEYVAULT_URI}
+      ASPNETCORE_URLS: "http://+:8080"
+      ConnectionStrings__DockerConnection: "${ConnectionStrings__DockerConnection}"
+      JWT__Key: "${JWT__KEY}"
+      JWT__Issuer: "${JWT__ISSUER}"
+      JWT__Audience: "${JWT__AUDIENCE}"
+      Redis__Host: "${REDIS__HOST}"
+      Redis__Port: "${REDIS__PORT}"
+      OTEL_TRACES_EXPORTER: "${OTEL_TRACES_EXPORTER:-none}"
+      OTEL_METRICS_EXPORTER: "${OTEL_METRICS_EXPORTER:-none}"
+      OTEL_LOGS_EXPORTER: "${OTEL_LOGS_EXPORTER:-none}"
     depends_on:
         redis:
             condition: service_healthy
@@ -27,8 +34,8 @@ services:
     container_name: stockmanager-sql
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
-        SA_PASSWORD: ${MSSQL_SA_PASSWORD}
-        ACCEPT_EULA: "Y"
+     MSSQL_SA_PASSWORD: "${MSSQL_SA_PASSWORD}" 
+     ACCEPT_EULA: "Y"
     ports:
       - "1433:1433"
     volumes:

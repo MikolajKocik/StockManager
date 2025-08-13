@@ -34,13 +34,8 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseForwardedHeaders(new ForwardedHeadersOptions
-    {
-        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
-    });
-
-    app.UseHttpsRedirection();
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 //serilog commands
 app.UseSerilogRequestLogging();
@@ -67,7 +62,7 @@ app.MapHealthChecks("/health", new HealthCheckOptions
 // check secret from azure key vault
 app.MapGet("/dbdev-check", (IConfiguration cfg) =>
 {
-    string conn = cfg["ConnectionStrings-DockerConnection"];
+    string conn = cfg.GetConnectionString("DockerConnection");
     return string.IsNullOrEmpty(conn)
         ? Results.NotFound($"Empty secret {nameof(conn)}")
         : Results.Ok($"Conn length: {conn.Length}");

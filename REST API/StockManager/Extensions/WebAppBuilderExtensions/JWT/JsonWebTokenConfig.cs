@@ -10,11 +10,11 @@ internal static class JsonWebTokenConfig
 {
     public static void AddJWT(WebApplicationBuilder builder)
     {
-        byte[] key = Encoding.UTF8.GetBytes(builder.Configuration["jwt-key"]!);
+        byte[] key = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]!);
 
-        string? issuer = builder.Configuration["jwt-issuer"]!;
+        string? issuer = builder.Configuration["JWT:Issuer"]!;
 
-        string? audience = builder.Configuration["jwt-audience"]!;
+        string? audience = builder.Configuration["JWT:Audience"]!;
 
         NullCheck.IsConfigured(key, issuer, audience);
 

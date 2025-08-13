@@ -45,7 +45,12 @@ else
 //serilog commands
 app.UseSerilogRequestLogging();
 
-await app.AddAutomateMigrations();
+if (app.Environment.IsDevelopment())
+{
+    CancellationToken ct = app.Lifetime.ApplicationStopping;
+
+    await app.AddAutomateMigrations(ct);
+}
 
 app.MapGroup("api/identity")
     .WithTags("Identity")

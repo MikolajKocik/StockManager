@@ -31,12 +31,18 @@ public static class ServiceCollectionExtension
 
             services.AddDbContext<StockManagerDbContext>(options =>
                 options
-                    .UseSqlServer(connectionString)
-                    .EnableSensitiveDataLogging());
+                    .UseSqlServer(connectionString, sql =>
+                    {
+                        sql.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorNumbersToAdd: null);
+                    })
+                    .EnableSensitiveDataLogging(env.IsDevelopment()));
         }
         else
         {
-            connectionString = cfg["ConnectionStrings:DefaultConnection"]
+            connectionString = cfg.GetConnectionString("DefaultConnection")
                 ?? throw new ArgumentException("Connection string is empty for azure database");
             ArgumentException.ThrowIfNullOrEmpty(connectionString);
 

@@ -3,6 +3,7 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 using Serilog;
 using StockManager.Application.Extensions;
 using StockManager.Core.Domain.Models.UserEntity;
@@ -31,13 +32,20 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+else
+{
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+    });
 
+    app.UseHttpsRedirection();
+    app.UseHsts();
+}
 //serilog commands
 app.UseSerilogRequestLogging();
 
 await app.AddAutomateMigrations();
-
-app.UseHttpsRedirection();
 
 app.MapGroup("api/identity")
     .WithTags("Identity")

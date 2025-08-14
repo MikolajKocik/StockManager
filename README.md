@@ -9,7 +9,7 @@ Project runs locally via **Docker Compose** (API + MS SQL Server + Redis). In th
 - [Architecture & Layers](#architecture--layers)
 - [Prerequisites](#prerequisites)
 - [Quickstart – Local (Docker Compose)](#quickstart--local-docker-compose)
-- [Configuration – local connection string](#Configuration–-local-connection-string)
+- [Configuration - local connection string](#configuration--local-connection-string)
 - [Tests](#tests)
 - [NuGet Packages](#nuget-packages)
 - [Azure Deployment](#azure-deployment)

@@ -75,7 +75,11 @@ if (!foundIssues)
 }
 else
 {
-    Console.WriteLine("\n❌ Potential secrets detected! Please review the findings above.");
-    Console.WriteLine("   Note: Some findings may be false positives. Review each case manually.");
-    Environment.Exit(0); // Exit with 0 to not fail the build on false positives
+    Console.WriteLine("\n⚠️  Potential secrets detected! Please review the findings above.");
+    Console.WriteLine("   Note: This script may produce false positives. Review each case manually.");
+    Console.WriteLine("   To fail the build on detection, update the exit code in the script.");
+    
+    // Exit with 0 to allow manual review (change to 1 to fail the build automatically)
+    var failOnSecrets = Environment.GetEnvironmentVariable("FAIL_ON_SECRETS") == "true";
+    Environment.Exit(failOnSecrets ? 1 : 0);
 }

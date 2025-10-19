@@ -54,7 +54,9 @@ steps:
     publishRunAttachments: true
 
 # check sensitive data 
-- script: dotnet script Azure/Scripts/CheckSecrets.csx
+- script: |
+    dotnet tool install -g dotnet-script || true
+    dotnet script Azure/Scripts/CheckSecrets.csx
   displayName: 'Scan code for obvious secrets'
   continueOnError: false 
 

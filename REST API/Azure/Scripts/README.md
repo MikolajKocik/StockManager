@@ -14,13 +14,21 @@ A C# script that scans the codebase for potential hardcoded secrets.
 
 **Usage in Pipeline:**
 ```yaml
+# Option 1: Warning only (does not fail build)
 - script: dotnet script Azure/Scripts/CheckSecrets.csx
+  displayName: 'Scan code for obvious secrets'
+
+# Option 2: Fail build on detected secrets
+- script: |
+    export FAIL_ON_SECRETS=true
+    dotnet script Azure/Scripts/CheckSecrets.csx
   displayName: 'Scan code for obvious secrets'
 ```
 
 **Requirements:**
-- dotnet-script global tool must be installed in the pipeline
-- Or use the pre-installed tools in Azure DevOps
+- dotnet-script global tool (install via: `dotnet tool install -g dotnet-script`)
+- Note: Azure DevOps hosted agents may not have dotnet-script pre-installed
+- Consider installing in pipeline: `dotnet tool install -g dotnet-script || true`
 
 **Note:** This script is designed to catch obvious mistakes. For production use, consider using specialized tools like:
 - GitGuardian

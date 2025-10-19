@@ -19,6 +19,7 @@
 		<PackageReference Include="FluentAssertions" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" />
 		<PackageReference Include="Moq" />
+		<PackageReference Include="xunit" />
 		<PackageReference Include="xunit.runner.visualstudio" />
 		<PackageReference Include="StackExchange.Redis" />
 		<PackageReference Include="xunit.analyzers">
@@ -27,7 +28,6 @@
 		</PackageReference>
 		<PackageReference Include="Testcontainers.MsSql" />
 		<PackageReference Include="Testcontainers.Redis" />
-		<PackageReference Include="xunit.v3" />
 	</ItemGroup>
 
 	<ItemGroup>

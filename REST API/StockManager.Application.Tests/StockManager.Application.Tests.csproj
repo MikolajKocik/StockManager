@@ -1,5 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="FluentAssertions" />
@@ -8,6 +17,7 @@
     <PackageReference Include="MockQueryable.Moq" />
     <PackageReference Include="Moq" />
     <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="xunit" />
     <PackageReference Include="xunit.analyzers">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -15,7 +25,6 @@
     <PackageReference Include="xunit.runner.visualstudio" />
 	<PackageReference Include="Testcontainers.MsSql" />
 	<PackageReference Include="Testcontainers.Redis" />
-	<PackageReference Include="xunit.v3" />
   </ItemGroup>
 
   <!-- Dependencies -->

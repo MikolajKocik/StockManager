@@ -11,14 +11,14 @@ public sealed class MsSqlIntegrationTests : IAsyncLifetime
 {
     private readonly MsSqlContainer _db = new MsSqlBuilder().Build();
 
-    public async ValueTask InitializeAsync()
+    public async Task InitializeAsync()
     {
         await _db.StartAsync();
     }
 
-    public ValueTask DisposeAsync()
+    public async Task DisposeAsync()
     {
-        return _db.DisposeAsync();
+        await _db.DisposeAsync();
     }
 
     /// <summary>

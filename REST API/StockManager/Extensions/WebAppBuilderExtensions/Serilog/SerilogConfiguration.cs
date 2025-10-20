@@ -14,7 +14,7 @@ internal static class SerilogConfiguration
             {
                 configuration
                     .ReadFrom.Configuration(context.Configuration)
-                    .WriteTo.Console();
+                    .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture);
 
             }
             else

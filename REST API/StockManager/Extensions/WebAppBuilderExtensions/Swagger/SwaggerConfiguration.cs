@@ -1,4 +1,8 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.Mvc.ApiExplorer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.OpenApi.Models;
 
 namespace StockManager.Extensions.WebAppBuilderExtensions.Swagger;
 
@@ -32,6 +36,18 @@ internal static class SwaggerConfiguration
                      Array.Empty<string>()
                  }
             });
+
+            // API Versioning
+            IApiVersionDescriptionProvider provider = builder.Services.BuildServiceProvider().GetRequiredService<IApiVersionDescriptionProvider>();
+            foreach (ApiVersionDescription description in provider.ApiVersionDescriptions)
+            {
+                c.SwaggerDoc(description.GroupName, new OpenApiInfo
+                {
+                    Title = $"StockManager API {description.ApiVersion}",
+                    Version = description.ApiVersion.ToString(),
+                    Description = description.IsDeprecated ? "This API version has been deprecated." : null
+                });
+            }
         });
     }
 }

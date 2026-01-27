@@ -22,7 +22,8 @@ namespace StockManager.Controllers;
 
 [Authorize]
 [ApiController]
-[Route("api/shipments")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/shipments")]
 [EnableRateLimiting("fixed")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]

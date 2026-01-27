@@ -25,7 +25,8 @@ namespace StockManager.Controllers;
 [Authorize]
 [ApiController]
 [EnableRateLimiting("fixed")]
-[Route("api/purchase-orders")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/purchase-orders")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class PurchaseOrdersController : ControllerBase
@@ -42,7 +43,6 @@ public sealed class PurchaseOrdersController : ControllerBase
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
-       // placeholder
        await Task.CompletedTask;
        return NoContent();
     }

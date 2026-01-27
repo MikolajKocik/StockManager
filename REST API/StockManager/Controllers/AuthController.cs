@@ -11,7 +11,8 @@ namespace StockManager.Controllers;
 
 [ApiController]
 [EnableRateLimiting("fixed")]
-[Route("api/auth")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/auth")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class AuthController : ControllerBase

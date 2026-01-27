@@ -20,7 +20,8 @@ namespace StockManager.Controllers;
 [Authorize]
 [ApiController]
 [EnableRateLimiting("fixed")]
-[Route("api/suppliers")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/suppliers")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class SupplierController : ControllerBase

@@ -19,7 +19,8 @@ namespace StockManager.Controllers;
 [Authorize]
 [ApiController]
 [EnableRateLimiting("fixed")]
-[Route("api/stock-transactions")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/stock-transactions")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class StockTransactionController : ControllerBase

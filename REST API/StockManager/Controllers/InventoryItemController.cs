@@ -26,7 +26,8 @@ namespace StockManager.Controllers;
 [ApiController]
 [Authorize]
 [EnableRateLimiting("fixed")]
-[Route("api/inventory-items")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/inventory-items")]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
 [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status429TooManyRequests)]
 public sealed class InventoryItemController : ControllerBase

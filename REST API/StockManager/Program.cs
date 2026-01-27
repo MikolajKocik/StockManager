@@ -3,6 +3,7 @@ using HealthChecks.UI.Client;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Serilog;
 using StockManager.Application.Extensions;
@@ -39,13 +40,25 @@ if (app.Environment.IsDevelopment())
         }
     });
 }
+else
+{
+    app.UseForwardedHeaders(new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
+    });
 
+    app.UseHsts();
+    app.UseHttpsRedirection();
+}
 //serilog commands
 app.UseSerilogRequestLogging();
 
-await app.AddAutomateMigrations();
+if (app.Environment.IsDevelopment())
+{
+    CancellationToken ct = app.Lifetime.ApplicationStopping;
 
-app.UseHttpsRedirection();
+    await app.AddAutomateMigrations(ct);
+}
 
 app.MapGroup("api/identity")
     .WithTags("Identity")
@@ -58,19 +71,17 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// health check endpoint
-app.MapHealthChecks("/health", new HealthCheckOptions
+if (app.Environment.IsDevelopment())
 {
-    ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
-});
-
-// check secret from azure key vault
-app.MapGet("/dbdev-check", (IConfiguration cfg) =>
+    // health check endpoint
+    app.MapHealthChecks("/health", new HealthCheckOptions
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
+}
+else
 {
-    string conn = cfg["ConnectionStrings-DockerConnection"];
-    return string.IsNullOrEmpty(conn)
-        ? Results.NotFound($"Empty secret {nameof(conn)}")
-        : Results.Ok($"Conn length: {conn.Length}");
-});
+    app.MapHealthChecks("/health");
+}
 
 await app.RunAsync();

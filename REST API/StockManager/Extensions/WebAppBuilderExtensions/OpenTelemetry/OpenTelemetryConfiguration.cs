@@ -13,65 +13,68 @@ internal static class OpenTelemetryConfiguration
 {
     public static void AddOpenTelemetryConfiguration(WebApplicationBuilder builder)
     {
-        // otlp debug
-        string otlLogLevel = builder.Configuration["otel-log-level"]
-            ?? "Information";
-
-        builder.Logging.SetMinimumLevel(otlLogLevel.ToLower() switch
+        if (builder.Environment.IsProduction())
         {
-            "debug" => LogLevel.Debug,
-            "information" => LogLevel.Information,
-            "warning" => LogLevel.Warning,
-            "error" => LogLevel.Error,
-            "critical" => LogLevel.Critical,
-            _ => LogLevel.Information
-        });
+            // otlp debug
+            string otlLogLevel = builder.Configuration["otel-log-level"]
+                ?? "Information";
 
-        // otlp config
-        builder.Services
-            .AddOpenTelemetry()
-            .ConfigureResource(resource =>
+            builder.Logging.SetMinimumLevel(otlLogLevel.ToLower() switch
             {
-                resource.AddService(
-                    serviceName: "StockManager",
-                    serviceNamespace: "StockManager-group"
-                    );
-            })
-            // grafana
-            .WithTracing(t =>
-            {
-                t.UseGrafana()
-                .AddConsoleExporter();
-            })
-            .WithMetrics(m =>
-            {
-                m.UseGrafana()
-                .AddConsoleExporter();
+                "debug" => LogLevel.Debug,
+                "information" => LogLevel.Information,
+                "warning" => LogLevel.Warning,
+                "error" => LogLevel.Error,
+                "critical" => LogLevel.Critical,
+                _ => LogLevel.Information
             });
 
-        builder.Logging.ClearProviders();
-        builder.Logging.AddConsole();
+            // otlp config
+            builder.Services
+                .AddOpenTelemetry()
+                .ConfigureResource(resource =>
+                {
+                    resource.AddService(
+                        serviceName: "StockManager",
+                        serviceNamespace: "StockManager-group"
+                        );
+                })
+                // grafana
+                .WithTracing(t =>
+                {
+                    t.UseGrafana()
+                    .AddConsoleExporter();
+                })
+                .WithMetrics(m =>
+                {
+                    m.UseGrafana()
+                    .AddConsoleExporter();
+                });
 
-        builder.Logging.AddOpenTelemetry(logging =>
-        {
-            logging.AddConsoleExporter();
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
 
-            logging.IncludeScopes = true;
-            logging.IncludeFormattedMessage = true;
-            logging.ParseStateValues = true;
-
-            string baseUrl = builder.Configuration["otel-exporter-otlp-endpoint"]
-                ?? throw new ArgumentException(nameof(baseUrl));
-
-            string headers = builder.Configuration["otel-exporter-otlp-headers"]
-                ?? throw new ArgumentException(nameof(headers));
-
-            logging.AddOtlpExporter(opt =>
+            builder.Logging.AddOpenTelemetry(logging =>
             {
-                opt.Endpoint = new Uri(baseUrl);
-                opt.Protocol = OtlpExportProtocol.HttpProtobuf;
-                opt.Headers = headers;
+                logging.AddConsoleExporter();
+
+                logging.IncludeScopes = true;
+                logging.IncludeFormattedMessage = true;
+                logging.ParseStateValues = true;
+
+                string baseUrl = builder.Configuration["otel-exporter-otlp-endpoint"]
+                    ?? throw new ArgumentException(nameof(baseUrl));
+
+                string headers = builder.Configuration["otel-exporter-otlp-headers"]
+                    ?? throw new ArgumentException(nameof(headers));
+
+                logging.AddOtlpExporter(opt =>
+                {
+                    opt.Endpoint = new Uri(baseUrl);
+                    opt.Protocol = OtlpExportProtocol.HttpProtobuf;
+                    opt.Headers = headers;
+                });
             });
-        });
+        }
     }
 }

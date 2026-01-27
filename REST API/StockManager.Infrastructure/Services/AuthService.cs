@@ -89,9 +89,9 @@ public class AuthService : IAuthService
 
         var tokenHandler = new JwtSecurityTokenHandler();
 
-        byte[] key = Encoding.UTF8.GetBytes(_configuration["jwt-key"]!);
-        string? issuer = _configuration["jwt-issuer"]!;
-        string? audience = _configuration["jwt-audience"]!;
+        byte[] key = Encoding.UTF8.GetBytes(_configuration["JWT:Key"]!);
+        string? issuer = _configuration["JWT:Issuer"]!;
+        string? audience = _configuration["JWT:Audience"]!;
 
         NullCheck.IsConfigured(key, issuer, audience);
 

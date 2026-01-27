@@ -47,6 +47,14 @@ public static class PresentationLayer
         // Cors
         CorsConfiguration.AddCorsCredentials(builder);
 
+        // hsts
+        builder.Services.AddHsts(opts =>
+        {
+            opts.Preload = false;    
+            opts.IncludeSubDomains = false;
+            opts.MaxAge = TimeSpan.FromDays(365);
+        });
+
         // JWT
         JsonWebTokenConfig.AddJWT(builder);
 

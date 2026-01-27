@@ -14,8 +14,6 @@ using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Infrastructure.Persistence.Data;
 using StockManager.Infrastructure.Repositories;
 using StockManager.Infrastructure.Services.Auth;
-using StockManager.Infrastructure.Settings;
-
 
 namespace StockManager.Infrastructure.Extensions;
 
@@ -27,18 +25,24 @@ public static class ServiceCollectionExtension
 
         if (env.IsDevelopment())
         {
-            connectionString = cfg["ConnectionStrings-DockerConnection"]
+            connectionString = cfg.GetConnectionString("DockerConnection")
                 ?? throw new ArgumentException("Connection string is empty for local database");
             ArgumentException.ThrowIfNullOrEmpty(connectionString);
 
             services.AddDbContext<StockManagerDbContext>(options =>
                 options
-                    .UseSqlServer(connectionString)
-                    .EnableSensitiveDataLogging());
+                    .UseSqlServer(connectionString, sql =>
+                    {
+                        sql.EnableRetryOnFailure(
+                            maxRetryCount: 5,
+                            maxRetryDelay: TimeSpan.FromSeconds(10),
+                            errorNumbersToAdd: null);
+                    })
+                    .EnableSensitiveDataLogging(env.IsDevelopment()));
         }
         else
         {
-            connectionString = cfg["ConnectionStrings-DefaultConnection"]
+            connectionString = cfg.GetConnectionString("DefaultConnection")
                 ?? throw new ArgumentException("Connection string is empty for azure database");
             ArgumentException.ThrowIfNullOrEmpty(connectionString);
 

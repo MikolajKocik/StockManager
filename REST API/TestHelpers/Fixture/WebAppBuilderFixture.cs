@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestHelpers.Fixture
+namespace TestHelpers.Fixture;
+
+public class WebAppBuilderFixture
 {
-    public class WebAppBuilderFixture
-    {
-        public WebApplicationBuilder Builder { get; } = WebApplication.CreateBuilder();
-    }
+    public WebApplicationBuilder Builder { get; } = WebApplication.CreateBuilder();
 }

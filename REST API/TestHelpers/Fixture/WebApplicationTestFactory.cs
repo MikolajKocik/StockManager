@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using StackExchange.Redis;
 using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using StockManager.Infrastructure.Persistence.Data;
@@ -29,16 +30,34 @@ public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
             services.AddScoped<IBaseRepository, TestBaseRepository>();
 
             // redis
+            var dbMock = new Mock<IDatabase>();
+
+            dbMock.Setup(x => x.StringIncrementAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<long>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync(1L);
+
+            dbMock.Setup(x => x.KeyExpireAsync(
+                It.IsAny<RedisKey>(),
+                It.IsAny<TimeSpan?>(),
+                It.IsAny<ExpireWhen>(),
+                It.IsAny<CommandFlags>()))
+            .ReturnsAsync(true);
+
+            var redisMock = new Mock<IConnectionMultiplexer>();
+            redisMock.Setup(x => x.GetDatabase(It.IsAny<int>(), It.IsAny<object>()))
+                .Returns(dbMock.Object);
+
             ServiceDescriptor? redis = services.SingleOrDefault(
                 d => d.ServiceType == typeof(IConnectionMultiplexer));
 
             if (redis != null)
             {
                 services.Remove(redis);
-            }
+            }           
 
-            services.AddSingleton<IConnectionMultiplexer>(_ =>
-                ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false"));
+            services.AddSingleton<IConnectionMultiplexer>(redisMock.Object);
 
             // cache
             ServiceDescriptor? cache = services.SingleOrDefault(

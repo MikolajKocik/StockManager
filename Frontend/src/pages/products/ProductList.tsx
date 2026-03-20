@@ -1,7 +1,8 @@
-import api from '../api/api';
+import api from '../../api/api';
 import { useEffect, useState } from 'react';
-import type { ProductCollection } from '../models/product';
-
+import type { ProductCollection } from '../../models/product';
+import { Link } from 'react-router-dom';
+ 
 export default function ProductList() {
     const [products, setProducts] = useState<ProductCollection>({ data: [] });
     const [loading, setLoading] = useState<boolean>(true);
@@ -33,7 +34,9 @@ export default function ProductList() {
             <ul>
                 {products.data.map(product => (
                     <li key={product.id}>
-                        {product.name}
+                        <Link to={`/products/${product.id}`}>
+                            {product.name}
+                        </Link>
                     </li>
                 ))}
             </ul>

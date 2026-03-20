@@ -1,4 +1,4 @@
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../../api/api';
 import type { Product } from '../../models/product';
@@ -9,6 +9,19 @@ export default function ProductDetails() {
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+
+    const navigate = useNavigate();
+
+    const handleDelete = async () => {
+        try {
+                await api.delete(`/products/${id}`);
+                navigate('/products');
+            } catch {
+                setError("Product not found");
+            } finally {
+                setLoading(false);
+            }
+    }
 
     useEffect(() => {
         const fetchData = async () => {
@@ -38,6 +51,9 @@ export default function ProductDetails() {
             <Link to={`/products/edit/${id}`}>
                 Edit product
             </Link>
+            <button onClick={handleDelete}>
+                Delete product
+            </button>
         </div>
     )
 }

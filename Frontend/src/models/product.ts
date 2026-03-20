@@ -25,3 +25,14 @@ export interface ProductCreateForm {
     supplierId: string;
     expirationDate: string;
 }
+
+export interface ProductUpdateForm {
+    id: number | null;
+    name: string | null;
+    genre: string | null;
+    unit: string | null;
+    type: string | null;
+    batchNumber: string | null;
+    supplierId: string | null;
+    expirationDate: string | null;
+}

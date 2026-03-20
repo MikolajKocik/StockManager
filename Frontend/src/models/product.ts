@@ -15,3 +15,13 @@ export interface Product {
 export interface ProductCollection {
     data: Product[];
 }
+
+export interface ProductCreateForm {
+    name: string;
+    genre: string;
+    unit: string;
+    type: string;
+    batchNumber: string;
+    supplierId: string;
+    expirationDate: string;
+}

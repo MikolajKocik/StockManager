@@ -30,7 +30,7 @@ export default function ProductList() {
 
     return (
         <div>
-            <h2>Lista produktów</h2>
+            <h2>Products list</h2>
             <ul>
                 {products.data.map(product => (
                     <li key={product.id}>

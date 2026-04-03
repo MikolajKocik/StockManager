@@ -2,40 +2,45 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../../api/api';
 import type { Product } from '../../models/product';
-import { Link } from 'react-router-dom';
+import ProductEditForm from '../../components/products/forms/ProductEditForm';
 
 export default function ProductDetails() {
     const { id } = useParams();
     const [product, setProduct] = useState<Product | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const navigate = useNavigate();
 
+    const fetchProduct = async () => {
+        setLoading(true);
+        try {
+            const res = await api.get<Product>(`/products/${id}`);
+            setProduct(res.data);
+        } catch {
+            setError("Product not found");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleDelete = async () => {
         try {
-                await api.delete(`/products/${id}`);
-                navigate('/products');
-            } catch {
-                setError("Product not found");
-            } finally {
-                setLoading(false);
-            }
+            await api.delete(`/products/${id}`);
+            navigate('/products');
+        } catch {
+            setError("Product not found");
+        }
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await api.get<Product>(`/products/${id}`);
-                setProduct(res.data);
-            } catch {
-                setError("Product not found");
-            } finally {
-                setLoading(false);
-            }
-        }
+    const handleEditSuccess = () => {
+        setIsEditModalOpen(false);
+        fetchProduct();
+    };
 
-        fetchData();
+    useEffect(() => {
+        fetchProduct();
     }, [id]);
 
     if(loading) return <p>Loading...</p>;
@@ -48,12 +53,19 @@ export default function ProductDetails() {
             <p>Genre: {product?.genre}</p>
             <p>Unit: {product?.unit}</p>
             <p>Supplier: {product?.supplierName}</p>
-            <Link to={`/products/edit/${id}`}>
+            <button onClick={() => setIsEditModalOpen(true)}>
                 Edit product
-            </Link>
+            </button>
             <button onClick={handleDelete}>
                 Delete product
             </button>
+
+            <ProductEditForm 
+                isOpen={isEditModalOpen}
+                productId={id || ''}
+                onClose={() => setIsEditModalOpen(false)}
+                onSuccess={handleEditSuccess}
+            />
         </div>
     )
 }

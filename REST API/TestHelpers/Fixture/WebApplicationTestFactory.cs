@@ -25,6 +25,16 @@ public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Test");
 
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            config.AddInMemoryCollection(new Dictionary<string, string?>
+            {
+                { "JWT:Key", "test-key-with-32-characters-minimum-long" },
+                { "JWT:Issuer", "test-issuer" },
+                { "JWT:Audience", "test-audience" }
+            });
+        });
+
         builder.ConfigureTestServices(services =>
         {
             services.AddScoped<IBaseRepository, TestBaseRepository>();

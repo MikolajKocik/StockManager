@@ -39,7 +39,9 @@ jobs:
       
     - name: Test
       working-directory: REST API
-      run: dotnet test --no-build --verbosity normal
+      run: |
+        dotnet test StockManager.Application.Tests/StockManager.Application.Tests.csproj --no-build --verbosity normal
+        dotnet test StockManager.Tests/StockManager.Tests.csproj --no-build --verbosity normal
 
   analyze:
     name: Analyze (${{ matrix.language }})

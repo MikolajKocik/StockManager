@@ -18,9 +18,6 @@ jobs:
   build-test: 
     name: Setup and build project
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: "REST API"
 
     steps:
     - uses: actions/checkout@v4
@@ -33,12 +30,15 @@ jobs:
         cache-dependency-path: 'REST API/**/*.csproj'
         
     - name: Restore dependencies
+      working-directory: REST API
       run: dotnet restore StockManager.sln
       
     - name: Build
+      working-directory: REST API
       run: dotnet build --no-restore StockManager.sln
       
     - name: Test
+      working-directory: REST API
       run: dotnet test --no-build --verbosity normal
 
   analyze:

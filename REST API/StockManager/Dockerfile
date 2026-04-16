@@ -12,15 +12,19 @@ WORKDIR /src
 # copy solution files
 COPY Directory.Build.props .
 COPY Directory.Packages.props .
+COPY StockManager.sln .
 
 # copy projects
 COPY StockManager/. ./StockManager/
 COPY StockManager.Application/. ./StockManager.Application/
 COPY StockManager.Infrastructure/. ./StockManager.Infrastructure/
 COPY StockManager.Core.Domain/. ./StockManager.Core.Domain/
+COPY TestHelpers/. ./TestHelpers/
+COPY StockManager.Application.Tests/. ./StockManager.Application.Tests/
+COPY StockManager.Tests/. ./StockManager.Tests/
 
 # restore dependencies
-RUN dotnet restore "./StockManager/StockManager.csproj"
+RUN dotnet restore "StockManager.sln"
 
 # build application
 WORKDIR "/src/StockManager"
@@ -29,13 +33,6 @@ RUN dotnet build "./StockManager.csproj" -c $BUILD_CONFIGURATION -o /app/build /
 # build application tests
 FROM build AS test
 WORKDIR /src
-
-COPY ./TestHelpers/. ./TestHelpers/
-COPY ./StockManager.Application.Tests/. ./StockManager.Application.Tests/
-COPY ./StockManager.Tests/. ./StockManager.Tests/
-
-RUN dotnet restore "./StockManager.Application.Tests/StockManager.Application.Tests.csproj"
-RUN dotnet restore "./StockManager.Tests/StockManager.Tests.csproj"
 
 RUN dotnet test "./StockManager.Application.Tests/StockManager.Application.Tests.csproj" --no-restore --verbosity normal
 RUN dotnet test "./StockManager.Tests/StockManager.Tests.csproj" --no-restore --verbosity normal

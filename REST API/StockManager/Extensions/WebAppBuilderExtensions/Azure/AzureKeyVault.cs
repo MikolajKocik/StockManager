@@ -9,7 +9,9 @@ public static class AzureKeyVault
     {
         string? kvUri = Environment.GetEnvironmentVariable("KEYVAULT_URI");
 
-        if(!string.IsNullOrWhiteSpace(kvUri) && !builder.Environment.IsDevelopment())
+        if(!string.IsNullOrWhiteSpace(kvUri) && 
+           !builder.Environment.IsDevelopment() && 
+           !builder.Environment.IsEnvironment("Test"))
         {
             builder.Configuration.AddAzureKeyVault(new Uri(kvUri), new DefaultAzureCredential());
         }

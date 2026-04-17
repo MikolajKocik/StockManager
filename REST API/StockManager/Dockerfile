@@ -45,11 +45,6 @@ ARG BUILD_CONFIGURATION=Release
 WORKDIR /src/StockManager
 RUN dotnet publish "StockManager.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false /p:BuildingInsideDocker=true
 
-COPY --from=build  /src/StockManager/appsettings.json /app/publish/
-COPY --from=build /src/StockManager/appsettings.Development.json /app/publish/
-
-RUN ls -la /app/publish
-
 # This stage is used in production environment or when running from VS in regular mode (default when not using debug configuration)
 FROM base AS final
 ARG APP_UID=1000

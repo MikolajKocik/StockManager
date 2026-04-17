@@ -33,8 +33,10 @@ README.md
 !StockManager.Infrastructure/**
 !Directory.Build.props
 !Directory.Packages.props
-!StockManager/appsettings*.json
+**/appsettings*.json
+!**/appsettings.Test.json
 !REST API/
 !REST API/StockManager/
 !REST API/StockManager/**
 !REST API/StockManager/Dockerfile
+!docker-compose.dcproj

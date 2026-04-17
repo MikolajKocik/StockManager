@@ -13,6 +13,8 @@ WORKDIR /src
 COPY Directory.Build.props .
 COPY Directory.Packages.props .
 COPY StockManager.sln .
+COPY docker-compose.dcproj .
+COPY .editorconfig .
 
 # copy projects
 COPY StockManager/. ./StockManager/

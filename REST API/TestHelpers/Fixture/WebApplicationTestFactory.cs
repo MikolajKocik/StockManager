@@ -21,9 +21,19 @@ namespace TestHelpers.Fixture;
 
 public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
 {
+    public WebApplicationTestFactory()
+    {
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
+    }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Test");
+
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            context.HostingEnvironment.EnvironmentName = "Test";
+        });
 
         builder.ConfigureTestServices(services =>
         {

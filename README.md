@@ -123,19 +123,22 @@ Main dependencies used in the project (based on structure/config):
 
 ---
 
-## Azure Deployment
+## Azure Deployment & CI/CD
 
-The backend runs as Azure Container Apps (ACA), the app image is pushed to Azure Container Registry (ACR).
+The backend runs on **Azure Container Apps (ACA)**, while the application image is built and pushed to **GitHub Container Registry (GHCR)** automatically via GitHub Actions pipelines.
+
+The automated process utilizes **Microsoft Entra ID (OIDC) Federated Credentials**, completely eliminating the need for storing explicit passwords/secrets in Azure connection strings.
+
 Environment consists of:
 
-- Azure Container Apps – API container host
-- Azure Container Registry – Docker image registry
-- Azure SQL Server + Azure SQL Database – database
-- Azure Storage – Azure Files – file shares
-- Azure Key Vault – secrets
-- Application Insights (+ Log Analytics Workspace) – telemetry & logs
-- Managed Environment (Container Apps) – ACA environment
-- Azure DevOps – CI/CD (service connections: Azure subscription, ACR, GitHub)
+- **GitHub Actions** – Continuous Integration / Continuous Deployment pipeline
+- **GitHub Container Registry (GHCR)** – Docker image registry
+- **Azure Container Apps** – API container host
+- **Azure SQL Server + Azure SQL Database** – database
+- **Azure Storage – Azure Files** – file shares
+- **Azure Key Vault** – secrets handling
+- **Application Insights (+ Log Analytics Workspace)** – telemetry & logs
+- **Managed Environment** – ACA environment
 
 ---
 
@@ -156,12 +159,12 @@ Environment consists of:
 - **Azure Files – file share:**  
   ![files](docs/azure-storage-files.jpg)
 
-- **Build & push (PowerShell):**  
-  ![ps](docs/powershell.png)
-  ![ps](docs/build-result-powershell-acr.PNG)
-
-- **Azure DevOps – service connections:**  
-  ![ado](docs/azure-devops-services.png)
+- **CI/CD via GitHub Actions & Entra ID (OIDC):**  
+  ![App Registrations](docs/azure-app-registrations.png)
+  ![Certificates & Secrets](docs/azure-certificates-secrets.png)
+  ![Federated Credential](docs/azure-federated-credential.png)
+  ![GitHub Actions Secrets](docs/github-actions-secrets.png)
+  ![Role Assignment](docs/azure-role-assignment.png)
 
 - **xUnit tests – passing:**  
   ![xunit](docs/xunit.PNG)

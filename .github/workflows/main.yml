@@ -166,10 +166,14 @@ jobs:
 
       - name: Deploy to Azure Container App
         run: |
+          az containerapp registry set \
+            --name stockmanager-ca \
+            --resource-group StockManager \
+            --server ${{ env.REGISTRY }} \
+            --username ${{ github.actor }} \
+            --password ${{ secrets.GITHUB_TOKEN }}
+            
           az containerapp update \
             --name stockmanager-ca \
             --resource-group StockManager \
-            --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
-            --registry-server ${{ env.REGISTRY }} \
-            --registry-username ${{ github.actor }} \
-            --registry-password ${{ secrets.GITHUB_TOKEN }}
+            --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest

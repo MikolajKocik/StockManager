@@ -176,4 +176,4 @@ jobs:
           az containerapp update \
             --name stockmanager-ca \
             --resource-group StockManager \
-            --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            --image ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main

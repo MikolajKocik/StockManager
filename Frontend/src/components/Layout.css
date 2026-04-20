@@ -1,15 +1,22 @@
 .app-container {
     display: flex;
     min-height: 100vh;
-    background: var(--bg);
+    background: var(--bg-main);
 }
 
 .content-area {
     flex-grow: 1;
-    padding: 40px;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding: 48px;
+    width: 100%;
+    min-height: 100vh;
     box-sizing: border-box;
+    overflow-y: auto;
+}
+
+@media (max-width: 1024px) {
+    .content-area {
+        padding: 24px;
+    }
 }
 
 @media (max-width: 768px) {
@@ -21,5 +28,7 @@
         width: 100%;
         height: auto;
         position: relative;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
     }
 }

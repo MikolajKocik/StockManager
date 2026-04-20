@@ -21,7 +21,7 @@ export default function LoginPage() {
         try {
             const response = await api.post('/auth/login', { userName, password });
 
-            const token = response.data.result.data.token;
+            const token = response.data.result.value.token;
             login(token);
             navigate('/');
         } catch (err: any) {
@@ -33,34 +33,42 @@ export default function LoginPage() {
 
     return (
         <div className="login-container">
-            <form className="login-form" onSubmit={handleSubmit}>
-                <h2>StockManager Login</h2>
-                {error && <div className="error-alert">{error}</div>}
+            <div className="login-card animate-fade">
+                <header className="login-header">
+                    <h2>StockManager</h2>
+                    <p>Welcome back! Please login to continue.</p>
+                </header>
 
-                <div className="form-group">
-                    <label>Username</label>
-                    <input
-                        type="text"
-                        value={userName}
-                        onChange={(e) => setUserName(e.target.value)}
-                        required
-                    />
-                </div>
+                <form onSubmit={handleSubmit}>
+                    {error && <div className="error-alert">{error}</div>}
 
-                <div className="form-group">
-                    <label>Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                </div>
+                    <div className="form-group">
+                        <label>Username</label>
+                        <input
+                            type="text"
+                            placeholder="Enter your username"
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
+                            required
+                        />
+                    </div>
 
-                <button type="submit" disabled={loading}>
-                    {loading ? 'Logging in...' : 'Login'}
-                </button>
-            </form>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+
+                    <button type="submit" className="login-btn" disabled={loading}>
+                        {loading ? 'Authenticating...' : 'Login to Dashboard'}
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }

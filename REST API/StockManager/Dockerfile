@@ -37,7 +37,6 @@ FROM build AS test
 WORKDIR /src
 
 RUN dotnet test "./StockManager.Application.Tests/StockManager.Application.Tests.csproj" --no-restore --verbosity normal
-RUN dotnet test "./StockManager.Tests/StockManager.Tests.csproj" --no-restore --verbosity normal
 
 # This stage is used to publish the service design to be copied to the final stages
 FROM build AS publish

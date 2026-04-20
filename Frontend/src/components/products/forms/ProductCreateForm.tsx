@@ -2,13 +2,14 @@ import type { ProductCreateForm } from "../../../models/product";
 import { useState, useEffect } from 'react';
 import api from '../../../api/api';
 import Modal from '../../Modal';
- 
+
 interface ProductCreateModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModalProps) {
+export default function ProductCreateForm({ isOpen, onClose, onSuccess }: ProductCreateModalProps) {
     const [genres, setGenres] = useState<string[]>([]);
     const [types, setTypes] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -35,6 +36,7 @@ export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModa
         e.preventDefault();
         try {
             await api.post('/products', form);
+            onSuccess?.();
             onClose();
         } catch (err) {
             setError("Error occurred while saving data...");
@@ -64,7 +66,7 @@ export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModa
 
         fetchData();
     }, [isOpen]);
-    
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <h2>Add new product</h2>
@@ -72,7 +74,7 @@ export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModa
             {loading ? (
                 <p>Loading...</p>
             ) : error ? (
-                <p style={{ color: 'red'}}>{error}</p>
+                <p style={{ color: 'red' }}>{error}</p>
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div>

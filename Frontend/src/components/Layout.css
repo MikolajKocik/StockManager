@@ -1,0 +1,25 @@
+.app-container {
+    display: flex;
+    min-height: 100vh;
+    background: var(--bg);
+}
+
+.content-area {
+    flex-grow: 1;
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    .app-container {
+        flex-direction: column;
+    }
+
+    .navbar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+}

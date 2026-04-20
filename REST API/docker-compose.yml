@@ -27,6 +27,16 @@ services:
         sqlserver:
             condition: service_healthy
 
+  frontend:
+    container_name: stockmanager-frontend
+    build:
+      context: ../Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - stockmanager
+
     volumes:
       - ./logs:/app/logs
 

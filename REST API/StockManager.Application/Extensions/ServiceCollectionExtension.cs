@@ -34,5 +34,6 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RetryPipelineBehavior<,>));
     }
 }

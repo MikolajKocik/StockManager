@@ -32,7 +32,7 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    const handleSubmit = async (e: React.SyntheticEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             await api.post('/products', form);

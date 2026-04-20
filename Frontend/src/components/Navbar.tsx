@@ -1,7 +1,16 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 export default function Navbar() {
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <nav className="navbar">
             <div className="navbar-logo">
@@ -25,6 +34,12 @@ export default function Navbar() {
                     </NavLink>
                 </li>
             </ul>
+
+            <div className="navbar-footer">
+                <button onClick={handleLogout} className="logout-btn">
+                    Logout
+                </button>
+            </div>
         </nav>
     );
 }

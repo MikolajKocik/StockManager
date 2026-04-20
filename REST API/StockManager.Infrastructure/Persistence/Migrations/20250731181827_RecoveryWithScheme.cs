@@ -16,15 +16,6 @@ public partial class RecoveryWithScheme : Migration
             schema: "StockManager",
             table: "StockTransactions");
 
-        migrationBuilder.AlterColumn<Guid>(
-            name: "AddressId",
-            schema: "StockManager",
-            table: "Suppliers",
-            type: "uniqueidentifier",
-            nullable: false,
-            oldClrType: typeof(int),
-            oldType: "int");
-
         migrationBuilder.AlterColumn<string>(
             name: "ReferenceNumber",
             schema: "StockManager",

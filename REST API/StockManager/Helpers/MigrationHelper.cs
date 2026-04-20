@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Infrastructure.Persistence.Data;
+using StockManager.Core.Domain.Models;
 
 namespace StockManager.Helpers;
 
@@ -25,41 +26,53 @@ internal static class MigrationHelper
         StockManagerDbContext dbContext = scope.ServiceProvider
             .GetRequiredService<StockManagerDbContext>();
 
-        var sw = Stopwatch.StartNew();
+        logger.LogInformation("Starting Dev migrations and seeding...");
 
-        while (sw.Elapsed < TimeSpan.FromSeconds(60))
+        try
         {
-            try
+            var pending = (await dbContext.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
+            if (pending.Any())
             {
-                if (await dbContext.Database.CanConnectAsync(cancellationToken))
-                {
-                    break;
-                }
+                logger.LogInformation("Applying {Count} migration(s)...", pending.Count);
+                await dbContext.Database.MigrateAsync(cancellationToken);
+                logger.LogInformation("Migrations applied.");
             }
-            catch { }
+            else
+            {
+                logger.LogInformation("No pending migrations.");
+            }
 
-            await Task.Delay(2000, cancellationToken);
+            await SeedAdminUserAsync(dbContext, logger, cancellationToken);
         }
-
-        if (!await dbContext.Database.CanConnectAsync(cancellationToken))
+        catch (Exception ex)
         {
-            logger.LogWarning("DB not reachable, skipping Dev migrations.");
-            return;
+            logger.LogWarning(ex, "Failed to apply migrations or seed data.");
         }
+    }
 
-        var pending = (await dbContext.Database.GetPendingMigrationsAsync(cancellationToken)).ToList();
-        if (pending.Count == 0)
+    private static async Task SeedAdminUserAsync(
+        StockManagerDbContext dbContext,
+        ILogger logger,
+        CancellationToken cancellationToken)
+    {
+        var adminUser = await dbContext.Users.FirstOrDefaultAsync(u => u.UserName == "admin", cancellationToken);
+        if (adminUser == null)
         {
-            logger.LogInformation("No pending migrations.");
-            return;
+            logger.LogInformation("Seeding admin user...");
+            adminUser = new StockManager.Core.Domain.Models.UserEntity.User("admin", "admin");
+            adminUser.NormalizedUserName = "ADMIN";
+            adminUser.SecurityStamp = Guid.NewGuid().ToString();
+            dbContext.Users.Add(adminUser);
+            await dbContext.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Admin user seeded successfully.");
         }
-
-        IExecutionStrategy strategy = dbContext.Database.CreateExecutionStrategy();
-        await strategy.ExecuteAsync(async () =>
+        else if (string.IsNullOrEmpty(adminUser.NormalizedUserName))
         {
-            logger.LogInformation("Applying {Count} migration(s)...", pending.Count);
-            await dbContext.Database.MigrateAsync(cancellationToken);
-            logger.LogInformation("Migrations applied.");
-        });
+            logger.LogInformation("Updating existing admin user with normalization...");
+            adminUser.NormalizedUserName = "ADMIN";
+            adminUser.SecurityStamp ??= Guid.NewGuid().ToString();
+            await dbContext.SaveChangesAsync(cancellationToken);
+            logger.LogInformation("Admin user updated successfully.");
+        }
     }
 }

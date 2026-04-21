@@ -85,6 +85,12 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0" />
     <!-- Resilience -->
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="8.7.0" />
+    <!-- Storage -->
+    <PackageVersion Include="Azure.Storage.Blobs" Version="12.23.0" />
+    <!-- Messaging -->
+    <PackageVersion Include="RabbitMQ.Client" Version="7.0.0" />
+    <!-- PDF Generation -->
+    <PackageVersion Include="QuestPDF" Version="2024.12.1" />
   </ItemGroup>
   <!-- Tests -->
   <!-- Application tests -->

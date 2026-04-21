@@ -4,6 +4,8 @@ import ProductDetails from './pages/products/ProductDetails';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import LoginPage from './pages/LoginPage';
+import Operations from './pages/Operations';
+import Documents from './pages/Documents';
 import { AuthProvider, useAuth } from './context/AuthContext';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -24,6 +26,8 @@ export default function App() {
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/operations" element={<Operations />} />
+            <Route path="/documents" element={<Documents />} />
           </Route>
         </Routes>
       </BrowserRouter>

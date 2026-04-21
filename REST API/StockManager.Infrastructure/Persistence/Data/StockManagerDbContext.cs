@@ -21,6 +21,8 @@ using StockManager.Core.Domain.Models.ShipmentEntity;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using StockManager.Core.Domain.Models.UserEntity;
+using StockManager.Core.Domain.Models.WarehouseOperationEntity;
+
 
 namespace StockManager.Infrastructure.Persistence.Data;
 
@@ -47,6 +49,10 @@ public sealed class StockManagerDbContext(DbContextOptions<StockManagerDbContext
     internal DbSet<Role> DomainRoles { get; set; }
     internal DbSet<Permission> Permissions { get; set; }
     internal DbSet<AuditLog> AuditLogs { get; set; }
+    internal DbSet<WarehouseOperation> WarehouseOperations { get; set; }
+    internal DbSet<OperationItem> OperationItems { get; set; }
+    internal DbSet<Document> Documents { get; set; }
+    internal DbSet<FileMetadata> FileMetadatas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

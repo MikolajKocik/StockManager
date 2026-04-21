@@ -51,7 +51,7 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
             try {
                 const [genresRes, typesRes] = await Promise.all([
                     api.get<string[]>('/products/genres'),
-                    api.get<string[]>('products/warehouses')
+                    api.get<string[]>('/products/warehouses')
                 ]);
                 setGenres(genresRes.data);
                 setTypes((typesRes.data));

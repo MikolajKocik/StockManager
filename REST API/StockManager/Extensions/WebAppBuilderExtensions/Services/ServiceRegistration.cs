@@ -11,6 +11,13 @@ using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 using StockManager.Infrastructure.DomainServices;
+using StockManager.Infrastructure.Services;
+using StockManager.Infrastructure.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
+using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Models.WarehouseOperationEntity;
+using StockManager.Infrastructure.Services.Auth;
+
 
 namespace StockManager.Extensions.WebAppBuilderExtensions.Services;
 
@@ -51,6 +58,15 @@ internal static class ServiceRegistration
                 "StockManager.Infrastructure.DomainServices"))
             .AsImplementedInterfaces()
             .WithTransientLifetime());
+
+        services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
+        services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
+        services.AddSingleton<IPdfService, PdfDocumentService>();
+
+        services.AddScoped<IWarehouseOperationRepository, WarehouseOperationRepository>();
+
+        // Background Workers
+        services.AddHostedService<DocumentGenerationWorker>();
     }
 
     private static void  RegisterMediatorAdapters(this IServiceCollection services)

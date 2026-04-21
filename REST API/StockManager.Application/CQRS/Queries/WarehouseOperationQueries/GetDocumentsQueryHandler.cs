@@ -6,26 +6,24 @@ using Microsoft.EntityFrameworkCore;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.WarehouseOperationDtos;
-using StockManager.Infrastructure.Persistence.Data;
+using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.WarehouseOperationQueries;
 
 public sealed class GetDocumentsQueryHandler : IQueryHandler<GetDocumentsQuery, List<DocumentDto>>
 {
-    private readonly StockManagerDbContext _context;
+    private readonly IWarehouseOperationRepository _repository;
     private readonly IMapper _mapper;
 
-    public GetDocumentsQueryHandler(StockManagerDbContext context, IMapper mapper)
+    public GetDocumentsQueryHandler(IWarehouseOperationRepository repository, IMapper mapper)
     {
-        _context = context;
+        _repository = repository;
         _mapper = mapper;
     }
 
     public async Task<Result<List<DocumentDto>>> Handle(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var documents = await _context.Documents
-            .OrderByDescending(d => d.CreatedAt)
-            .ToListAsync(cancellationToken);
+        var documents = await _repository.GetDocumentsAsync(cancellationToken);
 
         var dtos = _mapper.Map<List<DocumentDto>>(documents);
         return Result<List<DocumentDto>>.Success(dtos);

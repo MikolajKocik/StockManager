@@ -84,6 +84,20 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
             .FirstOrDefaultAsync(bl => bl.Id == binLocationId, cancellationToken);
 
     /// <summary>
+    /// Asynchronously retrieves a list of <see cref="InventoryItem"/> entities associated with a specific product.
+    /// </summary>
+    /// <param name="productId">The unique identifier of the product.</param>
+    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+    /// <returns>
+    /// A task that represents the asynchronous operation. The task result contains a list of <see cref="InventoryItem"/>
+    /// entities that match the specified product ID.
+    /// </returns>
+    public async Task<List<InventoryItem>> GetInventoryItemsByProductIdAsync(int productId, CancellationToken cancellationToken)
+        => await _dbContext.InventoryItems
+            .Where(i => i.ProductId == productId)
+            .ToListAsync(cancellationToken);
+
+    /// <summary>
     /// Asynchronously deletes the specified inventory item from the database.
     /// </summary>
     /// <param name="inventoryItem"></param>

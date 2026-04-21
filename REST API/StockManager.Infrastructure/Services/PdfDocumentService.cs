@@ -17,7 +17,7 @@ public class PdfDocumentService : IPdfService
     {
         var stream = new MemoryStream();
 
-        Document.Create(container =>
+        QuestPDF.Fluent.Document.Create(container =>
         {
             container.Page(page =>
             {

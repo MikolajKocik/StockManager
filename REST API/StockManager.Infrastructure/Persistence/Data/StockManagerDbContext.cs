@@ -30,29 +30,29 @@ public sealed class StockManagerDbContext(DbContextOptions<StockManagerDbContext
     : IdentityDbContext<User>(options)
 {
 
-    internal DbSet<Product> Products { get; set; }
-    internal DbSet<Supplier> Suppliers { get; set; }
-    internal DbSet<Address> Adresses { get; set; }
-    internal DbSet<InventoryItem> InventoryItems { get; set; }
-    internal DbSet<StockTransaction> StockTransactions { get; set; }
-    internal DbSet<PurchaseOrder> PurchaseOrders { get; set; }
-    internal DbSet<PurchaseOrderLine> PurchaseOrderLines { get; set; }
-    internal DbSet<SalesOrder> SalesOrders { get; set; }
-    internal DbSet<SalesOrderLine> SalesOrderLines { get; set; }
-    internal DbSet<Customer> Customers { get; set; }
-    internal DbSet<BinLocation> BinLocations { get; set; }
-    internal DbSet<ReorderRule> ReorderRules { get; set; }
-    internal DbSet<Shipment> Shipments { get; set; }
-    internal DbSet<Invoice> Invoices { get; set; }
-    internal DbSet<ReturnOrder> ReturnOrders { get; set; }
-    internal DbSet<ReturnOrderLine> ReturnOrderLines { get; set; }
-    internal DbSet<Role> DomainRoles { get; set; }
-    internal DbSet<Permission> Permissions { get; set; }
-    internal DbSet<AuditLog> AuditLogs { get; set; }
-    internal DbSet<WarehouseOperation> WarehouseOperations { get; set; }
-    internal DbSet<OperationItem> OperationItems { get; set; }
-    internal DbSet<Document> Documents { get; set; }
-    internal DbSet<FileMetadata> FileMetadatas { get; set; }
+    public DbSet<Product> Products { get; set; }
+    public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<Address> Adresses { get; set; }
+    public DbSet<InventoryItem> InventoryItems { get; set; }
+    public DbSet<StockTransaction> StockTransactions { get; set; }
+    public DbSet<PurchaseOrder> PurchaseOrders { get; set; }
+    public DbSet<PurchaseOrderLine> PurchaseOrderLines { get; set; }
+    public DbSet<SalesOrder> SalesOrders { get; set; }
+    public DbSet<SalesOrderLine> SalesOrderLines { get; set; }
+    public DbSet<Customer> Customers { get; set; }
+    public DbSet<BinLocation> BinLocations { get; set; }
+    public DbSet<ReorderRule> ReorderRules { get; set; }
+    public DbSet<Shipment> Shipments { get; set; }
+    public DbSet<Invoice> Invoices { get; set; }
+    public DbSet<ReturnOrder> ReturnOrders { get; set; }
+    public DbSet<ReturnOrderLine> ReturnOrderLines { get; set; }
+    public DbSet<Role> DomainRoles { get; set; }
+    public DbSet<Permission> Permissions { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
+    public DbSet<WarehouseOperation> WarehouseOperations { get; set; }
+    public DbSet<OperationItem> OperationItems { get; set; }
+    public DbSet<Document> Documents { get; set; }
+    public DbSet<FileMetadata> FileMetadatas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

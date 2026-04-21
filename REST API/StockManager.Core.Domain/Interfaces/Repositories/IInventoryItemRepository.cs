@@ -15,5 +15,6 @@ public interface IInventoryItemRepository
     Task<InventoryItem> AddInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken);
     Task<InventoryItem> UpdateInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken);
     Task<BinLocation> GetBinLocationByIdAsync(int binLocationId, CancellationToken cancellationToken);
+    Task<List<InventoryItem>> GetInventoryItemsByProductIdAsync(int productId, CancellationToken cancellationToken);
     Task<InventoryItem?> DeleteInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken);
 }

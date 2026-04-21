@@ -7,4 +7,6 @@ public interface IWarehouseOperationRepository
     Task AddAsync(WarehouseOperation operation, CancellationToken cancellationToken);
     Task<WarehouseOperation?> GetByIdAsync(int id, CancellationToken cancellationToken);
     Task UpdateAsync(WarehouseOperation operation, CancellationToken cancellationToken);
+    Task<List<WarehouseOperation>> GetOperationsWithItemsAsync(CancellationToken cancellationToken);
+    Task<List<Document>> GetDocumentsAsync(CancellationToken cancellationToken);
 }

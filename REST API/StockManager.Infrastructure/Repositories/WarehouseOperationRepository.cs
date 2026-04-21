@@ -32,4 +32,19 @@ public class WarehouseOperationRepository : IWarehouseOperationRepository
         _context.WarehouseOperations.Update(operation);
         await _context.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<List<WarehouseOperation>> GetOperationsWithItemsAsync(CancellationToken cancellationToken)
+    {
+        return await _context.WarehouseOperations
+            .Include(o => o.Items)
+            .OrderByDescending(o => o.Date)
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<Document>> GetDocumentsAsync(CancellationToken cancellationToken)
+    {
+        return await _context.Documents
+            .OrderByDescending(d => d.CreatedAt)
+            .ToListAsync(cancellationToken);
+    }
 }

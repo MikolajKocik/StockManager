@@ -16,8 +16,8 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
     {
         var factory = new ConnectionFactory()
         {
-            HostName = configuration["RabbitMQ:HostName"] ?? "localhost",
-            UserName = configuration["RabbitMQ:UserName"] ?? "guest",
+            HostName = configuration["RabbitMQ:Host"] ?? "localhost",
+            UserName = configuration["RabbitMQ:Username"] ?? "guest",
             Password = configuration["RabbitMQ:Password"] ?? "guest"
         };
 
@@ -27,17 +27,17 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
 
     public async Task PublishAsync<T>(T message, string queueName) where T : class
     {
-        await _channel.QueueDeclareAsync(queue = queueName, durable = true, exclusive = false, autoDelete = false, arguments = null);
+        await _channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null);
 
         var json = JsonSerializer.Serialize(message);
         var body = Encoding.UTF8.GetBytes(json);
 
-        await _channel.BasicPublishAsync(exchange = string.Empty, routingKey = queueName, body = body);
+        await _channel.BasicPublishAsync(exchange: string.Empty, routingKey: queueName, body: body);
     }
 
     public void Subscribe<T>(string queueName, Func<T, Task> onMessageReceived) where T : class
     {
-        _channel.QueueDeclareAsync(queue = queueName, durable = true, exclusive = false, autoDelete = false, arguments = null).GetAwaiter().GetResult();
+        _channel.QueueDeclareAsync(queue: queueName, durable: true, exclusive: false, autoDelete: false, arguments: null).GetAwaiter().GetResult();
 
         var consumer = new AsyncEventingBasicConsumer(_channel);
         consumer.ReceivedAsync += async (model, ea) =>
@@ -51,10 +51,10 @@ public class RabbitMQMessageBus : IMessageBus, IDisposable
                 await onMessageReceived(message);
             }
 
-            await _channel.BasicAckAsync(deliveryTag = ea.DeliveryTag, multiple = false);
+            await _channel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
         };
 
-        _channel.BasicConsumeAsync(queue = queueName, autoAck = false, consumer = consumer).GetAwaiter().GetResult();
+        _channel.BasicConsumeAsync(queue: queueName, autoAck: false, consumer: consumer).GetAwaiter().GetResult();
     }
 
     public void Dispose()

@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using StackExchange.Redis;
 using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Infrastructure.Persistence.Data;
 using TestHelpers.TestHelpers.Auth;
 
@@ -98,6 +99,9 @@ public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
             })
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
                 "Test", options => { });
-                    });
+
+            var messageBusMock = new Mock<IMessageBus>();
+            services.AddSingleton<IMessageBus>(messageBusMock.Object);
+        });
     }
 }

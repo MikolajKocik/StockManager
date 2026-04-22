@@ -1,0 +1,10 @@
+export { default as Home } from './Home';
+export { default as LoginPage } from './auth/LoginPage';
+export { default as ProductList } from './products/ProductList';
+export { default as ProductDetails } from './products/ProductDetails';
+export { default as Suppliers } from './suppliers/Suppliers';
+export { default as Operations } from './operations/Operations';
+export { default as Shipments } from './shipments/Shipments';
+export { default as Documents } from './documents/Documents';
+export { default as InventoryItems } from './inventoryItems/InventoryItems';
+export { default as Analytics } from './analytics/Analytics';

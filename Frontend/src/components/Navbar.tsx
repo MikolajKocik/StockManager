@@ -14,15 +14,17 @@ export default function Navbar() {
     return (
         <nav className="navbar">
             <div className="navbar-logo">
-                <span className="logo-icon">
-                    <img src="/warehouse-stock.svg" alt="Warehouse Stock" />
-                </span>
                 StockManager
             </div>
             <ul className="navbar-links">
                 <li>
                     <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Dashboard
+                        Home
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink to="/analytics" className={({ isActive }) => isActive ? 'active' : ''}>
+                        Analytics
                     </NavLink>
                 </li>
                 <li>
@@ -41,8 +43,18 @@ export default function Navbar() {
                     </NavLink>
                 </li>
                 <li>
+                    <NavLink to="/shipments" className={({ isActive }) => isActive ? 'active' : ''}>
+                        Shipments
+                    </NavLink>
+                </li>
+                <li>
                     <NavLink to="/documents" className={({ isActive }) => isActive ? 'active' : ''}>
                         Documents
+                    </NavLink>
+                </li>
+                <li>
+                    <NavLink to="/inventory-items" className={({ isActive }) => isActive ? 'active' : ''}>
+                        Stock
                     </NavLink>
                 </li>
             </ul>

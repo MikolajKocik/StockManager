@@ -1,12 +1,18 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import ProductList from './pages/products/ProductList';
-import ProductDetails from './pages/products/ProductDetails';
-import Layout from './components/Layout';
-import Home from './pages/Home';
-import LoginPage from './pages/LoginPage';
-import Operations from './pages/Operations';
-import Documents from './pages/Documents';
-import { AuthProvider, useAuth } from './context/AuthContext';
+import Layout from '@/components/Layout';
+import {
+  Home,
+  LoginPage,
+  ProductList,
+  ProductDetails,
+  Suppliers,
+  Operations,
+  Shipments,
+  Documents,
+  InventoryItems,
+  Analytics
+} from '@/pages';
+import { AuthProvider, useAuth } from '@/context/AuthContext';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
@@ -24,10 +30,14 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<Home />} />
+            <Route path="/analytics" element={<Analytics />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/products/:id" element={<ProductDetails />} />
+            <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/operations" element={<Operations />} />
+            <Route path="/shipments" element={<Shipments />} />
             <Route path="/documents" element={<Documents />} />
+            <Route path="/inventory-items" element={<InventoryItems />} />
           </Route>
         </Routes>
       </BrowserRouter>

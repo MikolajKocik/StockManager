@@ -1,0 +1,31 @@
+.card-icon-wrapper {
+    margin-bottom: 16px;
+}
+
+.card-icon {
+    width: 48px;
+    height: 48px;
+}
+
+.card-title {
+    color: var(--accent);
+    margin-bottom: 12px;
+}
+
+.card-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 24px;
+}
+
+.card-link {
+    display: inline-flex;
+    align-items: center;
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.card-link-arrow {
+    margin-left: 8px;
+}

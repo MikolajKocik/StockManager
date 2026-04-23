@@ -1,0 +1,19 @@
+.home-header {
+    margin-bottom: 48px;
+}
+
+.home-title {
+    font-size: 3rem;
+    margin-bottom: 12px;
+}
+
+.home-subtitle {
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+}
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 32px;
+}

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import type { Supplier } from '@/models/supplier';
 import api from '@/api/api';
 import type { Product } from '@/models/product';
@@ -7,6 +6,15 @@ import type { InventoryItemCollection } from '@/models/inventoryItem';
 import type { ShipmentCollection } from '@/models/shipment';
 import type { WarehouseOperation } from '@/models/warehouseOperation';
 import { warehouseApi } from '@/api/warehouseApi';
+import DashboardCard from '@/components/DashboardCard';
+import './Home.css';
+
+// Import icons
+import packageIcon from '@/assets/package-svgrepo-com.svg';
+import suppliersIcon from '@/assets/suppliers.svg';
+import stockIcon from '@/assets/stock.svg';
+import deliveryIcon from '@/assets/delivery-transport-svgrepo-com.svg';
+import processIcon from '@/assets/process.svg';
 
 export default function Home() {
     const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -30,7 +38,7 @@ export default function Home() {
                     api.get("/suppliers"),
                     api.get("/products"),
                     api.get("/inventory-items"),
-                    api.get("shipments?status=Shipped"),
+                    api.get("/shipments?status=Shipped"),
                     warehouseApi.getOperations()
                 ]);
                 setSuppliers(suppliersRes.data);
@@ -40,7 +48,7 @@ export default function Home() {
                 setOperations(operationsRes.data)
             } catch (err) {
                 console.error(`Error occurred while loading data: ${err}`);
-                setError("Error occurred while loading data")
+                setError("Error occurred while fetching data. Try again later.")
             } finally {
                 setLoading(false);
             }
@@ -62,111 +70,61 @@ export default function Home() {
             {loading ? (
                 <p>Loading ...</p>
             ) : error ? (
-                <p style={{ color: 'red' }}>{error}</p>
+                <p className="error-message">{error}</p>
             ) : (
                 <div className="animate-slide-up">
-                    <header style={{ marginBottom: '48px' }}>
-                        <h1 style={{ fontSize: '3rem', marginBottom: '12px' }}>Warehouse Management System</h1>
-                        <p style={{ fontSize: '1.25rem', color: 'var(--text-secondary)' }}>
+                    <header className="home-header">
+                        <h1 className="home-title">Warehouse Management System</h1>
+                        <p className="home-subtitle">
                             Manage your inventory, suppliers, and products with ease and efficiency.
                         </p>
                     </header>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '32px' }}>
-                        <div className="card">
-                            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
-                                <img src="~/src/assets/package-svgrepo-com.svg" />
-                            </div>
-                            <h2 style={{ color: 'var(--accent)', marginBottom: '12px' }}>Products</h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '24px' }}>
-                                Total products in stock: <strong>{products.length ?? 0}</strong>
-                            </p>
-                            <Link to="/products" style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                color: 'var(--accent)',
-                                fontWeight: '600',
-                                fontSize: '1.1rem'
-                            }}>
-                                View all products <span style={{ marginLeft: '8px' }}>→</span>
-                            </Link>
-                        </div>
+                    <div className="dashboard-grid">
+                        <DashboardCard
+                            icon={packageIcon}
+                            title="Products"
+                            subtitle="Total products in stock"
+                            count={products.length ?? 0}
+                            linkTo="/products"
+                            linkText="View all products"
+                        />
 
-                        <div className="card">
-                            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
-                                <img src="~/src/assets/suppliers.svg" />
-                            </div>
-                            <h2 style={{ color: 'var(--accent)', marginBottom: '12px' }}>Suppliers</h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '24px' }}>
-                                Active suppliers: <strong>{suppliers.length ?? 0}</strong>
-                            </p>
-                            <Link to="/suppliers" style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                color: 'var(--accent)',
-                                fontWeight: '600',
-                                fontSize: '1.1rem'
-                            }}>
-                                Manage suppliers <span style={{ marginLeft: '8px' }}>→</span>
-                            </Link>
-                        </div>
+                        <DashboardCard
+                            icon={suppliersIcon}
+                            title="Suppliers"
+                            subtitle="Active suppliers"
+                            count={suppliers.length ?? 0}
+                            linkTo="/suppliers"
+                            linkText="Manage suppliers"
+                        />
 
-                        <div className="card">
-                            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
-                                <img src="~/src/assets/stock.svg" />
-                            </div>
-                            <h2 style={{ color: 'var(--accent)', marginBottom: '12px' }}>Stock</h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '24px' }}>
-                                Stock state: <strong>{inventoryItems.data.length ?? 0}</strong>
-                            </p>
-                            <Link to="/inventory-items" style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                color: 'var(--accent)',
-                                fontWeight: '600',
-                                fontSize: '1.1rem'
-                            }}>
-                                Manage stock <span style={{ marginLeft: '8px' }}>→</span>
-                            </Link>
-                        </div>
+                        <DashboardCard
+                            icon={stockIcon}
+                            title="Stock"
+                            subtitle="Stock state"
+                            count={inventoryItems.data.length ?? 0}
+                            linkTo="/inventory-items"
+                            linkText="Manage stock"
+                        />
 
-                        <div className="card">
-                            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
-                                <img src="~/src/assets/delivery-transport-svgrepo-com.svg" />
-                            </div>
-                            <h2 style={{ color: 'var(--accent)', marginBottom: '12px' }}>Shipments</h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '24px' }}>
-                                Active shipments: <strong>{shipments.data.length ?? 0}</strong>
-                            </p>
-                            <Link to="/shipments" style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                color: 'var(--accent)',
-                                fontWeight: '600',
-                                fontSize: '1.1rem'
-                            }}>
-                                Manage shipments <span style={{ marginLeft: '8px' }}>→</span>
-                            </Link>
-                        </div>
+                        <DashboardCard
+                            icon={deliveryIcon}
+                            title="Shipments"
+                            subtitle="Active shipments"
+                            count={shipments.data.length ?? 0}
+                            linkTo="/shipments"
+                            linkText="Manage shipments"
+                        />
 
-                        <div className="card">
-                            <div style={{ fontSize: '2.5rem', marginBottom: '16px' }}>
-                                <img src="~src/assets/process.svg" />
-                            </div>
-                            <h2 style={{ color: 'var(--accent)', marginBottom: '12px' }}>Operations</h2>
-                            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', marginBottom: '24px' }}>
-                                Last 7 days: <strong>{recentOperationsCount}</strong>
-                            </p>
-                            <Link to="/operations" style={{
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                color: 'var(--accent)',
-                                fontWeight: '600',
-                                fontSize: '1.1rem'
-                            }}>
-                                Manage operations <span style={{ marginLeft: '8px' }}>→</span>
-                            </Link>
-                        </div>
+                        <DashboardCard
+                            icon={processIcon}
+                            title="Operations"
+                            subtitle="Last 7 days"
+                            count={recentOperationsCount}
+                            linkTo="/operations"
+                            linkText="Manage operations"
+                        />
                     </div>
                 </div>
             )

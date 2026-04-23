@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
@@ -38,4 +39,7 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
         return purchaseOrderExist;
     }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.CustomerEntity;
 using StockManager.Infrastructure.Helpers;
@@ -41,4 +42,7 @@ public sealed class CustomerRepository : ICustomerRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
         return entity;
     }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

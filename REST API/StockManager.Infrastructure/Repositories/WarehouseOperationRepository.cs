@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 using StockManager.Infrastructure.Persistence.Data;
@@ -47,4 +48,7 @@ public class WarehouseOperationRepository : IWarehouseOperationRepository
             .OrderByDescending(d => d.CreatedAt)
             .ToListAsync(cancellationToken);
     }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _context.Database.BeginTransactionAsync(cancellationToken);
 }

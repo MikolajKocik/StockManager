@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.InvoiceEntity;
 using StockManager.Infrastructure.Helpers;
@@ -32,7 +33,7 @@ public sealed class InvoiceRepository : IInvoiceRepository
     public async Task<Invoice> AddInvoiceAsync(Invoice entity, CancellationToken cancellationToken)
         => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, entity, cancellationToken);
 
-    public async Task<Invoice> UpdateInvoiceAsync(Invoice entity, CancellationToken ct = default)
+    public async Task<Invoice> UpdateInvoiceAsync(Invoice entity, CancellationToken cancellationToken)
     {
         if (_dbContext.Entry(entity).State == EntityState.Detached)
         {
@@ -40,7 +41,10 @@ public sealed class InvoiceRepository : IInvoiceRepository
             _dbContext.Entry(entity).State = EntityState.Modified;
         }
 
-        await _dbContext.SaveChangesAsync(ct);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return entity;
     }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

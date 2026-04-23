@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
@@ -50,6 +51,10 @@ public class StockTransactionRepository : IStockTransactionRepository
             .AsNoTracking()
             .Include(st => st.InventoryItemId)
             .Include(st => st.TargetLocationId);
+
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 
     public async Task<StockTransaction?> UpdateStockTransactionAsync(StockTransaction stockTransaction, CancellationToken cancellationToken)
     {

@@ -47,6 +47,6 @@ public sealed class ShipmentRepository : IShipmentRepository
         return shipment;
     }
 
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => Task.FromResult(_dbContext.Database.BeginTransaction());
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

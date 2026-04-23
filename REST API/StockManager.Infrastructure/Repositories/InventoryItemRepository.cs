@@ -111,4 +111,7 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
         return inventoryItem;
     }
+
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

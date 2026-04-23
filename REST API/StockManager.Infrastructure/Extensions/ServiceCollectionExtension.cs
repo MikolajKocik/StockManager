@@ -10,10 +10,13 @@ using Microsoft.Extensions.Hosting;
 using StockManager.Application.Configurations;
 using StockManager.Application.Services;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Infrastructure.Persistence.Data;
 using StockManager.Infrastructure.Repositories;
 using StockManager.Infrastructure.Services.Auth;
+using StockManager.Infrastructure.Services;
+using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Infrastructure.Extensions;
 
@@ -61,6 +64,7 @@ public static class ServiceCollectionExtension
             .AddDefaultTokenProviders();
 
         services.AddScoped<IAuthService, AuthService>();
+        services.AddSingleton<ISystemStatisticsService, SystemStatisticsService>();
 
         // repositories with interfaces
         var infrastructureAssembly = Assembly.Load("StockManager.Infrastructure");

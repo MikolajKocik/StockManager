@@ -10,4 +10,5 @@ public interface IWarehouseOperationRepository : IBaseRepository
     Task UpdateAsync(WarehouseOperation operation, CancellationToken cancellationToken);
     Task<List<WarehouseOperation>> GetOperationsWithItemsAsync(CancellationToken cancellationToken);
     Task<List<Document>> GetDocumentsAsync(CancellationToken cancellationToken);
+    IQueryable<WarehouseOperation> GetOperations();
 }

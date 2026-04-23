@@ -11,6 +11,7 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
+using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Application.CQRS.Commands.WarehouseOperationCommands;
 
@@ -22,6 +23,7 @@ public sealed class CreateWarehouseOperationCommandHandler : ICommandHandler<Cre
     private readonly IMessageBus _messageBus;
     private readonly IMapper _mapper;
     private readonly ILogger<CreateWarehouseOperationCommandHandler> _logger;
+    private readonly ISystemStatisticsService _statisticsService;
 
     public CreateWarehouseOperationCommandHandler(
         IWarehouseOperationRepository operationRepository,
@@ -29,7 +31,8 @@ public sealed class CreateWarehouseOperationCommandHandler : ICommandHandler<Cre
         IInventoryItemService inventoryService,
         IMessageBus messageBus,
         IMapper mapper,
-        ILogger<CreateWarehouseOperationCommandHandler> logger)
+        ILogger<CreateWarehouseOperationCommandHandler> logger,
+        ISystemStatisticsService statisticsService)
     {
         _operationRepository = operationRepository;
         _inventoryRepository = inventoryRepository;
@@ -37,6 +40,7 @@ public sealed class CreateWarehouseOperationCommandHandler : ICommandHandler<Cre
         _messageBus = messageBus;
         _mapper = mapper;
         _logger = logger;
+        _statisticsService = statisticsService;
     }
 
     public async Task<Result<WarehouseOperationDto>> Handle(CreateWarehouseOperationCommand command, CancellationToken cancellationToken)
@@ -78,6 +82,7 @@ public sealed class CreateWarehouseOperationCommandHandler : ICommandHandler<Cre
         await _operationRepository.UpdateAsync(operation, cancellationToken);
 
         await _messageBus.PublishAsync(new { OperationId = operation.Id }, "generate-document");
+        _statisticsService.IncrementProcessedOperations();
 
         var dto = _mapper.Map<WarehouseOperationDto>(operation);
         return Result<WarehouseOperationDto>.Success(dto);

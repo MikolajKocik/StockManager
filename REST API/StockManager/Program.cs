@@ -28,6 +28,7 @@ app.UseCors(Policy.SpecificOrigins);
 app.UseRateLimiter();
 
 // Configure the HTTP command pipeline.
+app.UseMiddleware<RequestCounterMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())

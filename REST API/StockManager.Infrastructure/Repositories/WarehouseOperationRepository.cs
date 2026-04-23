@@ -34,6 +34,9 @@ public class WarehouseOperationRepository : IWarehouseOperationRepository
         await _context.SaveChangesAsync(cancellationToken);
     }
 
+    public IQueryable<WarehouseOperation> GetOperations()
+        => _context.WarehouseOperations.AsQueryable();
+
     public async Task<List<WarehouseOperation>> GetOperationsWithItemsAsync(CancellationToken cancellationToken)
     {
         return await _context.WarehouseOperations

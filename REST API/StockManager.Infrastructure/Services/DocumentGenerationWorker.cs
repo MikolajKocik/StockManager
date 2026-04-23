@@ -12,6 +12,7 @@ public class DocumentGenerationWorker : BackgroundService
     private readonly ILogger<DocumentGenerationWorker> _logger;
     private readonly IServiceScopeFactory _scopeFactory;
     private readonly IMessageBus _messageBus;
+    private readonly SemaphoreSlim _semaphore = new(5, 5);
 
     public DocumentGenerationWorker(
         ILogger<DocumentGenerationWorker> logger,
@@ -47,35 +48,68 @@ public class DocumentGenerationWorker : BackgroundService
 
     private async Task GenerateDocument(int operationId)
     {
-        using var scope = _scopeFactory.CreateScope();
-        var operationRepository = scope.ServiceProvider.GetRequiredService<IWarehouseOperationRepository>();
-        var productRepository = scope.ServiceProvider.GetRequiredService<IProductRepository>();
-        var pdfService = scope.ServiceProvider.GetRequiredService<IPdfService>();
-        var blobStorage = scope.ServiceProvider.GetRequiredService<IBlobStorageService>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<StockManager.Infrastructure.Persistence.Data.StockManagerDbContext>();
-
-        // Get operation from database
-        var operation = await operationRepository.GetByIdAsync(operationId, CancellationToken.None);
-        if (operation == null) return;
-
-        var itemsWithNames = new List<(string ProductName, decimal Quantity)>();
-        foreach (var item in operation.Items)
+        await _semaphore.WaitAsync();
+        try
         {
-            var product = await productRepository.GetProductByIdAsync(item.ProductId, CancellationToken.None);
-            itemsWithNames.Add((product?.Name ?? "Unknown", item.Quantity));
+            using var scope = _scopeFactory.CreateScope();
+            var operationRepository = scope.ServiceProvider.GetRequiredService<IWarehouseOperationRepository>();
+            var productRepository = scope.ServiceProvider.GetRequiredService<IProductRepository>();
+            var pdfService = scope.ServiceProvider.GetRequiredService<IPdfService>();
+            var blobStorage = scope.ServiceProvider.GetRequiredService<IBlobStorageService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<StockManager.Infrastructure.Persistence.Data.StockManagerDbContext>();
+
+            // Get operation from database
+            var operation = await operationRepository.GetByIdAsync(operationId, CancellationToken.None);
+            if (operation == null) return;
+
+            var productIds = operation.Items.Select(i => i.ProductId).Distinct().ToList();
+            var products = await productRepository.GetProducts()
+                .Where(p => productIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p.Name);
+
+            var itemsWithNames = operation.Items
+                .Select(item => (products.GetValueOrDefault(item.ProductId) ?? "Unknown", item.Quantity))
+                .ToList();
+
+            // Generate PDF document
+            using var pdfStream = await pdfService.GenerateOperationDocumentAsync(operation, itemsWithNames);
+            string fileName = $"{operation.Type}_{operation.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
+            var fileUrl = await blobStorage.UploadAsync(pdfStream, fileName, "application/pdf");
+            var operationRepository = scope.ServiceProvider.GetRequiredService<IWarehouseOperationRepository>();
+            var productRepository = scope.ServiceProvider.GetRequiredService<IProductRepository>();
+            var pdfService = scope.ServiceProvider.GetRequiredService<IPdfService>();
+            var blobStorage = scope.ServiceProvider.GetRequiredService<IBlobStorageService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<StockManager.Infrastructure.Persistence.Data.StockManagerDbContext>();
+
+            // Get operation from database
+            var operation = await operationRepository.GetByIdAsync(operationId, CancellationToken.None);
+            if (operation == null) return;
+
+            var productIds = operation.Items.Select(i => i.ProductId).Distinct().ToList();
+            var products = await productRepository.GetProducts()
+                .Where(p => productIds.Contains(p.Id))
+                .ToDictionaryAsync(p => p.Id, p => p.Name);
+
+            var itemsWithNames = operation.Items
+                .Select(item => (products.GetValueOrDefault(item.ProductId) ?? "Unknown", item.Quantity))
+                .ToList();
+
+            // Generate PDF document
+            using var pdfStream = await pdfService.GenerateOperationDocumentAsync(operation, itemsWithNames);
+            string fileName = $"{operation.Type}_{operation.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
+            var fileUrl = await blobStorage.UploadAsync(pdfStream, fileName, "application/pdf");
+
+            // Save document to database
+            var document = new Document(operationId, $"{operation.Type}/{DateTime.UtcNow:yyyy/MM}/{operation.Id:D3}", fileUrl);
+            await dbContext.Documents.AddAsync(document);
+            await dbContext.SaveChangesAsync();
+
+            _logger.LogInformation($"Document generated for operation {operationId}: {fileUrl}");
         }
-
-        // Generate PDF document
-        using var pdfStream = await pdfService.GenerateOperationDocumentAsync(operation, itemsWithNames);
-        string fileName = $"{operation.Type}_{operation.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
-        var fileUrl = await blobStorage.UploadAsync(pdfStream, fileName, "application/pdf");
-
-        // Save document to database
-        var document = new Document(operationId, $"{operation.Type}/{DateTime.UtcNow:yyyy/MM}/{operation.Id:D3}", fileUrl);
-        await dbContext.Documents.AddAsync(document);
-        await dbContext.SaveChangesAsync();
-
-        _logger.LogInformation($"Document generated for operation {operationId}: {fileUrl}");
+        finally
+        {
+            _semaphore.Release();
+        }
     }
 }
 

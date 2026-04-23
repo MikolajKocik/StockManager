@@ -65,7 +65,7 @@ export default function LoginPage() {
                     </div>
 
                     <button type="submit" className="login-btn" disabled={loading}>
-                        {loading ? 'Authenticating...' : 'Login to Dashboard'}
+                        {loading ? 'Authenticating...' : 'Log In'}
                     </button>
                 </form>
             </div>

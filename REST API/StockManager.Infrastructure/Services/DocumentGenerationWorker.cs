@@ -23,14 +23,26 @@ public class DocumentGenerationWorker : BackgroundService
         _messageBus = messageBus;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _messageBus.Subscribe<DocumentGenerationRequest>("generate-document", async request =>
+        while (!stoppingToken.IsCancellationRequested)
         {
-            await GenerateDocument(request.OperationId);
-        });
+            try
+            {
+                await _messageBus.SubscribeAsync<DocumentGenerationRequest>("generate-document", async request =>
+                {
+                    await GenerateDocument(request.OperationId);
+                });
 
-        return Task.CompletedTask;
+                await Task.Delay(Timeout.Infinite, stoppingToken);
+                return;
+            }
+            catch (Exception ex) when (!stoppingToken.IsCancellationRequested)
+            {
+                _logger.LogWarning(ex, "RabbitMQ unavailable, retrying in 10s...");
+                await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
+            }
+        }
     }
 
     private async Task GenerateDocument(int operationId)

@@ -44,6 +44,8 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: "${RABBITMQ__USERNAME}"
       RABBITMQ_DEFAULT_PASS: "${RABBITMQ__PASSWORD}"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
@@ -104,5 +106,6 @@ services:
 
 volumes:
     sql-data: {}
+    rabbitmq-data: {}
 
   

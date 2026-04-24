@@ -79,6 +79,6 @@ public sealed class SupplierRepository : ISupplierRepository
         return supplierExist;
     }
 
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => Task.FromResult(_dbContext.Database.BeginTransaction());
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

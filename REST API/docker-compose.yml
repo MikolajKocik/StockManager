@@ -18,6 +18,12 @@ services:
       JWT__Audience: "${JWT__AUDIENCE}"
       Redis__Host: "${REDIS__HOST}"
       Redis__Port: "${REDIS__PORT}"
+      RabbitMQ__Host: "${RABBITMQ__HOST}"
+      RabbitMQ__Port: "${RABBITMQ__PORT}"
+      RabbitMQ__Username: "${RABBITMQ__USERNAME}"
+      RabbitMQ__Password: "${RABBITMQ__PASSWORD}"
+      AzureStorage__ConnectionString: "${AZURE_STORAGE__CONNECTION_STRING}"
+      AzureStorage__ContainerName: "${AZURE_STORAGE__CONTAINER_NAME}"
       OTEL_TRACES_EXPORTER: "${OTEL_TRACES_EXPORTER:-none}"
       OTEL_METRICS_EXPORTER: "${OTEL_METRICS_EXPORTER:-none}"
       OTEL_LOGS_EXPORTER: "${OTEL_LOGS_EXPORTER:-none}"
@@ -26,6 +32,35 @@ services:
             condition: service_healthy
         sqlserver:
             condition: service_healthy
+        rabbitmq:
+            condition: service_healthy
+
+  rabbitmq:
+    container_name: stockmanager-rabbitmq
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "${RABBITMQ__USERNAME}"
+      RABBITMQ_DEFAULT_PASS: "${RABBITMQ__PASSWORD}"
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    container_name: stockmanager-frontend
+    build:
+      context: ../Frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - stockmanager
 
     volumes:
       - ./logs:/app/logs
@@ -71,5 +106,6 @@ services:
 
 volumes:
     sql-data: {}
+    rabbitmq-data: {}
 
   

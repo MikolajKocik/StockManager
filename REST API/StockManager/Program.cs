@@ -22,10 +22,13 @@ builder.Services.AddApplication(builder.Configuration);
 
 WebApplication app = builder.Build();
 
+app.UseCors(Policy.SpecificOrigins);
+
 // rate limit middleware
 app.UseRateLimiter();
 
 // Configure the HTTP command pipeline.
+app.UseMiddleware<RequestCounterMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 if (app.Environment.IsDevelopment())
@@ -63,8 +66,6 @@ if (app.Environment.IsDevelopment())
 app.MapGroup("api/identity")
     .WithTags("Identity")
     .MapIdentityApi<User>();
-
-app.UseCors(Policy.SpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();

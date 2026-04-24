@@ -2,13 +2,14 @@ import type { ProductCreateForm } from "../../../models/product";
 import { useState, useEffect } from 'react';
 import api from '../../../api/api';
 import Modal from '../../Modal';
- 
+
 interface ProductCreateModalProps {
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModalProps) {
+export default function ProductCreateForm({ isOpen, onClose, onSuccess }: ProductCreateModalProps) {
     const [genres, setGenres] = useState<string[]>([]);
     const [types, setTypes] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
@@ -31,10 +32,11 @@ export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModa
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    const handleSubmit = async (e: React.SyntheticEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             await api.post('/products', form);
+            onSuccess?.();
             onClose();
         } catch (err) {
             setError("Error occurred while saving data...");
@@ -49,7 +51,7 @@ export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModa
             try {
                 const [genresRes, typesRes] = await Promise.all([
                     api.get<string[]>('/products/genres'),
-                    api.get<string[]>('products/warehouses')
+                    api.get<string[]>('/products/warehouses')
                 ]);
                 setGenres(genresRes.data);
                 setTypes((typesRes.data));
@@ -64,7 +66,7 @@ export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModa
 
         fetchData();
     }, [isOpen]);
-    
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <h2>Add new product</h2>
@@ -72,7 +74,7 @@ export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModa
             {loading ? (
                 <p>Loading...</p>
             ) : error ? (
-                <p style={{ color: 'red'}}>{error}</p>
+                <p style={{ color: 'red' }}>{error}</p>
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div>

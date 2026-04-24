@@ -10,15 +10,18 @@ using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.Logging.Supplier;
 using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
+using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 using System.Reflection;
 using System.Transactions;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Abstractions.CQRS.Query;
 
 namespace StockManager.Application.Common.PipelineBehavior;
 
 public sealed class TrackingBehavior<TRequest, TResponse> 
     : IPipelineBehavior<TRequest, TResponse> 
-    where TRequest : notnull
+    where TRequest : IBaseCommand
 {
     private readonly ILogger<TrackingBehavior<TRequest, TResponse>> _logger;
     private readonly IEnumerable<IValidator<TRequest>> _validators;

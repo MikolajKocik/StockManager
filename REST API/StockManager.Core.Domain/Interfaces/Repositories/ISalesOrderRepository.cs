@@ -8,7 +8,7 @@ using StockManager.Core.Domain.Models.SalesOrderEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface ISalesOrderRepository 
+public interface ISalesOrderRepository : IBaseRepository
 {
     IQueryable<SalesOrder> GetSalesOrders();
 

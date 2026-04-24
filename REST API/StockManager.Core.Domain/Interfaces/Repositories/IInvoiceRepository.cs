@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using StockManager.Core.Domain.Models.InvoiceEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
-public interface IInvoiceRepository
+public interface IInvoiceRepository : IBaseRepository
 {
     IQueryable<Invoice> GetInvoices();
     Task<Invoice?> GetInvoiceByIdAsync(int id, CancellationToken cancellationToken);

@@ -8,12 +8,13 @@ using StockManager.Core.Domain.Models.BinLocationEntity;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
-public interface IInventoryItemRepository 
+public interface IInventoryItemRepository : IBaseRepository
 {
     IQueryable<InventoryItem> GetInventoryItems();
     Task<InventoryItem?> GetInventoryItemByIdAsync(int id, CancellationToken cancellationToken);
     Task<InventoryItem> AddInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken);
     Task<InventoryItem> UpdateInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken);
     Task<BinLocation> GetBinLocationByIdAsync(int binLocationId, CancellationToken cancellationToken);
+    Task<List<InventoryItem>> GetInventoryItemsByProductIdAsync(int productId, CancellationToken cancellationToken);
     Task<InventoryItem?> DeleteInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken);
 }

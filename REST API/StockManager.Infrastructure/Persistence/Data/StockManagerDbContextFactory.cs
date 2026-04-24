@@ -19,6 +19,8 @@ public sealed class StockManagerDbContextFactory : IDesignTimeDbContextFactory<S
             .SetBasePath(basePath)
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
             .AddJsonFile("appsettings.Development.json", optional: true, reloadOnChange: true)
+            .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
+            .AddEnvironmentVariables()
             .Build();
 
         string? connString = configuration.GetConnectionString("DockerConnection")

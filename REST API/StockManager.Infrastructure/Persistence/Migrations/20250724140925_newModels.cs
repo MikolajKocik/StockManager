@@ -66,13 +66,12 @@ namespace StockManager.Infrastructure.Migrations
                 newName: "AspNetRoleClaims",
                 newSchema: "StockManager");
 
-            migrationBuilder.AddColumn<int>(
+            migrationBuilder.AddColumn<Guid>(
                 name: "AddressId",
                 schema: "StockManager",
                 table: "Suppliers",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+                type: "uniqueidentifier",
+                nullable: false);
 
             migrationBuilder.AlterColumn<string>(
                 name: "Slug",

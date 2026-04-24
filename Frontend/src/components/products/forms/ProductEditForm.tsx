@@ -10,7 +10,7 @@ interface ProductEditFormProps {
     onClose: () => void;
     onSuccess?: () => void;
 }
- 
+
 export default function ProductEditForm({ isOpen, productId, onClose, onSuccess }: ProductEditFormProps) {
     const [genres, setGenres] = useState<string[]>([]);
     const [types, setTypes] = useState<string[]>([]);
@@ -35,7 +35,7 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    const handleSubmit = async (e: React.SyntheticEvent) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
             await api.put(`/products/${productId}`, form);
@@ -73,7 +73,7 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
 
         fetchData();
     }, [isOpen, productId]);
-    
+
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <h2>Edit product</h2>
@@ -81,7 +81,7 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
             {loading ? (
                 <p>Loading...</p>
             ) : error ? (
-                <p style={{ color: 'red'}}>{error}</p>
+                <p style={{ color: 'red' }}>{error}</p>
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div>

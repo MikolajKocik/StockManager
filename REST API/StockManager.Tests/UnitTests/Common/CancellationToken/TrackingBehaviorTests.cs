@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
+using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using TestHelpers.ProductFactory;
@@ -14,12 +14,12 @@ namespace StockManager.Application.Tests.UnitTests.Common.CancellationToken;
 
 public sealed class TrackingBehaviorTests
 {
-    private readonly Mock<IEnumerable<IValidator<GetProductByIdQuery>>> _validators;
+    private readonly Mock<IEnumerable<IValidator<AddProductCommand>>> _validators;
     private readonly Mock<IBaseRepository> _baseRepository;
 
     public TrackingBehaviorTests()
     {
-        _validators = new Mock<IEnumerable<IValidator<GetProductByIdQuery>>>();
+        _validators = new Mock<IEnumerable<IValidator<AddProductCommand>>>();
         _baseRepository = new Mock<IBaseRepository>();
     }
 
@@ -29,7 +29,7 @@ public sealed class TrackingBehaviorTests
     /// cref="CancellationToken"/>.
     /// </summary>
     /// <remarks>This test ensures that the behavior correctly respects the cancellation token and halts
-    /// execution  when a cancellation is signaled. It uses a mock setup for validators and a test query to simulate 
+    /// execution  when a cancellation is signaled. It uses a mock setup for validators and a test command to simulate 
     /// the scenario.</remarks>
     /// <returns></returns>
     [Fact]
@@ -37,25 +37,35 @@ public sealed class TrackingBehaviorTests
     {   
         //
         _validators.Setup(v => v.GetEnumerator())
-            .Returns(Enumerable.Empty<IValidator<GetProductByIdQuery>>().GetEnumerator());
+            .Returns(Enumerable.Empty<IValidator<AddProductCommand>>().GetEnumerator());
 
-        NullLogger<TrackingBehavior<GetProductByIdQuery, Result<ProductCreateDto>>> logger = 
-            NullLogger<TrackingBehavior<GetProductByIdQuery, Result<ProductCreateDto>>>.Instance;
+        NullLogger<TrackingBehavior<AddProductCommand, Result<ProductDto>>> logger = 
+            NullLogger<TrackingBehavior<AddProductCommand, Result<ProductDto>>>.Instance;
 
-        var behavior = new TrackingBehavior<GetProductByIdQuery, Result<ProductCreateDto>>(
+        var behavior = new TrackingBehavior<AddProductCommand, Result<ProductDto>>(
             logger, _validators.Object, _baseRepository.Object
             );
 
         using var cancellationToken = new CancellationTokenSource();
         await cancellationToken.CancelAsync();
 
-        var query = new GetProductByIdQuery(1);
         ProductCreateDto data = ProductTestDtoFactory.CreateTestDto();
+        var command = new AddProductCommand(data);
+        var productDto = new ProductDto 
+        { 
+            Id = 1, 
+            Name = data.Name, 
+            Slug = "test-slug",
+            Genre = "test-genre",
+            Unit = "test-unit",
+            Type = "test-type",
+            BatchNumber = "test-batch"
+        };
 
         //
-        var next = new RequestHandlerDelegate<Result<ProductCreateDto>>(() => Task.FromResult(Result<ProductCreateDto>.Success(data)));
+        var next = new RequestHandlerDelegate<Result<ProductDto>>(() => Task.FromResult(Result<ProductDto>.Success(productDto)));
 
-        Func<Task> act = async () => await behavior.Handle(query, next, cancellationToken.Token);
+        Func<Task> act = async () => await behavior.Handle(command, next, cancellationToken.Token);
 
         //
         await act.Should().ThrowAsync<OperationCanceledException>();

@@ -30,7 +30,7 @@ public static class PresentationLayer
         {
             opts.AddFixedWindowLimiter("fixed", opt =>
             {
-                opt.PermitLimit = 5;
+                opt.PermitLimit = 30;
                 opt.Window = TimeSpan.FromSeconds(5);
                 opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
                 opt.QueueLimit = 0;

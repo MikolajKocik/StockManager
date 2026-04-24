@@ -871,6 +871,116 @@ namespace StockManager.Infrastructure.Migrations
                     b.ToTable("AspNetUsers", "StockManager");
                 });
 
+            modelBuilder.Entity("StockManager.Core.Domain.Models.WarehouseOperationEntity.Document", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DocumentNumber")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<int>("OperationId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Documents", "StockManager");
+                });
+
+            modelBuilder.Entity("StockManager.Core.Domain.Models.WarehouseOperationEntity.FileMetadata", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("BlobUrl")
+                        .IsRequired()
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int?>("OperationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("UploadedAt")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FileMetadatas", "StockManager");
+                });
+
+            modelBuilder.Entity("StockManager.Core.Domain.Models.WarehouseOperationEntity.OperationItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OperationId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProductId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Quantity")
+                        .HasPrecision(18, 4)
+                        .HasColumnType("decimal(18,4)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperationId");
+
+                    b.ToTable("OperationItems", "StockManager");
+                });
+
+            modelBuilder.Entity("StockManager.Core.Domain.Models.WarehouseOperationEntity.WarehouseOperation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("WarehouseOperations", "StockManager");
+                });
+
             modelBuilder.Entity("StockManager.Core.Domain.SharedModels.RolePermissionsEntity.RolePermissions", b =>
                 {
                     b.Property<int>("PermissionId")
@@ -1164,6 +1274,15 @@ namespace StockManager.Infrastructure.Migrations
                     b.Navigation("InventoryItem");
                 });
 
+            modelBuilder.Entity("StockManager.Core.Domain.Models.WarehouseOperationEntity.OperationItem", b =>
+                {
+                    b.HasOne("StockManager.Core.Domain.Models.WarehouseOperationEntity.WarehouseOperation", null)
+                        .WithMany("Items")
+                        .HasForeignKey("OperationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("StockManager.Core.Domain.SharedModels.RolePermissionsEntity.RolePermissions", b =>
                 {
                     b.HasOne("StockManager.Core.Domain.Models.RoleEntity.Role", null)
@@ -1252,6 +1371,11 @@ namespace StockManager.Infrastructure.Migrations
             modelBuilder.Entity("StockManager.Core.Domain.Models.UserEntity.User", b =>
                 {
                     b.Navigation("AuditLogs");
+                });
+
+            modelBuilder.Entity("StockManager.Core.Domain.Models.WarehouseOperationEntity.WarehouseOperation", b =>
+                {
+                    b.Navigation("Items");
                 });
 #pragma warning restore 612, 618
         }

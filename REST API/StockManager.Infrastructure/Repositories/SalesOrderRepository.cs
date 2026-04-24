@@ -51,6 +51,6 @@ public sealed class SalesOrderRepository : ISalesOrderRepository
         await _dbContext.SaveChangesAsync(cancellationToken);
         return salesOrder;
     }
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-         => Task.FromResult(_dbContext.Database.BeginTransaction());
+    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+         => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

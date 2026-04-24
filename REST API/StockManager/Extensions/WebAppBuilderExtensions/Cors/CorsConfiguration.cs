@@ -8,8 +8,7 @@ internal static class CorsConfiguration
         {
             c.AddPolicy(Policy.SpecificOrigins, policy =>
             {
-                policy.WithOrigins("http://stockmanager-example.com",
-                    "http://stockmanager-service-example.com")
+                policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
                 .AllowAnyHeader()
                 .AllowAnyMethod();
             });

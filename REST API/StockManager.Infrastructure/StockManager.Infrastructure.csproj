@@ -14,6 +14,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Scrutor" />
+    <PackageReference Include="Microsoft.Extensions.Http.Resilience" />
+    <PackageReference Include="Azure.Storage.Blobs" />
+    <PackageReference Include="RabbitMQ.Client" />
+    <PackageReference Include="QuestPDF" />
   </ItemGroup>
 
  <!-- Dependencies -->

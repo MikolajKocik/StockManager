@@ -25,9 +25,8 @@ The repository (`REST API/`) is divided into projects:
 
 - **StockManager.Core.Domain** – domain models/entities.
 - **StockManager.Application** – application logic, **CQRS** (commands/queries), **MediatR**, validation, etc.
-- **StockManager.Infrastructure** – data access (**EF Core** for Azure SQL), integrations (e.g., Redis), interface implementations.
-- **StockManager** – **ASP.NET Core Web API** app (endpoints, DI config, Serilog, OTEL).
-- **StockManager.Application.Tests / StockManager.Tests** – unit/integration tests (xUnit).
+- **StockManager.Infrastructure** – data access (**EF Core** for Azure SQL), integrations (**RabbitMQ**, **Azure Blob Storage**, Redis), interface implementations.
+- **StockManager** – **ASP.NET Core Web API** app (endpoints, DI config, Background Workers for document generation, Serilog, OTEL).
 - Files: `docker-compose.yml`, `docker-compose.override.yml`, `.env_template`, `Directory.Packages.props` (central NuGet versions), etc.
 
 ---
@@ -53,9 +52,9 @@ The repository (`REST API/`) is divided into projects:
    ```
    This command will:
 
-   - Pull images for mssql/server:2022-latest and redis:7-alpine,
+   - Pull images for mssql/server:2022-latest, redis:7-alpine, and **rabbitmq:3-management**,
    - Build the stockmanager:latest image (your API),
-   - Start 3 containers: stockmanager-sql (1433), redis (6379), stockmanager (API – mapped to e.g., http://localhost:5000 / http://localhost:8080 as per compose).
+   - Start 4 containers: stockmanager-sql (1433), redis (6379), **rabbitmq (5672/15672)**, stockmanager (API – mapped to e.g., http://localhost:5000 / http://localhost:8080 as per compose).
 
    Check containers:
    ```bash
@@ -78,6 +77,20 @@ The repository (`REST API/`) is divided into projects:
   User Id=sa;Password=<YourSAPassword>;
   TrustServerCertificate=True;Encrypt=False;
 ```
+
+---
+
+## Asynchronous Logistics Flow
+
+The project implements a modern, asynchronous architecture for warehouse operations:
+
+1.  **Operation Creation**: When a user creates a warehouse operation (PZ, WZ, RW, MM), the API updates the inventory and publishes a "Light Message" to **RabbitMQ**.
+2.  **Background Processing**: A `DocumentGenerationWorker` (HostedService) listens for these messages.
+3.  **PDF Generation**: The worker fetches operation details, generates a professional PDF receipt using **QuestPDF**.
+4.  **Cloud Storage**: The PDF is uploaded to **Azure Blob Storage**.
+5.  **Audit & Retrieval**: Metadata is saved to the database, allowing users to download generated documents via the React UI.
+
+---
 
 ## Tests
 
@@ -109,6 +122,9 @@ Main dependencies used in the project (based on structure/config):
 - OpenTelemetry.Instrumentation.Runtime
 - OpenTelemetry.Exporter.OpenTelemetryProtocol
 - Azure.Identity, Azure.Monitor.OpenTelemetry.Exporter
+- Azure.Storage.Blobs (Cloud file storage)
+- RabbitMQ.Client (Messaging)
+- QuestPDF (PDF generation engine)
 - Microsoft.AspNetCore.Authentication.JwtBearer
 
 **Validation / Mapping**
@@ -135,7 +151,8 @@ Environment consists of:
 - **GitHub Container Registry (GHCR)** – Docker image registry
 - **Azure Container Apps** – API container host
 - **Azure SQL Server + Azure SQL Database** – database
-- **Azure Storage – Azure Files** – file shares
+- **Azure Storage – Azure Blob Storage** – document storage
+- **Azure Service Bus or RabbitMQ** – messaging backbone
 - **Azure Key Vault** – secrets handling
 - **Application Insights (+ Log Analytics Workspace)** – telemetry & logs
 - **Managed Environment** – ACA environment
@@ -155,9 +172,6 @@ Environment consists of:
 
 - **Resource Group – all services:**  
   ![rg](docs/stockmanager-group-resources.png)
-
-- **Azure Files – file share:**  
-  ![files](docs/azure-storage-files.jpg)
 
 - **CI/CD via GitHub Actions & Entra ID (OIDC):**  
   ![App Registrations](docs/azure-app-registrations.png)

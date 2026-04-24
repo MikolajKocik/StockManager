@@ -11,7 +11,6 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
-using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Application.CQRS.Commands.WarehouseOperationCommands;
 
@@ -47,12 +46,12 @@ public sealed class CreateWarehouseOperationCommandHandler : ICommandHandler<Cre
     {
         var operation = new WarehouseOperation(command.Type, command.Date, command.Description);
 
-        foreach (var item in command.Items)
+        foreach (OperationItemDto item in command.Items)
         {
             operation.AddItem(item.ProductId, item.Quantity);
 
-            var inventoryItems = await _inventoryRepository.GetInventoryItemsByProductIdAsync(item.ProductId, cancellationToken);
-            var inventoryItem = inventoryItems.FirstOrDefault();
+            List<InventoryItem> inventoryItems = await _inventoryRepository.GetInventoryItemsByProductIdAsync(item.ProductId, cancellationToken);
+            InventoryItem inventoryItem = inventoryItems.FirstOrDefault();
 
             if (inventoryItem == null)
             {
@@ -81,10 +80,10 @@ public sealed class CreateWarehouseOperationCommandHandler : ICommandHandler<Cre
         operation.Complete();
         await _operationRepository.UpdateAsync(operation, cancellationToken);
 
-        await _messageBus.PublishAsync(new { OperationId = operation.Id }, "generate-document");
+        await _messageBus.PublishAsync(new { OperationId = operation.Id }, "generate-document", cancellationToken);
         _statisticsService.IncrementProcessedOperations();
 
-        var dto = _mapper.Map<WarehouseOperationDto>(operation);
+        WarehouseOperationDto dto = _mapper.Map<WarehouseOperationDto>(operation);
         return Result<WarehouseOperationDto>.Success(dto);
     }
 }

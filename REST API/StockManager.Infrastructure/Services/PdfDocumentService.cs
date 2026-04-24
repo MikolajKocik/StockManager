@@ -1,3 +1,4 @@
+using System.Globalization;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
@@ -13,9 +14,14 @@ public class PdfDocumentService : IPdfService
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
-    public Task<Stream> GenerateOperationDocumentAsync(WarehouseOperation operation, List<(string ProductName, decimal Quantity)> items)
+    public Task<Stream> GenerateOperationDocumentAsync(
+        WarehouseOperation operation,
+        List<(string ProductName, decimal Quantity)> items, 
+        CancellationToken cancellationToken)
     {
         var stream = new MemoryStream();
+
+        IFormatProvider formatProvider = CultureInfo.CurrentCulture;
 
         QuestPDF.Fluent.Document.Create(container =>
         {
@@ -50,20 +56,16 @@ public class PdfDocumentService : IPdfService
                             header.Cell().Element(CellStyle).Text("Quantity");
 
                             static IContainer CellStyle(IContainer container)
-                            {
-                                return container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
-                            }
+                                => container.DefaultTextStyle(x => x.SemiBold()).PaddingVertical(5).BorderBottom(1).BorderColor(Colors.Black);
                         });
 
-                        foreach (var item in items)
+                        foreach ((string productName, decimal quantity) in items)
                         {
-                            table.Cell().Element(CellStyle).Text(item.ProductName);
-                            table.Cell().Element(CellStyle).Text(item.Quantity.ToString());
+                            table.Cell().Element(CellStyle).Text(productName);
+                            table.Cell().Element(CellStyle).Text(quantity.ToString(formatProvider));
 
                             static IContainer CellStyle(IContainer container)
-                            {
-                                return container.PaddingVertical(5);
-                            }
+                                => container.PaddingVertical(5);                           
                         }
                     });
                 });

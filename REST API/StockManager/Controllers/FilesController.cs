@@ -41,10 +41,12 @@ public sealed class FilesController : ControllerBase
     public async Task<IActionResult> Upload(IFormFile file, [FromQuery] int? operationId, CancellationToken cancellationToken)
     {
         if (file == null || file.Length == 0)
+        {
             return BadRequest("No file uploaded.");
+        }
 
-        using var stream = file.OpenReadStream();
-        var blobUrl = await _blobStorage.UploadAsync(stream, file.FileName, file.ContentType);
+        using Stream stream = file.OpenReadStream();
+        string blobUrl = await _blobStorage.UploadAsync(stream, file.FileName, file.ContentType, cancellationToken);
 
         var fileMetadata = new FileMetadata(file.FileName, blobUrl, operationId);
         await _context.FileMetadatas.AddAsync(fileMetadata, cancellationToken);

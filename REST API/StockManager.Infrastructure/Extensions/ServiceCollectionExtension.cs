@@ -16,7 +16,6 @@ using StockManager.Infrastructure.Persistence.Data;
 using StockManager.Infrastructure.Repositories;
 using StockManager.Infrastructure.Services.Auth;
 using StockManager.Infrastructure.Services;
-using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Infrastructure.Extensions;
 

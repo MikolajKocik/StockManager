@@ -17,6 +17,7 @@ using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 using StockManager.Infrastructure.Services.Auth;
+using StockManager.Infrastructure.Jobs;
 
 
 namespace StockManager.Extensions.WebAppBuilderExtensions.Services;

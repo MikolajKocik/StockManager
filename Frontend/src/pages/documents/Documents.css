@@ -11,24 +11,6 @@
     margin-bottom: 3rem;
 }
 
-.doc-section {
-    margin-bottom: 4rem;
-}
-
-.doc-section h2 {
-    font-size: 1.5rem;
-    color: #1e293b;
-    margin-bottom: 1.5rem;
-    border-left: 4px solid #4f46e5;
-    padding-left: 1rem;
-}
-
-.doc-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.5rem;
-}
-
 .doc-card {
     background: white;
     padding: 1.5rem;

@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { warehouseApi } from '@/api/warehouseApi';
 import './Documents.css';
+import type { AnyObject } from 'node_modules/chart.js/dist/types/basic';
+import DocumentSection from '@/components/DocumentSection';
+import type { Document } from '@/models/document';
 
 export default function Documents() {
     const [documents, setDocuments] = useState([]);
@@ -46,37 +49,31 @@ export default function Documents() {
                 </div>
             </header>
 
-            <section className="doc-section">
-                <h2>Generated Documents</h2>
-                <div className="doc-grid">
-                    {documents.map((doc: any) => (
-                        <div key={doc.id} className="doc-card">
-                            <div className="doc-icon">📄</div>
-                            <div className="doc-info">
-                                <span className="doc-number">{doc.documentNumber}</span>
-                                <span className="doc-date">{new Date(doc.createdAt).toLocaleDateString()}</span>
-                            </div>
-                            <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
+            <DocumentSection title="Generated Documents">
+                {documents.map((doc: Document) => (
+                    <div key={doc.id} className="doc-card">
+                        <div className="doc-icon">📄</div>
+                        <div className="doc-info">
+                            <span className="doc-number">{doc.documentNumber}</span>
+                            <span className="doc-date">{new Date(doc.createdAt).toLocaleDateString()}</span>
                         </div>
-                    ))}
-                </div>
-            </section>
+                        <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
+                    </div>
+                ))}
+            </DocumentSection>
 
-            <section className="doc-section">
-                <h2>Uploaded Scans</h2>
-                <div className="doc-grid">
-                    {files.map((file: any) => (
-                        <div key={file.id} className="doc-card">
-                            <div className="doc-icon">📎</div>
-                            <div className="doc-info">
-                                <span className="doc-number">{file.fileName}</span>
-                                <span className="doc-date">{new Date(file.uploadedAt).toLocaleDateString()}</span>
-                            </div>
-                            <a href={file.blobUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
+            <DocumentSection title="Uploaded Scans">                
+                {files.map((file: AnyObject) => (
+                    <div key={file.id} className="doc-card">
+                        <div className="doc-icon">📎</div>
+                        <div className="doc-info">
+                            <span className="doc-number">{file.fileName}</span>
+                            <span className="doc-date">{new Date(file.uploadedAt).toLocaleDateString()}</span>
                         </div>
-                    ))}
-                </div>
-            </section>
+                        <a href={file.blobUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
+                    </div>
+                ))}
+            </DocumentSection>
         </div>
     );
 };

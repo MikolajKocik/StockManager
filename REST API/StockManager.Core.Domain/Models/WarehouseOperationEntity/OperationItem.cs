@@ -13,8 +13,10 @@ public sealed class OperationItem : Entity<int>
     {
         Guard.AgainstDefaultValue(productId);
         if (quantity <= 0)
+        {
             throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
-
+        }
+        
         OperationId = operationId;
         ProductId = productId;
         Quantity = quantity;

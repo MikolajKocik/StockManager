@@ -25,39 +25,6 @@
     background: var(--accent-hover);
 }
 
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--bg);
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: var(--shadow);
-    border: 1px solid var(--border);
-}
-
-.product-table th,
-.product-table td {
-    padding: 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-}
-
-.product-table th {
-    background: var(--code-bg);
-    color: var(--secondary);
-    font-weight: 600;
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-}
-
-.product-table tr:last-child td {
-    border-bottom: none;
-}
-
-.product-table tr:hover {
-    background: var(--accent-bg);
-}
 
 .product-link {
     color: var(--accent);

@@ -5,4 +5,6 @@ namespace StockManager.Core.Domain.Interfaces.Services;
 public interface IPdfService
 {
     Task<Stream> GenerateOperationDocumentAsync(WarehouseOperation operation, List<(string ProductName, decimal Quantity)> items, CancellationToken cancellationToken);
+
+    string ExtractTextFromPdf(Stream pdfStream);
 }

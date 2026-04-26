@@ -43,6 +43,7 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
             onClose();
         } catch (err) {
             setError("Error occurred while updating product");
+            console.error(`Error occurred while updating product: ${err}`);
         }
     };
 

@@ -18,6 +18,8 @@ using StockManager.Infrastructure.Services.Auth;
 using StockManager.Infrastructure.Services;
 using StockManager.Infrastructure.Ollama.Services;
 using StockManager.Infrastructure.Ollama.Interfaces;
+using Microsoft.Extensions.AI;
+using OllamaSharp;
 
 namespace StockManager.Infrastructure.Extensions;
 
@@ -67,6 +69,11 @@ public static class ServiceCollectionExtension
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<StockManagerDbContext>()
             .AddDefaultTokenProviders();
+
+        // AI Services
+        var ollamaUri = new Uri("http://localhost:11434");
+        services.AddChatClient(new OllamaApiClient(ollamaUri, "deepseek-r1:14b"));
+        services.AddEmbeddingGenerator(new OllamaApiClient(ollamaUri, "nomic-embed-text"));
 
         // configure DI for repositories and services with their interfaces
         var infrastructureAssembly = Assembly.Load("StockManager.Infrastructure");

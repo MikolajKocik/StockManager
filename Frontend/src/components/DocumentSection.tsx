@@ -1,4 +1,4 @@
-import '.DocumentSection.css'
+import './DocumentSection.css'
 import type { ReactNode } from 'react';
 
 interface DocumentSectionProps {
@@ -10,8 +10,8 @@ export default function DocumentSection({ title, children }: DocumentSectionProp
     return (
         <section className="doc-section">
             <h2>{title}</h2>
-                <div className="doc-grid">
-                    {children}
+            <div className="doc-grid">
+                {children}
             </div>
         </section>
     )

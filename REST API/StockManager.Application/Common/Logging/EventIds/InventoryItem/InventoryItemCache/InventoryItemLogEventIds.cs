@@ -11,6 +11,7 @@ public static class InventoryItemLogEventIds
     // Error
     public static readonly EventId EditingInventoryItemException = new(200, "EditingInventoryItemException");
     public static readonly EventId RemovingInventoryItemException = new(201, "RemovingInventoryItemException");
+    public static readonly EventId ExtractDataInventoryItemException = new (300, "ExtractDataInventoryItemException");
 
     // Warning
     public static readonly EventId InventoryItemNotFound = new(210, "InventoryItemNotFound");

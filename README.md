@@ -144,11 +144,13 @@ Main dependencies used in the project (based on structure/config):
 
 The project now includes integrated AI features for document processing and smart inventory search.
 
-### Quick Run Scripts
-- `./backend.sh` – Starts infrastructure and the .NET Backend.
-- `./frontend.sh` – Starts the React development server.
-- `./init_ollama.sh` – Pulls required AI models and initializes the vector database.
-- `seed_data.sql` – SQL script to populate the database with test data.
+### Quick Run Scripts (Makefile)
+The easiest way to run tasks is using the provided `Makefile`:
+- `make backend` – Starts infrastructure and the .NET Backend.
+- `make frontend` – Starts the React development server.
+- `make ai-init` – Pulls required AI models and initializes the vector database.
+- `make seed-db` – Populates the database with test data.
+- `make help` – Lists all available commands.
 
 ### AI Infrastructure (Ollama)
 The system uses **Ollama** for:

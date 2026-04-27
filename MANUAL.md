@@ -20,11 +20,10 @@ This guide provides instructions on how to set up and run the StockManager proje
 
 The project uses several infrastructure services (SQL Server, Redis, RabbitMQ, Ollama, PostgreSQL with pgvector).
 
-You can start them using the provided `backend.sh` script (which also starts the backend) or manually via Docker Compose:
+You can start them easily using the provided Makefile command (which also starts the backend) or manually via script/Docker Compose:
 
 ```bash
-cd "REST API"
-docker compose up -d
+make backend
 ```
 
 ### 2. Initialize AI Models & Vector DB
@@ -32,7 +31,7 @@ docker compose up -d
 Once the containers are running, you need to pull the AI models (DeepSeek-R1 and Nomic Embed) and initialize the vector extension:
 
 ```bash
-./init_ollama.sh
+make ai-init
 ```
 
 > [!NOTE]
@@ -40,10 +39,10 @@ Once the containers are running, you need to pull the AI models (DeepSeek-R1 and
 
 ### 3. Run Backend
 
-The backend can be started using the `backend.sh` script:
+The backend can be started using the Makefile:
 
 ```bash
-./backend.sh
+make backend
 ```
 
 This script will:
@@ -55,21 +54,20 @@ This script will:
 
 ### 4. Run Frontend
 
-The frontend can be started using the `frontend.sh` script:
+The frontend can be started using the Makefile command:
 
 ```bash
-./frontend.sh
+make frontend
 ```
 
 This will run the Vite development server, usually on port 3000.
 
 ### 5. Seed Initial Data (Optional)
 
-To populate the database with realistic test data (products, suppliers, inventory, operations), run:
+To populate the database with realistic test data (products, suppliers, inventory, operations), simply run:
 
 ```bash
-docker cp seed_data.sql stockmanager-sql:/seed_data.sql
-docker exec stockmanager-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -C -i /seed_data.sql
+make seed-db
 ```
 
 ## Environment Variables

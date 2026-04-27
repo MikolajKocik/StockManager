@@ -64,4 +64,29 @@ public sealed class RetrievalService : IRetrievalService
         ChatResponse response = await _chatClient.GetResponseAsync(prompt, cancellationToken: cancellationToken);
         return response.Text;
     }
+
+    public async Task<string> ExtractDataToJsonAsync(string question, CancellationToken cancellationToken = default)
+    {
+        string prompt = $$"""
+            You are a strict data extraction tool for a Warehouse Management System.
+            Extract search parameters from the user's prompt and return ONLY a valid JSON object.
+            Do not include any explanation or markdown tags like ```json.
+            
+            The JSON MUST match this structure:
+            {
+              "productName": "extracted name or null",
+              "warehouse": "extracted warehouse or null (Must be one of: RegularStorage, RefrigeratedSection, FreezerSection, OutdoorStorage)",
+              "binLocationCode": "extracted code or null",
+              "genre": "extracted genre or null (Must be one of: )"
+            }
+
+            USER PROMPT:
+            {{question}}
+            """;
+
+        ChatResponse aiResponse = await _chatClient.GetResponseAsync(prompt, cancellationToken: cancellationToken);
+        
+        string json = aiResponse.Text.Replace("```json", "").Replace("```", "").Trim();
+        return json;
+    }
 }

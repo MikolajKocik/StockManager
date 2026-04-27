@@ -118,6 +118,8 @@ public sealed class DocumentsController : ControllerBase
     )
     {
         string answer = await aiService.AnswerQuestionAsync(request.Question, cancellationToken);
-        return Ok(new { Answer = answer });
+        return Ok(new { 
+            Answer = answer,
+        });
     }
 }

@@ -1,7 +1,11 @@
-# Pobieranie modelu do tworzenia wyszukiwarki (embeddingi)
-docker exec -it stockmanager_ollama ollama pull nomic-embed-text
+#!/bin/bash
 
-# Pobieranie modelu do rozmowy (thinking model)
-docker exec -it stockmanager_ollama ollama pull deepseek-r1:14b
+# Pull the embedding model
+docker exec stockmanager-ollama ollama pull nomic-embed-text
 
-CREATE EXTENSION IF NOT EXISTS vector;
+# Pull the chat/thinking model
+docker exec stockmanager-ollama ollama pull deepseek-r1:14b
+
+# Initialize pgvector extension in the vector database
+# Note: POSTGRES__PASSWORD should be available in the environment
+docker exec -e PGPASSWORD=$POSTGRES__PASSWORD stockmanager-embeddings psql -U admin -d stockmanager-embeddings -c "CREATE EXTENSION IF NOT EXISTS vector;"

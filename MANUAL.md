@@ -63,6 +63,15 @@ The frontend can be started using the `frontend.sh` script:
 
 This will run the Vite development server, usually on port 3000.
 
+### 5. Seed Initial Data (Optional)
+
+To populate the database with realistic test data (products, suppliers, inventory, operations), run:
+
+```bash
+docker cp seed_data.sql stockmanager-sql:/seed_data.sql
+docker exec stockmanager-sql /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'YourStrong!Passw0rd' -C -i /seed_data.sql
+```
+
 ## Environment Variables
 
 Ensure you have a `.env` file in `REST API/` with the following variables:

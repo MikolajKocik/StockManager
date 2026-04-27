@@ -148,6 +148,7 @@ The project now includes integrated AI features for document processing and smar
 - `./backend.sh` – Starts infrastructure and the .NET Backend.
 - `./frontend.sh` – Starts the React development server.
 - `./init_ollama.sh` – Pulls required AI models and initializes the vector database.
+- `seed_data.sql` – SQL script to populate the database with test data.
 
 ### AI Infrastructure (Ollama)
 The system uses **Ollama** for:

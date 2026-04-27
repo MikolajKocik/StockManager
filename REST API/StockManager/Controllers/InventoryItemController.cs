@@ -15,11 +15,14 @@ using StockManager.Application.CQRS.Commands.InventoryItemCommands.IncreaseQuant
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.ReleaseQuantity;
 using StockManager.Application.CQRS.Commands.InventoryItemCommands.ReserveQuantity;
 using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
+using StockManager.Application.CQRS.Queries.InventoryItemQueries.AiSearchInventory;
 using StockManager.Application.CQRS.Queries.InventoryItemQueries.GetInventoryItemById;
 using StockManager.Application.CQRS.Queries.InventoryItemQueries.GetInventoryItems;
 using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
+using StockManager.Core.Domain.Interfaces.Services;
+using StockManager.Infrastructure.Ollama.Requests;
 
 namespace StockManager.Controllers;
 
@@ -367,4 +370,24 @@ public sealed class InventoryItemController : ControllerBase
         return result.Error!.ToActionResult();
     }
 
+    [HttpPost("/ai/search")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> SearchInventoryAiAsync(
+        [FromBody] AskQuestionRequest request, 
+        [FromServices] IMediator mediator,
+        CancellationToken cancellationToken
+    )
+    {
+        var command = new SearchInventoryAiQuery(request.Question);
+        Result<List<InventoryItemDto>> result = await mediator.Send(command, cancellationToken);
+
+        if (!result.IsSuccess)
+        {
+            return BadRequest(result.Error);
+        }
+
+        return Ok(new { 
+            Items = result.Value 
+        }); 
+    }
 }

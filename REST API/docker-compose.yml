@@ -45,7 +45,7 @@ services:
       RABBITMQ_DEFAULT_USER: "${RABBITMQ__USERNAME}"
       RABBITMQ_DEFAULT_PASS: "${RABBITMQ__PASSWORD}"
     volumes:
-      - rabbitmq-data:/var/lib/rabbitmq
+      - rabbitmq_data:/var/lib/rabbitmq
     healthcheck:
       test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
       interval: 10s
@@ -65,6 +65,27 @@ services:
     volumes:
       - ./logs:/app/logs
 
+  vector_db:
+    container_name: stockmanager-embeddings
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: ${POSTGRES__PASSWORD}
+      POSTGRES_DB: stockmanager-embeddings
+    ports: 
+      - "5432:5432"
+    volumes:
+      - pgvector_data:/var/lib/postgresql_data 
+
+  ollama:
+    container_name: stockmanager-ollama
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
   sqlserver:
     container_name: stockmanager-sql
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -74,7 +95,7 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - sql-data:/var/opt/mssql
+      - mssql_data:/var/opt/mssql
     healthcheck:
         test: ["CMD-SHELL", "bash -c 'echo > /dev/tcp/127.0.0.1/1433'"]
         interval: 15s
@@ -105,7 +126,7 @@ services:
      - sqlserver
 
 volumes:
-    sql-data: {}
-    rabbitmq-data: {}
-
-  
+    mssql_data: {}
+    rabbitmq_data: {}
+    pgvector_data: {}
+    ollama_data: {}

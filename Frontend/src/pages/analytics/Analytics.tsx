@@ -17,6 +17,7 @@ import { Line, Doughnut } from 'react-chartjs-2';
 import ChartContainer from '@/components/ChartContainer';
 import './Analytics.css';
 import type { StatsSummary, TrendData, DistributionData } from '@/models/statistics';
+import StatisticsCard from '@/components/StatisticsCard';
 
 ChartJS.register(
     CategoryScale,
@@ -105,18 +106,18 @@ export default function Analytics() {
             </header>
 
             <div className="stats-grid">
-                <div className="stat-card">
-                    <span className="stat-label">Total API Traffic</span>
-                    <span className="stat-value">{summary?.totalApiRequests.toLocaleString()}</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">Operations Processed</span>
-                    <span className="stat-value">{summary?.processedOperations.toLocaleString()}</span>
-                </div>
-                <div className="stat-card">
-                    <span className="stat-label">System Health</span>
-                    <span className="stat-value" style={{ color: '#10b981' }}>Optimal</span>
-                </div>
+                <StatisticsCard 
+                    label="Total API Traffic"
+                    value={summary?.totalApiRequests.toLocaleString()} 
+                />
+                <StatisticsCard
+                    label="Operations Processed"
+                    value={summary?.processedOperations.toLocaleString()}
+                />
+                <StatisticsCard
+                    label="Placeholder"
+                    value="Placeholder"
+                />
             </div>
 
             <div className="charts-grid">

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { warehouseApi } from '@/api/warehouseApi';
 import api from '@/api/api';
 import './Operations.css';
+import type { AnyObject } from 'node_modules/chart.js/dist/types/basic';
 
 export default function Operations() {
     const [operations, setOperations] = useState([]);
@@ -15,19 +16,17 @@ export default function Operations() {
     });
 
     useEffect(() => {
+        const fetchData = async () => {
+            const [operationsRes, productsRes] = await Promise.all([
+                warehouseApi.getOperations(),
+                api.get('/Product')
+            ]);
+            setOperations(operationsRes.data);
+            setProducts(productsRes.data);
+        };
+
         fetchData();
-        fetchProducts();
-    }, []);
-
-    const fetchData = async () => {
-        const response = await warehouseApi.getOperations();
-        setOperations(response.data);
-    };
-
-    const fetchProducts = async () => {
-        const response = await api.get('/Product');
-        setProducts(response.data);
-    };
+    }, [newOp]);
 
     const handleCreate = async () => {
         try {
@@ -37,7 +36,6 @@ export default function Operations() {
                 items: newOp.items.map(i => ({ ...i, productId: parseInt(i.productId) }))
             });
             setShowModal(false);
-            fetchData();
         } catch (err) {
             console.error(err);
             alert("Error creating operation");
@@ -65,7 +63,7 @@ export default function Operations() {
                         </tr>
                     </thead>
                     <tbody>
-                        {operations.map((op: any) => (
+                        {operations.map((op: AnyObject) => (
                             <tr key={op.id}>
                                 <td className={`type-badge type-${op.type}`}>{['PZ', 'WZ', 'RW', 'MM'][op.type]}</td>
                                 <td>{new Date(op.date).toLocaleDateString()}</td>
@@ -104,7 +102,8 @@ export default function Operations() {
                                     setNewOp({ ...newOp, items });
                                 }}>
                                     <option value="">Select Product</option>
-                                    {products.map((p: any) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                    {products.map((p: AnyObject) => 
+                                        <option key={p.id} value={p.id}>{p.name}</option>)}
                                 </select>
                                 <input type="number" value={item.quantity} onChange={e => {
                                     const items = [...newOp.items];

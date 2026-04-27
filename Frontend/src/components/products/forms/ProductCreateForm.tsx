@@ -40,6 +40,7 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
             onClose();
         } catch (err) {
             setError("Error occurred while saving data...");
+            console.error(`Error ocurred while saving data: ${err}`);
         }
     };
 

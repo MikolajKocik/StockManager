@@ -12,6 +12,7 @@ Project runs locally via **Docker Compose** (API + MS SQL Server + Redis). In th
 - [Configuration - local connection string](#configuration--local-connection-string)
 - [Tests](#tests)
 - [NuGet Packages](#nuget-packages)
+- [Setup & AI Services (Local)](#setup--ai-services-local)
 - [Azure Deployment](#azure-deployment)
 - [Screenshots](#screenshots)
 - [Known Limitations / Tips](#known-limitations--tips)
@@ -136,6 +137,27 @@ Main dependencies used in the project (based on structure/config):
 - xunit.runner.visualstudio
 - FluentAssertions
 - Moq
+
+---
+
+## Setup & AI Services (Local)
+
+The project now includes integrated AI features for document processing and smart inventory search.
+
+### Quick Run Scripts (Makefile)
+The easiest way to run tasks is using the provided `Makefile`:
+- `make backend` – Starts infrastructure and the .NET Backend.
+- `make frontend` – Starts the React development server.
+- `make ai-init` – Pulls required AI models and initializes the vector database.
+- `make seed-db` – Populates the database with test data.
+- `make help` – Lists all available commands.
+
+### AI Infrastructure (Ollama)
+The system uses **Ollama** for:
+- **Embeddings**: `nomic-embed-text` (for vector search).
+- **Reasoning**: `deepseek-r1:14b` (for conversational analysis).
+
+For detailed setup instructions, including Docker configurations and model requirements, see the [MANUAL.md](MANUAL.md).
 
 ---
 

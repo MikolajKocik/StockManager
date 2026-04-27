@@ -1,9 +1,12 @@
 using System.Globalization;
+using System.Text;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
+using UglyToad.PdfPig;
+using UglyToad.PdfPig.Content;
 
 namespace StockManager.Infrastructure.Services;
 
@@ -12,6 +15,19 @@ public class PdfDocumentService : IPdfService
     public PdfDocumentService()
     {
         QuestPDF.Settings.License = LicenseType.Community;
+    }
+
+    public string ExtractTextFromPdf(Stream pdfStream)
+    {
+        using var document = PdfDocument.Open(pdfStream);
+        var textBuilder = new StringBuilder();
+
+        foreach (Page page in document.GetPages())
+        {
+            textBuilder.AppendLine(page.Text);
+        }
+
+        return textBuilder.ToString();
     }
 
     public Task<Stream> GenerateOperationDocumentAsync(

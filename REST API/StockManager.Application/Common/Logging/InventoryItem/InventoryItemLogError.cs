@@ -21,4 +21,10 @@ public static class InventoryItemLogError
           LogLevel.Error,
           InventoryItemLogEventIds.RemovingInventoryItemException,
           "Error occured while removing inventory item");
+
+    public static readonly Action<ILogger, Exception?> LogExtractDataInventoryItemException =
+      LoggerMessage.Define(
+          LogLevel.Error,
+          InventoryItemLogEventIds.ExtractDataInventoryItemException,
+          "[OLLAMA]: Error occured while extracting data to JSON format for inventory item");
 }

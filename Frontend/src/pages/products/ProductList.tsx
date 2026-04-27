@@ -4,6 +4,7 @@ import type { ProductCollection } from '../../models/product';
 import { Link } from 'react-router-dom';
 import ProductCreateForm from '../../components/products/forms/ProductCreateForm';
 import './ProductList.css';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common/Table';
 
 export default function ProductList() {
     const [products, setProducts] = useState<ProductCollection>({ data: [] });
@@ -51,45 +52,38 @@ export default function ProductList() {
                 onSuccess={handleCreateSuccess}
             />
 
-            <table className="product-table">
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Genre/Category</th>
-                        <th>Supplier</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableHeaderCell>Product Name</TableHeaderCell>
+                        <TableHeaderCell>Genre/Category</TableHeaderCell>
+                        <TableHeaderCell>Supplier</TableHeaderCell>
+                        <TableHeaderCell>Status</TableHeaderCell>
+                        <TableHeaderCell>Actions</TableHeaderCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
                     {products.data.map(product => (
-                        <tr key={product.id}>
-                            <td>
+                        <TableRow key={product.id}>
+                            <TableCell>
                                 <Link to={`/products/${product.id}`} className="product-link">
                                     {product.name}
                                 </Link>
-                            </td>
-                            <td>{product.genre}</td>
-                            <td>{product.supplierName}</td>
-                            <td>
+                            </TableCell>
+                            <TableCell>{product.genre}</TableCell>
+                            <TableCell>{product.supplierName}</TableCell>
+                            <TableCell>
                                 <span className={`status-badge ${product.isDeleted ? 'status-deleted' : 'status-active'}`}>
                                     {product.isDeleted ? 'Deleted' : 'Active'}
                                 </span>
-                            </td>
-                            <td>
+                            </TableCell>
+                            <TableCell>
                                 <Link to={`/products/${product.id}`} className="view-btn">View Details</Link>
-                            </td>
-                        </tr>
+                            </TableCell>
+                        </TableRow>
                     ))}
-                    {products.data.length === 0 && (
-                        <tr>
-                            <td colSpan={5} style={{ textAlign: 'center', padding: '48px', color: 'var(--secondary)' }}>
-                                No products found. Click "Add New Product" to get started.
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                </TableBody>
+            </Table>
         </div>
     )
 }

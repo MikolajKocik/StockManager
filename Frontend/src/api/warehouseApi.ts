@@ -1,10 +1,11 @@
+import type { WarehouseOperation } from '@/models/warehouseOperation';
 import api from './api';
 
 export const warehouseApi = {
     getOperations: () => api.get('/warehouse-operations'),
-    createOperation: (data: any) => api.post('/warehouse-operations', data),
+    createOperation: (data: WarehouseOperation) => api.post('/warehouse-operations', data),
     getDocuments: () => api.get('/documents'),
-    getFiles: () => api.get('/files'),
+    getFiles: () => api.get('/documents/filesMetadata'),
     uploadFile: (file: File, operationId?: number) => {
         const formData = new FormData();
         formData.append('file', file);

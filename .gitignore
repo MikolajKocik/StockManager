@@ -13,9 +13,7 @@
 **/.env
 !**/.env_template
 
-# Local development scripts
-backend.sh
-frontend.sh
+# local backup script
 backup.sh
 
 # User-specific files
@@ -411,4 +409,5 @@ FodyWeavers.xsd
 *.msp
 
 # JetBrains Rider
+.idea/
 *.sln.iml

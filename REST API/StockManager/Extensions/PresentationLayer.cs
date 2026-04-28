@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
@@ -91,5 +91,7 @@ public static class PresentationLayer
 
         // Redis & health checks
         RedisAndHealthChecksConfiguration.AddConfigurations(builder);
+
+        builder.Services.AddResponseCaching();
     }
 }

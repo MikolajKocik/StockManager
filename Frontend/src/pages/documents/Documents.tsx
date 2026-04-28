@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { warehouseApi } from '@/api/warehouseApi';
 import './Documents.css';
-import type { AnyObject } from 'node_modules/chart.js/dist/types/basic';
-import DocumentSection from '@/components/DocumentSection';
+import DocumentSection from './components/DocumentSection';
 import type { Document } from '@/models/document';
 
 export default function Documents() {
-    const [documents, setDocuments] = useState([]);
-    const [files, setFiles] = useState([]);
+    const [documents, setDocuments] = useState<any[]>([]);
+    const [files, setFiles] = useState<any[]>([]);
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
@@ -62,8 +61,8 @@ export default function Documents() {
                 ))}
             </DocumentSection>
 
-            <DocumentSection title="Uploaded Scans">                
-                {files.map((file: AnyObject) => (
+            <DocumentSection title="Uploaded Scans">
+                {files.map((file: any) => (
                     <div key={file.id} className="doc-card">
                         <div className="doc-icon">📎</div>
                         <div className="doc-info">

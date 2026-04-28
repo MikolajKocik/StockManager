@@ -2,7 +2,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import api from '../../api/api';
 import type { Product } from '../../models/product';
-import ProductEditForm from '../../components/products/forms/ProductEditForm';
+import ProductEditForm from './components/ProductEditForm';
 import './ProductDetails.css';
 
 export default function ProductDetails() {

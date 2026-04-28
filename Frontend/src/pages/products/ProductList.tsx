@@ -2,7 +2,7 @@ import api from '../../api/api';
 import { useEffect, useState } from 'react';
 import type { ProductCollection } from '../../models/product';
 import { Link } from 'react-router-dom';
-import ProductCreateForm from '../../components/products/forms/ProductCreateForm';
+import ProductCreateForm from './components/ProductCreateForm';
 import './ProductList.css';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common/Table';
 

@@ -1,20 +1,23 @@
-import type { ProductCreateForm } from "../../../models/product";
+import type { ProductUpdateForm } from "@/models/product";
 import { useState, useEffect } from 'react';
-import api from '../../../api/api';
-import Modal from '../../Modal';
+import api from '@/api/api';
+import type { Product } from '@/models/product';
+import Modal from '@/components/common/Modal';
 
-interface ProductCreateModalProps {
+interface ProductEditFormProps {
     isOpen: boolean;
+    productId: number | string;
     onClose: () => void;
     onSuccess?: () => void;
 }
 
-export default function ProductCreateForm({ isOpen, onClose, onSuccess }: ProductCreateModalProps) {
+export default function ProductEditForm({ isOpen, productId, onClose, onSuccess }: ProductEditFormProps) {
     const [genres, setGenres] = useState<string[]>([]);
     const [types, setTypes] = useState<string[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
-    const [form, setForm] = useState<ProductCreateForm>({
+    const [form, setForm] = useState<ProductUpdateForm>({
+        id: null,
         name: '',
         genre: '',
         unit: '',
@@ -35,12 +38,12 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            await api.post('/products', form);
+            await api.put(`/products/${productId}`, form);
             onSuccess?.();
             onClose();
         } catch (err) {
-            setError("Error occurred while saving data...");
-            console.error(`Error ocurred while saving data: ${err}`);
+            setError("Error occurred while updating product");
+            console.error(`Error occurred while updating product: ${err}`);
         }
     };
 
@@ -49,13 +52,17 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
 
         const fetchData = async () => {
             setLoading(true);
+            setError(null);
             try {
-                const [genresRes, typesRes] = await Promise.all([
+                const [genresRes, typesRes, formRes] = await Promise.all([
                     api.get<string[]>('/products/genres'),
-                    api.get<string[]>('/products/warehouses')
+                    api.get<string[]>('products/warehouses'),
+                    api.get<Product>(`/products/${productId}`)
                 ]);
+
                 setGenres(genresRes.data);
-                setTypes((typesRes.data));
+                setTypes(typesRes.data);
+                setForm(formRes.data);
             } catch (err) {
                 console.log("Error occurred while loading data", err);
                 setError("Error occurred while loading data");
@@ -66,11 +73,11 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
         }
 
         fetchData();
-    }, [isOpen]);
+    }, [isOpen, productId]);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
-            <h2>Add new product</h2>
+            <h2>Edit product</h2>
 
             {loading ? (
                 <p>Loading...</p>
@@ -79,36 +86,45 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
             ) : (
                 <form onSubmit={handleSubmit}>
                     <div>
-                        <input name="name" type="text" value={form.name} onChange={handleChange} />
+                        <label>Name:</label>
+                        <input name="name" type="text" value={form.name ?? ''} onChange={handleChange} />
                     </div>
                     <div>
-                        <select name="genre" value={form.genre} onChange={handleSelectChange}>
+                        <label>Genre:</label>
+                        <select name="genre" value={form.genre ?? ''} onChange={handleSelectChange}>
+                            <option value="">Select genre</option>
                             {genres.map(g => (
                                 <option key={g} value={g}>{g}</option>
                             ))}
                         </select>
                     </div>
                     <div>
-                        <input name="unit" type="text" value={form.unit} onChange={handleChange} />
+                        <label>Unit:</label>
+                        <input name="unit" type="text" value={form.unit ?? ''} onChange={handleChange} />
                     </div>
                     <div>
-                        <select name="type" value={form.type} onChange={handleSelectChange}>
+                        <label>Type:</label>
+                        <select name="type" value={form.type ?? ''} onChange={handleSelectChange}>
+                            <option value="">Select type</option>
                             {types.map(t => (
                                 <option key={t} value={t}>{t}</option>
                             ))}
                         </select>
                     </div>
                     <div>
-                        <input name="batchNumber" type="text" value={form.batchNumber} onChange={handleChange} />
+                        <label>Batch Number:</label>
+                        <input name="batchNumber" type="text" value={form.batchNumber ?? ''} onChange={handleChange} />
                     </div>
                     <div>
-                        <input name="supplierId" type="text" value={form.supplierId} onChange={handleChange} />
+                        <label>Supplier ID:</label>
+                        <input name="supplierId" type="text" value={form.supplierId ?? ''} onChange={handleChange} />
                     </div>
                     <div>
-                        <input name="expirationDate" type="date" value={form.expirationDate} onChange={handleChange} />
+                        <label>Expiration Date:</label>
+                        <input name="expirationDate" type="date" value={form.expirationDate ?? ''} onChange={handleChange} />
                     </div>
                     <div>
-                        <button type="submit">Add product</button>
+                        <button type="submit">Save Changes</button>
                         <button type="button" onClick={onClose}>Cancel</button>
                     </div>
                 </form>

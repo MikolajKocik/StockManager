@@ -6,7 +6,7 @@ import type { InventoryItemCollection } from '@/models/inventoryItem';
 import type { ShipmentCollection } from '@/models/shipment';
 import type { WarehouseOperation } from '@/models/warehouseOperation';
 import { warehouseApi } from '@/api/warehouseApi';
-import DashboardCard from '@/components/DashboardCard';
+import DashboardCard from './components/DashboardCard';
 import './Home.css';
 
 // Import icons
@@ -42,7 +42,7 @@ export default function Home() {
                     warehouseApi.getOperations()
                 ]);
                 setSuppliers(suppliersRes.data);
-                setProducts(productsRes.data);
+                setProducts(productsRes.data.data || []);
                 setInventoryItems(invItemsRes.data);
                 setShipments(shipmentsRes.data);
                 setOperations(operationsRes.data)

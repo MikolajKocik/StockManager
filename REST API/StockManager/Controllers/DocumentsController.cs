@@ -51,15 +51,21 @@ public sealed class DocumentsController : ControllerBase
         return BadRequest(result.Error);
     }
 
-    [HttpGet("/filesMetadata")]
+    [HttpGet("filesMetadata")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<FileMetadata>> GetFilesMetadataAsync(CancellationToken cancellationToken)
+    public async Task<ActionResult<List<FileMetadata>>> GetFilesMetadataAsync(CancellationToken cancellationToken)
     {
-        Result<List<FileMetadata>> files = await _mediator.Send(new GetFileMetadataQuery(), cancellationToken);
-        return Ok(files);
+        Result<List<FileMetadata>> result = await _mediator.Send(new GetFileMetadataQuery(), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }      
 
-    [HttpGet("/invoice:{id}")]
+    [HttpGet("invoice/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<InvoiceDto>> GetInvoiceById([FromRoute] int id, CancellationToken cancellationToken)
     {
@@ -109,7 +115,7 @@ public sealed class DocumentsController : ControllerBase
         return result.Value!;
     }
 
-    [HttpPost("/ai/ask")]
+    [HttpPost("ai/ask")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> AskAsync(
         [FromBody] AskQuestionRequest request, 

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -226,6 +226,7 @@ public sealed class ProductController : ControllerBase
     /// <remarks>This method returns an HTTP 200 OK response with the list of genre names.</remarks>
     /// <returns>An <see cref="ActionResult{T}"/> containing an array of strings, each representing a genre name.</returns>
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Client)]
     [HttpGet("genres")]
     public ActionResult<Genre> GetGenres()
         => Ok(Enum.GetNames(typeof(Genre)));
@@ -237,6 +238,7 @@ public sealed class ProductController : ControllerBase
     /// from the enumeration of warehouse types.</remarks>
     /// <returns>An <see cref="ActionResult{T}"/> containing an array of strings with the names of all warehouses.</returns>
     [ProducesResponseType(StatusCodes.Status200OK)]
+    [ResponseCache(Duration = 86400, Location = ResponseCacheLocation.Client)]
     [HttpGet("warehouses")]
     public ActionResult<Warehouse> GetWarehouses()
         => Ok(Enum.GetNames(typeof(Warehouse)));

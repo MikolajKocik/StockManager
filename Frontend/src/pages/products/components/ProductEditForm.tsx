@@ -3,6 +3,10 @@ import { useState, useEffect } from 'react';
 import api from '@/api/api';
 import type { Product } from '@/models/product';
 import Modal from '@/components/common/Modal';
+import { Input } from '@/components/common/Input';
+import { Select } from '@/components/common/Select';
+import { Button } from '@/components/common/Button';
+import './ProductForm.css';
 
 interface ProductEditFormProps {
     isOpen: boolean;
@@ -84,48 +88,77 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
             ) : error ? (
                 <p style={{ color: 'red' }}>{error}</p>
             ) : (
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <label>Name:</label>
-                        <input name="name" type="text" value={form.name ?? ''} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <label>Genre:</label>
-                        <select name="genre" value={form.genre ?? ''} onChange={handleSelectChange}>
-                            <option value="">Select genre</option>
-                            {genres.map(g => (
-                                <option key={g} value={g}>{g}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Unit:</label>
-                        <input name="unit" type="text" value={form.unit ?? ''} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <label>Type:</label>
-                        <select name="type" value={form.type ?? ''} onChange={handleSelectChange}>
-                            <option value="">Select type</option>
-                            {types.map(t => (
-                                <option key={t} value={t}>{t}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <label>Batch Number:</label>
-                        <input name="batchNumber" type="text" value={form.batchNumber ?? ''} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <label>Supplier ID:</label>
-                        <input name="supplierId" type="text" value={form.supplierId ?? ''} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <label>Expiration Date:</label>
-                        <input name="expirationDate" type="date" value={form.expirationDate ?? ''} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <button type="submit">Save Changes</button>
-                        <button type="button" onClick={onClose}>Cancel</button>
+                <form onSubmit={handleSubmit} className="product-form-grid">
+                    <Input
+                        label="Product Name"
+                        name="name"
+                        type="text"
+                        value={form.name ?? ''}
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <Select
+                        label="Genre/Category"
+                        name="genre"
+                        value={form.genre ?? ''}
+                        onChange={handleSelectChange}
+                        options={[{ value: '', label: 'Select genre' },
+                        ...genres.map(g => ({ value: g, label: g }))]}
+                        required
+                    />
+
+                    <Input
+                        label="Unit"
+                        name="unit"
+                        type="text"
+                        value={form.unit ?? ''}
+                        onChange={handleChange}
+                        required
+                    />
+
+                    <Select
+                        label="Warehouse Type"
+                        name="type"
+                        value={form.type ?? ''}
+                        onChange={handleSelectChange}
+                        options={[{ value: '', label: 'Select type' },
+                        ...types.map(t => ({ value: t, label: t }))]}
+                        required
+                    />
+
+                    <Input
+                        label="Batch Number"
+                        name="batchNumber"
+                        type="text"
+                        value={form.batchNumber ?? ''}
+                        onChange={handleChange}
+                    />
+
+                    <Input
+                        label="Supplier ID"
+                        name="supplierId"
+                        type="text"
+                        value={form.supplierId ?? ''}
+                        onChange={handleChange}
+                    />
+
+                    <Input
+                        label="Expiration Date"
+                        name="expirationDate"
+                        type="date"
+                        value={form.expirationDate ?
+                            new Date(form.expirationDate).toISOString().split('T')[0] : ''}
+                        onChange={handleChange}
+                    />
+
+                    <div className="form-actions">
+                        <Button type="button" variant="outline" onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="primary">
+                            Save Changes
+                        </Button>
                     </div>
                 </form>
             )}

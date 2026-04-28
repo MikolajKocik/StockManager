@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { warehouseApi } from '@/api/warehouseApi';
 import './Documents.css';
 import DocumentSection from './components/DocumentSection';
 import type { Document } from '@/models/document';
+import { Button } from '@/components/common/Button';
 
 export default function Documents() {
     const [documents, setDocuments] = useState<any[]>([]);
     const [files, setFiles] = useState<any[]>([]);
     const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const onUploadButtonClick = () => {
+        fileInputRef.current?.click();
+    }
 
     useEffect(() => {
         fetchData();
@@ -41,10 +47,20 @@ export default function Documents() {
             <header className="documents-header">
                 <h1>Document Management</h1>
                 <div className="upload-wrapper">
-                    <label className="btn-primary">
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        style={{ display: 'none' }}
+                        onChange={handleUpload}
+                    />
+
+                    <Button
+                        variant="primary"
+                        onClick={onUploadButtonClick}
+                        isLoading={uploading}
+                    >
                         {uploading ? 'Uploading...' : 'Upload Scan'}
-                        <input type="file" hidden onChange={handleUpload} disabled={uploading} />
-                    </label>
+                    </Button>
                 </div>
             </header>
 
@@ -54,7 +70,9 @@ export default function Documents() {
                         <div className="doc-icon">📄</div>
                         <div className="doc-info">
                             <span className="doc-number">{doc.documentNumber}</span>
-                            <span className="doc-date">{new Date(doc.createdAt).toLocaleDateString()}</span>
+                            <span className="doc-date">
+                                {new Date(doc.createdAt).toLocaleDateString()}
+                            </span>
                         </div>
                         <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
                     </div>
@@ -67,7 +85,9 @@ export default function Documents() {
                         <div className="doc-icon">📎</div>
                         <div className="doc-info">
                             <span className="doc-number">{file.fileName}</span>
-                            <span className="doc-date">{new Date(file.uploadedAt).toLocaleDateString()}</span>
+                            <span className="doc-date">
+                                {new Date(file.uploadedAt).toLocaleDateString()}
+                            </span>
                         </div>
                         <a href={file.blobUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
                     </div>

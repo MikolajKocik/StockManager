@@ -2,6 +2,10 @@ import type { ProductCreateForm } from "@/models/product";
 import { useState, useEffect } from 'react';
 import api from '@/api/api';
 import Modal from '@/components/common/Modal';
+import { Input } from '@/components/common/Input';
+import { Select } from '@/components/common/Select';
+import { Button } from '@/components/common/Button';
+import './ProductForm.css';
 
 interface ProductCreateModalProps {
     isOpen: boolean;
@@ -77,39 +81,74 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
             ) : error ? (
                 <p style={{ color: 'red' }}>{error}</p>
             ) : (
-                <form onSubmit={handleSubmit}>
-                    <div>
-                        <input name="name" type="text" value={form.name} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <select name="genre" value={form.genre} onChange={handleSelectChange}>
-                            {genres.map(g => (
-                                <option key={g} value={g}>{g}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <input name="unit" type="text" value={form.unit} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <select name="type" value={form.type} onChange={handleSelectChange}>
-                            {types.map(t => (
-                                <option key={t} value={t}>{t}</option>
-                            ))}
-                        </select>
-                    </div>
-                    <div>
-                        <input name="batchNumber" type="text" value={form.batchNumber} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <input name="supplierId" type="text" value={form.supplierId} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <input name="expirationDate" type="date" value={form.expirationDate} onChange={handleChange} />
-                    </div>
-                    <div>
-                        <button type="submit">Add product</button>
-                        <button type="button" onClick={onClose}>Cancel</button>
+                <form onSubmit={handleSubmit} className="product-form-grid">
+                    <Input 
+                        label="Product Name"
+                        name="name" 
+                        type="text" 
+                        value={form.name} 
+                        onChange={handleChange} 
+                        required 
+                    />
+                    
+                    <Select 
+                        label="Genre/Category"
+                        name="genre" 
+                        value={form.genre} 
+                        onChange={handleSelectChange}
+                        options={genres}
+                        required
+                    />
+
+                    <Input 
+                        label="Unit"
+                        name="unit" 
+                        type="text" 
+                        value={form.unit} 
+                        onChange={handleChange} 
+                        required 
+                    />
+
+                    <Select 
+                        label="Warehouse Type"
+                        name="type" 
+                        value={form.type} 
+                        onChange={handleSelectChange}
+                        options={types}
+                        required
+                    />
+
+                    <Input 
+                        label="Batch Number"
+                        name="batchNumber" 
+                        type="text" 
+                        value={form.batchNumber} 
+                        onChange={handleChange} 
+                    />
+
+                    <Input 
+                        label="Supplier ID"
+                        name="supplierId" 
+                        type="text" 
+                        value={form.supplierId} 
+                        onChange={handleChange} 
+                    />
+
+                    <Input 
+                        label="Expiration Date"
+                        name="expirationDate" 
+                        type="date" 
+                        value={form.expirationDate} 
+                        onChange={handleChange} 
+                    />
+
+                    <div className="form-actions">
+                        <Button type="button" variant="outline" onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button type="submit" variant="primary">
+                            Add Product
+                        </Button>
                     </div>
                 </form>
             )}

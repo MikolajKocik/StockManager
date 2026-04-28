@@ -1,10 +1,14 @@
 import api from "@/api/api";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/common/Table";
+import { Button } from "@/components/common/Button";
 import type { InventoryItemCollection } from "@/models/inventoryItem";
 import { useState, useEffect } from "react"
+import "./InventoryItems.css";
+import { Select } from "@/components/common/Select";
+import { Input } from "@/components/common/Input";
 
 interface SearchRequest {
-    question: string, 
+    question: string,
     conversationId: string | null,
     categoryFilter: string | null,
     warehouseFilter: string | null;
@@ -17,6 +21,7 @@ export default function InventoryItems() {
     const [question, setQuestion] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
+    const [isSearching, setIsSearching] = useState<boolean>(false);
 
     const fetchItems = async () => {
         try {
@@ -35,7 +40,7 @@ export default function InventoryItems() {
     };
 
     useEffect(() => {
-        const fetchData = async () => 
+        const fetchData = async () =>
             await fetchItems();
 
         fetchData();
@@ -48,9 +53,10 @@ export default function InventoryItems() {
             return;
         }
 
+        setIsSearching(true);
         const requestPayload: SearchRequest = {
             question: question,
-            conversationId: null, 
+            conversationId: null,
             categoryFilter: selectedCategory || null,
             warehouseFilter: selectedWarehouse || null
         };
@@ -61,48 +67,57 @@ export default function InventoryItems() {
             setItems({ data: response.data.items || response.data.Items || [] });
         } catch (err) {
             console.error(`Something went wrong... \n ${err}`);
+        } finally {
+            setIsSearching(false);
         }
     }
 
     return (
-        <>
+        <div className="inventory-container animate-fade">
+            <header className="page-header">
+                <h1>Inventory Items</h1>
+                <p>Manage and browse your stock with AI-powered search</p>
+            </header>
+
             <div className="search-panel">
-                <div className="search-item">
-                    <label >Inventory Browser</label>
-                    <input 
-                        type="text" 
-                        placeholder="Search item..." 
-                        value={question}
-                        onChange={(e) => setQuestion(e.target.value)} 
-                    />
+                <div className="search-grid">
+                    <div className="input-group full-width">
+                        <Input
+                            label="AI Query / Search"
+                            type="text"
+                            placeholder="e.g., 'What items are low in stock in Warehouse A?'"
+                            value={question}
+                            onChange={(e) => setQuestion(e.target.value)}
+                        />
+                    </div>
 
-                    <label>
-                        Select category
-                        <select 
-                            value={selectedCategory} 
+                    <div className="input-group">
+                        <Select
+                            label="Category"
+                            value={selectedCategory}
                             onChange={(e) => setSelectedCategory(e.target.value)}
-                        >
-                            <option value="">-- All --</option>
-                            {genres.map(g => 
-                                <option key={g} value={g}>{g}</option>
-                            )}
-                        </select>
-                    </label>
-                    
-                    <label>
-                        Select warehouse
-                        <select 
-                            value={selectedWarehouse} 
-                            onChange={(e) => setSelectedWarehouse(e.target.value)}
-                        >
-                            <option value="">-- All --</option>
-                            {warehouses.map(ws =>
-                                <option key={ws} value={ws}>{ws}</option>
-                            )}
-                        </select>
-                    </label>
+                            options={["All Categories", ...genres]}
+                        />
+                    </div>
 
-                    <button onClick={handleAsk}>Ask AI</button>
+                    <div className="input-group">
+                        <Select
+                            label="Warehouse"
+                            value={selectedWarehouse}
+                            onChange={(e) => setSelectedWarehouse(e.target.value)}
+                            options={["All Warehouses", ...warehouses]}
+                        />
+                    </div>
+
+                    <div className="actions">
+                        <Button
+                            variant="ai"
+                            onClick={handleAsk}
+                            isLoading={isSearching}
+                        >
+                            <span className="sparkle">✨</span> Ask AI
+                        </Button>
+                    </div>
                 </div>
             </div>
 
@@ -130,6 +145,6 @@ export default function InventoryItems() {
                     )}
                 </TableBody>
             </Table>
-        </>
+        </div>
     )
 }

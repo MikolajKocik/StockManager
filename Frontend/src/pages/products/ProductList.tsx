@@ -1,16 +1,19 @@
 import api from '../../api/api';
 import { useEffect, useState } from 'react';
 import type { ProductCollection } from '../../models/product';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ProductCreateForm from './components/ProductCreateForm';
 import './ProductList.css';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common/Table';
+
+import { Button } from '@/components/common/Button';
 
 export default function ProductList() {
     const [products, setProducts] = useState<ProductCollection>({ data: [] });
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+    const navigate = useNavigate();
 
     const fetchProducts = async () => {
         try {
@@ -38,12 +41,12 @@ export default function ProductList() {
     if (error) return <div className="error-message">{error}</div>;
 
     return (
-        <div className="product-list-container">
+        <div className="product-list-container animate-fade">
             <div className="list-header">
                 <h1>Products Inventory</h1>
-                <button className="add-btn" onClick={() => setIsCreateModalOpen(true)}>
-                    + Add New Product
-                </button>
+                <Button variant="primary" onClick={() => setIsCreateModalOpen(true)}>
+                    Add New Product
+                </Button>
             </div>
 
             <ProductCreateForm
@@ -78,7 +81,13 @@ export default function ProductList() {
                                 </span>
                             </TableCell>
                             <TableCell>
-                                <Link to={`/products/${product.id}`} className="view-btn">View Details</Link>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => navigate(`/products/${product.id}`)}
+                                >
+                                    View Details
+                                </Button>
                             </TableCell>
                         </TableRow>
                     ))}

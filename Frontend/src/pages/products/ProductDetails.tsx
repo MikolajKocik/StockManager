@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import api from '../../api/api';
 import type { Product } from '../../models/product';
 import ProductEditForm from './components/ProductEditForm';
+import { Button } from '@/components/common/Button';
 import './ProductDetails.css';
 
 export default function ProductDetails() {
@@ -50,23 +51,23 @@ export default function ProductDetails() {
     if (error) return <div className="error-message">{error}</div>;
 
     return (
-        <div className="product-details-container">
+        <div className="product-details-container animate-fade">
             <Link to="/products" className="back-link">← Back to products</Link>
 
             <div className="details-header">
-                <div>
+                <div className="header-info">
                     <h1>{product?.name}</h1>
                     <span className={`status-badge ${product?.isDeleted ? 'status-deleted' : 'status-active'}`}>
                         {product?.isDeleted ? 'Deleted' : 'Active'}
                     </span>
                 </div>
                 <div className="action-bar">
-                    <button className="edit-btn" onClick={() => setIsEditModalOpen(true)}>
+                    <Button variant="secondary" onClick={() => setIsEditModalOpen(true)}>
                         Edit Product
-                    </button>
-                    <button className="delete-btn" onClick={handleDelete}>
+                    </Button>
+                    <Button variant="outline" className="btn-delete" onClick={handleDelete}>
                         Delete Product
-                    </button>
+                    </Button>
                 </div>
             </div>
 

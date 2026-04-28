@@ -41,7 +41,7 @@ export default function Home() {
                     api.get("/shipments?status=Shipped"),
                     warehouseApi.getOperations()
                 ]);
-                setSuppliers(suppliersRes.data);
+                setSuppliers(suppliersRes.data.data);
                 setProducts(productsRes.data.data || []);
                 setInventoryItems(invItemsRes.data);
                 setShipments(shipmentsRes.data);

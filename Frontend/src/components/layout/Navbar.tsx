@@ -83,7 +83,7 @@ export default function Navbar() {
                                 API Keys
                             </Button>
                             <div className="dropdown-divider"></div>
-                            <Button className="logout-btn-dropdown" onClick={handleLogout}>
+                            <Button variant="danger" className="logout-btn-dropdown" onClick={handleLogout}>
                                 Logout
                             </Button>
                         </div>

@@ -9,9 +9,20 @@
     border: 1px solid transparent;
 }
 
-.btn-sm { padding: 6px 12px; font-size: 0.875rem; }
-.btn-md { padding: 10px 20px; font-size: 1rem; }
-.btn-lg { padding: 14px 28px; font-size: 1.125rem; }
+.btn-sm {
+    padding: 6px 12px;
+    font-size: 0.875rem;
+}
+
+.btn-md {
+    padding: 10px 20px;
+    font-size: 1rem;
+}
+
+.btn-lg {
+    padding: 14px 28px;
+    font-size: 1.125rem;
+}
 
 .btn-primary {
     background: var(--accent);
@@ -56,6 +67,17 @@
     filter: brightness(1.1);
 }
 
+.btn-danger {
+    background: var(--error);
+    color: white;
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: var(--error-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
 .btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -71,5 +93,7 @@
 }
 
 @keyframes spin {
-    to { transform: rotate(360deg); }
+    to {
+        transform: rotate(360deg);
+    }
 }

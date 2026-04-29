@@ -8,10 +8,11 @@ import Modal from '@/components/common/Modal';
 import { Button } from '@/components/common/Button';
 import { Select } from '@/components/common/Select';
 import { Input } from '@/components/common/Input';
+import type { ProductCollection } from '@/models/product';
 
 export default function Operations() {
     const [operations, setOperations] = useState<WarehouseOperation[]>([]);
-    const [products, setProducts] = useState<any[]>([]);
+    const [products, setProducts] = useState<ProductCollection>({ data: [] });
     const [showModal, setShowModal] = useState(false);
     const [isCreating, setIsCreating] = useState(false);
     const [newOp, setNewOp] = useState({
@@ -137,7 +138,7 @@ export default function Operations() {
                                     }}
                                     options={[
                                         { value: '', label: 'Select Product' },
-                                        ...products.map(p => ({ value: p.id, label: p.name || p.date }))
+                                        ...products.data.map(p => ({ value: p.id, label: p.name || p.deliveredAt }))
                                     ]}
                                 />
                                 <Input

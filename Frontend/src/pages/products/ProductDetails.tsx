@@ -65,7 +65,7 @@ export default function ProductDetails() {
                     <Button variant="secondary" onClick={() => setIsEditModalOpen(true)}>
                         Edit Product
                     </Button>
-                    <Button variant="outline" className="btn-delete" onClick={handleDelete}>
+                    <Button variant="danger" onClick={handleDelete}>
                         Delete Product
                     </Button>
                 </div>

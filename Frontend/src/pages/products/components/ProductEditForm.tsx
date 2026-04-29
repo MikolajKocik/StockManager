@@ -153,7 +153,7 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
                     />
 
                     <div className="form-actions">
-                        <Button type="button" variant="outline" onClick={onClose}>
+                        <Button type="button" variant="danger" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button type="submit" variant="primary">

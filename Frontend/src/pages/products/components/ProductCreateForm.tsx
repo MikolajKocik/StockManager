@@ -82,68 +82,68 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
                 <p style={{ color: 'red' }}>{error}</p>
             ) : (
                 <form onSubmit={handleSubmit} className="product-form-grid">
-                    <Input 
+                    <Input
                         label="Product Name"
-                        name="name" 
-                        type="text" 
-                        value={form.name} 
-                        onChange={handleChange} 
-                        required 
+                        name="name"
+                        type="text"
+                        value={form.name}
+                        onChange={handleChange}
+                        required
                     />
-                    
-                    <Select 
+
+                    <Select
                         label="Genre/Category"
-                        name="genre" 
-                        value={form.genre} 
+                        name="genre"
+                        value={form.genre}
                         onChange={handleSelectChange}
                         options={genres}
                         required
                     />
 
-                    <Input 
+                    <Input
                         label="Unit"
-                        name="unit" 
-                        type="text" 
-                        value={form.unit} 
-                        onChange={handleChange} 
-                        required 
+                        name="unit"
+                        type="text"
+                        value={form.unit}
+                        onChange={handleChange}
+                        required
                     />
 
-                    <Select 
+                    <Select
                         label="Warehouse Type"
-                        name="type" 
-                        value={form.type} 
+                        name="type"
+                        value={form.type}
                         onChange={handleSelectChange}
                         options={types}
                         required
                     />
 
-                    <Input 
+                    <Input
                         label="Batch Number"
-                        name="batchNumber" 
-                        type="text" 
-                        value={form.batchNumber} 
-                        onChange={handleChange} 
+                        name="batchNumber"
+                        type="text"
+                        value={form.batchNumber}
+                        onChange={handleChange}
                     />
 
-                    <Input 
+                    <Input
                         label="Supplier ID"
-                        name="supplierId" 
-                        type="text" 
-                        value={form.supplierId} 
-                        onChange={handleChange} 
+                        name="supplierId"
+                        type="text"
+                        value={form.supplierId}
+                        onChange={handleChange}
                     />
 
-                    <Input 
+                    <Input
                         label="Expiration Date"
-                        name="expirationDate" 
-                        type="date" 
-                        value={form.expirationDate} 
-                        onChange={handleChange} 
+                        name="expirationDate"
+                        type="date"
+                        value={form.expirationDate}
+                        onChange={handleChange}
                     />
 
                     <div className="form-actions">
-                        <Button type="button" variant="outline" onClick={onClose}>
+                        <Button type="button" id="cancel" variant="danger" onClick={onClose}>
                             Cancel
                         </Button>
                         <Button type="submit" variant="primary">

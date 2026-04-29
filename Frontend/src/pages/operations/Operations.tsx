@@ -156,7 +156,7 @@ export default function Operations() {
                     </div>
 
                     <div className="modal-actions">
-                        <Button variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
+                        <Button variant="danger" onClick={() => setShowModal(false)}>Cancel</Button>
                         <Button variant="primary" onClick={handleCreate} isLoading={isCreating}>Create Operation</Button>
                     </div>
                 </div>

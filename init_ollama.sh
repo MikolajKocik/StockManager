@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# Ensure containers are running
+cd "REST API"
+docker compose up -d ollama vector_db
+cd ..
+
 # Pull the embedding model
 docker exec stockmanager-ollama ollama pull nomic-embed-text
 

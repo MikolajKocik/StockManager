@@ -24,7 +24,7 @@ export JWT__Key=${JWT__KEY:-"SuperSecretKey123!_SuperSecretKey123!"}
 
 echo -e "${BLUE}1. Starting Infrastructure (Docker)...${NC}"
 cd "REST API"
-docker compose up -d sqlserver rabbitmq redis
+docker compose up -d sqlserver rabbitmq redis ollama vector_db
 
 echo -e "${BLUE}2. Waiting for SQL Server to be ready...${NC}"
 # wait for the port to be open

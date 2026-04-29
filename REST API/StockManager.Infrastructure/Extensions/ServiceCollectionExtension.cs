@@ -70,14 +70,8 @@ public static class ServiceCollectionExtension
             .AddEntityFrameworkStores<StockManagerDbContext>()
             .AddDefaultTokenProviders();
 
-        // AI Services
-        var ollamaConfig = cfg.GetSection("Ollama");
-        var ollamaUri = new Uri(ollamaConfig["BaseUrl"]!);
-        var chatModel = ollamaConfig["ChatModel"]!;
-        var embeddingModel = ollamaConfig["EmbeddingModel"]!;
-
-        services.AddChatClient(new OllamaApiClient(ollamaUri, chatModel));
-        services.AddEmbeddingGenerator(new OllamaApiClient(ollamaUri, embeddingModel));
+        // Ollama instance
+        OllamaExtensions.RegisterOllamaInstance(services, cfg);
 
         // configure DI for repositories and services with their interfaces
         var infrastructureAssembly = Assembly.Load("StockManager.Infrastructure");

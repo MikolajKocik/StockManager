@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '@/api/api';
 import { useAuth } from '@/context/AuthContext';
+import { Input } from '@/components/common/Input';
+import { Button } from '@/components/common/Button';
 import './LoginPage.css';
 
 export default function LoginPage() {
@@ -42,31 +44,34 @@ export default function LoginPage() {
                 <form onSubmit={handleSubmit}>
                     {error && <div className="error-alert">{error}</div>}
 
-                    <div className="form-group">
-                        <label>Username</label>
-                        <input
-                            type="text"
-                            placeholder="Enter your username"
-                            value={userName}
-                            onChange={(e) => setUserName(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <Input
+                        label="Username"
+                        type="text"
+                        placeholder="Enter your username"
+                        value={userName}
+                        onChange={(e) => setUserName(e.target.value)}
+                        required
+                        className="login-input"
+                    />
 
-                    <div className="form-group">
-                        <label>Password</label>
-                        <input
-                            type="password"
-                            placeholder="••••••••"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            required
-                        />
-                    </div>
+                    <Input
+                        label="Password"
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        className="login-input"
+                    />
 
-                    <button type="submit" className="login-btn" disabled={loading}>
-                        {loading ? 'Authenticating...' : 'Log In'}
-                    </button>
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        isLoading={loading}
+                        className="login-btn-submit"
+                    >
+                        Log In
+                    </Button>
                 </form>
             </div>
         </div>

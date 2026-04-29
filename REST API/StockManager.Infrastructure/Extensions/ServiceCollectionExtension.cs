@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
@@ -70,10 +70,8 @@ public static class ServiceCollectionExtension
             .AddEntityFrameworkStores<StockManagerDbContext>()
             .AddDefaultTokenProviders();
 
-        // AI Services
-        var ollamaUri = new Uri("http://localhost:11434");
-        services.AddChatClient(new OllamaApiClient(ollamaUri, "deepseek-r1:14b"));
-        services.AddEmbeddingGenerator(new OllamaApiClient(ollamaUri, "nomic-embed-text"));
+        // Ollama instance
+        OllamaExtensions.RegisterOllamaInstance(services, cfg);
 
         // configure DI for repositories and services with their interfaces
         var infrastructureAssembly = Assembly.Load("StockManager.Infrastructure");

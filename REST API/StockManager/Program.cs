@@ -27,6 +27,8 @@ app.UseCors(Policy.SpecificOrigins);
 // rate limit middleware
 app.UseRateLimiter();
 
+app.UseResponseCaching();
+
 // Configure the HTTP command pipeline.
 app.UseMiddleware<RequestCounterMiddleware>();
 app.UseMiddleware<ErrorHandlingMiddleware>();

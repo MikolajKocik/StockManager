@@ -1,6 +1,6 @@
-export type OperationType = "PZ" | "WZ" | "RW" | "MM";
+export type OperationType = number;
 
-export type OperationStatus = "Pending" | "Completed" | "Cancelled";
+export type OperationStatus = number;
 
 export interface OperationItem {
     productId: number;

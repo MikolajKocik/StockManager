@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/Layout';
 import {
   Home,
   LoginPage,
@@ -10,7 +10,8 @@ import {
   Shipments,
   Documents,
   InventoryItems,
-  Analytics
+  Analytics,
+  NotFound
 } from '@/pages';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 
@@ -38,6 +39,9 @@ export default function App() {
             <Route path="/shipments" element={<Shipments />} />
             <Route path="/documents" element={<Documents />} />
             <Route path="/inventory-items" element={<InventoryItems />} />
+
+            {/* Catch all route - 404 */}
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Routes>
       </BrowserRouter>

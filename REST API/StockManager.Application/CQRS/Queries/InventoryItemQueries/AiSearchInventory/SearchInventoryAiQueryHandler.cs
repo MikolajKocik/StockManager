@@ -64,6 +64,9 @@ public sealed class SearchInventoryAiQueryHandler : IQueryHandler<SearchInventor
             AiInventoryFiltersDto filters = JsonSerializer.Deserialize<AiInventoryFiltersDto>(json, _jsonOptions) 
                 ?? new AiInventoryFiltersDto();
 
+            _logger.LogInformation("AI Extracted Filters - Name: {Name}, Warehouse: {Warehouse}, Category: {Category}", 
+                filters.ProductName, filters.Warehouse, filters.Genre);
+
             IQueryable<InventoryItem> query = _repository.GetInventoryItems()
                 .IfHasValue(
                     !string.IsNullOrWhiteSpace(filters.ProductName),
@@ -72,16 +75,20 @@ public sealed class SearchInventoryAiQueryHandler : IQueryHandler<SearchInventor
                     !string.IsNullOrWhiteSpace(filters.BinLocationCode),
                     i => i.BinLocation.Code == filters.BinLocationCode);
 
-            if (!string.IsNullOrWhiteSpace(filters.Warehouse) && 
-                Enum.TryParse(filters.Warehouse, true, out Warehouse parsedWarehouse))
+            if (!string.IsNullOrWhiteSpace(filters.Warehouse))
             {
-                query = query.Where(i => i.Warehouse == parsedWarehouse);
+                if (Enum.TryParse(filters.Warehouse.Replace(" ", ""), true, out Warehouse parsedWarehouse))
+                {
+                    query = query.Where(i => i.Warehouse == parsedWarehouse);
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(filters.Genre) && 
-                Enum.TryParse(filters.Genre, true, out Genre parsedGenre))
+            if (!string.IsNullOrWhiteSpace(filters.Genre))
             {
-                query = query.Where(i => i.Product.Genre == parsedGenre);
+                if (Enum.TryParse(filters.Genre.Replace(" ", ""), true, out Genre parsedGenre))
+                {
+                    query = query.Where(i => i.Product.Genre == parsedGenre);
+                }
             }
 
             List<InventoryItemDto> filteredItems = await query
@@ -101,10 +108,21 @@ public sealed class SearchInventoryAiQueryHandler : IQueryHandler<SearchInventor
                     "AI_PARSE_ERROR", 
                     "Could not understand the search request."));
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Ollama service is unavailable. Make sure it's running at the configured URL.");
+            return Result<List<InventoryItemDto>>.Failure(
+                new Error(
+                    "AI_SERVICE_UNAVAILABLE",
+                    "AI service (Ollama) is currently unavailable. Please ensure it is running."));
+        }
         catch (Exception ex)
         {
             GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
+            return Result<List<InventoryItemDto>>.Failure(
+                new Error(
+                    "AI_INTERNAL_ERROR",
+                    "An unexpected error occurred during AI search."));
         }
     }
 }

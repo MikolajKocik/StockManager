@@ -1,0 +1,152 @@
+.navbar {
+    width: 280px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 32px 16px;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
+    transition: var(--transition);
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 48px;
+    padding: 0 16px;
+}
+
+.logo-icon {
+    font-size: 2rem;
+}
+
+.navbar-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.navbar-links a {
+    display: flex;
+    align-items: center;
+    padding: 14px 20px;
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.navbar-links a:hover {
+    background: var(--bg-main);
+    color: var(--accent);
+    transform: translateX(4px);
+}
+
+.navbar-links a.active {
+    background: var(--accent-light);
+    color: var(--accent);
+    font-weight: 600;
+    box-shadow: inset 4px 0 0 var(--accent);
+}
+
+.navbar-footer {
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.settings-container {
+    position: relative;
+}
+
+.settings-trigger {
+    width: 100%;
+}
+
+.settings-trigger.active {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    filter: brightness(1.1);
+}
+
+.settings-dropdown {
+    position: absolute;
+    bottom: calc(100% + 12px);
+    left: 0;
+    width: 220px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    padding: 8px;
+    z-index: 100;
+    animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dropdown-header {
+    padding: 8px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.settings-dropdown button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: none;
+    background: none;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.settings-dropdown button:hover {
+    background: var(--accent-light);
+    color: var(--accent);
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 8px 0;
+}
+
+.logout-btn-dropdown {
+    color: #e11d48 !important;
+}
+
+.logout-btn-dropdown:hover {
+    background: #fff1f2 !important;
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(10px) scale(0.95); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
+}

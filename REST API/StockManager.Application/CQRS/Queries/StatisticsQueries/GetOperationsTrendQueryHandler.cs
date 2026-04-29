@@ -19,12 +19,17 @@ public sealed class GetOperationsTrendQueryHandler : IQueryHandler<GetOperations
     {
         var startDate = DateTime.UtcNow.Date.AddDays(-query.Days);
 
-        var trend = await _operationRepository.GetOperations()
+        var trendData = await _operationRepository.GetOperations()
             .Where(o => o.Date >= startDate)
             .GroupBy(o => o.Date.Date)
-            .Select(g => new OperationsTrendDto(g.Key, g.Count()))
+            .Select(g => new { 
+                Date = g.Key, 
+                Count = g.Count() 
+            })
             .OrderBy(o => o.Date)
             .ToListAsync(cancellationToken);
+
+        var trend = trendData.Select(x => new OperationsTrendDto(x.Date, x.Count));
 
         return Result<IEnumerable<OperationsTrendDto>>.Success(trend);
     }

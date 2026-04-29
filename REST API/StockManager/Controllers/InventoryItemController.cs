@@ -370,7 +370,7 @@ public sealed class InventoryItemController : ControllerBase
         return result.Error!.ToActionResult();
     }
 
-    [HttpPost("/ai/search")]
+    [HttpPost("ai/search")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchInventoryAiAsync(
         [FromBody] AskQuestionRequest request, 

@@ -35,7 +35,7 @@ make ai-init
 ```
 
 > [!NOTE]
-> Pulling the models might take some time depending on your internet connection (DeepSeek-R1:14b is ~9GB).
+> Pulling the models might take some time depending on your internet connection (DeepSeek-R1:1.5b is ~1.1GB).
 
 ### 3. Run Backend
 
@@ -89,7 +89,7 @@ POSTGRES__PASSWORD=YourPostgresPassword
 ## AI Features
 
 The project uses Ollama for:
-- **Chat/Reasoning**: `deepseek-r1:14b`
+- **Chat/Reasoning**: `deepseek-r1:1.5b`
 - **Embeddings**: `nomic-embed-text`
 
 These are used for document retrieval and AI-powered search in the inventory.

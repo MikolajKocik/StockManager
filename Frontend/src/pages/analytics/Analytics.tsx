@@ -14,10 +14,10 @@ import {
     Filler
 } from 'chart.js';
 import { Line, Doughnut } from 'react-chartjs-2';
-import ChartContainer from '@/components/ChartContainer';
+import ChartContainer from './components/ChartContainer';
 import './Analytics.css';
 import type { StatsSummary, TrendData, DistributionData } from '@/models/statistics';
-import StatisticsCard from '@/components/StatisticsCard';
+import StatisticsCard from './components/StatisticsCard';
 
 ChartJS.register(
     CategoryScale,
@@ -106,9 +106,9 @@ export default function Analytics() {
             </header>
 
             <div className="stats-grid">
-                <StatisticsCard 
+                <StatisticsCard
                     label="Total API Traffic"
-                    value={summary?.totalApiRequests.toLocaleString()} 
+                    value={summary?.totalApiRequests.toLocaleString()}
                 />
                 <StatisticsCard
                     label="Operations Processed"

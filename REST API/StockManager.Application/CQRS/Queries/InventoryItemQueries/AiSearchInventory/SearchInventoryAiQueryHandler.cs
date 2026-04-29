@@ -101,10 +101,21 @@ public sealed class SearchInventoryAiQueryHandler : IQueryHandler<SearchInventor
                     "AI_PARSE_ERROR", 
                     "Could not understand the search request."));
         }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Ollama service is unavailable. Make sure it's running at the configured URL.");
+            return Result<List<InventoryItemDto>>.Failure(
+                new Error(
+                    "AI_SERVICE_UNAVAILABLE",
+                    "AI service (Ollama) is currently unavailable. Please ensure it is running."));
+        }
         catch (Exception ex)
         {
             GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
+            return Result<List<InventoryItemDto>>.Failure(
+                new Error(
+                    "AI_INTERNAL_ERROR",
+                    "An unexpected error occurred during AI search."));
         }
     }
 }

@@ -155,7 +155,7 @@ The easiest way to run tasks is using the provided `Makefile`:
 ### AI Infrastructure (Ollama)
 The system uses **Ollama** for:
 - **Embeddings**: `nomic-embed-text` (for vector search).
-- **Reasoning**: `deepseek-r1:14b` (for conversational analysis).
+- **Reasoning**: `deepseek-r1:1.5b` (for conversational analysis - lightweight).
 
 For detailed setup instructions, including Docker configurations and model requirements, see the [MANUAL.md](MANUAL.md).
 

@@ -64,6 +64,9 @@ public sealed class SearchInventoryAiQueryHandler : IQueryHandler<SearchInventor
             AiInventoryFiltersDto filters = JsonSerializer.Deserialize<AiInventoryFiltersDto>(json, _jsonOptions) 
                 ?? new AiInventoryFiltersDto();
 
+            _logger.LogInformation("AI Extracted Filters - Name: {Name}, Warehouse: {Warehouse}, Category: {Category}", 
+                filters.ProductName, filters.Warehouse, filters.Genre);
+
             IQueryable<InventoryItem> query = _repository.GetInventoryItems()
                 .IfHasValue(
                     !string.IsNullOrWhiteSpace(filters.ProductName),
@@ -72,16 +75,20 @@ public sealed class SearchInventoryAiQueryHandler : IQueryHandler<SearchInventor
                     !string.IsNullOrWhiteSpace(filters.BinLocationCode),
                     i => i.BinLocation.Code == filters.BinLocationCode);
 
-            if (!string.IsNullOrWhiteSpace(filters.Warehouse) && 
-                Enum.TryParse(filters.Warehouse, true, out Warehouse parsedWarehouse))
+            if (!string.IsNullOrWhiteSpace(filters.Warehouse))
             {
-                query = query.Where(i => i.Warehouse == parsedWarehouse);
+                if (Enum.TryParse(filters.Warehouse.Replace(" ", ""), true, out Warehouse parsedWarehouse))
+                {
+                    query = query.Where(i => i.Warehouse == parsedWarehouse);
+                }
             }
 
-            if (!string.IsNullOrWhiteSpace(filters.Genre) && 
-                Enum.TryParse(filters.Genre, true, out Genre parsedGenre))
+            if (!string.IsNullOrWhiteSpace(filters.Genre))
             {
-                query = query.Where(i => i.Product.Genre == parsedGenre);
+                if (Enum.TryParse(filters.Genre.Replace(" ", ""), true, out Genre parsedGenre))
+                {
+                    query = query.Where(i => i.Product.Genre == parsedGenre);
+                }
             }
 
             List<InventoryItemDto> filteredItems = await query

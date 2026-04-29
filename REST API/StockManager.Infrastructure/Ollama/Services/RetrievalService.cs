@@ -70,15 +70,20 @@ public sealed class RetrievalService : IRetrievalService
         string prompt = $$"""
             You are a strict data extraction tool for a Warehouse Management System.
             Extract search parameters from the user's prompt and return ONLY a valid JSON object.
-            Do not include any explanation or markdown tags like ```json.
             
             The JSON MUST match this structure:
             {
               "productName": "extracted name or null",
-              "warehouse": "extracted warehouse or null (Must be one of: RegularStorage, RefrigeratedSection, FreezerSection, OutdoorStorage)",
+              "warehouse": "one of: RegularStorage, RefrigeratedSection, FreezerSection, OutdoorStorage or null",
               "binLocationCode": "extracted code or null",
-              "genre": "extracted genre or null (Must be one of: )"
+              "genre": "one of: Vegetables, Fruits, Dairy, Meat, Fish, DryProducts, FrozenProducts or null"
             }
+
+            RULES:
+            - If you see "Regular", use "RegularStorage".
+            - If you see "Refrigerated", use "RefrigeratedSection".
+            - If you see "Freezer", use "FreezerSection".
+            - Output ONLY JSON. No markdown tags.
 
             USER PROMPT:
             {{question}}

@@ -9,7 +9,7 @@ cd ..
 docker exec stockmanager-ollama ollama pull nomic-embed-text
 
 # Pull the chat/thinking model
-docker exec stockmanager-ollama ollama pull deepseek-r1:14b
+docker exec stockmanager-ollama ollama pull deepseek-r1:1.5b
 
 # Initialize pgvector extension in the vector database
 # Note: POSTGRES__PASSWORD should be available in the environment

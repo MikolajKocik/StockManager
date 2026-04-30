@@ -1,45 +1,39 @@
-import { useState, useEffect, useRef } from 'react';
-import { warehouseApi } from '@/api/warehouseApi';
+import { useRef } from 'react';
 import './Documents.css';
 import DocumentSection from './components/DocumentSection';
-import type { Document } from '@/models/document';
+import type { Document, FileMetadata } from '@/models/document';
 import { Button } from '@/components/common/Button';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { documentsApi } from '@/api/documentsApi';
 
 export default function Documents() {
-    const [documents, setDocuments] = useState<any[]>([]);
-    const [files, setFiles] = useState<any[]>([]);
-    const [uploading, setUploading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const queryClient = useQueryClient();
 
     const onUploadButtonClick = () => {
         fileInputRef.current?.click();
     }
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    const { data: docs = [] } = useQuery({
+        queryKey: ['docs'],
+        queryFn: documentsApi.getDocuments
+    })
 
-    const fetchData = async () => {
-        const [docRes, fileRes] = await Promise.all([
-            warehouseApi.getDocuments(),
-            warehouseApi.getFiles()
-        ]);
-        setDocuments(docRes.data);
-        setFiles(fileRes.data);
-    };
+    const { data: files = [] } = useQuery({
+        queryKey: ['files'],
+        queryFn: documentsApi.getFiles
+    })
+
+    const { mutate: uploadFile, isPending: isUploading } = useMutation({
+        mutationFn: (file: File) => documentsApi.uploadFile(file),
+        onSuccess: () => queryClient.invalidateQueries({ queryKey: ['files'] }),
+        onError: () => alert("Upload failed")
+    });
 
     const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (!e.target.files) return;
-        setUploading(true);
-        try {
-            await warehouseApi.uploadFile(e.target.files[0]);
-            fetchData();
-        } catch (err) {
-            console.error(err);
-            alert("Upload failed");
-        } finally {
-            setUploading(false);
-        }
+        const file = e.target.files?.[0];
+        if (!file) return;
+        uploadFile(file);
     };
 
     return (
@@ -57,15 +51,15 @@ export default function Documents() {
                     <Button
                         variant="primary"
                         onClick={onUploadButtonClick}
-                        isLoading={uploading}
+                        isLoading={isUploading}
                     >
-                        {uploading ? 'Uploading...' : 'Upload Scan'}
+                        {isUploading ? 'Uploading...' : 'Upload Scan'}
                     </Button>
                 </div>
             </header>
 
             <DocumentSection title="Generated Documents">
-                {documents.map((doc: Document) => (
+                {docs.map((doc: Document) => (
                     <div key={doc.id} className="doc-card">
                         <div className="doc-icon">📄</div>
                         <div className="doc-info">
@@ -80,7 +74,7 @@ export default function Documents() {
             </DocumentSection>
 
             <DocumentSection title="Uploaded Scans">
-                {files.map((file: any) => (
+                {files.map((file: FileMetadata) => (
                     <div key={file.id} className="doc-card">
                         <div className="doc-icon">📎</div>
                         <div className="doc-info">

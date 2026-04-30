@@ -5,3 +5,11 @@ export interface Document {
     fileUrl: string,
     createdAt: string
 }
+
+export interface FileMetadata {
+    id: number;
+    fileName: string;
+    blobUrl: string;
+    uploadedAt: string;
+    operationId?: number;
+}

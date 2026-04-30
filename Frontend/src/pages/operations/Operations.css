@@ -129,3 +129,39 @@ td {
     border-radius: 0.5rem;
     cursor: pointer;
 }
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.quick-add-link {
+    background: none;
+    border: none;
+    color: var(--accent);
+    font-size: 0.875rem;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+    transition: var(--transition);
+}
+
+.quick-add-link:hover {
+    color: var(--accent-hover);
+}
+
+.items-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px dotted var(--border);
+}
+
+.quick-add-btn {
+    font-size: 0.8rem !important;
+}

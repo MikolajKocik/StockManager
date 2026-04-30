@@ -9,11 +9,13 @@ import { Input } from '@/components/common/Input';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { operationsApi } from '@/api/internal/operationsApi';
 import { productsApi } from '@/api/internal/productsApi';
+import ProductCreateForm from '../products/components/ProductCreateForm';
 
 export default function Operations() {
     const queryClient = useQueryClient();
 
     const [showModal, setShowModal] = useState(false);
+    const [showProductModal, setShowProductModal] = useState(false);
     const [newOp, setNewOp] = useState({
         type: 0, // PZ
         date: new Date().toISOString().split('T')[0],
@@ -25,12 +27,12 @@ export default function Operations() {
         queryKey: ['operations'],
         queryFn: operationsApi.getOperations
     });
-    
+
     const { data: products = { data: [] } } = useQuery({
         queryKey: ['products'],
         queryFn: productsApi.getProducts
     });
- 
+
     const { mutate: createOperation, isPending: isCreating } = useMutation({
         mutationFn: (op: WarehouseOperation) => operationsApi.createOperation(op),
         onSuccess: () => {
@@ -48,12 +50,12 @@ export default function Operations() {
             ...newOp,
             type: parseInt(newOp.type.toString()),
             items: newOp.items.map(i => ({ ...i, productId: parseInt(i.productId) }))
-        } as WarehouseOperation);     
+        } as WarehouseOperation);
     };
 
-    const addItem = () => setNewOp({ 
-        ...newOp, 
-        items: [...newOp.items, { productId: '', quantity: 1 }] 
+    const addItem = () => setNewOp({
+        ...newOp,
+        items: [...newOp.items, { productId: '', quantity: 1 }]
     });
 
     const operationTypes = [
@@ -107,8 +109,8 @@ export default function Operations() {
                 </Table>
             </div>
 
-            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                <div className="modal-content">
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)} size="md">
+                <div className="operation-modal-inner">
                     <h2>New Operation</h2>
                     <div className="form-grid">
                         <Select
@@ -155,7 +157,25 @@ export default function Operations() {
                                 />
                             </div>
                         ))}
-                        <Button variant="secondary" size="sm" onClick={addItem}>Add Item</Button>
+                        <div className="items-actions">
+                            <Button variant="secondary" size="sm" onClick={addItem}>Add Item</Button>
+                            <Button
+                                className="quick-add-btn"
+                                variant="outline"
+                                size="sm"
+                                type="button"
+                                onClick={() => setShowProductModal(true)}
+                            >
+                                Add new product
+                            </Button>
+                        </div>
+                        <ProductCreateForm
+                            isOpen={showProductModal}
+                            onClose={() => setShowProductModal(false)}
+                            onSuccess={() => {
+                                queryClient.invalidateQueries({ queryKey: ['products'] });
+                            }}
+                        />
                     </div>
 
                     <div className="modal-actions">

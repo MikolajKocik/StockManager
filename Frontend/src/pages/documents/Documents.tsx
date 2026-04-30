@@ -1,8 +1,7 @@
 import { useRef } from 'react';
 import './Documents.css';
-import DocumentSection from './components/DocumentSection';
 import type { Document, FileMetadata } from '@/models/document';
-import { Button } from '@/components/common/Button';
+import { Button, Header, Section } from '@/components/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { documentsApi } from '@/api/internal/documentsApi';
 
@@ -38,55 +37,61 @@ export default function Documents() {
 
     return (
         <div className="documents-container animate-fade">
-            <header className="documents-header">
-                <h1>Document Management</h1>
-                <div className="upload-wrapper">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        style={{ display: 'none' }}
-                        onChange={handleUpload}
-                    />
+            <Header 
+                title="Document Management" 
+                actions={
+                    <div className="upload-wrapper">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            onChange={handleUpload}
+                        />
 
-                    <Button
-                        variant="primary"
-                        onClick={onUploadButtonClick}
-                        isLoading={isUploading}
-                    >
-                        {isUploading ? 'Uploading...' : 'Upload Scan'}
-                    </Button>
+                        <Button
+                            variant="primary"
+                            onClick={onUploadButtonClick}
+                            isLoading={isUploading}
+                        >
+                            {isUploading ? 'Uploading...' : 'Upload Scan'}
+                        </Button>
+                    </div>
+                }
+            />
+
+            <Section title="Generated Documents">
+                <div className="doc-grid">
+                    {docs.map((doc: Document) => (
+                        <div key={doc.id} className="doc-card">
+                            <div className="doc-icon">📄</div>
+                            <div className="doc-info">
+                                <span className="doc-number">{doc.documentNumber}</span>
+                                <span className="doc-date">
+                                    {new Date(doc.createdAt).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
+                        </div>
+                    ))}
                 </div>
-            </header>
+            </Section>
 
-            <DocumentSection title="Generated Documents">
-                {docs.map((doc: Document) => (
-                    <div key={doc.id} className="doc-card">
-                        <div className="doc-icon">📄</div>
-                        <div className="doc-info">
-                            <span className="doc-number">{doc.documentNumber}</span>
-                            <span className="doc-date">
-                                {new Date(doc.createdAt).toLocaleDateString()}
-                            </span>
+            <Section title="Uploaded Scans">
+                <div className="doc-grid">
+                    {files.map((file: FileMetadata) => (
+                        <div key={file.id} className="doc-card">
+                            <div className="doc-icon">📎</div>
+                            <div className="doc-info">
+                                <span className="doc-number">{file.fileName}</span>
+                                <span className="doc-date">
+                                    {new Date(file.uploadedAt).toLocaleDateString()}
+                                </span>
+                            </div>
+                            <a href={file.blobUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
                         </div>
-                        <a href={doc.fileUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
-                    </div>
-                ))}
-            </DocumentSection>
-
-            <DocumentSection title="Uploaded Scans">
-                {files.map((file: FileMetadata) => (
-                    <div key={file.id} className="doc-card">
-                        <div className="doc-icon">📎</div>
-                        <div className="doc-info">
-                            <span className="doc-number">{file.fileName}</span>
-                            <span className="doc-date">
-                                {new Date(file.uploadedAt).toLocaleDateString()}
-                            </span>
-                        </div>
-                        <a href={file.blobUrl} target="_blank" rel="noreferrer" className="btn-download">Download</a>
-                    </div>
-                ))}
-            </DocumentSection>
+                    ))}
+                </div>
+            </Section>
         </div>
     );
 };

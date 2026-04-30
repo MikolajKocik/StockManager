@@ -1,6 +1,5 @@
 import { suppliersApi } from "@/api/internal/suppliersApi";
-import { Select } from "@/components/common/Select";
-import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/common/Table";
+import { Select, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Header } from "@/components/common";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import './Suppliers.css';
@@ -39,11 +38,11 @@ export default function Suppliers() {
     };
 
     return (
-        <div className="suppliers-container">
-            <header className="suppliers-header">
-                <h1>Suppliers Directory</h1>
-                <p className="suppliers-subtitle">Manage and filter your global supply chain partners</p>
-            </header>
+        <div className="suppliers-container animate-fade">
+            <Header 
+                title="Suppliers Directory" 
+                subtitle="Manage and filter your global supply chain partners" 
+            />
 
             <div className="filters">
                 <Select

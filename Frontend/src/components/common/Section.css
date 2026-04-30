@@ -1,0 +1,29 @@
+.common-section {
+    margin-bottom: 3rem;
+}
+
+.section-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+}
+
+.section-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.section-card .section-title {
+    margin-top: 0;
+}
+
+@media (max-width: 48rem) {
+    .common-section {
+        margin-bottom: 2rem;
+    }
+}

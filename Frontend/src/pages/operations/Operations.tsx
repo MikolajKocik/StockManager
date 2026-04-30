@@ -2,14 +2,11 @@ import { useState } from 'react';
 import './Operations.css';
 import type { WarehouseOperation } from '@/models/warehouseOperation';
 import { Table, TableHead, TableHeaderCell, TableRow, TableBody, TableCell } from '@/components/common/Table';
-import Modal from '@/components/common/Modal';
-import { Button } from '@/components/common/Button';
-import { Select } from '@/components/common/Select';
-import { Input } from '@/components/common/Input';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { operationsApi } from '@/api/internal/operationsApi';
 import { productsApi } from '@/api/internal/productsApi';
 import ProductCreateForm from '../products/components/ProductCreateForm';
+import { Header, Button, Select, Input, Modal } from '@/components/common';
 
 export default function Operations() {
     const queryClient = useQueryClient();
@@ -67,10 +64,12 @@ export default function Operations() {
 
     return (
         <div className="operations-container animate-fade">
-            <header className="operations-header">
-                <h1>Warehouse Operations</h1>
-                <Button variant="primary" onClick={() => setShowModal(true)}>New Operation</Button>
-            </header>
+            <Header
+                title="Warehouse Operations"
+                actions={
+                    <Button variant="primary" onClick={() => setShowModal(true)}>New Operation</Button>
+                }
+            />
 
             <div className="operations-grid">
                 <Table>

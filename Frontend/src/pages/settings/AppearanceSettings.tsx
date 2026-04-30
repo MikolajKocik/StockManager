@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@/components/common/Button';
+import { Header, Section, Button } from '@/components/common';
 import './Settings.css';
 
 export default function AppearanceSettings() {
@@ -8,23 +8,22 @@ export default function AppearanceSettings() {
 
     return (
         <div className="settings-page animate-fade">
-            <header className="settings-header">
-                <h1>Appearance Settings</h1>
-                <p>Customize how StockManager looks on your device.</p>
-            </header>
+            <Header
+                title="Appearance Settings"
+                subtitle="Customize how StockManager looks on your device."
+            />
 
             <div className="settings-content">
-                <section className="settings-section">
-                    <h3>Theme</h3>
+                <Section title="Theme" variant="card">
                     <div className="theme-options">
-                        <button 
+                        <button
                             className={`theme-card ${theme === 'light' ? 'active' : ''}`}
                             onClick={() => setTheme('light')}
                         >
                             <div className="theme-preview light"></div>
                             <span>Light Mode</span>
                         </button>
-                        <button 
+                        <button
                             className={`theme-card ${theme === 'dark' ? 'active' : ''}`}
                             onClick={() => setTheme('dark')}
                         >
@@ -32,31 +31,30 @@ export default function AppearanceSettings() {
                             <span>Dark Mode</span>
                         </button>
                     </div>
-                </section>
+                </Section>
 
-                <section className="settings-section">
-                    <h3>Typography</h3>
+                <Section title="Typography" variant="card">
                     <div className="font-options">
-                        <Button 
+                        <Button
                             variant={fontSize === 'small' ? 'primary' : 'secondary'}
                             onClick={() => setFontSize('small')}
                         >
                             Small
                         </Button>
-                        <Button 
+                        <Button
                             variant={fontSize === 'medium' ? 'primary' : 'secondary'}
                             onClick={() => setFontSize('medium')}
                         >
                             Medium
                         </Button>
-                        <Button 
+                        <Button
                             variant={fontSize === 'large' ? 'primary' : 'secondary'}
                             onClick={() => setFontSize('large')}
                         >
                             Large
                         </Button>
                     </div>
-                </section>
+                </Section>
 
                 <div className="settings-actions">
                     <Button variant="primary">Save Changes</Button>

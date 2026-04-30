@@ -6,6 +6,11 @@ export interface Shipment {
     status: string;
     shippedDate: string;
     deliveredDate: string | null;
+    customerName?: string;
+    destinationCity?: string;
+    destinationCountry?: string;
+    originCity?: string;
+    originCountry?: string;
 }
 
 export interface ShipmentCollection {

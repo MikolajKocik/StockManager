@@ -28,7 +28,7 @@
     font-size: 1.1rem;
     color: var(--text-secondary, #4b5563);
     margin-bottom: 2rem;
-    max-width: 500px;
+    max-width: 31.25rem;
 }
 
 .not-found-btn {

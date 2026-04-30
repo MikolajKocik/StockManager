@@ -1,7 +1,7 @@
 .product-list-container {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 1.5rem;
 }
 
 .list-header {
@@ -14,8 +14,8 @@
     background: var(--accent);
     color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
     font-weight: 600;
     cursor: pointer;
     transition: background 0.2s;
@@ -37,8 +37,8 @@
 }
 
 .status-badge {
-    padding: 4px 8px;
-    border-radius: 6px;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.375rem;
     font-size: 0.8rem;
     font-weight: 600;
 }

@@ -6,20 +6,20 @@
 
 .content-area {
     flex-grow: 1;
-    padding: 48px;
+    padding: 3rem;
     width: 100%;
     min-height: 100vh;
     box-sizing: border-box;
     overflow-y: auto;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 64rem) {
     .content-area {
-        padding: 24px;
+        padding: 1.5rem;
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48rem) {
     .app-container {
         flex-direction: column;
     }

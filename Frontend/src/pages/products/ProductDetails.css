@@ -1,10 +1,10 @@
 .product-details-container {
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 32px;
+    border-radius: 0.75rem;
+    padding: 2rem;
     box-shadow: var(--shadow);
-    max-width: 800px;
+    max-width: 50rem;
 }
 
 .details-header {
@@ -12,15 +12,15 @@
     justify-content: space-between;
     align-items: flex-start;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 24px;
-    margin-bottom: 24px;
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
 }
 
 .details-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 32px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
 .detail-item label {
@@ -29,7 +29,7 @@
     text-transform: uppercase;
     color: var(--secondary);
     font-weight: 600;
-    margin-bottom: 4px;
+    margin-bottom: 0.25rem;
 }
 
 .detail-item span {
@@ -40,17 +40,17 @@
 
 .action-bar {
     display: flex;
-    gap: 12px;
+    gap: 0.75rem;
     border-top: 1px solid var(--border);
-    padding-top: 24px;
+    padding-top: 1.5rem;
 }
 
 .edit-btn {
     background: var(--bg);
     color: var(--text-h);
     border: 1px solid var(--border);
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -65,8 +65,8 @@
     background: #fee2e2;
     color: #991b1b;
     border: 1px solid #fecaca;
-    padding: 10px 20px;
-    border-radius: 8px;
+    padding: 0.625rem 1.25rem;
+    border-radius: 0.5rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
@@ -78,7 +78,7 @@
 
 .back-link {
     display: inline-block;
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
     color: var(--secondary);
     text-decoration: none;
     font-size: 0.9rem;

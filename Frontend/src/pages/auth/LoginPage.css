@@ -4,28 +4,28 @@
     align-items: center;
     min-height: 100vh;
     background: linear-gradient(135deg, var(--bg-main) 0%, #edf2f7 100%);
-    padding: 20px;
+    padding: 1.25rem;
 }
 
 .login-card {
     background: var(--bg-card);
-    padding: 48px;
+    padding: 3rem;
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow-lg);
     width: 100%;
-    max-width: 440px;
+    max-width: 27.5rem;
     border: 1px solid var(--border);
 }
 
 .login-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 2.5rem;
 }
 
 .login-header h2 {
     font-size: 2rem;
     color: var(--text-primary);
-    margin-bottom: 8px;
+    margin-bottom: 0.5rem;
 }
 
 .login-header p {
@@ -33,12 +33,12 @@
 }
 
 .form-group {
-    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 0.625rem;
     font-weight: 600;
     font-size: 0.95rem;
     color: var(--text-secondary);
@@ -46,8 +46,8 @@
 
 .form-group input {
     width: 100%;
-    padding: 14px 16px;
-    border: 2px solid var(--border);
+    padding: 0.875rem 1rem;
+    border: 0.125rem solid var(--border);
     border-radius: var(--radius-md);
     font-size: 1rem;
     transition: var(--transition);
@@ -56,23 +56,23 @@
 .form-group input:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 4px var(--accent-light);
+    box-shadow: 0 0 0 0.25rem var(--accent-light);
 }
 
 .login-btn {
     width: 100%;
-    padding: 16px;
+    padding: 1rem;
     background: var(--accent);
     color: white;
     border-radius: var(--radius-md);
     font-weight: 700;
     font-size: 1.1rem;
-    margin-top: 12px;
+    margin-top: 0.75rem;
 }
 
 .login-btn:hover:not(:disabled) {
     background: var(--accent-hover);
-    transform: translateY(-2px);
+    transform: translateY(-0.125rem);
     box-shadow: var(--shadow-md);
 }
 
@@ -84,9 +84,9 @@
 .error-alert {
     background: #fff1f2;
     color: #e11d48;
-    padding: 16px;
+    padding: 1rem;
     border-radius: var(--radius-md);
-    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
     border: 1px solid #fecdd3;
     font-size: 0.95rem;
     text-align: center;

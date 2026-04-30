@@ -14,14 +14,14 @@ export default function Suppliers() {
         queryFn: suppliersApi.getAll
     });
 
-    const countries = [...new Set(suppliers.map(s =>
+    const countries = [...new Set(suppliers.data.map(s =>
         s.address?.country).filter(Boolean)
     )] as string[];
-    const cities = [...new Set(suppliers.map(s =>
+    const cities = [...new Set(suppliers.data.map(s =>
         s.address?.city).filter(Boolean)
     )] as string[];
 
-    const filtered = suppliers.filter(s => {
+    const filtered = suppliers.data.filter(s => {
         const byCountry = !selectedCountry || s.address?.country === selectedCountry;
         const byCity = !selectedCity || s.address?.city === selectedCity;
         return byCountry && byCity;

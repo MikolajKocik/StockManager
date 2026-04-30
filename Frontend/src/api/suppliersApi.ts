@@ -1,8 +1,8 @@
-import type { Supplier } from "@/models/supplier";
+import type { Supplier, SupplierCollection } from "@/models/supplier";
 import api from "./api";
 
 export const suppliersApi = {
-    getAll: async (): Promise<Supplier[]> => {
+    getAll: async (): Promise<SupplierCollection> => {
         const res = await api.get("/suppliers");
         return res.data;
     },

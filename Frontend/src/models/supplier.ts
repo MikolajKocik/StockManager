@@ -7,3 +7,7 @@ export interface Supplier {
     addressId?: string;
     address?: Address;
 }
+
+export interface SupplierCollection {
+    data: Supplier[];
+}

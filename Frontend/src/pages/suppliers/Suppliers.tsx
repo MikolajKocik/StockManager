@@ -3,14 +3,15 @@ import { Select } from "@/components/common/Select";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/common/Table";
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
+import './Suppliers.css';
 
 export default function Suppliers() {
     const [selectedCountry, setSelectedCountry] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
 
     const { data: suppliers } = useSuspenseQuery({
-       queryKey: ['suppliers'],
-       queryFn: suppliersApi.getAll 
+        queryKey: ['suppliers'],
+        queryFn: suppliersApi.getAll
     });
 
     const countries = [...new Set(suppliers.map(s =>
@@ -35,30 +36,35 @@ export default function Suppliers() {
     };
 
     return (
-        <div>   
+        <div className="suppliers-container">
+            <header className="suppliers-header">
+                <h1>Suppliers Directory</h1>
+                <p className="suppliers-subtitle">Manage and filter your global supply chain partners</p>
+            </header>
+
             <div className="filters">
-                <Select 
+                <Select
                     label="Country"
                     value={selectedCountry}
                     onChange={handleCountryChange}
                     options={[
-                        { value: '', label: 'All Countries'},
+                        { value: '', label: 'All Countries' },
                         ...countries.map(c => ({ value: c, label: c }))
                     ]}
                 />
 
-                <Select 
+                <Select
                     label="City"
                     value={selectedCity}
                     onChange={e => setSelectedCity(e.target.value)}
                     options={[
-                        { value: '', label: 'All Cities'},
+                        { value: '', label: 'All Cities' },
                         ...cities.map(c => ({ value: c, label: c }))
                     ]}
                 />
             </div>
 
-            <div ref={tableRef}>
+            <div ref={tableRef} className="table-wrapper animate-fade">
                 <Table>
                     <TableHead>
                         <TableRow>
@@ -80,24 +86,24 @@ export default function Suppliers() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filtered.map(s => 
-                        <TableRow key={s.id}>
-                            <TableCell>
-                                {s.name}
-                            </TableCell>
-                            <TableCell>
-                                {s.slug}
-                            </TableCell>
-                            <TableCell>
-                                {s.address?.city}
-                            </TableCell>
-                            <TableCell>
-                                {s.address?.country}
-                            </TableCell>
-                            <TableCell>
-                                {s.address?.postalCode}
-                            </TableCell>
-                        </TableRow>
+                        {filtered.map(s =>
+                            <TableRow key={s.id}>
+                                <TableCell>
+                                    {s.name}
+                                </TableCell>
+                                <TableCell>
+                                    {s.slug}
+                                </TableCell>
+                                <TableCell>
+                                    {s.address?.city}
+                                </TableCell>
+                                <TableCell>
+                                    {s.address?.country}
+                                </TableCell>
+                                <TableCell>
+                                    {s.address?.postalCode}
+                                </TableCell>
+                            </TableRow>
                         )}
                     </TableBody>
                 </Table>

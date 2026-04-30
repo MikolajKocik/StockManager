@@ -79,7 +79,7 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
     const error = productError ? "Error occurred while loading data" : (mutationError ? "Error occurred while updating product" : null);
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <h2>Edit product</h2>
 
             {isLoading ? (

@@ -64,7 +64,7 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
     const error = mutationError ? "Error occurred while saving data..." : null;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <h2>Add new product</h2>
 
             {isLoading ? (

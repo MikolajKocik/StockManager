@@ -1,44 +1,31 @@
-import api from '../../api/api';
-import { useEffect, useState } from 'react';
-import type { ProductCollection } from '../../models/product';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductCreateForm from './components/ProductCreateForm';
 import './ProductList.css';
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common/Table';
 
 import { Button } from '@/components/common/Button';
+import { QueryClient, useQuery } from '@tanstack/react-query';
+import { productsApi } from '@/api/productsApi';
 
 export default function ProductList() {
-    const [products, setProducts] = useState<ProductCollection>({ data: [] });
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
+    const queryClient = new QueryClient();
+    const { data: products = { data: [] }, isLoading, isError } = useQuery({
+        queryKey: ['products'],
+        queryFn: productsApi.getProducts
+    });
+
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
     const navigate = useNavigate();
 
-    const fetchProducts = async () => {
-        try {
-            const res = await api.get<ProductCollection>("/products");
-            setProducts(res.data);
-        } catch (err) {
-            console.error("Error occurred while fetching data", err)
-            setError("Error occurred while fetching data. Try again later.")
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchProducts();
-    }, []);
-
     const handleCreateSuccess = () => {
         setIsCreateModalOpen(false);
-        fetchProducts();
+        queryClient.invalidateQueries({ queryKey: ['products'] });
     };
 
-    if (loading) return <div className="loading">Loading products...</div>;
 
-    if (error) return <div className="error-message">{error}</div>;
+    if (isLoading) return <div className="loading">Loading products...</div>;
+    if (isError) return <div className="error-message">Error occurred. Try again later.</div>;
 
     return (
         <div className="product-list-container animate-fade">

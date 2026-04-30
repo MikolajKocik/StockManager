@@ -1,7 +1,7 @@
 import { suppliersApi } from "@/api/suppliersApi";
 import { Select } from "@/components/common/Select";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/common/Table";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import './Suppliers.css';
 
@@ -9,10 +9,13 @@ export default function Suppliers() {
     const [selectedCountry, setSelectedCountry] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
 
-    const { data: suppliers } = useSuspenseQuery({
+    const { data: suppliers = { data: [] }, isLoading, isError } = useQuery({
         queryKey: ['suppliers'],
         queryFn: suppliersApi.getAll
     });
+
+    if (isLoading) return <div className="loading">Loading suppliers...</div>;
+    if (isError) return <div className="error-message">Error loading suppliers.</div>;
 
     const countries = [...new Set(suppliers.data.map(s =>
         s.address?.country).filter(Boolean)

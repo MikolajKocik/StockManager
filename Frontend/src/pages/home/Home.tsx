@@ -15,7 +15,7 @@ import { operationsApi } from '@/api/operationsApi';
 
 export default function Home() {
 
-    const { data: suppliers = [], isLoading: l1, isError: e1 } = useQuery({
+    const { data: suppliers = { data: [] }, isLoading: l1, isError: e1 } = useQuery({
         queryKey: ['suppliers'],
         queryFn: suppliersApi.getAll
     });
@@ -77,10 +77,10 @@ export default function Home() {
                     icon={suppliersIcon}
                     title="Suppliers"
                     subtitle="Active suppliers"
-                    count={suppliers.length ?? 0}
+                    count={suppliers.data.length ?? 0}
                     linkTo="/suppliers"
                     linkText="Manage suppliers"
-                    />
+                />
 
                 <DashboardCard
                     icon={stockIcon}
@@ -98,7 +98,7 @@ export default function Home() {
                     count={shipments.data.length ?? 0}
                     linkTo="/shipments"
                     linkText="Manage shipments"
-                    />
+                />
 
                 <DashboardCard
                     icon={processIcon}

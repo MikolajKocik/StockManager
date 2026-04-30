@@ -10,9 +10,7 @@
 
 .page-header h1 {
     margin-bottom: 0.5rem;
-    background: linear-gradient(to right, var(--text-primary), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
 }
 
 .page-header p {
@@ -88,11 +86,11 @@
     .search-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .actions {
         justify-content: stretch;
     }
-    
+
     .actions button {
         width: 100%;
     }

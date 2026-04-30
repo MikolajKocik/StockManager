@@ -1,9 +1,6 @@
-import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/common/Table";
-import { Button } from "@/components/common/Button";
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Select, Input, Button, Header } from "@/components/common";
 import { useState } from "react"
 import "./InventoryItems.css";
-import { Select } from "@/components/common/Select";
-import { Input } from "@/components/common/Input";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { inventoryApi } from "@/api/internal/inventoryApi";
 import { productsApi } from "@/api/internal/productsApi";
@@ -21,8 +18,8 @@ export default function InventoryItems() {
     });
 
     const { data: genres = [] } = useQuery({
-       queryKey: ['genres'],
-       queryFn: productsApi.getGenres 
+        queryKey: ['genres'],
+        queryFn: productsApi.getGenres
     });
 
     const { data: warehouses = [] } = useQuery({
@@ -35,7 +32,7 @@ export default function InventoryItems() {
         onSuccess: (data) => setAiItems(data),
         onError: () => alert("Ollama error ocurred during retrieving question")
     });
-    
+
     const handleAsk = async () => {
         if (!question.trim()) {
             setAiItems(null);
@@ -49,17 +46,17 @@ export default function InventoryItems() {
             };
 
             searchAI(requestPayload);
-        }     
+        }
     }
 
     const displayItems = aiItems ?? items;
 
     return (
         <div className="inventory-container animate-fade">
-            <header className="page-header">
-                <h1>Inventory Items</h1>
-                <p>Manage and browse your stock with AI-powered search</p>
-            </header>
+            <Header
+                title="Inventory Items"
+                subtitle="Manage and browse your stock with AI-powered search"
+            />
 
             <div className="search-panel">
                 <div className="search-grid">

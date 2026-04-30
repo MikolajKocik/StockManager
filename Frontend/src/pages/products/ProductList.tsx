@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import ProductCreateForm from './components/ProductCreateForm';
 import './ProductList.css';
-import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common/Table';
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Button, Header } from '@/components/common';
 
-import { Button } from '@/components/common/Button';
 import { QueryClient, useQuery } from '@tanstack/react-query';
 import { productsApi } from '@/api/internal/productsApi';
 
@@ -29,12 +28,14 @@ export default function ProductList() {
 
     return (
         <div className="product-list-container animate-fade">
-            <div className="list-header">
-                <h1>Products Inventory</h1>
-                <Button variant="primary" onClick={() => setIsCreateModalOpen(true)}>
-                    Add New Product
-                </Button>
-            </div>
+            <Header 
+                title="Products Inventory" 
+                actions={
+                    <Button variant="primary" onClick={() => setIsCreateModalOpen(true)}>
+                        Add New Product
+                    </Button>
+                }
+            />
 
             <ProductCreateForm
                 isOpen={isCreateModalOpen}

@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { Button } from '@/components/common/Button';
-import { Input } from '@/components/common/Input';
+import { Header, Section, Button, Input } from '@/components/common';
 import './Settings.css';
 
 export default function ApiSettings() {
@@ -9,14 +8,13 @@ export default function ApiSettings() {
 
     return (
         <div className="settings-page animate-fade">
-            <header className="settings-header">
-                <h1>API Settings</h1>
-                <p>Manage your API keys to integrate StockManager with other services.</p>
-            </header>
+            <Header 
+                title="API Settings" 
+                subtitle="Manage your API keys to integrate StockManager with other services." 
+            />
 
             <div className="settings-content">
-                <section className="settings-section">
-                    <h3>Your API Keys</h3>
+                <Section title="Your API Keys" variant="card">
                     <div className="api-key-card">
                         <div className="api-key-info">
                             <span className="key-label">Production Key</span>
@@ -34,10 +32,9 @@ export default function ApiSettings() {
                             <Button size="sm" variant="danger">Revoke</Button>
                         </div>
                     </div>
-                </section>
+                </Section>
 
-                <section className="settings-section">
-                    <h3>Webhook URL</h3>
+                <Section title="Webhook URL" variant="card">
                     <div className="webhook-form">
                         <Input 
                             label="Endpoint URL" 
@@ -46,7 +43,7 @@ export default function ApiSettings() {
                         />
                         <p className="hint">We'll send POST requests to this URL for inventory updates.</p>
                     </div>
-                </section>
+                </Section>
 
                 <div className="settings-actions">
                     <Button variant="primary">Save Configuration</Button>

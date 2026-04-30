@@ -1,5 +1,6 @@
 import DashboardCard from './components/DashboardCard';
 import './Home.css';
+import { Header } from '@/components/common';
 
 import packageIcon from '@/assets/package-svgrepo-com.svg';
 import suppliersIcon from '@/assets/suppliers.svg';
@@ -56,12 +57,10 @@ export default function Home() {
 
     return (
         <div className="animate-slide-up">
-            <header className="home-header">
-                <h1 className="home-title">Warehouse Management System</h1>
-                <p className="home-subtitle">
-                    Manage your inventory, suppliers, and products with ease and efficiency.
-                </p>
-            </header>
+            <Header
+                title="Warehouse Management System"
+                subtitle="Manage your inventory, suppliers, and products with ease and efficiency."
+            />
 
             <div className="dashboard-grid">
                 <DashboardCard

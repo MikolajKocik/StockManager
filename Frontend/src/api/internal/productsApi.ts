@@ -1,5 +1,5 @@
 import type { Product, ProductCollection, ProductCreateForm, ProductUpdateForm } from "@/models/product";
-import api from "./api";
+import api from "../config/api";
 
 export const productsApi = {
     getProducts: async (): Promise<ProductCollection> => {

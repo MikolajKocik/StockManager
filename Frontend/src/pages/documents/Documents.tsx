@@ -4,7 +4,7 @@ import DocumentSection from './components/DocumentSection';
 import type { Document, FileMetadata } from '@/models/document';
 import { Button } from '@/components/common/Button';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { documentsApi } from '@/api/documentsApi';
+import { documentsApi } from '@/api/internal/documentsApi';
 
 export default function Documents() {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -37,7 +37,7 @@ export default function Documents() {
     };
 
     return (
-        <div className="documents-container">
+        <div className="documents-container animate-fade">
             <header className="documents-header">
                 <h1>Document Management</h1>
                 <div className="upload-wrapper">

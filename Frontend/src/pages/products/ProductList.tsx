@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } fro
 
 import { Button } from '@/components/common/Button';
 import { QueryClient, useQuery } from '@tanstack/react-query';
-import { productsApi } from '@/api/productsApi';
+import { productsApi } from '@/api/internal/productsApi';
 
 export default function ProductList() {
     const queryClient = new QueryClient();

@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { statisticsApi } from '@/api/statisticsApi';
+import { statisticsApi } from '@/api/internal/statisticsApi';
 import {
     Chart as ChartJS,
     CategoryScale,

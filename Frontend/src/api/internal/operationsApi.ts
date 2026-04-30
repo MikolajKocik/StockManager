@@ -1,5 +1,5 @@
 import type { WarehouseOperation } from "@/models/warehouseOperation"
-import api from "./api"
+import api from "../config/api"
 
 export const operationsApi = {
     getOperations: async (): Promise<WarehouseOperation[]> => {

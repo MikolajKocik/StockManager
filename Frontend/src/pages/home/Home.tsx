@@ -7,11 +7,11 @@ import stockIcon from '@/assets/stock.svg';
 import deliveryIcon from '@/assets/delivery-transport-svgrepo-com.svg';
 import processIcon from '@/assets/process.svg';
 import { useQuery } from '@tanstack/react-query';
-import { suppliersApi } from '@/api/suppliersApi';
-import { inventoryApi } from '@/api/inventoryApi';
-import { productsApi } from '@/api/productsApi';
-import { shipmentsApi } from '@/api/shipmentsApi';
-import { operationsApi } from '@/api/operationsApi';
+import { suppliersApi } from '@/api/internal/suppliersApi';
+import { inventoryApi } from '@/api/internal/inventoryApi';
+import { productsApi } from '@/api/internal/productsApi';
+import { shipmentsApi } from '@/api/internal/shipmentsApi';
+import { operationsApi } from '@/api/internal/operationsApi';
 
 export default function Home() {
 

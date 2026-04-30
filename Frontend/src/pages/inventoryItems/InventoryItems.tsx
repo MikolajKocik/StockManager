@@ -5,8 +5,8 @@ import "./InventoryItems.css";
 import { Select } from "@/components/common/Select";
 import { Input } from "@/components/common/Input";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { inventoryApi } from "@/api/inventoryApi";
-import { productsApi } from "@/api/productsApi";
+import { inventoryApi } from "@/api/internal/inventoryApi";
+import { productsApi } from "@/api/internal/productsApi";
 import type { InventoryItemCollection } from "@/models/inventoryItem";
 
 export default function InventoryItems() {

@@ -1,5 +1,5 @@
 import type { InventoryItemCollection } from "@/models/inventoryItem";
-import api from "./api"
+import api from "../config/api"
 
 interface SearchRequest {
     question: string,

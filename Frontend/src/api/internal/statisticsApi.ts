@@ -1,5 +1,5 @@
 import type { DistributionData, StatsSummary, TrendData } from "@/models/statistics";
-import api from "./api"
+import api from "../config/api"
 
 export const statisticsApi = {
     getSummary: async (): Promise<StatsSummary> => {

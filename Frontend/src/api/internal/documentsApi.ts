@@ -1,5 +1,5 @@
 import type { Document, FileMetadata } from "@/models/document";
-import api from "./api";
+import api from "../config/api";
 
 export const documentsApi = {
     getDocuments: async (): Promise<Document[]> => {

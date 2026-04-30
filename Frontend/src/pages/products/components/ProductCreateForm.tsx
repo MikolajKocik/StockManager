@@ -1,7 +1,7 @@
 import type { ProductCreateForm } from "@/models/product";
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { productsApi } from '@/api/productsApi';
+import { productsApi } from '@/api/internal/productsApi';
 import Modal from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { Select } from '@/components/common/Select';

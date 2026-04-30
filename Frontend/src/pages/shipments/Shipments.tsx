@@ -3,8 +3,8 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useQuery } from '@tanstack/react-query';
-import { shipmentsApi } from '@/api/shipmentsApi';
-import { geocodingApi } from '@/api/geocodingApi';
+import { shipmentsApi } from '@/api/internal/shipmentsApi';
+import { geocodingApi } from '@/api/external/geocodingApi';
 import type { Shipment } from '@/models/shipment';
 import './Shipments.css';
 

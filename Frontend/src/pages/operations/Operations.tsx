@@ -7,8 +7,8 @@ import { Button } from '@/components/common/Button';
 import { Select } from '@/components/common/Select';
 import { Input } from '@/components/common/Input';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { operationsApi } from '@/api/operationsApi';
-import { productsApi } from '@/api/productsApi';
+import { operationsApi } from '@/api/internal/operationsApi';
+import { productsApi } from '@/api/internal/productsApi';
 
 export default function Operations() {
     const queryClient = useQueryClient();
@@ -64,7 +64,7 @@ export default function Operations() {
     ];
 
     return (
-        <div className="operations-container">
+        <div className="operations-container animate-fade">
             <header className="operations-header">
                 <h1>Warehouse Operations</h1>
                 <Button variant="primary" onClick={() => setShowModal(true)}>New Operation</Button>

@@ -4,7 +4,7 @@ import ProductEditForm from './components/ProductEditForm';
 import { Button } from '@/components/common/Button';
 import './ProductDetails.css';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { productsApi } from '@/api/productsApi';
+import { productsApi } from '@/api/internal/productsApi';
 
 export default function ProductDetails() {
     const { id } = useParams();

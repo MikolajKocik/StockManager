@@ -1,4 +1,4 @@
-import { suppliersApi } from "@/api/suppliersApi";
+import { suppliersApi } from "@/api/internal/suppliersApi";
 import { Select } from "@/components/common/Select";
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/common/Table";
 import { useQuery } from "@tanstack/react-query";

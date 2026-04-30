@@ -1,7 +1,7 @@
 import type { ProductUpdateForm } from "@/models/product";
 import { useState, useEffect } from 'react';
-import api from '@/api/api';
-import type { Product } from '@/models/product';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { productsApi } from '@/api/productsApi';
 import Modal from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { Select } from '@/components/common/Select';
@@ -10,16 +10,13 @@ import './ProductForm.css';
 
 interface ProductEditFormProps {
     isOpen: boolean;
-    productId: number | string;
+    productId: string;
     onClose: () => void;
     onSuccess?: () => void;
 }
 
 export default function ProductEditForm({ isOpen, productId, onClose, onSuccess }: ProductEditFormProps) {
-    const [genres, setGenres] = useState<string[]>([]);
-    const [types, setTypes] = useState<string[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+    const queryClient = useQueryClient();
     const [form, setForm] = useState<ProductUpdateForm>({
         id: null,
         name: '',
@@ -31,6 +28,40 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
         expirationDate: ''
     });
 
+    const { data: genres = [], isLoading: isGenresLoading } = useQuery({
+        queryKey: ['genres'],
+        queryFn: productsApi.getGenres,
+        enabled: isOpen
+    });
+
+    const { data: types = [], isLoading: isTypesLoading } = useQuery({
+        queryKey: ['warehouses'],
+        queryFn: productsApi.getWarehouses,
+        enabled: isOpen
+    });
+
+    const { data: product, isLoading: isProductLoading, error: productError } = useQuery({
+        queryKey: ['product', productId],
+        queryFn: () => productsApi.getProductById(productId),
+        enabled: isOpen && !!productId
+    });
+
+    const { mutate: updateProduct, isPending: isUpdating, error: mutationError } = useMutation({
+        mutationFn: (data: ProductUpdateForm) => productsApi.updateProduct(productId, data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            queryClient.invalidateQueries({ queryKey: ['product', productId] });
+            onSuccess?.();
+            onClose();
+        }
+    });
+
+    useEffect(() => {
+        if (product) {
+            setForm(product);
+        }
+    }, [product]);
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     }
@@ -39,51 +70,19 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        try {
-            await api.put(`/products/${productId}`, form);
-            onSuccess?.();
-            onClose();
-        } catch (err) {
-            setError("Error occurred while updating product");
-            console.error(`Error occurred while updating product: ${err}`);
-        }
+        updateProduct(form);
     };
 
-    useEffect(() => {
-        if (!isOpen) return;
-
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                const [genresRes, typesRes, formRes] = await Promise.all([
-                    api.get<string[]>('/products/genres'),
-                    api.get<string[]>('products/warehouses'),
-                    api.get<Product>(`/products/${productId}`)
-                ]);
-
-                setGenres(genresRes.data);
-                setTypes(typesRes.data);
-                setForm(formRes.data);
-            } catch (err) {
-                console.log("Error occurred while loading data", err);
-                setError("Error occurred while loading data");
-            }
-            finally {
-                setLoading(false);
-            }
-        }
-
-        fetchData();
-    }, [isOpen, productId]);
+    const isLoading = isGenresLoading || isTypesLoading || isProductLoading;
+    const error = productError ? "Error occurred while loading data" : (mutationError ? "Error occurred while updating product" : null);
 
     return (
         <Modal isOpen={isOpen} onClose={onClose}>
             <h2>Edit product</h2>
 
-            {loading ? (
+            {isLoading ? (
                 <p>Loading...</p>
             ) : error ? (
                 <p style={{ color: 'red' }}>{error}</p>
@@ -156,8 +155,8 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
                         <Button type="button" variant="danger" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button type="submit" variant="primary">
-                            Save Changes
+                        <Button type="submit" variant="primary" isLoading={isUpdating}>
+                            {isUpdating ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </div>
                 </form>

@@ -9,3 +9,5 @@ export { default as Documents } from './documents/Documents';
 export { default as InventoryItems } from './inventoryItems/InventoryItems';
 export { default as Analytics } from './analytics/Analytics';
 export { default as NotFound } from './notFound/NotFound';
+export { default as AppearanceSettings } from './settings/AppearanceSettings';
+export { default as ApiSettings } from './settings/ApiSettings';

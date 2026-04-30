@@ -11,7 +11,9 @@ import {
   Documents,
   InventoryItems,
   Analytics,
-  NotFound
+  NotFound,
+  AppearanceSettings,
+  ApiSettings
 } from '@/pages';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 
@@ -39,6 +41,8 @@ export default function App() {
             <Route path="/shipments" element={<Shipments />} />
             <Route path="/documents" element={<Documents />} />
             <Route path="/inventory-items" element={<InventoryItems />} />
+            <Route path="/settings/appearance" element={<AppearanceSettings />} />
+            <Route path="/settings/api" element={<ApiSettings />} />
 
             {/* Catch all route - 404 */}
             <Route path="*" element={<NotFound />} />

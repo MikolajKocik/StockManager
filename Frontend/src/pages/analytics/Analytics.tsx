@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import api from '@/api/api';
+import { useQuery } from '@tanstack/react-query';
+import { statisticsApi } from '@/api/internal/statisticsApi';
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -33,36 +33,25 @@ ChartJS.register(
 );
 
 export default function Analytics() {
-    const [summary, setSummary] = useState<StatsSummary | null>(null);
-    const [trend, setTrend] = useState<TrendData[]>([]);
-    const [distribution, setDistribution] = useState<DistributionData[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { data: summary, isLoading: isSummaryLoading } = useQuery<StatsSummary>({
+        queryKey: ['stats-summary'],
+        queryFn: statisticsApi.getSummary,
+        refetchInterval: 10000
+    });
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const [summaryRes, trendRes, distRes] = await Promise.all([
-                    api.get('/statistics/summary'),
-                    api.get('/statistics/operations-trend?days=14'),
-                    api.get('/statistics/stock-distribution')
-                ]);
+    const { data: trend = [], isLoading: isTrendLoading } = useQuery<TrendData[]>({
+        queryKey: ['stats-trend'],
+        queryFn: statisticsApi.getTrend,
+        refetchInterval: 10000
+    });
 
-                setSummary(summaryRes.data);
-                setTrend(trendRes.data);
-                setDistribution(distRes.data);
-            } catch (error) {
-                console.error('Error fetching statistics:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
+    const { data: distribution = [], isLoading: isDistributionLoading } = useQuery<DistributionData[]>({
+        queryKey: ['stats-distribution'],
+        queryFn: statisticsApi.getDistribution,
+        refetchInterval: 10000
+    });
 
-        fetchStats();
-
-        // Polling interval
-        const interval = setInterval(fetchStats, 10000);
-        return () => clearInterval(interval);
-    }, []);
+    const isLoading = isSummaryLoading || isTrendLoading || isDistributionLoading;
 
     const trendChartData = {
         labels: trend.map(t => new Date(t.date).toLocaleDateString()),
@@ -96,7 +85,7 @@ export default function Analytics() {
         ],
     };
 
-    if (loading) return <div className="analytics-container">Loading analytics...</div>;
+    if (isLoading) return <div className="analytics-container">Loading analytics...</div>;
 
     return (
         <div className="analytics-container animate-fade">

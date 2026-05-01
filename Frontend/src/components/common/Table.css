@@ -2,7 +2,7 @@
     width: 100%;
     border-collapse: collapse;
     background: var(--bg);
-    border-radius: 12px;
+    border-radius: 0.75rem;
     overflow: hidden;
     box-shadow: var(--shadow);
     border: 1px solid var(--border);
@@ -10,7 +10,7 @@
 
 .template-table th,
 .template-table td {
-    padding: 16px;
+    padding: 1rem;
     text-align: left;
     border-bottom: 1px solid var(--border);
 }

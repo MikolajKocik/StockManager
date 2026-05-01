@@ -1,83 +1,62 @@
-import api from "@/api/api";
-import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/common/Table";
-import { Button } from "@/components/common/Button";
-import type { InventoryItemCollection } from "@/models/inventoryItem";
-import { useState, useEffect } from "react"
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Select, Input, Button, Header } from "@/components/common";
+import { useState } from "react"
 import "./InventoryItems.css";
-import { Select } from "@/components/common/Select";
-import { Input } from "@/components/common/Input";
-
-interface SearchRequest {
-    question: string,
-    conversationId: string | null,
-    categoryFilter: string | null,
-    warehouseFilter: string | null;
-}
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { inventoryApi } from "@/api/internal/inventoryApi";
+import { productsApi } from "@/api/internal/productsApi";
+import type { InventoryItemCollection } from "@/models/inventoryItem";
 
 export default function InventoryItems() {
-    const [items, setItems] = useState<InventoryItemCollection>({ data: [] });
-    const [warehouses, setWarehouses] = useState<string[]>([]);
-    const [genres, setGenres] = useState<string[]>([]);
     const [question, setQuestion] = useState<string>("");
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
-    const [isSearching, setIsSearching] = useState<boolean>(false);
+    const [aiItems, setAiItems] = useState<InventoryItemCollection | null>(null);
 
-    const fetchItems = async () => {
-        try {
-            const [invRes, wsRes, genRes] = await Promise.all([
-                api.get<InventoryItemCollection>("/inventory-items"),
-                api.get<string[]>("/products/warehouses"),
-                api.get<string[]>("/products/genres")
-            ]);
+    const { data: items = { data: [] } } = useQuery({
+        queryKey: ['items'],
+        queryFn: inventoryApi.getItems
+    });
 
-            setItems(invRes.data);
-            setWarehouses(wsRes.data);
-            setGenres(genRes.data);
-        } catch (err) {
-            console.error("Failed to fetch initial data", err);
-        }
-    };
+    const { data: genres = [] } = useQuery({
+        queryKey: ['genres'],
+        queryFn: productsApi.getGenres
+    });
 
-    useEffect(() => {
-        const fetchData = async () =>
-            await fetchItems();
+    const { data: warehouses = [] } = useQuery({
+        queryKey: ['warehouses'],
+        queryFn: productsApi.getWarehouses
+    });
 
-        fetchData();
-    }, []);
-
+    const { mutate: searchAI, isPending: isSearching } = useMutation({
+        mutationFn: inventoryApi.searchAI,
+        onSuccess: (data) => setAiItems(data),
+        onError: () => alert("Ollama error ocurred during retrieving question")
+    });
 
     const handleAsk = async () => {
         if (!question.trim()) {
-            await fetchItems();
+            setAiItems(null);
             return;
-        }
+        } else {
+            const requestPayload = {
+                question: question,
+                conversationId: null,
+                categoryFilter: selectedCategory || null,
+                warehouseFilter: selectedWarehouse || null
+            };
 
-        setIsSearching(true);
-        const requestPayload: SearchRequest = {
-            question: question,
-            conversationId: null,
-            categoryFilter: selectedCategory || null,
-            warehouseFilter: selectedWarehouse || null
-        };
-
-        try {
-            const response = await api.post("/inventory-items/ai/search", requestPayload);
-
-            setItems({ data: response.data.items || response.data.Items || [] });
-        } catch (err) {
-            console.error(`Something went wrong... \n ${err}`);
-        } finally {
-            setIsSearching(false);
+            searchAI(requestPayload);
         }
     }
 
+    const displayItems = aiItems ?? items;
+
     return (
         <div className="inventory-container animate-fade">
-            <header className="page-header">
-                <h1>Inventory Items</h1>
-                <p>Manage and browse your stock with AI-powered search</p>
-            </header>
+            <Header
+                title="Inventory Items"
+                subtitle="Manage and browse your stock with AI-powered search"
+            />
 
             <div className="search-panel">
                 <div className="search-grid">
@@ -133,7 +112,7 @@ export default function InventoryItems() {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {items.data.map(item =>
+                    {displayItems.data.map(item =>
                         <TableRow key={item.id}>
                             <TableCell>{item.productName}</TableCell>
                             <TableCell>{item.binLocationCode}</TableCell>

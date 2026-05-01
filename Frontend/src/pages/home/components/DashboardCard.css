@@ -1,21 +1,21 @@
 .card-icon-wrapper {
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
 }
 
 .card-icon {
-    width: 48px;
-    height: 48px;
+    width: 3rem;
+    height: 3rem;
 }
 
 .card-title {
     color: var(--accent);
-    margin-bottom: 12px;
+    margin-bottom: 0.75rem;
 }
 
 .card-subtitle {
     color: var(--text-secondary);
     font-size: 1.1rem;
-    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
 }
 
 .card-link {
@@ -27,5 +27,5 @@
 }
 
 .card-link-arrow {
-    margin-left: 8px;
+    margin-left: 0.5rem;
 }

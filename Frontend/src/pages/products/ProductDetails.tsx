@@ -1,54 +1,42 @@
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import api from '../../api/api';
-import type { Product } from '../../models/product';
+import { useState } from 'react';
 import ProductEditForm from './components/ProductEditForm';
 import { Button } from '@/components/common/Button';
 import './ProductDetails.css';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { productsApi } from '@/api/internal/productsApi';
 
 export default function ProductDetails() {
     const { id } = useParams();
-    const [product, setProduct] = useState<Product | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string | null>(null);
-    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
-
     const navigate = useNavigate();
+    const queryClient = useQueryClient();
 
-    const fetchProduct = async () => {
-        setLoading(true);
-        try {
-            const res = await api.get<Product>(`/products/${id}`);
-            setProduct(res.data);
-        } catch {
-            setError("Product not found");
-        } finally {
-            setLoading(false);
-        }
-    };
+    const { data: product = null, isLoading, error } = useQuery({
+        queryKey: ['products', id],
+        queryFn: () => productsApi.getProductById(id!)
+    });
+
+    const { mutate: deleteProduct } = useMutation({
+        mutationFn: () => productsApi.deleteProduct(id!),
+        onSuccess: () => navigate("/products"),
+        onError: () => alert("Could not delete product")
+    });
+
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
 
     const handleDelete = async () => {
         if (!window.confirm("Are you sure you want to delete this product?")) return;
-        try {
-            await api.delete(`/products/${id}`);
-            navigate('/products');
-        } catch {
-            setError("Could not delete product");
-        }
+        deleteProduct();
     }
 
     const handleEditSuccess = () => {
         setIsEditModalOpen(false);
-        fetchProduct();
+        queryClient.invalidateQueries({ queryKey: ['products', id] });
     };
 
-    useEffect(() => {
-        fetchProduct();
-    }, [id]);
+    if (isLoading) return <div className="loading">Loading product details...</div>;
 
-    if (loading) return <div className="loading">Loading product details...</div>;
-
-    if (error) return <div className="error-message">{error}</div>;
+    if (error) return <div className="error-message">{error.message}</div>;
 
     return (
         <div className="product-details-container animate-fade">

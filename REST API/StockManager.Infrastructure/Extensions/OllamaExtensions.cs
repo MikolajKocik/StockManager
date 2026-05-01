@@ -9,10 +9,10 @@ public static class OllamaExtensions
 {
     public static void RegisterOllamaInstance(this IServiceCollection services, IConfiguration cfg)
     {
-        var ollamaConfig = cfg.GetSection("Ollama");
+        IConfigurationSection ollamaConfig = cfg.GetSection("Ollama");
         var ollamaUri = new Uri(ollamaConfig["BaseUrl"]!);
-        var chatModel = ollamaConfig["ChatModel"]!;
-        var embeddingModel = ollamaConfig["EmbeddingModel"]!;
+        string chatModel = ollamaConfig["ChatModel"]!;
+        string embeddingModel = ollamaConfig["EmbeddingModel"]!;
 
         services.AddHttpClient("Ollama", client =>
         {
@@ -22,13 +22,13 @@ public static class OllamaExtensions
 
         services.AddChatClient(sp =>
         {
-            var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Ollama");
+            HttpClient httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Ollama");
             return new OllamaApiClient(httpClient, chatModel);
         });
 
         services.AddEmbeddingGenerator(sp =>
         {
-            var httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Ollama");
+            HttpClient httpClient = sp.GetRequiredService<IHttpClientFactory>().CreateClient("Ollama");
             return new OllamaApiClient(httpClient, embeddingModel);
         });
     }

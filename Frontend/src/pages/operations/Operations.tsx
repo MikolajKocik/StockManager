@@ -1,20 +1,18 @@
-import { useState, useEffect } from 'react';
-import { warehouseApi } from '@/api/warehouseApi';
-import api from '@/api/api';
+import { useState } from 'react';
 import './Operations.css';
 import type { WarehouseOperation } from '@/models/warehouseOperation';
 import { Table, TableHead, TableHeaderCell, TableRow, TableBody, TableCell } from '@/components/common/Table';
-import Modal from '@/components/common/Modal';
-import { Button } from '@/components/common/Button';
-import { Select } from '@/components/common/Select';
-import { Input } from '@/components/common/Input';
-import type { ProductCollection } from '@/models/product';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { operationsApi } from '@/api/internal/operationsApi';
+import { productsApi } from '@/api/internal/productsApi';
+import ProductCreateForm from '../products/components/ProductCreateForm';
+import { Header, Button, Select, Input, Modal } from '@/components/common';
 
 export default function Operations() {
-    const [operations, setOperations] = useState<WarehouseOperation[]>([]);
-    const [products, setProducts] = useState<ProductCollection>({ data: [] });
+    const queryClient = useQueryClient();
+
     const [showModal, setShowModal] = useState(false);
-    const [isCreating, setIsCreating] = useState(false);
+    const [showProductModal, setShowProductModal] = useState(false);
     const [newOp, setNewOp] = useState({
         type: 0, // PZ
         date: new Date().toISOString().split('T')[0],
@@ -22,37 +20,40 @@ export default function Operations() {
         items: [{ productId: '', quantity: 1 }]
     });
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const [operationsRes, productsRes] = await Promise.all([
-                warehouseApi.getOperations(),
-                api.get('/products')
-            ]);
-            setOperations(operationsRes.data);
-            setProducts(productsRes.data.data || productsRes.data);
-        };
+    const { data: operations = [] } = useQuery({
+        queryKey: ['operations'],
+        queryFn: operationsApi.getOperations
+    });
 
-        fetchData();
-    }, [newOp]);
+    const { data: products = { data: [] } } = useQuery({
+        queryKey: ['products'],
+        queryFn: productsApi.getProducts
+    });
+
+    const { mutate: createOperation, isPending: isCreating } = useMutation({
+        mutationFn: (op: WarehouseOperation) => operationsApi.createOperation(op),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['operations'] });
+            setShowModal(false);
+        },
+        onError: (err) => {
+            alert("Error creating operation");
+            console.error(err);
+        }
+    });
 
     const handleCreate = async () => {
-        setIsCreating(true);
-        try {
-            await warehouseApi.createOperation({
-                ...newOp,
-                type: parseInt(newOp.type.toString()),
-                items: newOp.items.map(i => ({ ...i, productId: parseInt(i.productId) }))
-            } as WarehouseOperation);
-            setShowModal(false);
-        } catch (err) {
-            console.error(err);
-            alert("Error creating operation");
-        } finally {
-            setIsCreating(false);
-        }
+        createOperation({
+            ...newOp,
+            type: parseInt(newOp.type.toString()),
+            items: newOp.items.map(i => ({ ...i, productId: parseInt(i.productId) }))
+        } as WarehouseOperation);
     };
 
-    const addItem = () => setNewOp({ ...newOp, items: [...newOp.items, { productId: '', quantity: 1 }] });
+    const addItem = () => setNewOp({
+        ...newOp,
+        items: [...newOp.items, { productId: '', quantity: 1 }]
+    });
 
     const operationTypes = [
         { value: 0, label: 'PZ (Goods Receipt)' },
@@ -62,11 +63,13 @@ export default function Operations() {
     ];
 
     return (
-        <div className="operations-container">
-            <header className="operations-header">
-                <h1>Warehouse Operations</h1>
-                <Button variant="primary" onClick={() => setShowModal(true)}>New Operation</Button>
-            </header>
+        <div className="operations-container animate-fade">
+            <Header
+                title="Warehouse Operations"
+                actions={
+                    <Button variant="primary" onClick={() => setShowModal(true)}>New Operation</Button>
+                }
+            />
 
             <div className="operations-grid">
                 <Table>
@@ -105,8 +108,8 @@ export default function Operations() {
                 </Table>
             </div>
 
-            <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
-                <div className="modal-content">
+            <Modal isOpen={showModal} onClose={() => setShowModal(false)} size="md">
+                <div className="operation-modal-inner">
                     <h2>New Operation</h2>
                     <div className="form-grid">
                         <Select
@@ -153,7 +156,25 @@ export default function Operations() {
                                 />
                             </div>
                         ))}
-                        <Button variant="secondary" size="sm" onClick={addItem}>Add Item</Button>
+                        <div className="items-actions">
+                            <Button variant="secondary" size="sm" onClick={addItem}>Add Item</Button>
+                            <Button
+                                className="quick-add-btn"
+                                variant="outline"
+                                size="sm"
+                                type="button"
+                                onClick={() => setShowProductModal(true)}
+                            >
+                                Add new product
+                            </Button>
+                        </div>
+                        <ProductCreateForm
+                            isOpen={showProductModal}
+                            onClose={() => setShowProductModal(false)}
+                            onSuccess={() => {
+                                queryClient.invalidateQueries({ queryKey: ['products'] });
+                            }}
+                        />
                     </div>
 
                     <div className="modal-actions">

@@ -1,6 +1,6 @@
 .inventory-container {
     padding: 2rem;
-    max-width: 1200px;
+    max-width: 75rem;
     margin: 0 auto;
 }
 
@@ -10,9 +10,7 @@
 
 .page-header h1 {
     margin-bottom: 0.5rem;
-    background: linear-gradient(to right, var(--text-primary), var(--accent));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--text-primary);
 }
 
 .page-header p {
@@ -31,7 +29,7 @@
 
 .search-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(12.5rem, 1fr));
     gap: 1.5rem;
     align-items: flex-end;
 }
@@ -56,7 +54,7 @@
 
 .input-group input,
 .input-group select {
-    padding: 12px 16px;
+    padding: 0.75rem 1rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-main);
@@ -70,7 +68,7 @@
 .input-group select:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-light);
+    box-shadow: 0 0 0 0.1875rem var(--accent-light);
     background: white;
 }
 
@@ -81,18 +79,18 @@
 
 .sparkle {
     font-size: 1.2rem;
-    margin-right: 4px;
+    margin-right: 0.25rem;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 48rem) {
     .search-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .actions {
         justify-content: stretch;
     }
-    
+
     .actions button {
         width: 100%;
     }

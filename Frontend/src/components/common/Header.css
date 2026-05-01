@@ -1,0 +1,40 @@
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 2.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.header-content h1 {
+    font-size: 2.5rem;
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.2;
+}
+
+.header-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-top: 0.5rem;
+}
+
+.header-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+@media (max-width: 48rem) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1.5rem;
+    }
+
+    .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

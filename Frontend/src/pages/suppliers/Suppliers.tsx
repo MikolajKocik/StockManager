@@ -1,7 +1,115 @@
-export default function Suppliers() {
-    return (
-        <div>
+import { suppliersApi } from "@/api/internal/suppliersApi";
+import { Select, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Header } from "@/components/common";
+import { useQuery } from "@tanstack/react-query";
+import { useRef, useState } from "react";
+import './Suppliers.css';
 
+export default function Suppliers() {
+    const [selectedCountry, setSelectedCountry] = useState('');
+    const [selectedCity, setSelectedCity] = useState('');
+
+    const { data: suppliers = { data: [] }, isLoading, isError } = useQuery({
+        queryKey: ['suppliers'],
+        queryFn: suppliersApi.getAll
+    });
+
+    if (isLoading) return <div className="loading">Loading suppliers...</div>;
+    if (isError) return <div className="error-message">Error loading suppliers.</div>;
+
+    const countries = [...new Set(suppliers.data.map(s =>
+        s.address?.country).filter(Boolean)
+    )] as string[];
+    const cities = [...new Set(suppliers.data.map(s =>
+        s.address?.city).filter(Boolean)
+    )] as string[];
+
+    const filtered = suppliers.data.filter(s => {
+        const byCountry = !selectedCountry || s.address?.country === selectedCountry;
+        const byCity = !selectedCity || s.address?.city === selectedCity;
+        return byCountry && byCity;
+    })
+
+    const tableRef = useRef<HTMLDivElement>(null);
+
+    const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setSelectedCountry(e.target.value);
+        setSelectedCity('');
+        tableRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    return (
+        <div className="suppliers-container animate-fade">
+            <Header 
+                title="Suppliers Directory" 
+                subtitle="Manage and filter your global supply chain partners" 
+            />
+
+            <div className="filters">
+                <Select
+                    label="Country"
+                    value={selectedCountry}
+                    onChange={handleCountryChange}
+                    options={[
+                        { value: '', label: 'All Countries' },
+                        ...countries.map(c => ({ value: c, label: c }))
+                    ]}
+                />
+
+                <Select
+                    label="City"
+                    value={selectedCity}
+                    onChange={e => setSelectedCity(e.target.value)}
+                    options={[
+                        { value: '', label: 'All Cities' },
+                        ...cities.map(c => ({ value: c, label: c }))
+                    ]}
+                />
+            </div>
+
+            <div ref={tableRef} className="table-wrapper animate-fade">
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableHeaderCell>
+                                Supplier name
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                Unique identifier
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                City
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                Country
+                            </TableHeaderCell>
+                            <TableHeaderCell>
+                                Postal code
+                            </TableHeaderCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filtered.map(s =>
+                            <TableRow key={s.id}>
+                                <TableCell>
+                                    {s.name}
+                                </TableCell>
+                                <TableCell>
+                                    {s.slug}
+                                </TableCell>
+                                <TableCell>
+                                    {s.address?.city}
+                                </TableCell>
+                                <TableCell>
+                                    {s.address?.country}
+                                </TableCell>
+                                <TableCell>
+                                    {s.address?.postalCode}
+                                </TableCell>
+                            </TableRow>
+                        )}
+                    </TableBody>
+                </Table>
+            </div>
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import type { ProductCreateForm } from "@/models/product";
-import { useState, useEffect } from 'react';
-import api from '@/api/api';
+import { useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { productsApi } from '@/api/internal/productsApi';
 import Modal from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { Select } from '@/components/common/Select';
@@ -14,10 +15,7 @@ interface ProductCreateModalProps {
 }
 
 export default function ProductCreateForm({ isOpen, onClose, onSuccess }: ProductCreateModalProps) {
-    const [genres, setGenres] = useState<string[]>([]);
-    const [types, setTypes] = useState<string[]>([]);
-    const [error, setError] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
+    const queryClient = useQueryClient();
     const [form, setForm] = useState<ProductCreateForm>({
         name: '',
         genre: '',
@@ -28,6 +26,27 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
         expirationDate: ''
     });
 
+    const { data: genres = [], isLoading: isGenresLoading } = useQuery({
+        queryKey: ['genres'],
+        queryFn: productsApi.getGenres,
+        enabled: isOpen
+    });
+
+    const { data: types = [], isLoading: isTypesLoading } = useQuery({
+        queryKey: ['warehouses'],
+        queryFn: productsApi.getWarehouses,
+        enabled: isOpen
+    });
+
+    const { mutate: createProduct, isPending: isCreating, error: mutationError } = useMutation({
+        mutationFn: (data: ProductCreateForm) => productsApi.createProduct(data),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+            onSuccess?.();
+            onClose();
+        }
+    });
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
     }
@@ -36,47 +55,19 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        try {
-            await api.post('/products', form);
-            onSuccess?.();
-            onClose();
-        } catch (err) {
-            setError("Error occurred while saving data...");
-            console.error(`Error ocurred while saving data: ${err}`);
-        }
+        createProduct(form);
     };
 
-    useEffect(() => {
-        if (!isOpen) return;
-
-        const fetchData = async () => {
-            setLoading(true);
-            try {
-                const [genresRes, typesRes] = await Promise.all([
-                    api.get<string[]>('/products/genres'),
-                    api.get<string[]>('/products/warehouses')
-                ]);
-                setGenres(genresRes.data);
-                setTypes((typesRes.data));
-            } catch (err) {
-                console.log("Error occurred while loading data", err);
-                setError("Error occurred while loading data");
-            }
-            finally {
-                setLoading(false);
-            }
-        }
-
-        fetchData();
-    }, [isOpen]);
+    const isLoading = isGenresLoading || isTypesLoading;
+    const error = mutationError ? "Error occurred while saving data..." : null;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose}>
+        <Modal isOpen={isOpen} onClose={onClose} size="lg">
             <h2>Add new product</h2>
 
-            {loading ? (
+            {isLoading ? (
                 <p>Loading...</p>
             ) : error ? (
                 <p style={{ color: 'red' }}>{error}</p>
@@ -146,8 +137,8 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
                         <Button type="button" id="cancel" variant="danger" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button type="submit" variant="primary">
-                            Add Product
+                        <Button type="submit" variant="primary" isLoading={isCreating}>
+                            {isCreating ? 'Adding...' : 'Add Product'}
                         </Button>
                     </div>
                 </form>

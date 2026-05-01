@@ -14,7 +14,8 @@
 }
 
 .select-input {
-    padding: 12px 16px;
+    width: 100%;
+    padding: 0.75rem 1rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
     background: var(--bg-main);
@@ -25,10 +26,14 @@
     cursor: pointer;
 }
 
+.select-wrapper {
+    margin-bottom: 1.25rem;
+}
+
 .select-input:focus {
     outline: none;
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px var(--accent-light);
+    box-shadow: 0 0 0 0.1875rem var(--accent-light);
     background: white;
 }
 

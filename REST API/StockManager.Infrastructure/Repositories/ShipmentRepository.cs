@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,10 +23,17 @@ public sealed class ShipmentRepository : IShipmentRepository
     public IQueryable<Shipment> GetShipments()
         => _dbContext.Shipments
            .AsNoTracking()
-           .Include(so => so.SalesOrder);            
+           .Include(s => s.SalesOrder)
+                .ThenInclude(so => so.Customer)
+                    .ThenInclude(c => c.Address)
+           .Include(s => s.SalesOrder)
+                .ThenInclude(so => so.SalesOrderLines)
+                    .ThenInclude(sol => sol.Product)
+                        .ThenInclude(p => p.Supplier)
+                            .ThenInclude(sup => sup.Address);
 
     public async Task<Shipment?> GetShipmentByIdAsync(int id, CancellationToken cancellationToken)
-        => await _dbContext.Shipments
+        => await GetShipments()
             .Where(s => s.Id == id)
             .FirstOrDefaultAsync(cancellationToken);
     

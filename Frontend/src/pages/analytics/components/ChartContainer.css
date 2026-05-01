@@ -2,9 +2,9 @@
     background: var(--bg-card);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
-    padding: 32px;
+    padding: 2rem;
     box-shadow: var(--shadow-md);
-    min-height: 450px;
+    min-height: 28.125rem;
     display: flex;
     flex-direction: column;
     transition: var(--transition);
@@ -12,11 +12,11 @@
 
 .chart-container-card:hover {
     box-shadow: var(--shadow-lg);
-    transform: translateY(-4px);
+    transform: translateY(-0.25rem);
 }
 
 .chart-container-header {
-    margin-bottom: 24px;
+    margin-bottom: 1.5rem;
 }
 
 .chart-container-title {

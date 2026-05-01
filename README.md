@@ -3,7 +3,7 @@
 **StockManager** – backend (ASP.NET Core/.NET 8) for warehouse inventory management, built with **Clean Architecture + CQRS (MediatR)**, logging (**Serilog**), and observability (**OpenTelemetry**).  
 Project runs locally via **Docker Compose** (API + MS SQL Server + Redis). In the cloud, it operates as **Azure Container Apps** with supporting resources (SQL Database, Storage – Azure Files, Container Registry, Key Vault, Application Insights, etc.).
 
-  ![main](docs/img.png)
+  ![ERD](docs/stockmanager-erd.png)
 
 ## Table of Contents
 - [Architecture & Layers](#architecture--layers)

@@ -20,7 +20,10 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ASPNETCORE_ENVIRONMENT: Test
-
+      Ollama__BaseUrl: "http://localhost:11434"
+      Ollama__ChatModel: "deepseek-r1:1.5b"
+      Ollama__EmbeddingModel: "nomic-embed-text"
+      
     steps:
     - uses: actions/checkout@v4
     

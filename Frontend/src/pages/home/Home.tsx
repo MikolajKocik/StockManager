@@ -1,11 +1,6 @@
 import DashboardCard from './components/DashboardCard';
 import { Header } from '@/components/common';
 
-import packageIcon from '@/assets/package-svgrepo-com.svg';
-import suppliersIcon from '@/assets/suppliers.svg';
-import stockIcon from '@/assets/stock.svg';
-import deliveryIcon from '@/assets/delivery-transport-svgrepo-com.svg';
-import processIcon from '@/assets/process.svg';
 import { useQuery } from '@tanstack/react-query';
 import { suppliersApi } from '@/api/internal/suppliersApi';
 import { inventoryApi } from '@/api/internal/inventoryApi';

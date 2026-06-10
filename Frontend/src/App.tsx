@@ -9,7 +9,6 @@ import {
   Shipments,
   Documents,
   InventoryItems,
-  Analytics,
   NotFound
 } from '@/pages';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -41,7 +40,6 @@ export default function App() {
         <Routes>
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<Home />} />
-            <Route path="/analytics" element={<Analytics />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/suppliers" element={<Suppliers />} />

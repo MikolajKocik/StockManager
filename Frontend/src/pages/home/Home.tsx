@@ -1,5 +1,4 @@
 import DashboardCard from './components/DashboardCard';
-import './Home.css';
 import { Header } from '@/components/common';
 
 import packageIcon from '@/assets/package-svgrepo-com.svg';
@@ -56,58 +55,8 @@ export default function Home() {
     if (isError) return <p className="error-message">Something went wrong</p>;
 
     return (
-        <div className="animate-slide-up">
-            <Header
-                title="Warehouse Management System"
-                subtitle="Manage your inventory, suppliers, and products with ease and efficiency."
-            />
-
-            <div className="dashboard-grid">
-                <DashboardCard
-                    icon={packageIcon}
-                    title="Products"
-                    subtitle="Total products in stock"
-                    count={products.data.length ?? 0}
-                    linkTo="/products"
-                    linkText="View all products"
-                />
-
-                <DashboardCard
-                    icon={suppliersIcon}
-                    title="Suppliers"
-                    subtitle="Active suppliers"
-                    count={suppliers.data.length ?? 0}
-                    linkTo="/suppliers"
-                    linkText="Manage suppliers"
-                />
-
-                <DashboardCard
-                    icon={stockIcon}
-                    title="Stock"
-                    subtitle="Stock state"
-                    count={items.data.length ?? 0}
-                    linkTo="/inventory-items"
-                    linkText="Manage stock"
-                />
-
-                <DashboardCard
-                    icon={deliveryIcon}
-                    title="Shipments"
-                    subtitle="Active shipments"
-                    count={shipments.data.length ?? 0}
-                    linkTo="/shipments"
-                    linkText="Manage shipments"
-                />
-
-                <DashboardCard
-                    icon={processIcon}
-                    title="Operations"
-                    subtitle="Last 7 days"
-                    count={recentOperationsCount}
-                    linkTo="/operations"
-                    linkText="Manage operations"
-                />
-            </div>
+        <div>
+            <h1>Home Dashboard</h1>
         </div>
     );
 }

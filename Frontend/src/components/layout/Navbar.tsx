@@ -1,20 +1,6 @@
-import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import './Navbar.css';
-import { Button } from '../common/Button';
+import { NavLink } from 'react-router-dom';
 
 export default function Navbar() {
-    const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-
-    const { logout } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
-
     return (
         <nav className="navbar">
             <div className="navbar-logo">
@@ -62,34 +48,6 @@ export default function Navbar() {
                     </NavLink>
                 </li>
             </ul>
-
-            <div className="navbar-footer">
-                <div className="settings-container">
-                    <Button
-                        className={`settings-trigger ${showSettingsMenu ? 'active' : ''}`}
-                        onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                    >
-                        <span className="icon">⚙️</span>
-                        <span>Settings</span>
-                    </Button>
-
-                    {showSettingsMenu && (
-                        <div className="settings-dropdown">
-                            <div className="dropdown-header">System Settings</div>
-                            <Button onClick={() => navigate('/settings/appearance')}>
-                                Appearance
-                            </Button>
-                            <Button onClick={() => navigate('/settings/api')}>
-                                API Keys
-                            </Button>
-                            <div className="dropdown-divider"></div>
-                            <Button variant="danger" className="logout-btn-dropdown" onClick={handleLogout}>
-                                Logout
-                            </Button>
-                        </div>
-                    )}
-                </div>
-            </div>
         </nav>
     );
 }

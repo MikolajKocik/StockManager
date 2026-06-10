@@ -1,4 +1,3 @@
-import './StatisticsCard.css'
 
 interface StatisticsCardProps {
     label: string;

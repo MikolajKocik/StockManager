@@ -1,5 +1,4 @@
 export { default as Home } from './home/Home';
-export { default as LoginPage } from './auth/LoginPage';
 export { default as ProductList } from './products/ProductList';
 export { default as ProductDetails } from './products/ProductDetails';
 export { default as Suppliers } from './suppliers/Suppliers';
@@ -9,5 +8,3 @@ export { default as Documents } from './documents/Documents';
 export { default as InventoryItems } from './inventoryItems/InventoryItems';
 export { default as Analytics } from './analytics/Analytics';
 export { default as NotFound } from './notFound/NotFound';
-export { default as AppearanceSettings } from './settings/AppearanceSettings';
-export { default as ApiSettings } from './settings/ApiSettings';

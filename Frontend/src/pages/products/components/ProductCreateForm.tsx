@@ -6,7 +6,6 @@ import Modal from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { Select } from '@/components/common/Select';
 import { Button } from '@/components/common/Button';
-import './ProductForm.css';
 
 interface ProductCreateModalProps {
     isOpen: boolean;

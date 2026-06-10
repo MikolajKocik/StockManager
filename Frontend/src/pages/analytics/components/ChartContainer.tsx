@@ -1,5 +1,4 @@
 import React from 'react';
-import './ChartContainer.css';
 
 interface ChartContainerProps {
     title: string;

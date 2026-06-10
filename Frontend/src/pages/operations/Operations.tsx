@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import './Operations.css';
 import type { WarehouseOperation } from '@/models/warehouseOperation';
 import { Table, TableHead, TableHeaderCell, TableRow, TableBody, TableCell } from '@/components/common/Table';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -63,126 +62,8 @@ export default function Operations() {
     ];
 
     return (
-        <div className="operations-container animate-fade">
-            <Header
-                title="Warehouse Operations"
-                actions={
-                    <Button variant="primary" onClick={() => setShowModal(true)}>New Operation</Button>
-                }
-            />
-
-            <div className="operations-grid">
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableHeaderCell>Type</TableHeaderCell>
-                            <TableHeaderCell>Date</TableHeaderCell>
-                            <TableHeaderCell>Status</TableHeaderCell>
-                            <TableHeaderCell>Description</TableHeaderCell>
-                            <TableHeaderCell>Items Count</TableHeaderCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {operations.map((op) => {
-                            return (
-                                <TableRow key={op.id}>
-                                    <TableCell>
-                                        {typeof op.type === 'number' ? ['PZ', 'WZ', 'RW', 'MM'][op.type] : op.type}
-                                    </TableCell>
-                                    <TableCell>{new Date(op.date).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <span
-                                            className={`status-badge status-${(typeof op.status === 'number'
-                                                ? ['pending', 'completed', 'cancelled'][op.status]
-                                                : String(op.status).toLowerCase() || '')}`}
-                                        >
-                                            {typeof op.status === 'number' ? ['Pending', 'Completed', 'Cancelled'][op.status] : op.status}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>{op.description}</TableCell>
-                                    <TableCell>{op.items?.length || 0}</TableCell>
-                                </TableRow>
-                            );
-                        })}
-                    </TableBody>
-                </Table>
-            </div>
-
-            <Modal isOpen={showModal} onClose={() => setShowModal(false)} size="md">
-                <div className="operation-modal-inner">
-                    <h2>New Operation</h2>
-                    <div className="form-grid">
-                        <Select
-                            label="Operation Type"
-                            value={newOp.type}
-                            onChange={e => setNewOp({ ...newOp, type: parseInt(e.target.value) })}
-                            options={operationTypes}
-                        />
-
-                        <Input
-                            label="Description"
-                            type="text"
-                            placeholder="Optional description..."
-                            value={newOp.description}
-                            onChange={e => setNewOp({ ...newOp, description: e.target.value })}
-                        />
-                    </div>
-
-                    <div className="items-section">
-                        <h3>Items</h3>
-                        {newOp.items.map((item, idx) => (
-                            <div key={idx} className="item-row">
-                                <Select
-                                    value={item.productId}
-                                    onChange={e => {
-                                        const items = [...newOp.items];
-                                        items[idx].productId = e.target.value;
-                                        setNewOp({ ...newOp, items });
-                                    }}
-                                    options={[
-                                        { value: '', label: 'Select Product' },
-                                        ...products.data.map(p => ({ value: p.id, label: p.name || p.deliveredAt }))
-                                    ]}
-                                />
-                                <Input
-                                    type="number"
-                                    value={item.quantity}
-                                    min="1"
-                                    onChange={e => {
-                                        const items = [...newOp.items];
-                                        items[idx].quantity = parseFloat(e.target.value);
-                                        setNewOp({ ...newOp, items });
-                                    }}
-                                />
-                            </div>
-                        ))}
-                        <div className="items-actions">
-                            <Button variant="secondary" size="sm" onClick={addItem}>Add Item</Button>
-                            <Button
-                                className="quick-add-btn"
-                                variant="outline"
-                                size="sm"
-                                type="button"
-                                onClick={() => setShowProductModal(true)}
-                            >
-                                Add new product
-                            </Button>
-                        </div>
-                        <ProductCreateForm
-                            isOpen={showProductModal}
-                            onClose={() => setShowProductModal(false)}
-                            onSuccess={() => {
-                                queryClient.invalidateQueries({ queryKey: ['products'] });
-                            }}
-                        />
-                    </div>
-
-                    <div className="modal-actions">
-                        <Button variant="danger" onClick={() => setShowModal(false)}>Cancel</Button>
-                        <Button variant="primary" onClick={handleCreate} isLoading={isCreating}>Create Operation</Button>
-                    </div>
-                </div>
-            </Modal>
+        <div>
+            <h2>Operations</h2>
         </div>
     );
 }

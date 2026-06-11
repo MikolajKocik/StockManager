@@ -1,57 +1,88 @@
-import DashboardCard from './components/DashboardCard';
-import { Header } from '@/components/common';
-
+import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common';
 import { useQuery } from '@tanstack/react-query';
-import { suppliersApi } from '@/api/internal/suppliersApi';
+import { useState } from 'react';
 import { inventoryApi } from '@/api/internal/inventoryApi';
-import { productsApi } from '@/api/internal/productsApi';
-import { shipmentsApi } from '@/api/internal/shipmentsApi';
-import { operationsApi } from '@/api/internal/operationsApi';
+import type { InventoryItemCollection } from '@/models/inventoryItem';
 
 export default function Home() {
-
-    const { data: suppliers = { data: [] }, isLoading: l1, isError: e1 } = useQuery({
-        queryKey: ['suppliers'],
-        queryFn: suppliersApi.getAll
-    });
-
-    const { data: items = { data: [] }, isLoading: l2, isError: e2 } = useQuery({
-        queryKey: ['items'],
+    const { data: responseitems = { data: [] } } = useQuery<InventoryItemCollection>({
+        queryKey: ['locations'],
         queryFn: inventoryApi.getItems
     });
+    const items = responseitems?.data || [];
 
-    const { data: products = { data: [] }, isLoading: l3, isError: e3 } = useQuery({
-        queryKey: ['products'],
-        queryFn: productsApi.getProducts
-    });
-
-    const { data: shipments = { data: [] }, isLoading: l4, isError: e4 } = useQuery({
-        queryKey: ['shipments'],
-        queryFn: shipmentsApi.getSuccessfulShipments
-    });
-
-    const { data: operations = [], isLoading: l5, isError: e5 } = useQuery({
-        queryKey: ['operations'],
-        queryFn: operationsApi.getOperations
-    });
-
-    const isLoading = l1 || l2 || l3 || l4 || l5;
-    const isError = e1 || e2 || e3 || e4 || e5;
-
-    // operations of last 7 days
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-
-    const recentOperationsCount = operations.filter(op =>
-        new Date(op.date) >= sevenDaysAgo
-    ).length ?? 0;
-
-    if (isLoading) return <p>Loading...</p>;
-    if (isError) return <p className="error-message">Something went wrong</p>;
+    const LIMIT = 500;
 
     return (
-        <div>
-            <h1>Home Dashboard</h1>
+        <div className='h-full grid grid-cols-6 grid-rows-[auto_1.4fr_1fr_1.2fr] gap-4'>
+            <div className="col-span-6">
+                <div className="flex flex-row-reverse gap-4">
+                    <button className="bg-[#CC6557] dash-button">Report Incident</button>
+                    <button className="bg-amber-300 dash-button">Customize View</button>
+                    <button className="bg-[#9BB477] dash-button">Generate Report</button>
+                    <button className="bg-[#77A4B4] dash-button">Refresh</button>
+                </div>
+            </div>
+
+            <div className="col-span-2 flex flex-col card">
+                <h2 className="flex-row card-header">Location bin availability</h2>
+                <div className="flex-row">
+                    <Table className="w-full border-collapse">
+                        <TableHead className="bg-slate-200">
+                            <TableRow>
+                                <TableHeaderCell>
+                                    Name
+                                </TableHeaderCell>
+                                <TableHeaderCell>
+                                    Type
+                                </TableHeaderCell>
+                                <TableHeaderCell>
+                                    Bin usage in [%]
+                                </TableHeaderCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {items.map((item) => {
+                                const usagePercent = Math.min(100, Math.round((item.quantityOnHand / LIMIT) * 100));
+
+                                return (
+                                    <TableRow key={item.id}>
+                                        <TableCell>
+                                            {item.binLocationCode}
+                                        </TableCell>
+                                        <TableCell className="bg-[#E3E3E3]">
+                                            {item.warehouse}
+                                        </TableCell>
+                                        <TableCell>
+                                            {usagePercent}%
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </div>
+            </div>
+            <div className="col-span-2 flex flex-col card">
+            </div>
+
+            <div className="col-span-2 flex flex-col card">
+            </div>
+
+            <div className="col-span-2 flex flex-col card">
+            </div>
+
+            <div className="col-span-2 flex flex-col card">
+            </div>
+
+            <div className="col-span-2 flex flex-col card">
+            </div>
+
+            <div className="col-span-3 flex flex-col card">
+            </div>
+
+            <div className="col-span-3 flex flex-col card">
+            </div>
         </div>
     );
 }

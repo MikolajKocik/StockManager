@@ -38,4 +38,13 @@
         @apply h-[1.7rem] pl-2 mb-2 font-semibold;
         @apply text-lg text-left text-slate-700;
     }
+
+    /* MODAL */
+    .modal-overlay {
+        @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
+    }
+
+    .modal-content {
+        @apply relative bg-white p-6 shadow-2xl;
+    }
 }

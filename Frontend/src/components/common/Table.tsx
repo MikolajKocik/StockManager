@@ -7,6 +7,7 @@ interface TableElementProps {
     children: ReactNode;
     className?: string;
     isFiltered?: boolean;
+    onClick?: () => void;
 }
 
 export function Table({ children, className }: TableElementProps) {
@@ -25,11 +26,11 @@ export function TableRow({ children, className }: TableElementProps) {
     return <tr className={className}>{children}</tr>
 }
 
-export function TableHeaderCell({ children, className, isFiltered }: TableElementProps) {
+export function TableHeaderCell({ children, className, isFiltered, onClick }: TableElementProps) {
     return <th className={className}>
         {children}
         {isFiltered !== undefined && (
-            <Button className="h-4 pl-1">
+            <Button className="h-4 pl-1 cursor-pointer" onClick={onClick}>
                 {isFiltered
                     ? <img src={filterIcon} alt="filter icon" />
                     : <img src={filterNoneIcon} alt="filter none icon" />

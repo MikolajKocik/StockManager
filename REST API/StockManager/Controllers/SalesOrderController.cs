@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +16,9 @@ using StockManager.Application.CQRS.Commands.SalesOrderCommands.ShipSalesOrder;
 using StockManager.Application.Dtos.ModelsDto.SalesOrderDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Core.Domain.Enums;
+using StockManager.Application.CQRS.Queries.SalesOrderQueries;
 
 namespace StockManager.Controllers;
-
 
 [Authorize]
 [ApiController]
@@ -36,6 +36,20 @@ public sealed class SalesOrdersController : ControllerBase
     {
         _mediator = mediator;
         _logger = logger;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<SalesOrderDto>>> GetAll(CancellationToken cancellationToken)
+    {
+        Result<List<SalesOrderDto>> result = await _mediator.Send(new GetSalesOrdersQuery(), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]

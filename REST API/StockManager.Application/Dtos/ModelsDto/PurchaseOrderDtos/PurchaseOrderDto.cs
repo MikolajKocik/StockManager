@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using StockManager.Application.Dtos.ModelsDto.PurchaseOrderLineDtos;
 
 namespace StockManager.Application.Dtos.ModelsDto.PurchaseOrderDtos;
 
@@ -12,4 +14,5 @@ public sealed record PurchaseOrderDto
     public required string Status { get; init; }
     public int? InvoiceId { get; init; }
     public int? ReturnOrderId { get; init; }
+    public List<PurchaseOrderLineDto> PurchaseOrderLines { get; init; } = new();
 }

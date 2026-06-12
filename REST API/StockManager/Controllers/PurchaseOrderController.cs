@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -19,6 +19,7 @@ using StockManager.Application.Dtos.ModelsDto.PurchaseOrderDtos;
 using StockManager.Application.Dtos.ModelsDto.PurchaseOrderLineDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
+using StockManager.Application.CQRS.Queries.PurchaseOrderQueries;
 
 namespace StockManager.Controllers;
 
@@ -38,6 +39,20 @@ public sealed class PurchaseOrdersController : ControllerBase
     {
         _mediator = mediator;
         _logger = logger;
+    }
+
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<PurchaseOrderDto>>> GetAll(CancellationToken cancellationToken)
+    {
+        Result<List<PurchaseOrderDto>> result = await _mediator.Send(new GetPurchaseOrdersQuery(), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
     }
 
     [HttpGet("{id}")]

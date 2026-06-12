@@ -3,27 +3,33 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { inventoryApi } from '@/api/internal/inventoryApi';
 import type { InventoryItemCollection } from '@/models/inventoryItem';
+import type { DistributionData } from '@/models/statistics';
+import { statisticsApi } from '@/api/internal/statisticsApi';
 
 export default function Home() {
-    const { data: responseitems = { data: [] }, refetch } = useQuery<InventoryItemCollection>({
+    const { data: items = { data: [] }, refetch } = useQuery<InventoryItemCollection>({
         queryKey: ['locations'],
         queryFn: inventoryApi.getItems
     });
+    const responseitems = items?.data || [];
 
-    const [activeSort, setActiveSort] = useState<'name' | 'type' | 'usage' | null>(null);
+    const { data: statistics = [] } = useQuery<DistributionData[]>({
+        queryKey: ['statistics'],
+        queryFn: statisticsApi.getDistribution
+    });
+
+    const [activeSort, setActiveSort] = useState<'name' | 'type' | 'usage' | 'category' | 'count' | null>(null);
     const [isOpenCustomize, setOpenCustomize] = useState(false);
     const [isOpenReport, setOpenReport] = useState(false);
     const [isOpenIncident, setOpenIncident] = useState(false);
 
-    const toggleFilter = (key: 'name' | 'type' | 'usage') => {
+    const toggleFilter = (key: 'name' | 'type' | 'usage' | 'category' | 'count') => {
         setActiveSort(prev => prev === key ? null : key);
     };
 
     const LIMIT = 500;
 
-    const items = responseitems?.data || [];
-
-    const displayedItems = [...items].sort((a, b) => {
+    const displayedItems = [...responseitems].sort((a, b) => {
         if (activeSort === 'name') {
             return (a.binLocationCode || '').localeCompare(b.binLocationCode || '');
         }
@@ -32,6 +38,16 @@ export default function Home() {
         }
         if (activeSort === 'usage') {
             return a.quantityOnHand - b.quantityOnHand;
+        }
+        return 0;
+    });
+
+    const sortedStatistics = [...statistics].sort((a, b) => {
+        if (activeSort === 'category') {
+            return (a.label || '').localeCompare(b.label || '');
+        }
+        if (activeSort === 'count') {
+            return a.count - b.count;
         }
         return 0;
     });
@@ -73,11 +89,11 @@ export default function Home() {
                 </Modal>
             </div>
 
-            <div className="col-span-2 flex flex-col card">
-                <h2 className="flex-row card-header">Location bin availability</h2>
-                <div className="flex-row">
-                    <Table className="w-full border-collapse mb-2">
-                        <TableHead className="bg-slate-200">
+            <div className="col-span-2 card">
+                <h2 className="card-header">Location bin availability</h2>
+                <div className="card-body">
+                    <Table className="w-full h-full border-collapse mb-2 border">
+                        <TableHead className="bg-slate-200 border">
                             <TableRow>
                                 <TableHeaderCell isFiltered={activeSort === 'name'} onClick={() => toggleFilter('name')}>
                                     Name
@@ -95,14 +111,14 @@ export default function Home() {
                                 const usagePercent = Math.min(100, Math.round((item.quantityOnHand / LIMIT) * 100));
 
                                 return (
-                                    <TableRow key={item.id} className="text-center">
-                                        <TableCell>
+                                    <TableRow key={item.id} className="text-center bg-slate-300">
+                                        <TableCell className="border">
                                             {item.binLocationCode}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className="border">
                                             {item.warehouse}
                                         </TableCell>
-                                        <TableCell>
+                                        <TableCell className={`border ${usagePercent >= 90 ? 'bg-[#CC6557]' : usagePercent >= 50 ? 'bg-amber-300' : 'bg-[#9BB477]'}`}>
                                             {usagePercent}%
                                         </TableCell>
                                     </TableRow>
@@ -112,25 +128,52 @@ export default function Home() {
                     </Table>
                 </div>
             </div>
-            <div className="col-span-2 flex flex-col card">
+            <div className="col-span-2 card">
+                <h2 className="card-header">Distribution data</h2>
+                <div className="card-body">
+                    <Table className="w-full h-full border-collapse mb-2 border">
+                        <TableHead className="bg-slate-200 border">
+                            <TableRow>
+                                <TableHeaderCell isFiltered={activeSort === 'category'} onClick={() => toggleFilter('category')}>
+                                    Category
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'count'} onClick={() => toggleFilter('count')}>
+                                    Count
+                                </TableHeaderCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {sortedStatistics.map((stat) => {
+
+                                return (
+                                    <TableRow key={stat.label} className="text-center bg-slate-300">
+                                        <TableCell className="border">
+                                            {stat.label}
+                                        </TableCell>
+                                        <TableCell className="border">
+                                            {stat.count}
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
 
-            <div className="col-span-2 flex flex-col card">
+            <div className="col-span-2 card">
             </div>
 
-            <div className="col-span-2 flex flex-col card">
+            <div className="col-span-2 card">
             </div>
 
-            <div className="col-span-2 flex flex-col card">
+            <div className="col-span-4 card">
             </div>
 
-            <div className="col-span-2 flex flex-col card">
+            <div className="col-span-3 card">
             </div>
 
-            <div className="col-span-3 flex flex-col card">
-            </div>
-
-            <div className="col-span-3 flex flex-col card">
+            <div className="col-span-3 card">
             </div>
         </div>
     );

@@ -26,10 +26,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('token');
     };
 
-    const isAuthenticated = true; // !!token
+    const isAuthenticated = !!token;
 
     useEffect(() => {
-        if (!token) {
+        if (import.meta.env.DEV && !token) {
             setIsAuthenticating(true);
             api.post('/auth/login', { userName: 'admin', password: 'admin' })
                 .then(response => {

@@ -12,6 +12,7 @@ import {
   NotFound
 } from '@/pages';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
+import api from './api/config/api';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isAuthenticating } = useAuth();

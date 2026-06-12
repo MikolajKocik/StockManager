@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.Error;
@@ -135,6 +135,10 @@ public static class ErrorExtension
             ErrorCodes.InvoiceAlreadyCancelled => StatusCodes.Status400BadRequest,
             ErrorCodes.InvoiceAlreadyCompleted => StatusCodes.Status400BadRequest,
             ErrorCodes.InvoiceAlreadyProcessing => StatusCodes.Status400BadRequest,
+            ErrorCodes.MaintenanceAssetNotFound => StatusCodes.Status404NotFound,
+            ErrorCodes.MaintenanceAssetConflict => StatusCodes.Status409Conflict,
+            ErrorCodes.MaintenanceIncidentNotFound => StatusCodes.Status404NotFound,
+            ErrorCodes.MaintenanceIncidentConflict => StatusCodes.Status409Conflict,
             _ => StatusCodes.Status500InternalServerError
         };
     } 

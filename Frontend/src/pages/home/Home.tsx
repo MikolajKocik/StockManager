@@ -93,7 +93,7 @@ export default function Home() {
             sum: line.lineTotal,
             type: 'PZ',
             client: order.supplierName,
-            nip: '-',
+            nip: order.supplierTaxId || '-',
             date: order.orderDate
         })))
     ];

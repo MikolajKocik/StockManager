@@ -13,6 +13,7 @@ export interface PurchaseOrder {
     id: number;
     supplierId: string;
     supplierName?: string;
+    supplierTaxId?: string;
     orderDate: string;
     expectedDate: string | null;
     status: string;

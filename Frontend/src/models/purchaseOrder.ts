@@ -1,3 +1,14 @@
+export interface PurchaseOrderLine {
+    id: number;
+    purchaseOrderId: number;
+    productId: number;
+    productName?: string;
+    quantity: number;
+    uoM: string;
+    unitPrice: number;
+    lineTotal: number;
+}
+
 export interface PurchaseOrder {
     id: number;
     supplierId: string;
@@ -7,4 +18,5 @@ export interface PurchaseOrder {
     status: string;
     invoiceId: number | null;
     returnOrderId: number | null;
+    purchaseOrderLines: PurchaseOrderLine[];
 }

@@ -5,6 +5,31 @@ import { inventoryApi } from '@/api/internal/inventoryApi';
 import type { InventoryItemCollection } from '@/models/inventoryItem';
 import type { DistributionData } from '@/models/statistics';
 import { statisticsApi } from '@/api/internal/statisticsApi';
+import type { SalesOrder } from '@/models/salesOrder';
+import { salesApi } from '@/api/internal/salesApi';
+import { purchaseApi } from '@/api/internal/purchaseApi';
+import type { PurchaseOrder } from '@/models/purchaseOrder';
+
+type Sorted = 'name' | 'type' | 'usage' | 'category' | 'count' |
+    'product' | 'unit' | 'quantity' | 'price' | 'sum' | 'orderType' |
+    'client' | 'NIP' | 'date';
+const LIMIT = 500;
+
+function genericSort<T>(array: T[], activeSort: string | null, keyMap?: Record<string, string>) {
+    if (!activeSort) return array;
+    const propKey = keyMap ? keyMap[activeSort] : activeSort;
+    if (!propKey) return array;
+
+    return [...array].sort((a, b) => {
+        const valA = a[propKey as keyof T];
+        const valB = b[propKey as keyof T];
+
+        if (typeof valA === 'number' && typeof valB === 'number') {
+            return valA - valB;
+        }
+        return String(valA || '').localeCompare(String(valB || ''));
+    });
+}
 
 export default function Home() {
     const { data: items = { data: [] }, refetch } = useQuery<InventoryItemCollection>({
@@ -18,38 +43,64 @@ export default function Home() {
         queryFn: statisticsApi.getDistribution
     });
 
-    const [activeSort, setActiveSort] = useState<'name' | 'type' | 'usage' | 'category' | 'count' | null>(null);
+    const { data: salesOrders = [] } = useQuery<SalesOrder[]>({
+        queryKey: ['salesOrders'],
+        queryFn: salesApi.getAll
+    });
+
+    const { data: purchaseOrders = [] } = useQuery<PurchaseOrder[]>({
+        queryKey: ['purchasesOrders'],
+        queryFn: purchaseApi.getAll
+    });
+
+    const [activeSort, setActiveSort] = useState<Sorted | null>(null);
     const [isOpenCustomize, setOpenCustomize] = useState(false);
     const [isOpenReport, setOpenReport] = useState(false);
     const [isOpenIncident, setOpenIncident] = useState(false);
 
-    const toggleFilter = (key: 'name' | 'type' | 'usage' | 'category' | 'count') => {
+    const toggleFilter = (key: Sorted) => {
         setActiveSort(prev => prev === key ? null : key);
     };
 
-    const LIMIT = 500;
-
-    const displayedItems = [...responseitems].sort((a, b) => {
-        if (activeSort === 'name') {
-            return (a.binLocationCode || '').localeCompare(b.binLocationCode || '');
-        }
-        if (activeSort === 'type') {
-            return (a.warehouse || '').localeCompare(b.warehouse || '');
-        }
-        if (activeSort === 'usage') {
-            return a.quantityOnHand - b.quantityOnHand;
-        }
-        return 0;
+    const displayedItems = genericSort(responseitems, activeSort, {
+        name: 'binLocationCode',
+        type: 'warehouse',
+        usage: 'quantityOnHand'
     });
 
-    const sortedStatistics = [...statistics].sort((a, b) => {
-        if (activeSort === 'category') {
-            return (a.label || '').localeCompare(b.label || '');
-        }
-        if (activeSort === 'count') {
-            return a.count - b.count;
-        }
-        return 0;
+    const sortedStatistics = genericSort(statistics, activeSort, {
+        category: 'label',
+        count: 'count'
+    });
+
+    const pendingItems = [
+        ...salesOrders.flatMap(order => order.salesOrderLines.map(line => ({
+            product: line.productName,
+            unit: line.uoM,
+            quantity: line.quantity,
+            price: line.unitPrice,
+            sum: line.lineTotal,
+            type: 'WZ',
+            client: order.customerName,
+            nip: order.customerTaxId || '-',
+            date: order.orderDate
+        }))),
+        ...purchaseOrders.flatMap(order => order.purchaseOrderLines.map(line => ({
+            product: line.productName,
+            unit: line.uoM,
+            quantity: line.quantity,
+            price: line.unitPrice,
+            sum: line.lineTotal,
+            type: 'PZ',
+            client: order.supplierName,
+            nip: '-',
+            date: order.orderDate
+        })))
+    ];
+
+    const sortedPendingItems = genericSort(pendingItems, activeSort, {
+        orderType: 'type',
+        NIP: 'nip'
     });
 
     return (
@@ -143,10 +194,10 @@ export default function Home() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {sortedStatistics.map((stat) => {
+                            {sortedStatistics.map((stat, idx) => {
 
                                 return (
-                                    <TableRow key={stat.label} className="text-center bg-slate-300">
+                                    <TableRow key={idx} className="text-center bg-slate-300">
                                         <TableCell className="border">
                                             {stat.label}
                                         </TableCell>
@@ -168,6 +219,59 @@ export default function Home() {
             </div>
 
             <div className="col-span-4 card">
+                <h2 className="card-header">Pending Orders</h2>
+                <div className="card-body">
+                    <Table className="w-full h-full border-collapse mb-2 border">
+                        <TableHead className="bg-slate-200 border">
+                            <TableRow>
+                                <TableHeaderCell isFiltered={activeSort === 'product'} onClick={() => toggleFilter('product')}>
+                                    Product
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'unit'} onClick={() => toggleFilter('unit')}>
+                                    Unit
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'quantity'} onClick={() => toggleFilter('quantity')}>
+                                    Quantity
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'price'} onClick={() => toggleFilter('price')}>
+                                    Price
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'sum'} onClick={() => toggleFilter('sum')}>
+                                    Sum
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'orderType'} onClick={() => toggleFilter('orderType')}>
+                                    Type
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'client'} onClick={() => toggleFilter('client')}>
+                                    Client
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'NIP'} onClick={() => toggleFilter('NIP')}>
+                                    NIP
+                                </TableHeaderCell>
+                                <TableHeaderCell isFiltered={activeSort === 'date'} onClick={() => toggleFilter('date')}>
+                                    Date
+                                </TableHeaderCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {sortedPendingItems.map((item, idx) => {
+                                return (
+                                    <TableRow key={idx} className="text-center bg-slate-300">
+                                        <TableCell className="border">{item.product}</TableCell>
+                                        <TableCell className="border">{item.unit}</TableCell>
+                                        <TableCell className="border">{item.quantity}</TableCell>
+                                        <TableCell className="border">{item.price.toFixed(2)}</TableCell>
+                                        <TableCell className="border">{item.sum.toFixed(2)}</TableCell>
+                                        <TableCell className="border">{item.type}</TableCell>
+                                        <TableCell className="border">{item.client || '-'}</TableCell>
+                                        <TableCell className="border">{item.nip}</TableCell>
+                                        <TableCell className="border">{new Date(item.date).toLocaleDateString()}</TableCell>
+                                    </TableRow>
+                                );
+                            })}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
 
             <div className="col-span-3 card">

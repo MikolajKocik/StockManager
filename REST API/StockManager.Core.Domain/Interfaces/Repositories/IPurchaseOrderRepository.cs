@@ -5,6 +5,7 @@ namespace StockManager.Core.Domain.Interfaces.Repositories;
 
 public interface IPurchaseOrderRepository : IBaseRepository
 {
+    Task<List<PurchaseOrder>> GetPurchaseOrdersAsync(CancellationToken cancellationToken);
     Task<PurchaseOrder> AddPurchaseOrderAsync(PurchaseOrder entity, CancellationToken cancellationToken);
     Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int id, CancellationToken cancellationToken);
     Task<PurchaseOrder> UpdatePurchaseOrderAsync(PurchaseOrder entity, CancellationToken cancellationToken);

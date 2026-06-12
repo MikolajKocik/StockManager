@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Models.AddressEntity;
@@ -22,6 +22,8 @@ using StockManager.Core.Domain.Models.StockTransactionEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
+using StockManager.Core.Domain.Models.MaintenanceAssetEntity;
+using StockManager.Core.Domain.Models.MaintenanceIncidentEntity;
 
 
 namespace StockManager.Infrastructure.Persistence.Data;
@@ -32,6 +34,8 @@ public sealed class StockManagerDbContext(DbContextOptions<StockManagerDbContext
 
     public DbSet<Product> Products { get; set; }
     public DbSet<Supplier> Suppliers { get; set; }
+    public DbSet<MaintenanceAsset> MaintenanceAssets { get; set; }
+    public DbSet<MaintenanceIncident> MaintenanceIncidents { get; set; }
     public DbSet<Address> Adresses { get; set; }
     public DbSet<InventoryItem> InventoryItems { get; set; }
     public DbSet<StockTransaction> StockTransactions { get; set; }

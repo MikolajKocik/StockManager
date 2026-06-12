@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -10,11 +13,8 @@ using StockManager.Application.Helpers.NullConfiguration;
 using StockManager.Application.Services;
 using StockManager.Core.Application.Dtos.Authorization;
 using StockManager.Core.Domain.Models.UserEntity;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
-namespace StockManager.Infrastructure.Services.Auth;
+namespace StockManager.Infrastructure.Services;
 
 public class AuthService : IAuthService
 {
@@ -106,7 +106,10 @@ public class AuthService : IAuthService
         claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
 
         _ = int.TryParse(_configuration["JWT:ExpireHours"], out int expireHours);
-        if (expireHours <= 0) expireHours = 1;
+        if (expireHours <= 0)
+        {
+            expireHours = 1;
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {

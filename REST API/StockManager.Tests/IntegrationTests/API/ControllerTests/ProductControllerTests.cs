@@ -1,26 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Net;
 using System.Net.Http.Json;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-using AutoFixture;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
-using StockManager.Application.Dtos.ModelsDto.AddressDtos;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
-using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Models.AddressEntity;
-using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 using StockManager.Infrastructure.Persistence.Data;
 using TestHelpers.Fixture;
-using TestHelpers.ProductFactory;
 using Xunit.Abstractions;
 
 namespace StockManager.Tests.IntegrationTests.API.ControllerTests;
@@ -57,7 +45,7 @@ public class ProductControllerTests : IClassFixture<WebApplicationTestFactory>
         // arrange
         HttpClient client = _factory.CreateClient();
 
-        int id = 1;
+        const int id = 1;
 
         // act
         HttpResponseMessage result = await client.GetAsync($"api/v1.0/products/{id}");
@@ -74,8 +62,8 @@ public class ProductControllerTests : IClassFixture<WebApplicationTestFactory>
         // arrange
         HttpClient client = _factory.CreateClient();
 
-        int id = 1;
-       
+        const int id = 1;
+
         // act
         HttpResponseMessage result = await client.DeleteAsync($"api/v1.0/products/{id}");
         string content = await result.Content.ReadAsStringAsync();
@@ -104,7 +92,7 @@ public class ProductControllerTests : IClassFixture<WebApplicationTestFactory>
 
         // act
         HttpResponseMessage result =
-            await client.PostAsJsonAsync($"api/v1.0/products", productDto);
+            await client.PostAsJsonAsync("api/v1.0/products", productDto);
 
         ValidationProblemDetails problem =
             await result.Content.ReadFromJsonAsync<ValidationProblemDetails>();
@@ -160,7 +148,7 @@ public class ProductControllerTests : IClassFixture<WebApplicationTestFactory>
 
         // act
         HttpResponseMessage result =
-            await client.PostAsJsonAsync($"api/v1.0/products", productDto);
+            await client.PostAsJsonAsync("api/v1.0/products", productDto);
         string content = await result.Content.ReadAsStringAsync();
         _output.WriteLine(content);
 

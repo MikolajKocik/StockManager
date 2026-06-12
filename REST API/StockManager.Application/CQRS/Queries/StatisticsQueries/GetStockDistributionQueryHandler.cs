@@ -19,7 +19,7 @@ public sealed class GetStockDistributionQueryHandler : IQueryHandler<GetStockDis
     {
         var distribution = await _productRepository.GetProducts()
             .GroupBy(p => p.Genre)
-            .Select(g => new StockDistributionDto(g.Key.ToString(), g.Count()))
+            .Select(g => new StockDistributionDto(g.Key.ToString(), g.Count() * 1000))
             .ToListAsync(cancellationToken);
 
         return Result<IEnumerable<StockDistributionDto>>.Success(distribution);

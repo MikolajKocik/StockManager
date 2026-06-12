@@ -1,4 +1,4 @@
-﻿using System.Threading;
+using System.Threading;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,9 +16,9 @@ using StockManager.Application.CQRS.Commands.SalesOrderCommands.ShipSalesOrder;
 using StockManager.Application.Dtos.ModelsDto.SalesOrderDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Core.Domain.Enums;
+using StockManager.Application.CQRS.Queries.SalesOrderQueries;
 
 namespace StockManager.Controllers;
-
 
 [Authorize]
 [ApiController]
@@ -38,12 +38,38 @@ public sealed class SalesOrdersController : ControllerBase
         _logger = logger;
     }
 
-    [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    [HttpGet]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<SalesOrderDto>>> GetAll(CancellationToken cancellationToken)
     {
-        //placeholder
-        await Task.CompletedTask;
-        return NoContent();
+        Result<List<SalesOrderDto>> result = await _mediator.Send(new GetSalesOrdersQuery(), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        return BadRequest(result.Error);
+    }
+
+    [HttpGet("{id}")]
+    [ProducesResponseType(typeof(SalesOrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SalesOrderDto>> GetById(int id, CancellationToken cancellationToken)
+    {
+        Result<SalesOrderDto> result = await _mediator.Send(new GetSalesOrderByIdQuery(id), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
+
+        return new ObjectResult(problem)
+        {
+            StatusCode = problem.Status
+        };
     }
 
     [HttpPost]

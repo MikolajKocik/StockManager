@@ -1,4 +1,3 @@
-import './DocumentSection.css'
 import type { ReactNode } from 'react';
 
 interface DocumentSectionProps {

@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { shipmentsApi } from '@/api/internal/shipmentsApi';
 import { geocodingApi } from '@/api/external/geocodingApi';
 import type { Shipment } from '@/models/shipment';
-import './Shipments.css';
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -84,74 +83,8 @@ export default function Shipments() {
     if (isError) return <div className="error-message">Failed to load shipments.</div>;
 
     return (
-        <div className="shipments-page">
-            <div className="map-section">
-                <MapContainer center={mapCenter} zoom={zoom} scrollWheelZoom={true} className="leaflet-container">
-                    <ChangeView center={mapCenter} zoom={zoom} />
-                    <TileLayer
-                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                    />
-
-                    {shipments.data.map(s => {
-                        const destKey = `${s.destinationCity}, ${s.destinationCountry}`;
-                        const originKey = `${s.originCity}, ${s.originCountry}`;
-                        const destPos = locations[destKey];
-                        const originPos = locations[originKey];
-
-                        return (
-                            <div key={s.id}>
-                                {destPos && (
-                                    <Marker position={destPos}>
-                                        <Popup>
-                                            <strong>To: {s.customerName}</strong><br />
-                                            {s.destinationCity}, {s.destinationCountry}<br />
-                                            Status: {s.status}
-                                        </Popup>
-                                    </Marker>
-                                )}
-                                {originPos && destPos && (
-                                    <Polyline
-                                        positions={[originPos, destPos]}
-                                        color={s.status === 'Delivered' ? '#10b981' : '#3b82f6'}
-                                        dashArray={s.status === 'Shipped' ? "5, 10" : "0"}
-                                        weight={3}
-                                    />
-                                )}
-                            </div>
-                        );
-                    })}
-                </MapContainer>
-            </div>
-
-            <aside className="shipments-sidebar">
-                <header className="sidebar-header">
-                    <h2>Shipments</h2>
-                    <p>{shipments.data.length} active orders</p>
-                </header>
-
-                <div className="shipment-list">
-                    {shipments.data.map(s => (
-                        <div
-                            key={s.id}
-                            className={`shipment-card ${selectedShipment?.id === s.id ? 'active' : ''}`}
-                            onClick={() => handleShipmentClick(s)}
-                        >
-                            <div className="card-status-dot" data-status={s.status.toLowerCase()}></div>
-                            <div className="card-info">
-                                <span className="tracking-number">{s.trackingNumber}</span>
-                                <span className="customer-name">{s.customerName}</span>
-                                <span className="route-summary">
-                                    {s.originCity} &rarr; {s.destinationCity}
-                                </span>
-                            </div>
-                            <div className="card-meta">
-                                <span className="status-badge">{s.status}</span>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            </aside>
+        <div>
+            <h2>Shipments</h2>
         </div>
     );
 }

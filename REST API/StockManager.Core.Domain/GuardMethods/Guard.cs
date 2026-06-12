@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -93,7 +93,6 @@ internal static class Guard
     /// future date.
     /// </summary>
     /// <param name="timestamp">The date and time value to validate. Must not be the default value and must not be in the future.</param>
-    /// <param name="paramName">An optional parameter name to include in the exception message if validation fails.  If not provided, the
     /// default parameter name will be used.</param>
     /// <exception cref="ArgumentException">Thrown if <paramref name="timestamp"/> represents a future date. Thrown if <paramref name="timestamp"/> is the
     /// default value for <see cref="DateTime"/>.</exception>
@@ -103,7 +102,7 @@ internal static class Guard
 
         if (timestamp > DateTime.UtcNow)
         {
-            throw new ArgumentException("Timestamp cannot be in the future", nameof(timestamp));
+            throw new ArgumentException("Timestamp cannot be in the future", paramName ?? nameof(timestamp));
         }
     }
 
@@ -159,7 +158,7 @@ internal static class Guard
     /// <typeparam name="TEnum">The enumeration type to check. Must be an unmanaged type (e.g., enum).</typeparam>
     /// <param name="value">The enum value to validate.</param>
     /// <exception cref="System.ArgumentException">Thrown if the provided enum value is not a valid defined member of its type.</exception>
-    public static void AgainstInvalidEnumValue<TEnum>(TEnum value) where TEnum : struct, Enum 
+    public static void AgainstInvalidEnumValue<TEnum>(TEnum value) where TEnum : struct, Enum
     {
         if (!Enum.IsDefined(typeof(TEnum), value))
         {

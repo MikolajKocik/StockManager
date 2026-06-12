@@ -368,6 +368,109 @@ namespace StockManager.Infrastructure.Migrations
                     b.ToTable("Invoices", "StockManager");
                 });
 
+            modelBuilder.Entity("StockManager.Core.Domain.Models.MaintenanceAssetEntity.MaintenanceAsset", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("BinLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("LastServiceDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BinLocationId");
+
+                    b.ToTable("MaintenanceAssets", "StockManager");
+                });
+
+            modelBuilder.Entity("StockManager.Core.Domain.Models.MaintenanceIncidentEntity.MaintenanceIncident", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid?>("AssetId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("AssignedToId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("BinLocationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("PhotoUrl")
+                        .HasMaxLength(2048)
+                        .HasColumnType("nvarchar(2048)");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReportedById")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("ResolutionNotes")
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<DateTime?>("ResolvedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("AssignedToId");
+
+                    b.HasIndex("BinLocationId");
+
+                    b.HasIndex("ReportedById");
+
+                    b.ToTable("MaintenanceIncidents", "StockManager");
+                });
+
             modelBuilder.Entity("StockManager.Core.Domain.Models.PermissionEntity.Permission", b =>
                 {
                     b.Property<int>("Id")
@@ -794,6 +897,9 @@ namespace StockManager.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("TaxId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("Suppliers", "StockManager");
@@ -1123,6 +1229,48 @@ namespace StockManager.Infrastructure.Migrations
                     b.Navigation("SalesOrder");
                 });
 
+            modelBuilder.Entity("StockManager.Core.Domain.Models.MaintenanceAssetEntity.MaintenanceAsset", b =>
+                {
+                    b.HasOne("StockManager.Core.Domain.Models.BinLocationEntity.BinLocation", "BinLocation")
+                        .WithMany()
+                        .HasForeignKey("BinLocationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("BinLocation");
+                });
+
+            modelBuilder.Entity("StockManager.Core.Domain.Models.MaintenanceIncidentEntity.MaintenanceIncident", b =>
+                {
+                    b.HasOne("StockManager.Core.Domain.Models.MaintenanceAssetEntity.MaintenanceAsset", "Asset")
+                        .WithMany("Incidents")
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("StockManager.Core.Domain.Models.UserEntity.User", "AssignedTo")
+                        .WithMany()
+                        .HasForeignKey("AssignedToId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("StockManager.Core.Domain.Models.BinLocationEntity.BinLocation", "BinLocation")
+                        .WithMany()
+                        .HasForeignKey("BinLocationId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("StockManager.Core.Domain.Models.UserEntity.User", "ReportedBy")
+                        .WithMany()
+                        .HasForeignKey("ReportedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Asset");
+
+                    b.Navigation("AssignedTo");
+
+                    b.Navigation("BinLocation");
+
+                    b.Navigation("ReportedBy");
+                });
+
             modelBuilder.Entity("StockManager.Core.Domain.Models.ProductEntity.Product", b =>
                 {
                     b.HasOne("StockManager.Core.Domain.Models.SupplierEntity.Supplier", "Supplier")
@@ -1317,6 +1465,11 @@ namespace StockManager.Infrastructure.Migrations
             modelBuilder.Entity("StockManager.Core.Domain.Models.InventoryItemEntity.InventoryItem", b =>
                 {
                     b.Navigation("StockTransactions");
+                });
+
+            modelBuilder.Entity("StockManager.Core.Domain.Models.MaintenanceAssetEntity.MaintenanceAsset", b =>
+                {
+                    b.Navigation("Incidents");
                 });
 
             modelBuilder.Entity("StockManager.Core.Domain.Models.ProductEntity.Product", b =>

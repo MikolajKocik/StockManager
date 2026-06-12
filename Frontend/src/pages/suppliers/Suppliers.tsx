@@ -2,7 +2,6 @@ import { suppliersApi } from "@/api/internal/suppliersApi";
 import { Select, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Header } from "@/components/common";
 import { useQuery } from "@tanstack/react-query";
 import { useRef, useState } from "react";
-import './Suppliers.css';
 
 export default function Suppliers() {
     const [selectedCountry, setSelectedCountry] = useState('');
@@ -38,78 +37,8 @@ export default function Suppliers() {
     };
 
     return (
-        <div className="suppliers-container animate-fade">
-            <Header 
-                title="Suppliers Directory" 
-                subtitle="Manage and filter your global supply chain partners" 
-            />
-
-            <div className="filters">
-                <Select
-                    label="Country"
-                    value={selectedCountry}
-                    onChange={handleCountryChange}
-                    options={[
-                        { value: '', label: 'All Countries' },
-                        ...countries.map(c => ({ value: c, label: c }))
-                    ]}
-                />
-
-                <Select
-                    label="City"
-                    value={selectedCity}
-                    onChange={e => setSelectedCity(e.target.value)}
-                    options={[
-                        { value: '', label: 'All Cities' },
-                        ...cities.map(c => ({ value: c, label: c }))
-                    ]}
-                />
-            </div>
-
-            <div ref={tableRef} className="table-wrapper animate-fade">
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableHeaderCell>
-                                Supplier name
-                            </TableHeaderCell>
-                            <TableHeaderCell>
-                                Unique identifier
-                            </TableHeaderCell>
-                            <TableHeaderCell>
-                                City
-                            </TableHeaderCell>
-                            <TableHeaderCell>
-                                Country
-                            </TableHeaderCell>
-                            <TableHeaderCell>
-                                Postal code
-                            </TableHeaderCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {filtered.map(s =>
-                            <TableRow key={s.id}>
-                                <TableCell>
-                                    {s.name}
-                                </TableCell>
-                                <TableCell>
-                                    {s.slug}
-                                </TableCell>
-                                <TableCell>
-                                    {s.address?.city}
-                                </TableCell>
-                                <TableCell>
-                                    {s.address?.country}
-                                </TableCell>
-                                <TableCell>
-                                    {s.address?.postalCode}
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+        <div>
+            <h2>Suppliers</h2>
         </div>
     )
 }

@@ -1,5 +1,4 @@
 import React from 'react';
-import './Select.css';
 
 interface Option {
     value: string | number;

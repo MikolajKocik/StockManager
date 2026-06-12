@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -22,12 +22,12 @@ public sealed partial class SalesOrder
         Guard.AgainstInvalidEnumValue(unit);
         Guard.AgainstDefaultValue(productId);
 
-        _salesOrderlines.Add(new SalesOrderLine(Id, productId, qty, price, unit));
+        _salesOrderLines.Add(new SalesOrderLine(Id, productId, qty, price, unit));
     }
 
     public void Confirm()
     {
-        if (!_salesOrderlines.Any())
+        if (!_salesOrderLines.Any())
         {
             throw new InvalidOperationException("Order must have at least one position");
         }

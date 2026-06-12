@@ -10,14 +10,12 @@ using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
 using StockManager.Application.CQRS.Commands.ProductCommands.EditProduct;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
-using StockManager.Infrastructure.DomainServices;
-using StockManager.Infrastructure.Services;
-using StockManager.Infrastructure.Repositories;
-using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.WarehouseOperationEntity;
-using StockManager.Infrastructure.Services.Auth;
+using StockManager.Core.Domain.Interfaces.Services;
+using StockManager.Infrastructure.DomainServices;
 using StockManager.Infrastructure.Jobs;
+using StockManager.Infrastructure.Repositories;
+using StockManager.Infrastructure.Services;
 
 
 namespace StockManager.Extensions.WebAppBuilderExtensions.Services;
@@ -70,7 +68,7 @@ internal static class ServiceRegistration
         services.AddHostedService<DocumentGenerationWorker>();
     }
 
-    private static void  RegisterMediatorAdapters(this IServiceCollection services)
+    private static void RegisterMediatorAdapters(this IServiceCollection services)
     {
 
         Assembly appAssembly = typeof(Application.Extensions.ServiceCollectionExtensions).Assembly;

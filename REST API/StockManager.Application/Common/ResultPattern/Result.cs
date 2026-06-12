@@ -26,12 +26,4 @@ public sealed class Result<T> : IResult
 
     // method depends on failure/error constructor
     public static Result<T> Failure(Error error) => new Result<T>(error);
-
-    /// <summary>
-    /// Transforms the current Result into another type based on whether it is a success or failure.
-    /// </summary>
-    /// <typeparam name="TResult">The type to map to.</typeparam>
-    /// <param name="onSuccess">Function to apply if the result is successful.</param>
-    /// <param name="onFailure">Function to apply if the result is a failure.</param>
-    /// <returns>The result of either the success or failure function.</returns>
 }

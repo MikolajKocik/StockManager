@@ -6,4 +6,5 @@ public sealed record SupplierCreateDto
 {
     public required string Name { get; init; }
     public Guid AddressId { get; init; }
+    public string? TaxId { get; init; }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +8,9 @@ namespace StockManager.Core.Domain.Enums;
 
 public enum UnitOfMeasure
 {
-    Piece,
-    Kilogram,
-    Liter,
-    Box,
-    Pallet
+    pcs,
+    kg,
+    l,
+    box,
+    pallet
 }

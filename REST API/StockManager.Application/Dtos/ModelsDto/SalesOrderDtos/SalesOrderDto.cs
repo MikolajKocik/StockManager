@@ -1,4 +1,5 @@
 using System;
+using StockManager.Application.Dtos.ModelsDto.SalesOrderLineDtos;
 
 namespace StockManager.Application.Dtos.ModelsDto.SalesOrderDtos;
 
@@ -14,4 +15,6 @@ public sealed record SalesOrderDto
     public required string Status { get; init; }
     public int InvoiceId { get; init; }
     public int? ReturnOrderId { get; init; }
+    public string? CustomerTaxId { get; init; }
+    public List<SalesOrderLineDto> SalesOrderLines { get; init; } = new();
 }

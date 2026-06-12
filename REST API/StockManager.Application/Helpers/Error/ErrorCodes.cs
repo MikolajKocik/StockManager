@@ -1,4 +1,4 @@
-﻿namespace StockManager.Application.Helpers.Error;
+namespace StockManager.Application.Helpers.Error;
 
 /// <summary>
 /// Provides a centralized collection of error codes used throughout the application to represent specific error
@@ -90,4 +90,9 @@ public static class ErrorCodes
     public const string CustomerUpdateFailed = "Customer.UpdateFailed";
     public const string CustomerCreateFailed = "Customer.CreateFailed";
     public const string CustomerAlreadyExists = "Customer.AlreadyExists";
+    
+    public const string MaintenanceAssetNotFound = "MaintenanceAsset.NotFound";
+    public const string MaintenanceAssetConflict = "MaintenanceAsset.Conflict";
+    public const string MaintenanceIncidentNotFound = "MaintenanceIncident.NotFound";
+    public const string MaintenanceIncidentConflict = "MaintenanceIncident.Conflict";
 }

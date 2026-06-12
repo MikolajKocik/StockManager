@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authentication;
+﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using StackExchange.Redis;
@@ -31,10 +25,7 @@ public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
     {
         builder.UseEnvironment("Test");
 
-        builder.ConfigureAppConfiguration((context, config) =>
-        {
-            context.HostingEnvironment.EnvironmentName = "Test";
-        });
+        builder.ConfigureAppConfiguration((context, _) => context.HostingEnvironment.EnvironmentName = "Test");
 
         builder.ConfigureTestServices(services =>
         {
@@ -66,7 +57,7 @@ public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
             if (redis != null)
             {
                 services.Remove(redis);
-            }           
+            }
 
             services.AddSingleton<IConnectionMultiplexer>(redisMock.Object);
 
@@ -98,7 +89,7 @@ public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
                 options.DefaultChallengeScheme = "Test";
             })
             .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(
-                "Test", options => { });
+                "Test", _ => { });
 
             var messageBusMock = new Mock<IMessageBus>();
             services.AddSingleton<IMessageBus>(messageBusMock.Object);

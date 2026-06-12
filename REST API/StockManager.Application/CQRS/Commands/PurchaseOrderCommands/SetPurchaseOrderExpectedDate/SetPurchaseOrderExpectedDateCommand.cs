@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using StockManager.Application.Abstractions.CQRS.Command;
 
-namespace StockManager.Application.CQRS.Commands.PurchaseOrder.SetPurchaseOrderExpectedDate;
+namespace StockManager.Application.CQRS.Commands.PurchaseOrderCommands.SetPurchaseOrderExpectedDate;
+
 public sealed record SetPurchaseOrderExpectedDateCommand(
     int Id,
     DateTime ExpectedDate
-    ): ICommand<Unit>;
+    ) : ICommand<Unit>;

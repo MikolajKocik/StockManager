@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 using StockManager.Infrastructure.Helpers;
 using StockManager.Infrastructure.Persistence.Data;
@@ -17,12 +16,22 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
         _dbContext = dbContext;
     }
 
-    public async Task<PurchaseOrder> AddPurchaseOrderAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, purchaseOrder, cancellationToken);
+    public Task<List<PurchaseOrder>> GetPurchaseOrdersAsync(CancellationToken cancellationToken)
+        => _dbContext.PurchaseOrders
+            .Include(o => o.Supplier)
+            .Include(o => o.PurchaseOrderLines)
+                .ThenInclude(l => l.Product)
+            .ToListAsync(cancellationToken);
 
-    public async Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int id, CancellationToken cancellationToken)
-        => await _dbContext.PurchaseOrders.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
-    
+    public Task<PurchaseOrder> AddPurchaseOrderAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken)
+        => RepositoryQueriesHelpers.AddEntityAsync(_dbContext, purchaseOrder, cancellationToken);
+
+    public Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int id, CancellationToken cancellationToken)
+        => _dbContext.PurchaseOrders
+            .Include(o => o.Supplier)
+            .Include(o => o.PurchaseOrderLines)
+                .ThenInclude(l => l.Product)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
     public async Task<PurchaseOrder> UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken)
     {
@@ -40,6 +49,6 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
         return purchaseOrderExist;
     }
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

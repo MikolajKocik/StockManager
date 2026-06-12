@@ -17,16 +17,11 @@ public static class ApplicationInsightConfiguration
 
             builder.Logging.AddApplicationInsights(
                 configureTelemetryConfiguration: (cfg) =>
-                {
-                    cfg.ConnectionString = aiConn;
-                },
-                configureApplicationInsightsLoggerOptions: (opts) => { }
+                    cfg.ConnectionString = aiConn,
+                    configureApplicationInsightsLoggerOptions: (_) => { }
                 );
 
-            builder.Services.Configure<AzureMonitorExporterOptions>(a =>
-            {
-                a.ConnectionString = aiConn;
-            });
+            builder.Services.Configure<AzureMonitorExporterOptions>(a => a.ConnectionString = aiConn);
 
             builder.Services
              .AddOpenTelemetry()
@@ -46,10 +41,7 @@ public static class ApplicationInsightConfiguration
                  .AddConsoleExporter()
                  .AddAzureMonitorTraceExporter();
              })
-             .WithMetrics(m =>
-             {
-                 m.AddAzureMonitorMetricExporter();
-             });
+             .WithMetrics(m => m.AddAzureMonitorMetricExporter());
 
             var controllerFilters = new Dictionary<string, LogLevel[]>
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -28,9 +28,9 @@ public sealed partial class SalesOrder : Entity<int>
     public Customer Customer { get; private set; }
 
     // relation 1-* with salesOrderLines
-    private readonly List<SalesOrderLine> _salesOrderlines = new();
+    private readonly List<SalesOrderLine> _salesOrderLines = new();
     public IReadOnlyList<SalesOrderLine> SalesOrderLines
-        => _salesOrderlines.AsReadOnly();
+        => _salesOrderLines.AsReadOnly();
 
     // relation 1-* with shipment
     private readonly List<Shipment> _shipments = new();

@@ -23,7 +23,7 @@ public static class PresentationLayer
     public static void AddPresentation(this WebApplicationBuilder builder)
     {
         // Azure key-vault
-        AzureKeyVault.AzureConfigure(builder);
+        builder.AzureConfigure();
 
         // Rate limitting
         builder.Services.AddRateLimiter(opts =>
@@ -50,7 +50,7 @@ public static class PresentationLayer
         // hsts
         builder.Services.AddHsts(opts =>
         {
-            opts.Preload = false;    
+            opts.Preload = false;
             opts.IncludeSubDomains = false;
             opts.MaxAge = TimeSpan.FromDays(365);
         });
@@ -59,7 +59,7 @@ public static class PresentationLayer
         JsonWebTokenConfig.AddJWT(builder);
 
         // Services - cqrs, domain
-        ServiceRegistration.AddServices(builder.Services);
+        builder.Services.AddServices();
 
         builder.Services
             .AddControllers()
@@ -93,5 +93,7 @@ public static class PresentationLayer
         RedisAndHealthChecksConfiguration.AddConfigurations(builder);
 
         builder.Services.AddResponseCaching();
+
+        builder.Services.AddSignalR();
     }
 }

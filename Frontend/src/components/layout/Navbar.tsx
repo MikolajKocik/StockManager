@@ -1,95 +1,141 @@
+import { NavLink } from 'react-router-dom';
 import { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/context/AuthContext';
-import './Navbar.css';
-import { Button } from '../common/Button';
+import shipmentIcon from '@/assets/delivery-truck-speed-outline.svg';
+import operationIcon from '@/assets/operation.svg';
+import docIcon from '@/assets/document-search-outline-rounded.svg';
+import stockIcon from '@/assets/backup-table-sharp.svg';
+import barCodeIcon from '@/assets/barcode-scanner.svg';
+import processIcon from '@/assets/browse-activity-outline-sharp.svg';
+import suppliersIcon from '@/assets/suppliers-person.svg';
+import arrowIcon from '@/assets/arrow-right.svg';
+import productsIcon from '@/assets/warehouse-outline.svg';
+import technicalIcon from '@/assets/forklift.svg';
+import analyzeIcon from '@/assets/network-intelligence.svg';
+import binMap from '@/assets/zoom-out-map.svg';
+import mngIcon from '@/assets/engineering.svg';
+import customerIcon from '@/assets/person.svg';
+import returnIcon from '@/assets/keyboard-return.svg';
+import rulesIcon from '@/assets/edit-notifications-outline.svg';
+import auditIcon from '@/assets/event-list-outline-rounded.svg';
+import invoiceIcon from '@/assets/invoices.svg';
 
 export default function Navbar() {
-    const [showSettingsMenu, setShowSettingsMenu] = useState(false);
-
-    const { logout } = useAuth();
-    const navigate = useNavigate();
-
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
-        <nav className="navbar">
-            <div className="navbar-logo">
-                StockManager
-            </div>
-            <ul className="navbar-links">
-                <li>
-                    <NavLink to="/" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Home
+        <nav className={`relative flex flex-col pr-4 bg-[#D9D9D9] border-r-[0.1rem] border-r-[#779ABC] transition-[width] duration-300 ease-in-out
+            ${isCollapsed ? 'w-18' : 'w-54'}
+        `}>
+
+            <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                className="absolute top-1/3 -right-4.5 z-50 p-1 bg-[#D9D9D9] border-[#779ABC] rounded border cursor-pointer hover:bg-[#B5B4B4]">
+                <img src={arrowIcon} alt="Panel" />
+            </button>
+
+            <ul className="flex-col mt-2 overflow-hidden">
+                <li className="nav-box flex-row">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={processIcon} className="nav-icon" alt="Dashboard" />
+                        {!isCollapsed && <span>Dashboard</span>}
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink to="/analytics" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Analytics
+                <li className="nav-box">
+                    <NavLink to="/products" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={productsIcon} className="nav-icon" alt="Products" />
+                        {!isCollapsed && <span>Products</span>}
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink to="/products" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Products
+                <li className="nav-box">
+                    <NavLink to="/suppliers" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={suppliersIcon} className="nav-icon" alt="Suppliers" />
+                        {!isCollapsed && <span>Suppliers</span>}
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink to="/suppliers" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Suppliers
+                <li className="nav-box">
+                    <NavLink to="/operations" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={operationIcon} className="nav-icon" alt="Operations" />
+                        {!isCollapsed && <span>Operations</span>}
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink to="/operations" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Operations
+                <li className="nav-box">
+                    <NavLink to="/shipments" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={shipmentIcon} className="nav-icon" alt="Shipments" />
+                        {!isCollapsed && <span>Shipments</span>}
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink to="/shipments" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Shipments
+                <li className="nav-box">
+                    <NavLink to="/documents" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={docIcon} className="nav-icon" alt="Documents" />
+                        {!isCollapsed && <span>Documents</span>}
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink to="/documents" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Documents
+                <li className="nav-box">
+                    <NavLink to="/inventory-items" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={stockIcon} className="nav-icon" alt="Stock" />
+                        {!isCollapsed && <span>Stock</span>}
                     </NavLink>
                 </li>
-                <li>
-                    <NavLink to="/inventory-items" className={({ isActive }) => isActive ? 'active' : ''}>
-                        Stock
+                <li className="nav-box">
+                    <NavLink to="/inventory-items" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={barCodeIcon} className="nav-icon" alt="BarCodes" />
+                        {!isCollapsed && <span>BarCodes</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={technicalIcon} className="nav-icon" alt="Maintenance" />
+                        {!isCollapsed && <span>Maintenance</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={analyzeIcon} className="nav-icon" alt="Analyze" />
+                        {!isCollapsed && <span>Analyze</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={binMap} className="nav-icon" alt="Bin Map" />
+                        {!isCollapsed && <span>Bin Map</span>}
+                    </NavLink>
+                </li><li className="nav-box">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={mngIcon} className="nav-icon" alt="Bin Map" />
+                        {!isCollapsed && <span>Manage</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={rulesIcon} className="nav-icon" alt="Reorder rules" />
+                        {!isCollapsed && <span>Reorder rules</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/customers" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={customerIcon} className="nav-icon" alt="Customers" />
+                        {!isCollapsed && <span>Customers</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/returns" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={returnIcon} className="nav-icon" alt="Returns" />
+                        {!isCollapsed && <span>Returns</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={auditIcon} className="nav-icon" alt="Audit Log" />
+                        {!isCollapsed && <span>Audit Log</span>}
+                    </NavLink>
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={invoiceIcon} className="nav-icon" alt="Invoices" />
+                        {!isCollapsed && <span>Invoices</span>}
                     </NavLink>
                 </li>
             </ul>
-
-            <div className="navbar-footer">
-                <div className="settings-container">
-                    <Button
-                        className={`settings-trigger ${showSettingsMenu ? 'active' : ''}`}
-                        onClick={() => setShowSettingsMenu(!showSettingsMenu)}
-                    >
-                        <span className="icon">⚙️</span>
-                        <span>Settings</span>
-                    </Button>
-
-                    {showSettingsMenu && (
-                        <div className="settings-dropdown">
-                            <div className="dropdown-header">System Settings</div>
-                            <Button onClick={() => navigate('/settings/appearance')}>
-                                Appearance
-                            </Button>
-                            <Button onClick={() => navigate('/settings/api')}>
-                                API Keys
-                            </Button>
-                            <div className="dropdown-divider"></div>
-                            <Button variant="danger" className="logout-btn-dropdown" onClick={handleLogout}>
-                                Logout
-                            </Button>
-                        </div>
-                    )}
-                </div>
-            </div>
         </nav>
     );
 }

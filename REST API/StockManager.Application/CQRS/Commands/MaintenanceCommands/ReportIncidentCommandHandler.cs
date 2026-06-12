@@ -6,7 +6,9 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.MaintenanceDtos;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Events;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.BinLocationEntity;
 using StockManager.Core.Domain.Models.MaintenanceAssetEntity;
 using StockManager.Core.Domain.Models.MaintenanceIncidentEntity;
@@ -22,6 +24,7 @@ public sealed class ReportIncidentCommandHandler : ICommandHandler<ReportInciden
     private readonly UserManager<User> _userManager;
     private readonly IMapper _mapper;
     private readonly ILogger<ReportIncidentCommandHandler> _logger;
+    private readonly IMessageBus _messageBus;
 
     public ReportIncidentCommandHandler(
         IMaintenanceIncidentRepository incidentRepository,
@@ -29,7 +32,9 @@ public sealed class ReportIncidentCommandHandler : ICommandHandler<ReportInciden
         IInventoryItemRepository inventoryItemRepository,
         UserManager<User> userManager,
         IMapper mapper,
-        ILogger<ReportIncidentCommandHandler> logger)
+        ILogger<ReportIncidentCommandHandler> logger,
+        IMessageBus messageBus
+        )
     {
         _incidentRepository = incidentRepository;
         _assetRepository = assetRepository;
@@ -37,6 +42,7 @@ public sealed class ReportIncidentCommandHandler : ICommandHandler<ReportInciden
         _userManager = userManager;
         _mapper = mapper;
         _logger = logger;
+        _messageBus = messageBus;
     }
 
     public async Task<Result<MaintenanceIncidentDto>> Handle(ReportIncidentCommand command, CancellationToken cancellationToken)
@@ -105,6 +111,22 @@ public sealed class ReportIncidentCommandHandler : ICommandHandler<ReportInciden
             MaintenanceIncident? fullIncident = await _incidentRepository.GetIncidentWithDetailsByIdAsync(created.Id, cancellationToken);
 
             MaintenanceIncidentDto dto = _mapper.Map<MaintenanceIncidentDto>(fullIncident ?? created);
+
+            await _messageBus.PublishAsync(
+                new ActivityMessage(
+                    Title: "Incident reported",
+                    Description: $"Incident reported: '{command.CreateDto.Title}' with priority: {priority}",
+                    Category: "Maintenance",
+                    Type: priority == IncidentPriority.Critical
+                        ? nameof(IncidentPriority.Critical)
+                        : nameof(IncidentPriority.Medium),
+                    Timestamp: DateTime.UtcNow,
+                    User: user.UserName
+                ),
+                "activities-queue",
+                cancellationToken
+            );
+
             return Result<MaintenanceIncidentDto>.Success(dto);
         }
         catch (Exception ex)

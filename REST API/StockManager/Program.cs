@@ -1,7 +1,4 @@
-using System.Globalization;
 using HealthChecks.UI.Client;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
@@ -11,7 +8,9 @@ using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Extensions;
 using StockManager.Extensions.WebAppBuilderExtensions.Cors;
 using StockManager.Helpers;
+using StockManager.Hubs;
 using StockManager.Infrastructure.Extensions;
+using StockManager.Jobs;
 using StockManager.Middlewares;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -19,6 +18,8 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 builder.AddPresentation();
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddApplication(builder.Configuration);
+
+builder.Services.AddHostedService<ActivityWorker>();
 
 WebApplication app = builder.Build();
 
@@ -57,6 +58,7 @@ else
 }
 //serilog commands
 app.UseSerilogRequestLogging();
+app.MapHub<ActivityHub>("/hubs/activity");
 
 if (app.Environment.IsDevelopment())
 {

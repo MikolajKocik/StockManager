@@ -10,7 +10,8 @@ internal static class CorsConfiguration
             {
                 policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
                 .AllowAnyHeader()
-                .AllowAnyMethod();
+                .AllowAnyMethod()
+                .AllowCredentials();
             });
         });
     }

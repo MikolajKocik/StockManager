@@ -17,6 +17,6 @@
     }
 
     .card-body {
-        @apply flex-row;
+        @apply flex flex-col flex-1 min-h-0 overflow-y-auto;
     }
 }

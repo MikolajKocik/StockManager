@@ -28,7 +28,7 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
 
     private async Task EnsureConnectedAsync(CancellationToken cancellationToken)
     {
-        if (_initialized && _connection?.IsOpen == true && _channel?.IsOpen == true)
+        if (_initialized && _connection?.IsOpen is true && _channel?.IsOpen is true)
         {
             return;
         }
@@ -36,7 +36,7 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
         await _initLock.WaitAsync(cancellationToken);
         try
         {
-            if (_initialized && _connection?.IsOpen == true && _channel?.IsOpen == true)
+            if (_initialized && _connection?.IsOpen is true && _channel?.IsOpen is true)
             {
                 return;
             }
@@ -92,15 +92,15 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
         );
         await _channel.QueueDeclareAsync(
             queue: errorQueueName,
-            durable: true, 
-            exclusive: false, 
-            autoDelete: false, 
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
             arguments: null,
             cancellationToken: cancellationToken
         );
         await _channel.QueueBindAsync(
-            queue: errorQueueName, 
-            exchange: dlxName, 
+            queue: errorQueueName,
+            exchange: dlxName,
             routingKey: queueName,
             cancellationToken: cancellationToken
         );
@@ -112,10 +112,10 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
         };
 
         await _channel.QueueDeclareAsync(
-            queue: queueName, 
-            durable: true, 
-            exclusive: false, 
-            autoDelete: false, 
+            queue: queueName,
+            durable: true,
+            exclusive: false,
+            autoDelete: false,
             arguments: arguments!,
             cancellationToken: cancellationToken
         );
@@ -136,11 +136,11 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
         };
 
         await _channel!.BasicPublishAsync(
-            exchange: string.Empty, 
-            routingKey: queueName, 
-            body: body, 
-            mandatory:false, 
+            exchange: string.Empty,
+            routingKey: queueName,
+            mandatory: false,
             basicProperties: properties,
+            body: body,
             cancellationToken: cancellationToken);
     }
 
@@ -151,7 +151,7 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
         await DeclareDlxQueueAsync(queueName, cancellationToken);
 
         var consumer = new AsyncEventingBasicConsumer(_channel!);
-        consumer.ReceivedAsync += async (model, ea) =>
+        consumer.ReceivedAsync += async (_, ea) =>
         {
             try
             {
@@ -173,20 +173,20 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
         };
 
         await _channel!.BasicConsumeAsync(
-            queue: queueName, 
-            autoAck: false, 
+            queue: queueName,
+            autoAck: false,
             consumer: consumer,
             cancellationToken: cancellationToken);
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_channel?.IsOpen == true)
+        if (_channel?.IsOpen is true)
         {
             await _channel.CloseAsync();
             await _channel.DisposeAsync();
         }
-        if (_connection?.IsOpen == true)
+        if (_connection?.IsOpen is true)
         {
             await _connection.CloseAsync();
             await _connection.DisposeAsync();

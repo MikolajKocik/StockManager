@@ -9,6 +9,7 @@ import type { SalesOrder } from '@/models/salesOrder';
 import { salesApi } from '@/api/internal/salesApi';
 import { purchaseApi } from '@/api/internal/purchaseApi';
 import type { PurchaseOrder } from '@/models/purchaseOrder';
+import { LiveActivityFeed } from '@/components/LiveActivityFeed';
 
 type Sorted = 'name' | 'type' | 'usage' | 'category' | 'count' |
     'product' | 'unit' | 'quantity' | 'price' | 'sum' | 'orderType' |
@@ -221,17 +222,14 @@ export default function Home() {
             </div>
 
             <div className="col-span-2 card">
-                <h2 className="card-header">Distribution data</h2>
+                <h2 className="card-header">TODO</h2>
                 <div className="card-body">
 
                 </div>
             </div>
 
             <div className="col-span-2 card">
-                <h2 className="card-header">Live Activity Feed</h2>
-                <div className="card-body">
-
-                </div>
+                <LiveActivityFeed />
             </div>
 
             <div className="col-span-4 card">

@@ -50,7 +50,7 @@ public static class PresentationLayer
         // hsts
         builder.Services.AddHsts(opts =>
         {
-            opts.Preload = false;    
+            opts.Preload = false;
             opts.IncludeSubDomains = false;
             opts.MaxAge = TimeSpan.FromDays(365);
         });
@@ -93,5 +93,7 @@ public static class PresentationLayer
         RedisAndHealthChecksConfiguration.AddConfigurations(builder);
 
         builder.Services.AddResponseCaching();
+
+        builder.Services.AddSignalR();
     }
 }

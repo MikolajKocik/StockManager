@@ -5,7 +5,9 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.MaintenanceDtos;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Events;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.MaintenanceAssetEntity;
 using StockManager.Core.Domain.Models.MaintenanceIncidentEntity;
 
@@ -17,17 +19,20 @@ public sealed class ResolveIncidentCommandHandler : ICommandHandler<ResolveIncid
     private readonly IMaintenanceAssetRepository _assetRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<ResolveIncidentCommandHandler> _logger;
+    private readonly IMessageBus _messageBus;
 
     public ResolveIncidentCommandHandler(
         IMaintenanceIncidentRepository incidentRepository,
         IMaintenanceAssetRepository assetRepository,
         IMapper mapper,
-        ILogger<ResolveIncidentCommandHandler> logger)
+        ILogger<ResolveIncidentCommandHandler> logger,
+        IMessageBus messageBus)
     {
         _incidentRepository = incidentRepository;
         _assetRepository = assetRepository;
         _mapper = mapper;
         _logger = logger;
+        _messageBus = messageBus;
     }
 
     public async Task<Result<MaintenanceIncidentDto>> Handle(ResolveIncidentCommand command, CancellationToken cancellationToken)
@@ -79,6 +84,20 @@ public sealed class ResolveIncidentCommandHandler : ICommandHandler<ResolveIncid
             MaintenanceIncident? fullIncident = await _incidentRepository.GetIncidentWithDetailsByIdAsync(incident.Id, cancellationToken);
 
             MaintenanceIncidentDto dto = _mapper.Map<MaintenanceIncidentDto>(fullIncident ?? incident);
+
+            await _messageBus.PublishAsync(
+                new ActivityMessage(
+                    Title: "Incident resolved",
+                    Description: $"Incident ID {incident.Id} ('{incident.Title}') has been resolved.",
+                    Category: "Maintenance",
+                    Type: "Success",
+                    Timestamp: DateTime.UtcNow,
+                    User: "Technician"
+                ),
+                "activities-queue",
+                cancellationToken
+            );
+
             return Result<MaintenanceIncidentDto>.Success(dto);
         }
         catch (Exception ex)

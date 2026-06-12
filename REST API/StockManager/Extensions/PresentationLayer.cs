@@ -23,7 +23,7 @@ public static class PresentationLayer
     public static void AddPresentation(this WebApplicationBuilder builder)
     {
         // Azure key-vault
-        AzureKeyVault.AzureConfigure(builder);
+        builder.AzureConfigure();
 
         // Rate limitting
         builder.Services.AddRateLimiter(opts =>
@@ -59,7 +59,7 @@ public static class PresentationLayer
         JsonWebTokenConfig.AddJWT(builder);
 
         // Services - cqrs, domain
-        ServiceRegistration.AddServices(builder.Services);
+        builder.Services.AddServices();
 
         builder.Services
             .AddControllers()

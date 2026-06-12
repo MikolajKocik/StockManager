@@ -1,25 +1,11 @@
 using System.Reflection;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using StockManager.Application.Configurations;
-using StockManager.Application.Services;
-using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Infrastructure.Persistence.Data;
-using StockManager.Infrastructure.Repositories;
-using StockManager.Infrastructure.Services.Auth;
-using StockManager.Infrastructure.Services;
-using StockManager.Infrastructure.Ollama.Services;
-using StockManager.Infrastructure.Ollama.Interfaces;
-using Microsoft.Extensions.AI;
-using OllamaSharp;
 
 namespace StockManager.Infrastructure.Extensions;
 
@@ -27,11 +13,11 @@ public static class ServiceCollectionExtension
 {
     public static void AddInfrastructure(this IServiceCollection services, IConfiguration cfg, IHostEnvironment env)
     {
-        string? connectionString; 
+        string? connectionString;
 
-        services.AddDbContext<VectorDbContext>(options => 
+        services.AddDbContext<VectorDbContext>(options =>
             options.UseNpgsql(cfg.GetConnectionString("VectorDb"),
-            o => o.UseVector())); 
+            o => o.UseVector()));
 
         if (env.IsDevelopment())
         {
@@ -71,7 +57,7 @@ public static class ServiceCollectionExtension
             .AddDefaultTokenProviders();
 
         // Ollama instance
-        OllamaExtensions.RegisterOllamaInstance(services, cfg);
+        services.RegisterOllamaInstance(cfg);
 
         // configure DI for repositories and services with their interfaces
         var infrastructureAssembly = Assembly.Load("StockManager.Infrastructure");

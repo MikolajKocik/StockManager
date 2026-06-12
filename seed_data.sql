@@ -20,6 +20,8 @@ DELETE FROM [StockManager].[Products];
 DELETE FROM [StockManager].[Customers];
 DELETE FROM [StockManager].[Suppliers];
 DELETE FROM [StockManager].[Adresses];
+DELETE FROM [StockManager].[MaintenanceIncidents];
+DELETE FROM [StockManager].[MaintenanceAssets];
 DELETE FROM [StockManager].[BinLocations];
 
 BEGIN TRANSACTION;
@@ -289,13 +291,13 @@ SET IDENTITY_INSERT [StockManager].[Invoices] OFF;
 -- 9. SALES ORDER LINES
 SET IDENTITY_INSERT [StockManager].[SalesOrderLines] ON;
 INSERT INTO [StockManager].[SalesOrderLines] ([Id], [Quantity], [UoM], [UnitPrice], [ProductId], [SalesOrderId]) VALUES
-(1, 150.00, 'kg', 2.50, 1, 1),
-(2, 80.00, 'kg', 3.99, 2, 1),
-(3, 300.00, 'pcs', 1.20, 7, 2),
-(4, 200.00, 'pcs', 1.50, 8, 2),
-(5, 50.00, 'liter', 8.99, 11, 2),
-(6, 250.00, 'pcs', 3.49, 14, 3),
-(7, 500.00, 'pcs', 0.89, 18, 3);
+(1, 150.00, 'Kilogram', 2.50, 1, 1),
+(2, 80.00, 'Kilogram', 3.99, 2, 1),
+(3, 300.00, 'Piece', 1.20, 7, 2),
+(4, 200.00, 'Piece', 1.50, 8, 2),
+(5, 50.00, 'Liter', 8.99, 11, 2),
+(6, 250.00, 'Piece', 3.49, 14, 3),
+(7, 500.00, 'Piece', 0.89, 18, 3);
 SET IDENTITY_INSERT [StockManager].[SalesOrderLines] OFF;
 
 -- 10. PURCHASE ORDERS
@@ -309,13 +311,35 @@ SET IDENTITY_INSERT [StockManager].[PurchaseOrders] OFF;
 -- 11. PURCHASE ORDER LINES
 SET IDENTITY_INSERT [StockManager].[PurchaseOrderLines] ON;
 INSERT INTO [StockManager].[PurchaseOrderLines] ([Id], [Quantity], [UoM], [UnitPrice], [ProductId], [PurchaseOrderId]) VALUES
-(1, 1000.00, 'kg', 1.50, 1, 1),
-(2, 500.00, 'kg', 2.50, 2, 1),
-(3, 200.00, 'kg', 6.00, 5, 2),
-(4, 150.00, 'kg', 4.50, 6, 2),
-(5, 300.00, 'kg', 1.80, 16, 3),
-(6, 400.00, 'pcs', 0.95, 19, 3);
+(1, 1000.00, 'Kilogram', 1.50, 1, 1),
+(2, 500.00, 'Kilogram', 2.50, 2, 1),
+(3, 200.00, 'Kilogram', 6.00, 5, 2),
+(4, 150.00, 'Kilogram', 4.50, 6, 2),
+(5, 300.00, 'Kilogram', 1.80, 16, 3),
+(6, 400.00, 'Piece', 0.95, 19, 3);
 SET IDENTITY_INSERT [StockManager].[PurchaseOrderLines] OFF;
+
+DECLARE @AdminId NVARCHAR(450);
+SELECT TOP 1 @AdminId = [Id] FROM [StockManager].[AspNetUsers] WHERE [UserName] = 'admin';
+
+DECLARE @Asset1 UNIQUEIDENTIFIER = NEWID();
+DECLARE @Asset2 UNIQUEIDENTIFIER = NEWID();
+DECLARE @Asset3 UNIQUEIDENTIFIER = NEWID();
+DECLARE @Asset4 UNIQUEIDENTIFIER = NEWID();
+
+INSERT INTO [StockManager].[MaintenanceAssets] ([Id], [Name], [SerialNumber], [Type], [Status], [LastServiceDate], [BinLocationId]) VALUES
+(@Asset1, 'Toyota Heavy Forklift A1', 'TOY-FL-2026-001', 'Forklift', 'Operational', DATEADD(month, -2, GETDATE()), 1),
+(@Asset2, 'Zebra Label Printer P3', 'ZEB-LP-505-19A', 'Printer', 'UnderMaintenance', DATEADD(month, -6, GETDATE()), 3),
+(@Asset3, 'Honeywell Handheld Scanner S12', 'HON-SC-9988X', 'Scanner', 'Operational', DATEADD(month, -1, GETDATE()), 5),
+(@Asset4, 'Electric Pallet Jack J5', 'EPJ-JACK-8877', 'Forklift', 'OutOfService', DATEADD(month, -4, GETDATE()), 2);
+
+INSERT INTO [StockManager].[MaintenanceIncidents] 
+([Title], [Description], [Priority], [Status], [PhotoUrl], [CreatedAt], [ResolvedAt], [ResolutionNotes], [ReportedById], [AssignedToId], [AssetId], [BinLocationId]) 
+VALUES
+('Hydraulic Leak on Lift Arm', 'Forklift is leaking hydraulic fluid from the main lift arm cylinder. Puddles forming in aisle 1.', 'Critical', 'Reported', NULL, DATEADD(hour, -2, GETDATE()), NULL, NULL, @AdminId, NULL, @Asset1, 1),
+('Printer paper jam and connectivity error', 'Printer keeps jamming on 4x6 label rolls and goes offline repeatedly.', 'Medium', 'InProgress', NULL, DATEADD(day, -1, GETDATE()), NULL, NULL, @AdminId, @AdminId, @Asset2, 3),
+('Scanner screen cracked', 'Handheld scanner fell off charging dock. Screen is cracked but touch response still works.', 'Low', 'Resolved', NULL, DATEADD(day, -4, GETDATE()), DATEADD(day, -3, GETDATE()), 'Replaced screen assembly with spare parts from stock.', @AdminId, @AdminId, @Asset3, 5),
+('Battery charging failure', 'Pallet jack battery will not hold charge or go above 15% after overnight charging.', 'High', 'Reported', NULL, DATEADD(day, -2, GETDATE()), NULL, NULL, @AdminId, NULL, @Asset4, 2);
 
 COMMIT;
 PRINT 'Seed successful! Database populated with rich dataset.';

@@ -2,7 +2,6 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using StockManager.Application.Common.Logging.Product;
 using StockManager.Application.Common.Logging.PurchaseOrder;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.PurchaseOrder.AddPurchase;
@@ -12,14 +11,11 @@ using StockManager.Application.CQRS.Commands.PurchaseOrder.AssignPurchaseOrderRe
 using StockManager.Application.CQRS.Commands.PurchaseOrder.ConfirmPurchase;
 using StockManager.Application.CQRS.Commands.PurchaseOrder.DeletePurchase;
 using StockManager.Application.CQRS.Commands.PurchaseOrder.EditPurchase;
-using StockManager.Application.CQRS.Commands.PurchaseOrder.SetPurchaseOrderExpectedDate;
-using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
-using StockManager.Application.Dtos.ModelsDto.ProductDtos;
+using StockManager.Application.CQRS.Commands.PurchaseOrderCommands.SetPurchaseOrderExpectedDate;
+using StockManager.Application.CQRS.Queries.PurchaseOrderQueries;
 using StockManager.Application.Dtos.ModelsDto.PurchaseOrderDtos;
 using StockManager.Application.Dtos.ModelsDto.PurchaseOrderLineDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
-using StockManager.Core.Domain.Models.PurchaseOrderEntity;
-using StockManager.Application.CQRS.Queries.PurchaseOrderQueries;
 
 namespace StockManager.Controllers;
 
@@ -56,10 +52,23 @@ public sealed class PurchaseOrdersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id)
+    [ProducesResponseType(typeof(PurchaseOrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<PurchaseOrderDto>> GetById(int id, CancellationToken cancellationToken)
     {
-       await Task.CompletedTask;
-       return NoContent();
+        Result<PurchaseOrderDto> result = await _mediator.Send(new GetPurchaseOrderByIdQuery(id), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
+
+        return new ObjectResult(problem)
+        {
+            StatusCode = problem.Status
+        };
     }
 
     [HttpPost]
@@ -94,7 +103,7 @@ public sealed class PurchaseOrdersController : ControllerBase
             return NoContent();
         }
 
-        return result.Error!.ToActionResult();    
+        return result.Error!.ToActionResult();
     }
 
     [HttpDelete("{id}")]
@@ -103,12 +112,12 @@ public sealed class PurchaseOrdersController : ControllerBase
     {
         Result<Unit> result = await _mediator.Send(new DeletePurchaseOrderCommand(id), cancellationToken);
 
-        if(result.IsSuccess)
+        if (result.IsSuccess)
         {
             PurchaseOrderLogInfo.LogPurchaseOrderDeleted(_logger, id, default);
             return NoContent();
         }
-        
+
         return result.Error!.ToActionResult();
     }
 
@@ -135,12 +144,12 @@ public sealed class PurchaseOrdersController : ControllerBase
     {
         Result<Unit> result = await _mediator.Send(new SetPurchaseOrderExpectedDateCommand(id, expectedDate), cancellationToken);
 
-        if(result.IsSuccess)
+        if (result.IsSuccess)
         {
             PurchaseOrderLogInfo.LogPurchaseOrderDateTimeSet(_logger, expectedDate, default);
             return NoContent();
         }
-        
+
         return result.Error!.ToActionResult();
     }
 
@@ -150,7 +159,7 @@ public sealed class PurchaseOrdersController : ControllerBase
     public async Task<IActionResult> AssignInvoice(int id, [FromBody] int invoiceId, CancellationToken cancellationToken)
     {
         Result<Unit> result = await _mediator.Send(new AssignPurchaseOrderInvoiceCommand(id, invoiceId), cancellationToken);
-        
+
         if (result.IsSuccess)
         {
             PurchaseOrderLogInfo.LogPurchaseOrderInvoiceAssigned(_logger, invoiceId, default);
@@ -167,7 +176,7 @@ public sealed class PurchaseOrdersController : ControllerBase
     {
         Result<Unit> result = await _mediator.Send(new AssignPurchaseOrderReturnOrderCommand(id, returnOrderId), cancellationToken);
 
-        if(result.IsSuccess)
+        if (result.IsSuccess)
         {
             PurchaseOrderLogInfo.PurchaseOrderReturned(_logger, returnOrderId, default);
             return NoContent();
@@ -183,7 +192,7 @@ public sealed class PurchaseOrdersController : ControllerBase
     {
         Result<Unit> result = await _mediator.Send(new AddPurchaseOrderLineCommand(id, line), cancellationToken);
 
-        if(result.IsSuccess)
+        if (result.IsSuccess)
         {
             PurchaseOrderLogInfo.PurchasOrderLineAdded(_logger, line, id, default);
             return NoContent();

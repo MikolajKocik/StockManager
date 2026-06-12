@@ -53,11 +53,23 @@ public sealed class SalesOrdersController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<IActionResult> GetById(int id, CancellationToken cancellationToken)
+    [ProducesResponseType(typeof(SalesOrderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+    public async Task<ActionResult<SalesOrderDto>> GetById(int id, CancellationToken cancellationToken)
     {
-        //placeholder
-        await Task.CompletedTask;
-        return NoContent();
+        Result<SalesOrderDto> result = await _mediator.Send(new GetSalesOrderByIdQuery(id), cancellationToken);
+
+        if (result.IsSuccess)
+        {
+            return Ok(result.Value);
+        }
+
+        var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
+
+        return new ObjectResult(problem)
+        {
+            StatusCode = problem.Status
+        };
     }
 
     [HttpPost]

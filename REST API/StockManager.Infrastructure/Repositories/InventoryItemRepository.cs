@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.BinLocationEntity;
@@ -12,6 +7,7 @@ using StockManager.Infrastructure.Helpers;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
+
 public sealed class InventoryItemRepository : IInventoryItemRepository
 {
     private readonly StockManagerDbContext _dbContext;
@@ -56,8 +52,8 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
     /// <param name="inventoryItem">The inventory item to add. Cannot be null.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>The added <see cref="InventoryItem"/> instance.</returns>
-    public async Task<InventoryItem> AddInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, inventoryItem, cancellationToken);
+    public Task<InventoryItem> AddInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken)
+        => RepositoryQueriesHelpers.AddEntityAsync(_dbContext, inventoryItem, cancellationToken);
 
     /// <summary>
     /// Updates the specified inventory item in the database asynchronously.
@@ -79,8 +75,8 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="BinLocation"/> if
     /// found; otherwise, <see langword="null"/>.</returns>
-    public async Task<BinLocation> GetBinLocationByIdAsync(int binLocationId, CancellationToken cancellationToken)
-        => await _dbContext.BinLocations
+    public Task<BinLocation?> GetBinLocationByIdAsync(int binLocationId, CancellationToken cancellationToken)
+        => _dbContext.BinLocations
             .FirstOrDefaultAsync(bl => bl.Id == binLocationId, cancellationToken);
 
     /// <summary>
@@ -92,8 +88,8 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
     /// A task that represents the asynchronous operation. The task result contains a list of <see cref="InventoryItem"/>
     /// entities that match the specified product ID.
     /// </returns>
-    public async Task<List<InventoryItem>> GetInventoryItemsByProductIdAsync(int productId, CancellationToken cancellationToken)
-        => await _dbContext.InventoryItems
+    public Task<List<InventoryItem>> GetInventoryItemsByProductIdAsync(int productId, CancellationToken cancellationToken)
+        => _dbContext.InventoryItems
             .Where(i => i.ProductId == productId)
             .ToListAsync(cancellationToken);
 
@@ -112,6 +108,6 @@ public sealed class InventoryItemRepository : IInventoryItemRepository
         return inventoryItem;
     }
 
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
+        => _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

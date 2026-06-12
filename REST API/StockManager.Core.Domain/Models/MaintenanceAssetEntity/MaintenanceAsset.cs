@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.GuardMethods;
@@ -10,14 +8,14 @@ namespace StockManager.Core.Domain.Models.MaintenanceAssetEntity;
 
 public sealed class MaintenanceAsset : Entity<Guid>
 {
-    public string Name { get; private set; }
-    public string SerialNumber { get; private set; }
-    public AssetType Type { get; private set; }
+    public string Name { get; }
+    public string SerialNumber { get; }
+    public AssetType Type { get; }
     public AssetStatus Status { get; private set; }
     public DateTime? LastServiceDate { get; private set; }
 
     public int? BinLocationId { get; private set; }
-    public BinLocation? BinLocation { get; private set; }
+    public BinLocation? BinLocation { get; }
 
     private readonly List<MaintenanceIncident> _incidents = new();
     public IReadOnlyCollection<MaintenanceIncident> Incidents => _incidents.AsReadOnly();

@@ -27,7 +27,11 @@ public class PurchaseOrderRepository : IPurchaseOrderRepository
         => RepositoryQueriesHelpers.AddEntityAsync(_dbContext, purchaseOrder, cancellationToken);
 
     public Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int id, CancellationToken cancellationToken)
-        => _dbContext.PurchaseOrders.FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        => _dbContext.PurchaseOrders
+            .Include(o => o.Supplier)
+            .Include(o => o.PurchaseOrderLines)
+                .ThenInclude(l => l.Product)
+            .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
     public async Task<PurchaseOrder> UpdatePurchaseOrderAsync(PurchaseOrder purchaseOrder, CancellationToken cancellationToken)
     {

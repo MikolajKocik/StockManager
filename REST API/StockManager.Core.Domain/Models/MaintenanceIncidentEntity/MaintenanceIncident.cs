@@ -10,26 +10,26 @@ namespace StockManager.Core.Domain.Models.MaintenanceIncidentEntity;
 
 public sealed class MaintenanceIncident : Entity<int>
 {
-    public string Title { get; private set; }
-    public string Description { get; private set; }
-    public IncidentPriority Priority { get; private set; }
+    public string Title { get; }
+    public string Description { get; }
+    public IncidentPriority Priority { get; }
     public IncidentStatus Status { get; private set; }
-    public string? PhotoUrl { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public string? PhotoUrl { get; }
+    public DateTime CreatedAt { get; }
     public DateTime? ResolvedAt { get; private set; }
     public string? ResolutionNotes { get; private set; }
 
-    public string ReportedById { get; private set; }
-    public User ReportedBy { get; private set; }
+    public string ReportedById { get; }
+    public User ReportedBy { get; }
 
     public string? AssignedToId { get; private set; }
-    public User? AssignedTo { get; private set; }
+    public User? AssignedTo { get; }
 
     public Guid? AssetId { get; private set; }
-    public MaintenanceAsset? Asset { get; private set; }
+    public MaintenanceAsset? Asset { get; }
 
     public int? BinLocationId { get; private set; }
-    public BinLocation? BinLocation { get; private set; }
+    public BinLocation? BinLocation { get; }
 
     private MaintenanceIncident() : base() { }
 

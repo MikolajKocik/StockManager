@@ -228,10 +228,6 @@ export default function Home() {
                 </div>
             </div>
 
-            <div className="col-span-2 card">
-                <LiveActivityFeed />
-            </div>
-
             <div className="col-span-4 card">
                 <div className="flex items-center gap-2">
                     <h2 className="flex-row card-header pr-6">Pending Orders</h2>
@@ -306,6 +302,10 @@ export default function Home() {
                         </TableBody>
                     </Table>
                 </div>
+            </div>
+
+            <div className="col-span-2 card">
+                <LiveActivityFeed />
             </div>
         </div>
     );

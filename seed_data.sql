@@ -4,6 +4,15 @@
 USE [StockManagerDb];
 GO
 
+SET ANSI_NULLS ON;
+SET QUOTED_IDENTIFIER ON;
+GO
+
+DELETE FROM [StockManager].[SalesOrderLines];
+DELETE FROM [StockManager].[PurchaseOrderLines];
+DELETE FROM [StockManager].[Invoices];
+DELETE FROM [StockManager].[SalesOrders];
+DELETE FROM [StockManager].[PurchaseOrders];
 DELETE FROM [StockManager].[OperationItems];
 DELETE FROM [StockManager].[WarehouseOperations];
 DELETE FROM [StockManager].[InventoryItems];
@@ -261,6 +270,53 @@ SET @OpId10 = SCOPE_IDENTITY();
 INSERT INTO [StockManager].[OperationItems] ([OperationId], [ProductId], [Quantity])
 VALUES (@OpId10, 20, 1000);
 
+-- 7. SALES ORDERS
+SET IDENTITY_INSERT [StockManager].[SalesOrders] ON;
+INSERT INTO [StockManager].[SalesOrders] ([Id], [OrderDate], [ShipDate], [DeliveredDate], [CancelDate], [Status], [CustomerId], [InvoiceId], [ReturnOrderId]) VALUES
+(1, GETDATE(), NULL, NULL, NULL, 'Confirmed', 1, 1, NULL),
+(2, GETDATE(), NULL, NULL, NULL, 'Draft', 3, 2, NULL),
+(3, GETDATE(), NULL, NULL, NULL, 'Confirmed', 5, 3, NULL);
+SET IDENTITY_INSERT [StockManager].[SalesOrders] OFF;
+
+-- 8. INVOICES
+SET IDENTITY_INSERT [StockManager].[Invoices] ON;
+INSERT INTO [StockManager].[Invoices] ([Id], [Type], [InvoiceDate], [DueDate], [Status], [TotalAmount], [PurchaseOrderId], [SalesOrderId]) VALUES
+(1, 'Sales', GETDATE(), DATEADD(day, 14, GETDATE()), 'Unpaid', 694.20, NULL, 1),
+(2, 'Sales', GETDATE(), DATEADD(day, 14, GETDATE()), 'Unpaid', 1049.50, NULL, 2),
+(3, 'Sales', GETDATE(), DATEADD(day, 14, GETDATE()), 'Unpaid', 1317.50, NULL, 3);
+SET IDENTITY_INSERT [StockManager].[Invoices] OFF;
+
+-- 9. SALES ORDER LINES
+SET IDENTITY_INSERT [StockManager].[SalesOrderLines] ON;
+INSERT INTO [StockManager].[SalesOrderLines] ([Id], [Quantity], [UoM], [UnitPrice], [ProductId], [SalesOrderId]) VALUES
+(1, 150.00, 'kg', 2.50, 1, 1),
+(2, 80.00, 'kg', 3.99, 2, 1),
+(3, 300.00, 'pcs', 1.20, 7, 2),
+(4, 200.00, 'pcs', 1.50, 8, 2),
+(5, 50.00, 'liter', 8.99, 11, 2),
+(6, 250.00, 'pcs', 3.49, 14, 3),
+(7, 500.00, 'pcs', 0.89, 18, 3);
+SET IDENTITY_INSERT [StockManager].[SalesOrderLines] OFF;
+
+-- 10. PURCHASE ORDERS
+SET IDENTITY_INSERT [StockManager].[PurchaseOrders] ON;
+INSERT INTO [StockManager].[PurchaseOrders] ([Id], [OrderDate], [ExpectedDate], [Status], [SupplierId], [InvoiceId], [ReturnOrderId]) VALUES
+(1, GETDATE(), DATEADD(day, 2, GETDATE()), 'Submitted', @Supp1, NULL, NULL),
+(2, GETDATE(), DATEADD(day, 5, GETDATE()), 'Draft', @Supp3, NULL, NULL),
+(3, GETDATE(), DATEADD(day, 3, GETDATE()), 'Submitted', @Supp5, NULL, NULL);
+SET IDENTITY_INSERT [StockManager].[PurchaseOrders] OFF;
+
+-- 11. PURCHASE ORDER LINES
+SET IDENTITY_INSERT [StockManager].[PurchaseOrderLines] ON;
+INSERT INTO [StockManager].[PurchaseOrderLines] ([Id], [Quantity], [UoM], [UnitPrice], [ProductId], [PurchaseOrderId]) VALUES
+(1, 1000.00, 'kg', 1.50, 1, 1),
+(2, 500.00, 'kg', 2.50, 2, 1),
+(3, 200.00, 'kg', 6.00, 5, 2),
+(4, 150.00, 'kg', 4.50, 6, 2),
+(5, 300.00, 'kg', 1.80, 16, 3),
+(6, 400.00, 'pcs', 0.95, 19, 3);
+SET IDENTITY_INSERT [StockManager].[PurchaseOrderLines] OFF;
+
 COMMIT;
-PRINT 'Extended Seed successful! Database populated with rich dataset.';
+PRINT 'Seed successful! Database populated with rich dataset.';
 GO

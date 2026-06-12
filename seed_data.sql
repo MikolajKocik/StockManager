@@ -70,27 +70,27 @@ SET IDENTITY_INSERT [StockManager].[BinLocations] OFF;
 -- 2. SUPPLIERS & THEIR ADDRESSES (5 Suppliers)
 DECLARE @Supp1 UNIQUEIDENTIFIER = NEWID();
 DECLARE @Addr1 UNIQUEIDENTIFIER = NEWID();
-INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId]) VALUES (@Supp1, 'FreshGrains Sp. z o.o.', 'supp-01', @Addr1);
+INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId], [TaxId]) VALUES (@Supp1, 'FreshGrains Sp. z o.o.', 'supp-01', @Addr1, 'PL1111111111');
 INSERT INTO [StockManager].[Adresses] ([Id], [Slug], [City], [Country], [PostalCode], [SupplierId], [CustomerId]) VALUES (@Addr1, 'addr-supp-01', 'Warsaw', 'Poland', '00-001', @Supp1, 0);
 
 DECLARE @Supp2 UNIQUEIDENTIFIER = NEWID();
 DECLARE @Addr2 UNIQUEIDENTIFIER = NEWID();
-INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId]) VALUES (@Supp2, 'Global Logistics & Supply', 'supp-02', @Addr2);
+INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId], [TaxId]) VALUES (@Supp2, 'Global Logistics & Supply', 'supp-02', @Addr2, 'PL2222222222');
 INSERT INTO [StockManager].[Adresses] ([Id], [Slug], [City], [Country], [PostalCode], [SupplierId], [CustomerId]) VALUES (@Addr2, 'addr-supp-02', 'Berlin', 'Germany', '10115', @Supp2, 0);
 
 DECLARE @Supp3 UNIQUEIDENTIFIER = NEWID();
 DECLARE @Addr3 UNIQUEIDENTIFIER = NEWID();
-INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId]) VALUES (@Supp3, 'Pol-Meat S.A.', 'supp-03', @Addr3);
+INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId], [TaxId]) VALUES (@Supp3, 'Pol-Meat S.A.', 'supp-03', @Addr3, 'PL3333333333');
 INSERT INTO [StockManager].[Adresses] ([Id], [Slug], [City], [Country], [PostalCode], [SupplierId], [CustomerId]) VALUES (@Addr3, 'addr-supp-03', 'Krakow', 'Poland', '31-001', @Supp3, 0);
 
 DECLARE @Supp4 UNIQUEIDENTIFIER = NEWID();
 DECLARE @Addr4 UNIQUEIDENTIFIER = NEWID();
-INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId]) VALUES (@Supp4, 'Nordic Fish Export', 'supp-04', @Addr4);
+INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId], [TaxId]) VALUES (@Supp4, 'Nordic Fish Export', 'supp-04', @Addr4, 'PL4444444444');
 INSERT INTO [StockManager].[Adresses] ([Id], [Slug], [City], [Country], [PostalCode], [SupplierId], [CustomerId]) VALUES (@Addr4, 'addr-supp-04', 'Oslo', 'Norway', '0150', @Supp4, 0);
 
 DECLARE @Supp5 UNIQUEIDENTIFIER = NEWID();
 DECLARE @Addr5 UNIQUEIDENTIFIER = NEWID();
-INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId]) VALUES (@Supp5, 'BioHortus Growers', 'supp-05', @Addr5);
+INSERT INTO [StockManager].[Suppliers] ([Id], [Name], [Slug], [AddressId], [TaxId]) VALUES (@Supp5, 'BioHortus Growers', 'supp-05', @Addr5, 'PL5555555555');
 INSERT INTO [StockManager].[Adresses] ([Id], [Slug], [City], [Country], [PostalCode], [SupplierId], [CustomerId]) VALUES (@Addr5, 'addr-supp-05', 'Madrid', 'Spain', '28001', @Supp5, 0);
 
 
@@ -141,7 +141,7 @@ SET IDENTITY_INSERT [StockManager].[Products] ON;
 INSERT INTO [StockManager].[Products] ([Id], [Name], [Slug], [Genre], [Unit], [ExpirationDate], [DeliveredAt], [Type], [BatchNumber], [SupplierId]) VALUES
 (1, 'Organic Carrots', 'prod-001', 'Vegetables', 'kg', DATEADD(day, 14, GETDATE()), GETDATE(), 'RegularStorage', 'BATCH-2024-001', @Supp1),
 (2, 'Red Apples', 'prod-002', 'Fruits', 'kg', DATEADD(day, 30, GETDATE()), GETDATE(), 'RegularStorage', 'BATCH-2024-002', @Supp1),
-(3, 'Whole Milk 3.2%', 'prod-003', 'Dairy', 'liter', DATEADD(day, 7, GETDATE()), GETDATE(), 'RefrigeratedSection', 'BATCH-MLK-01', @Supp2),
+(3, 'Whole Milk 3.2%', 'prod-003', 'Dairy', 'l', DATEADD(day, 7, GETDATE()), GETDATE(), 'RefrigeratedSection', 'BATCH-MLK-01', @Supp2),
 (4, 'Unsalted Butter', 'prod-004', 'Dairy', 'pcs', DATEADD(day, 60, GETDATE()), GETDATE(), 'RefrigeratedSection', 'BATCH-BTR-01', @Supp2),
 (5, 'Frozen Ground Beef', 'prod-005', 'Meat', 'kg', DATEADD(month, 6, GETDATE()), GETDATE(), 'FreezerSection', 'BATCH-BEEF-99', @Supp3),
 (6, 'Chicken Breast', 'prod-006', 'Meat', 'kg', DATEADD(day, 5, GETDATE()), GETDATE(), 'RefrigeratedSection', 'BATCH-CHK-01', @Supp3),
@@ -149,7 +149,7 @@ INSERT INTO [StockManager].[Products] ([Id], [Name], [Slug], [Genre], [Unit], [E
 (8, 'Pasta Penne', 'prod-008', 'DryProducts', 'pcs', DATEADD(year, 2, GETDATE()), GETDATE(), 'RegularStorage', 'PST-2024-A', @Supp1),
 (9, 'Frozen Salmon Fillets', 'prod-009', 'Fish', 'kg', DATEADD(month, 12, GETDATE()), GETDATE(), 'FreezerSection', 'SLM-FRZ-01', @Supp4),
 (10, 'Plain Yogurt', 'prod-010', 'Dairy', 'pcs', DATEADD(day, 10, GETDATE()), GETDATE(), 'RefrigeratedSection', 'YGR-PLN-01', @Supp2),
-(11, 'Spanish Olive Oil', 'prod-011', 'DryProducts', 'liter', DATEADD(year, 2, GETDATE()), GETDATE(), 'RegularStorage', 'OIL-ESP-202', @Supp5),
+(11, 'Spanish Olive Oil', 'prod-011', 'DryProducts', 'l', DATEADD(year, 2, GETDATE()), GETDATE(), 'RegularStorage', 'OIL-ESP-202', @Supp5),
 (12, 'Ice Cream Vanilla', 'prod-012', 'Dairy', 'pcs', DATEADD(month, 8, GETDATE()), GETDATE(), 'FreezerSection', 'ICE-VAN-55', @Supp2),
 (13, 'Frozen Cod Fillets', 'prod-013', 'Fish', 'kg', DATEADD(month, 10, GETDATE()), GETDATE(), 'FreezerSection', 'COD-FRZ-02', @Supp4),
 (14, 'Cheddar Cheese 200g', 'prod-014', 'Dairy', 'pcs', DATEADD(day, 90, GETDATE()), GETDATE(), 'RefrigeratedSection', 'CHD-200-Z', @Supp2),
@@ -291,13 +291,13 @@ SET IDENTITY_INSERT [StockManager].[Invoices] OFF;
 -- 9. SALES ORDER LINES
 SET IDENTITY_INSERT [StockManager].[SalesOrderLines] ON;
 INSERT INTO [StockManager].[SalesOrderLines] ([Id], [Quantity], [UoM], [UnitPrice], [ProductId], [SalesOrderId]) VALUES
-(1, 150.00, 'Kilogram', 2.50, 1, 1),
-(2, 80.00, 'Kilogram', 3.99, 2, 1),
-(3, 300.00, 'Piece', 1.20, 7, 2),
-(4, 200.00, 'Piece', 1.50, 8, 2),
-(5, 50.00, 'Liter', 8.99, 11, 2),
-(6, 250.00, 'Piece', 3.49, 14, 3),
-(7, 500.00, 'Piece', 0.89, 18, 3);
+(1, 150.00, 'kg', 2.50, 1, 1),
+(2, 80.00, 'kg', 3.99, 2, 1),
+(3, 300.00, 'pcs', 1.20, 7, 2),
+(4, 200.00, 'pcs', 1.50, 8, 2),
+(5, 50.00, 'l', 8.99, 11, 2),
+(6, 250.00, 'pcs', 3.49, 14, 3),
+(7, 500.00, 'pcs', 0.89, 18, 3);
 SET IDENTITY_INSERT [StockManager].[SalesOrderLines] OFF;
 
 -- 10. PURCHASE ORDERS
@@ -311,12 +311,12 @@ SET IDENTITY_INSERT [StockManager].[PurchaseOrders] OFF;
 -- 11. PURCHASE ORDER LINES
 SET IDENTITY_INSERT [StockManager].[PurchaseOrderLines] ON;
 INSERT INTO [StockManager].[PurchaseOrderLines] ([Id], [Quantity], [UoM], [UnitPrice], [ProductId], [PurchaseOrderId]) VALUES
-(1, 1000.00, 'Kilogram', 1.50, 1, 1),
-(2, 500.00, 'Kilogram', 2.50, 2, 1),
-(3, 200.00, 'Kilogram', 6.00, 5, 2),
-(4, 150.00, 'Kilogram', 4.50, 6, 2),
-(5, 300.00, 'Kilogram', 1.80, 16, 3),
-(6, 400.00, 'Piece', 0.95, 19, 3);
+(1, 1000.00, 'kg', 1.50, 1, 1),
+(2, 500.00, 'kg', 2.50, 2, 1),
+(3, 200.00, 'kg', 6.00, 5, 2),
+(4, 150.00, 'kg', 4.50, 6, 2),
+(5, 300.00, 'kg', 1.80, 16, 3),
+(6, 400.00, 'pcs', 0.95, 19, 3);
 SET IDENTITY_INSERT [StockManager].[PurchaseOrderLines] OFF;
 
 DECLARE @AdminId NVARCHAR(450);

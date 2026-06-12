@@ -9,6 +9,7 @@ public sealed record PurchaseOrderDto
     public int Id { get; init; }
     public Guid SupplierId { get; init; }
     public string? SupplierName { get; init; }
+    public string? SupplierTaxId { get; init; }
     public DateTime OrderDate { get; init; }
     public DateTime? ExpectedDate { get; init; }
     public required string Status { get; init; }

@@ -1,4 +1,4 @@
-﻿using StockManager.Core.Domain.Common;
+using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.AddressEntity;
 using StockManager.Core.Domain.Models.ProductEntity;
@@ -12,6 +12,7 @@ public sealed partial class Supplier : Entity<Guid>
 {
     public string Name { get; private set; } 
     public string Slug { get; private set; } 
+    public string? TaxId { get; private set; }
 
     // relation 1-1 with address
     public Guid AddressId { get; private set; }
@@ -31,7 +32,8 @@ public sealed partial class Supplier : Entity<Guid>
 
     public Supplier(
         string name,
-        Guid addressId
+        Guid addressId,
+        string? taxId = null
         ) : base()
     {
         Guard.AgainstNullOrWhiteSpace(name);
@@ -40,12 +42,14 @@ public sealed partial class Supplier : Entity<Guid>
         Name = name;
         Slug = $"s_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
         AddressId = addressId;
+        TaxId = taxId;
     }
 
     public Supplier(
         Guid id,
         string name,
-        Guid addressId
+        Guid addressId,
+        string? taxId = null
         ) : base(id)
     {
         Guard.AgainstNullOrWhiteSpace(name);
@@ -54,5 +58,6 @@ public sealed partial class Supplier : Entity<Guid>
         Name = name;
         Slug = $"s_{Uuid.NewDatabaseFriendly(Database.SqlServer)}";
         AddressId = addressId;
+        TaxId = taxId;
     }
 }

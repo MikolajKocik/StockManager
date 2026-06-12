@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using MediatR;
+﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.General;
@@ -14,7 +9,7 @@ using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 
-namespace StockManager.Application.CQRS.Commands.PurchaseOrder.SetPurchaseOrderExpectedDate;
+namespace StockManager.Application.CQRS.Commands.PurchaseOrderCommands.SetPurchaseOrderExpectedDate;
 
 public sealed class SetPurchaseOrderExpectedDateCommandHandler : ICommandHandler<SetPurchaseOrderExpectedDateCommand, Unit>
 {

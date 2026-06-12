@@ -16,6 +16,7 @@ using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Queries.InventoryItemQueries.GetInventoryItems;
+
 public sealed class GetInventoryItemsQueryHandler : IQueryHandler<GetInventoryItemsQuery, IEnumerable<InventoryItemDto>>
 {
     private readonly IMapper _mapper;
@@ -56,13 +57,13 @@ public sealed class GetInventoryItemsQueryHandler : IQueryHandler<GetInventoryIt
             }
         }
 
-        IEnumerable<InventoryItemDto> dtos =  await inventoryItems
+        IEnumerable<InventoryItemDto> dtos = await inventoryItems
             .ProjectTo<InventoryItemDto>(_mapper.ConfigurationProvider)
             .Skip((query.PageNumber - 1) * query.PageSize)
             .Take(query.PageSize)
             .ToListAsync(cancellationToken);
 
         return Result<IEnumerable<InventoryItemDto>>.Success(
-            dtos.Any() ? dtos : Enumerable.Empty<InventoryItemDto>());
+            dtos.Any() ? dtos : []);
     }
 }

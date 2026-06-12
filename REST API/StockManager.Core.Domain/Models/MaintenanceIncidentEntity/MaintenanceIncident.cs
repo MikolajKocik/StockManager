@@ -15,7 +15,7 @@ public sealed class MaintenanceIncident : Entity<int>
     public IncidentPriority Priority { get; }
     public IncidentStatus Status { get; private set; }
     public string? PhotoUrl { get; }
-    public DateTime CreatedAt { get; }
+    public DateTime CreatedAt { get; private set; }
     public DateTime? ResolvedAt { get; private set; }
     public string? ResolutionNotes { get; private set; }
 

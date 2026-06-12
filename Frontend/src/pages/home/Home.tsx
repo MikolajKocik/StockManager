@@ -99,12 +99,20 @@ export default function Home() {
     ];
 
     const sortedPendingItems = genericSort(pendingItems, activeSort, {
+        product: 'product',
+        unit: 'unit',
+        quantity: 'quantity',
+        price: 'price',
+        sum: 'sum',
         orderType: 'type',
-        NIP: 'nip'
+        client: 'client',
+        NIP: 'nip',
+        date: 'date'
     });
 
+
     return (
-        <div className='h-full grid grid-cols-6 grid-rows-[auto_1.4fr_1fr_1.2fr] gap-4'>
+        <div className='h-full grid grid-cols-6 grid-rows-[auto_1fr_1fr] gap-4'>
             <div className="col-span-6">
                 <div className="flex flex-row-reverse gap-4">
                     <Button className="bg-[#CC6557] dash-button" onClick={() => setOpenIncident(true)}>Report Incident</Button>
@@ -213,13 +221,41 @@ export default function Home() {
             </div>
 
             <div className="col-span-2 card">
+                <h2 className="card-header">Distribution data</h2>
+                <div className="card-body">
+
+                </div>
             </div>
 
             <div className="col-span-2 card">
+                <h2 className="card-header">Live Activity Feed</h2>
+                <div className="card-body">
+
+                </div>
             </div>
 
             <div className="col-span-4 card">
-                <h2 className="card-header">Pending Orders</h2>
+                <div className="flex items-center gap-2">
+                    <h2 className="flex-row card-header pr-6">Pending Orders</h2>
+
+                    <div className="bg-[#77A4B4] w-4 h-4" />
+                    <span className="font-bold pr-4">PZ</span>
+
+                    <div className="bg-[#8564C8] w-4 h-4" />
+                    <span className="font-bold pr-4">WZ</span>
+
+                    <div className="bg-[#CC8F49] w-4 h-4" />
+                    <span className="font-bold pr-4">MM</span>
+
+                    <div className="bg-[#3A8054] w-4 h-4" />
+                    <span className="font-bold pr-4">kg</span>
+
+                    <div className="bg-[#9C4A36] w-4 h-4" />
+                    <span className="font-bold pr-4">pcs</span>
+
+                    <div className="bg-[#8F49CC] w-4 h-4" />
+                    <span className="font-bold pr-4">l</span>
+                </div>
                 <div className="card-body">
                     <Table className="w-full h-full border-collapse mb-2 border">
                         <TableHead className="bg-slate-200 border">
@@ -258,11 +294,11 @@ export default function Home() {
                                 return (
                                     <TableRow key={idx} className="text-center bg-slate-300">
                                         <TableCell className="border">{item.product}</TableCell>
-                                        <TableCell className="border">{item.unit}</TableCell>
+                                        <TableCell className={`border ${item.unit === 'kg' ? 'bg-[#3A8054]' : item.unit === 'pcs' ? 'bg-[#9C4A36]' : 'bg-[#8F49CC]'}`}>{item.unit}</TableCell>
                                         <TableCell className="border">{item.quantity}</TableCell>
                                         <TableCell className="border">{item.price.toFixed(2)}</TableCell>
                                         <TableCell className="border">{item.sum.toFixed(2)}</TableCell>
-                                        <TableCell className="border">{item.type}</TableCell>
+                                        <TableCell className={`border ${item.type === 'WZ' ? 'bg-[#8564C8]' : item.type === 'PZ' ? 'bg-[#77A4B4]' : 'bg-[#CC8F49]'}`}>{item.type}</TableCell>
                                         <TableCell className="border">{item.client || '-'}</TableCell>
                                         <TableCell className="border">{item.nip}</TableCell>
                                         <TableCell className="border">{new Date(item.date).toLocaleDateString()}</TableCell>
@@ -272,12 +308,6 @@ export default function Home() {
                         </TableBody>
                     </Table>
                 </div>
-            </div>
-
-            <div className="col-span-3 card">
-            </div>
-
-            <div className="col-span-3 card">
             </div>
         </div>
     );

@@ -1,6 +1,6 @@
 @layer components {
     .nav-box {
-        @apply bg-[#779ABC] border-l-8 border-l-[#366FB9];
+        @apply bg-[#779ABC] border-l-8 border-l-[#366FB9] border-2;
         @apply text-white text-[1.2rem];
         @apply w-44 h-10 m-2 px-2;
         @apply hover:bg-[#AA9559] transition-colors duration-500 cursor-pointer;

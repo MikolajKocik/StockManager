@@ -10,6 +10,8 @@ import { salesApi } from '@/api/internal/salesApi';
 import { purchaseApi } from '@/api/internal/purchaseApi';
 import type { PurchaseOrder } from '@/models/purchaseOrder';
 import { LiveActivityFeed } from '@/components/LiveActivityFeed';
+import { maintenanceApi } from '@/api/internal/maintenanceApi';
+import { type MaintenanceIncident } from '@/models/maintenance';
 
 type Sorted = 'name' | 'type' | 'usage' | 'category' | 'count' |
     'product' | 'unit' | 'quantity' | 'price' | 'sum' | 'orderType' |
@@ -33,25 +35,30 @@ function genericSort<T>(array: T[], activeSort: string | null, keyMap?: Record<s
 }
 
 export default function Home() {
-    const { data: items = { data: [] }, refetch } = useQuery<InventoryItemCollection>({
+    const { data: items = { data: [] }, refetch: refetchItems } = useQuery<InventoryItemCollection>({
         queryKey: ['locations'],
         queryFn: inventoryApi.getItems
     });
     const responseitems = items?.data || [];
 
-    const { data: statistics = [] } = useQuery<DistributionData[]>({
+    const { data: statistics = [], refetch: refetchStatistics } = useQuery<DistributionData[]>({
         queryKey: ['statistics'],
         queryFn: statisticsApi.getDistribution
     });
 
-    const { data: salesOrders = [] } = useQuery<SalesOrder[]>({
+    const { data: salesOrders = [], refetch: refetchSalesOrders } = useQuery<SalesOrder[]>({
         queryKey: ['salesOrders'],
         queryFn: salesApi.getAll
     });
 
-    const { data: purchaseOrders = [] } = useQuery<PurchaseOrder[]>({
+    const { data: purchaseOrders = [], refetch: refetchPurchaseOrders } = useQuery<PurchaseOrder[]>({
         queryKey: ['purchasesOrders'],
         queryFn: purchaseApi.getAll
+    });
+
+    const { data: incidents = [], refetch: refetchIncidents } = useQuery<MaintenanceIncident[]>({
+        queryKey: ['incidents'],
+        queryFn: () => maintenanceApi.getIncidents()
     });
 
     const [activeSort, setActiveSort] = useState<Sorted | null>(null);
@@ -61,6 +68,16 @@ export default function Home() {
 
     const toggleFilter = (key: Sorted) => {
         setActiveSort(prev => prev === key ? null : key);
+    };
+
+    const handleRefresh = async () => {
+        await Promise.all([
+            refetchItems(),
+            refetchIncidents(),
+            refetchPurchaseOrders(),
+            refetchSalesOrders(),
+            refetchStatistics(),
+        ]);
     };
 
     const displayedItems = genericSort(responseitems, activeSort, {
@@ -111,6 +128,10 @@ export default function Home() {
         date: 'date'
     });
 
+    const activeIncidents = incidents.filter(
+        incident => incident.status !== 'Resolved' &&
+            incident.status !== 'Cancelled'
+    );
 
     return (
         <div className='h-full grid grid-cols-6 grid-rows-[auto_1fr_1fr] gap-4'>
@@ -119,7 +140,7 @@ export default function Home() {
                     <Button className="bg-[#CC6557] dash-button" onClick={() => setOpenIncident(true)}>Report Incident</Button>
                     <Button className="bg-amber-300 dash-button" onClick={() => setOpenCustomize(true)}>Customize View</Button>
                     <Button className="bg-[#9BB477] dash-button" onClick={() => setOpenReport(true)}>Generate Report</Button>
-                    <Button className="bg-[#77A4B4] dash-button" onClick={() => refetch()}>Refresh</Button>
+                    <Button className="bg-[#77A4B4] dash-button" onClick={() => handleRefresh}>Refresh</Button>
                 </div>
 
                 <Modal
@@ -222,9 +243,41 @@ export default function Home() {
             </div>
 
             <div className="col-span-2 card">
-                <h2 className="card-header">TODO</h2>
+                <h2 className="card-header">Maintenance Tasks</h2>
                 <div className="card-body">
-
+                    <Table className="w-full h-full border-collapse mb-2 border">
+                        <TableHead className="bg-slate-200 border">
+                            <TableRow>
+                                <TableHeaderCell>Incident / Asset</TableHeaderCell>
+                                <TableHeaderCell>Location</TableHeaderCell>
+                                <TableHeaderCell>Priority</TableHeaderCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {activeIncidents.length === 0 ? (
+                                <TableRow>
+                                    <TableCell className="text-center italic text-slate-500 py-4">
+                                        No active incidents
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                activeIncidents.map((incident) => (
+                                    <TableRow key={incident.id} className="text-center bg-slate-300">
+                                        <TableCell className="border text-left pl-2">
+                                            <div className="font-semibold">{incident.title}</div>
+                                            <div className="text-xs text-slate-600">{incident.assetName || 'General'}</div>
+                                        </TableCell>
+                                        <TableCell className="border">{incident.binLocationCode || '-'}</TableCell>
+                                        <TableCell className={`border font-semibold ${incident.priority === 'Critical' ? 'bg-[#CC6557]' :
+                                            incident.priority === 'High' ? 'bg-amber-300' : 'bg-slate-200'
+                                            }`}>
+                                            {incident.priority}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
                 </div>
             </div>
 

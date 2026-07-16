@@ -6,6 +6,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using StockManager.Core.Domain.Models.UserEntity;
 using StockManager.Infrastructure.Persistence.Data;
+using StockManager.Core.Domain.Interfaces.Common;
+using StockManager.Infrastructure.Common;
 
 namespace StockManager.Infrastructure.Extensions;
 
@@ -73,5 +75,7 @@ public static class ServiceCollectionExtension
                 .AsImplementedInterfaces()
                 .WithScopedLifetime();
         });
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
     }
 }

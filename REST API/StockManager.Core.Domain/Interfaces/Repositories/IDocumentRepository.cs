@@ -5,7 +5,7 @@ namespace StockManager.Core.Domain.Interfaces.Repositories;
 
 public interface IDocumentRepository : IBaseRepository
 {
-    Task AddDocumentAsync(FileMetadata fileMetadata, CancellationToken cancellationToken);
+    void AddDocument(FileMetadata fileMetadata);
 
-    Task<List<FileMetadata>> GetAllFilesAsync(CancellationToken cancellationToken);
+    IQueryable<FileMetadata> GetAllFiles();
 }

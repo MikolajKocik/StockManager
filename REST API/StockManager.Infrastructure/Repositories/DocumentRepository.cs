@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
@@ -19,18 +14,11 @@ public sealed class DocumentRepository : IDocumentRepository
         _dbContext = dbContext;
     }
 
-    public async Task AddDocumentAsync(FileMetadata fileMetadata, CancellationToken cancellationToken)
-    {
-        await _dbContext.FileMetadatas.AddAsync(fileMetadata, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    } 
+    public void AddDocument(FileMetadata fileMetadata)
+    => _dbContext.FileMetadatas.Add(fileMetadata);
 
-    public async Task<List<FileMetadata>> GetAllFilesAsync(CancellationToken cancellationToken)
-        => await _dbContext.FileMetadatas
-            .AsNoTracking() 
-            .OrderByDescending(f => f.UploadedAt)
-            .Select(f => new FileMetadata(f.FileName, f.BlobUrl, f.OperationId))
-            .ToListAsync(cancellationToken);
+    public IQueryable<FileMetadata> GetAllFiles()
+        =>  _dbContext.FileMetadatas;
 
     public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
     {

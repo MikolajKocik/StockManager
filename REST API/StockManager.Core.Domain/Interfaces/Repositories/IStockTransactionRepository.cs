@@ -1,13 +1,11 @@
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface IStockTransactionRepository : IBaseRepository
+public interface IStockTransactionRepository
 {
     IQueryable<StockTransaction> GetStockTransactions();
-    Task<StockTransaction?> GetStockTransactionByIdAsync(int id, CancellationToken cancellationToken);
-    Task<StockTransaction> AddStockTransactionAsync(StockTransaction entity, CancellationToken cancellationToken);
-    Task<StockTransaction?> UpdateStockTransactionAsync(StockTransaction entity, CancellationToken cancellationToken);
-    Task<StockTransaction?> DeleteStockTransactionAsync(StockTransaction entity, CancellationToken cancellationToken);
+    Task<StockTransaction?> GetStockTransactionByIdAsync(int id, CancellationToken ct);
+    void AddStockTransaction(StockTransaction transaction);
+    Task DeleteStockTransactionAsync(int id, CancellationToken cancellationToken);
 }

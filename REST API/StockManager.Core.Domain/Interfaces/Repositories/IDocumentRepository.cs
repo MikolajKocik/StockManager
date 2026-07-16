@@ -1,11 +1,9 @@
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface IDocumentRepository : IBaseRepository
+public interface IDocumentRepository 
 {
-    void AddDocument(FileMetadata fileMetadata);
-
     IQueryable<FileMetadata> GetAllFiles();
+    void AddDocument(FileMetadata fileMetadata);
 }

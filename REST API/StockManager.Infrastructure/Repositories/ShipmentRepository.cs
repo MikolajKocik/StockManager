@@ -1,59 +1,31 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.ShipmentEntity;
-using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
-public sealed class ShipmentRepository : IShipmentRepository
+
+internal sealed class ShipmentRepository(StockManagerDbContext db) 
+    : BaseOperations<Shipment>(db), IShipmentRepository
 {
-    public readonly StockManagerDbContext _dbContext;
-
-    public ShipmentRepository(StockManagerDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public IQueryable<Shipment> GetShipments()
-        => _dbContext.Shipments
-           .AsNoTracking()
-           .Include(s => s.SalesOrder)
-                .ThenInclude(so => so.Customer)
-                    .ThenInclude(c => c.Address)
-           .Include(s => s.SalesOrder)
-                .ThenInclude(so => so.SalesOrderLines)
-                    .ThenInclude(sol => sol.Product)
-                        .ThenInclude(p => p.Supplier)
-                            .ThenInclude(sup => sup.Address);
+        => GetAll()
+            .AsNoTracking();
 
-    public async Task<Shipment?> GetShipmentByIdAsync(int id, CancellationToken cancellationToken)
-        => await GetShipments()
+    public async Task<Shipment?> GetShipmentByIdAsync(int id, CancellationToken ct)
+        => await _db.Shipments
             .Where(s => s.Id == id)
-            .FirstOrDefaultAsync(cancellationToken);
+            .AsNoTracking()
+            .SingleOrDefaultAsync(ct);
     
-    public async Task<Shipment> AddShipmentAsync(Shipment shipment, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, shipment, cancellationToken);
+    public void AddShipment(Shipment shipment)
+        => Add(shipment);
 
-    public async Task<Shipment?> UpdateShipmentAsync(Shipment shipment, CancellationToken cancellationToken) 
+    public async Task DeleteShipmentAsync(int id, CancellationToken ct)
     {
-        _dbContext.Shipments.Update(shipment);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return shipment;
+        Shipment shipment = await _db.Shipments.FindAsync([id], ct) 
+            ?? throw new InvalidOperationException($"Shipment with id {id} not found.");
+        Delete(shipment);
     }
-
-    public async Task<Shipment?> DeleteShipmentAsync(Shipment shipment, CancellationToken cancellationToken)
-    {
-        _dbContext.Shipments.Remove(shipment);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return shipment;
-    }
-
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

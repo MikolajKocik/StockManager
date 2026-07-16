@@ -1,27 +1,17 @@
-using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
-public sealed class DocumentRepository : IDocumentRepository
+internal sealed class DocumentRepository(StockManagerDbContext db) 
+    : BaseOperations<FileMetadata>(db), IDocumentRepository
 {
-    private readonly StockManagerDbContext _dbContext;
-
-    public DocumentRepository(StockManagerDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public void AddDocument(FileMetadata fileMetadata)
-    => _dbContext.FileMetadatas.Add(fileMetadata);
-
-    public IQueryable<FileMetadata> GetAllFiles()
-        =>  _dbContext.FileMetadatas;
-
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
+    public IQueryable<FileMetadata> GetAllFiles() 
+        => GetAll()
+            .AsNoTracking();
+    
+    public void AddDocument(FileMetadata fileMetadata) => Add(fileMetadata);
 }

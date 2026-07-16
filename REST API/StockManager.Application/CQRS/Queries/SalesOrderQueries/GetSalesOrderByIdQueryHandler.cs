@@ -27,14 +27,10 @@ public sealed class GetSalesOrderByIdQueryHandler : IQueryHandler<GetSalesOrderB
         _logger = logger;
     }
 
-    public async Task<Result<SalesOrderDto>> Handle(GetSalesOrderByIdQuery query, CancellationToken cancellationToken)
+    public async Task<Result<SalesOrderDto>> Handle(GetSalesOrderByIdQuery query, CancellationToken ct)
     {
-        SalesOrder? order = await _repository.GetSalesOrders()
-            .Include(o => o.Customer)
-            .Include(o => o.SalesOrderLines)
-                .ThenInclude(l => l.Product)
-            .FirstOrDefaultAsync(x => x.Id == query.Id, cancellationToken);
-
+        SalesOrder? order = await _repository.GetSalesOrderByIdAsync(query.Id, ct);
+          
         if (order is null)
         {
             SalesOrderLogWarning.LogSalesOrderNotFound(_logger, query.Id, default);

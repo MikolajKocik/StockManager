@@ -1,14 +1,12 @@
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface IWarehouseOperationRepository : IBaseRepository
+public interface IWarehouseOperationRepository
 {
-    Task AddAsync(WarehouseOperation operation, CancellationToken cancellationToken);
-    Task<WarehouseOperation?> GetByIdAsync(int id, CancellationToken cancellationToken);
-    Task UpdateAsync(WarehouseOperation operation, CancellationToken cancellationToken);
-    Task<List<WarehouseOperation>> GetOperationsWithItemsAsync(CancellationToken cancellationToken);
-    Task<List<Document>> GetDocumentsAsync(CancellationToken cancellationToken);
+    void AddOperation(WarehouseOperation operation);
+    Task<WarehouseOperation?> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<IReadOnlyList<WarehouseOperation>> GetOperationsWithItemsAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<Document>> GetDocumentsAsync(CancellationToken ct = default);
     IQueryable<WarehouseOperation> GetOperations();
 }

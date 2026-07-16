@@ -1,49 +1,26 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.MaintenanceAssetEntity;
-using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
-public sealed class MaintenanceAssetRepository : IMaintenanceAssetRepository
+internal sealed class MaintenanceAssetRepository(StockManagerDbContext db)
+    : BaseOperations<MaintenanceAsset>(db), IMaintenanceAssetRepository
 {
-    private readonly StockManagerDbContext _dbContext;
+    public IQueryable<MaintenanceAsset> GetAssets() 
+        => GetAll()
+            .AsNoTracking();
 
-    public MaintenanceAssetRepository(StockManagerDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    public async Task<MaintenanceAsset?> GetAssetByIdAsync(Guid id, CancellationToken ct)
+        => await _db.MaintenanceAssets.SingleOrDefaultAsync(x => x.Id == id, ct);
 
-    public IQueryable<MaintenanceAsset> GetAssets()
-        => _dbContext.MaintenanceAssets.AsQueryable();
-
-    public Task<MaintenanceAsset?> GetAssetByIdAsync(Guid id, CancellationToken cancellationToken)
-        => _dbContext.MaintenanceAssets
-            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
-
-    public Task<MaintenanceAsset?> GetAssetWithDetailsByIdAsync(Guid id, CancellationToken cancellationToken)
-        => _dbContext.MaintenanceAssets
+    public async Task<MaintenanceAsset?> GetAssetWithDetailsByIdAsync(Guid id, CancellationToken cancellationToken)
+        => await _db.MaintenanceAssets
             .Include(a => a.BinLocation)
             .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
 
-
-    public Task<MaintenanceAsset> AddAssetAsync(MaintenanceAsset asset, CancellationToken cancellationToken)
-        => RepositoryQueriesHelpers.AddEntityAsync(_dbContext, asset, cancellationToken);
-
-    public async Task<MaintenanceAsset> UpdateAssetAsync(MaintenanceAsset asset, CancellationToken cancellationToken)
-    {
-        if (_dbContext.Entry(asset).State == EntityState.Detached)
-        {
-            _dbContext.MaintenanceAssets.Attach(asset);
-            _dbContext.Entry(asset).State = EntityState.Modified;
-        }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return asset;
-    }
-
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-         => _dbContext.Database.BeginTransactionAsync(cancellationToken);
+    public void AddAsset(MaintenanceAsset asset)
+        => Add(asset);
 }

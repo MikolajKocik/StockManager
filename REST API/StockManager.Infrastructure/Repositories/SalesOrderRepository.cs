@@ -1,56 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.SalesOrderEntity;
-using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
-public sealed class SalesOrderRepository : ISalesOrderRepository
+internal sealed class SalesOrderRepository(StockManagerDbContext db) 
+    : BaseOperations<SalesOrder>(db), ISalesOrderRepository
 {
-    private readonly StockManagerDbContext _dbContext;
-
-    public SalesOrderRepository(StockManagerDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
     public IQueryable<SalesOrder> GetSalesOrders()
-        => _dbContext.SalesOrders.AsQueryable();
+        => GetAll()
+            .AsNoTracking()
+            .Include(o => o.Customer)
+            .Include(x => x.SalesOrderLines)
+                .ThenInclude(l => l.Product)
+            .AsSplitQuery();
 
-    public async Task<SalesOrder?> GetSalesOrderByIdAsync(int id, CancellationToken cancellationToken)
-        => await _dbContext.SalesOrders
+    public async Task<SalesOrder?> GetSalesOrderByIdAsync(int id, CancellationToken ct)
+        => await _db.SalesOrders
             .Include(x => x.SalesOrderLines)  
-            .SingleOrDefaultAsync(x => x.Id == id, cancellationToken);
+            .AsSplitQuery()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.Id == id, ct);
 
-    public async Task<SalesOrder> AddSalesOrderAsync(SalesOrder salesOrder, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, salesOrder, cancellationToken);
+    public void AddSalesOrder(SalesOrder salesOrder)
+        => Add(salesOrder);
 
-    public async Task<SalesOrder> UpdateSalesOrderAsync(SalesOrder salesOrder, CancellationToken cancellationToken)
+    public async Task DeleteSalesOrderAsync(int id, CancellationToken ct)
     {
-        if (_dbContext.Entry(salesOrder).State == EntityState.Detached)
-        {
-            _dbContext.SalesOrders.Attach(salesOrder);
-            _dbContext.Entry(salesOrder).State = EntityState.Modified;
-        }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return salesOrder;
+        SalesOrder order = await _db.SalesOrders.FindAsync([id], ct) 
+            ?? throw new InvalidOperationException($"Sales order with id {id} not found.");
+        Delete(order);
     }
-
-    public async Task<SalesOrder> DeleteSalesOrderAsync(SalesOrder salesOrder, CancellationToken cancellationToken)
-    {
-        _dbContext.SalesOrders.Remove(salesOrder);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return salesOrder;
-    }
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-         => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

@@ -1,13 +1,11 @@
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface IPurchaseOrderRepository : IBaseRepository
+public interface IPurchaseOrderRepository
 {
-    Task<List<PurchaseOrder>> GetPurchaseOrdersAsync(CancellationToken cancellationToken);
-    Task<PurchaseOrder> AddPurchaseOrderAsync(PurchaseOrder entity, CancellationToken cancellationToken);
-    Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int id, CancellationToken cancellationToken);
-    Task<PurchaseOrder> UpdatePurchaseOrderAsync(PurchaseOrder entity, CancellationToken cancellationToken);
-    Task<PurchaseOrder> DeletePurchaseOrderAsync(PurchaseOrder entity, CancellationToken cancellationToken);
+    IQueryable<PurchaseOrder> GetPurchaseOrders();
+    void AddPurchaseOrder(PurchaseOrder purchaseOrder);    
+    Task<PurchaseOrder?> GetPurchaseOrderByIdAsync(int id, CancellationToken ct = default);
+    Task DeletePurchaseOrder(int id, CancellationToken ct = default);
 }

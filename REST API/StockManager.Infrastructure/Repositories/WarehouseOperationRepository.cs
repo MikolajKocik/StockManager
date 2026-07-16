@@ -9,12 +9,11 @@ namespace StockManager.Infrastructure.Repositories;
 internal sealed class WarehouseOperationRepository(StockManagerDbContext db) 
     : BaseOperations<WarehouseOperation>(db), IWarehouseOperationRepository
 {
-
     public void AddOperation(WarehouseOperation operation)
         => Add(operation);
 
     public async Task<WarehouseOperation?> GetByIdAsync(int id, CancellationToken ct)
-        => await db.WarehouseOperations
+        => await _db.WarehouseOperations
             .AsNoTracking()
             .Include(o => o.Items)
             .SingleOrDefaultAsync(o => o.Id == id, ct);
@@ -24,13 +23,13 @@ internal sealed class WarehouseOperationRepository(StockManagerDbContext db)
             .AsNoTracking();
 
     public async Task<IReadOnlyList<WarehouseOperation>> GetOperationsWithItemsAsync(CancellationToken ct)
-        => await db.WarehouseOperations
+        => await _db.WarehouseOperations
             .Include(o => o.Items)
             .OrderByDescending(o => o.Date)
             .ToListAsync(ct);
 
     public async Task<IReadOnlyList<Document>> GetDocumentsAsync(CancellationToken ct)
-        => await db.Documents
+        => await _db.Documents
             .OrderByDescending(d => d.CreatedAt)
             .ToListAsync(ct);
 }

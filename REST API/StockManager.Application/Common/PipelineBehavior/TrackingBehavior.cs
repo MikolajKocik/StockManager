@@ -1,48 +1,32 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
-using StockManager.Application.Common.Logging.Categories;
-using StockManager.Application.Common.Logging.EventIds.General;
-using StockManager.Application.Common.Logging.General;
-using StockManager.Application.Common.Logging.InventoryItem;
-using StockManager.Application.Common.Logging.Product;
-using StockManager.Application.Common.Logging.Supplier;
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
-using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.InventoryItemEntity;
-using System.Reflection;
-using System.Transactions;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common.Logging.Categories;
+using StockManager.Application.Common.Logging.General;
+using StockManager.Core.Domain.Interfaces.Common;
+using StockManager.Application.Common.ResultPattern;
 
 namespace StockManager.Application.Common.PipelineBehavior;
 
-public sealed class TrackingBehavior<TRequest, TResponse> 
-    : IPipelineBehavior<TRequest, TResponse> 
-    where TRequest : IBaseCommand
-{
-    private readonly ILogger<TrackingBehavior<TRequest, TResponse>> _logger;
-    private readonly IEnumerable<IValidator<TRequest>> _validators;
-    private readonly IBaseRepository _repository;
-
-    public TrackingBehavior(
+public sealed class TrackingBehavior<TRequest, TResponse>(
         ILogger<TrackingBehavior<TRequest, TResponse>> logger,
         IEnumerable<IValidator<TRequest>> validators,
-        IBaseRepository repository
-        )
-    {
-        _logger = logger;
-        _validators = validators;
-        _repository = repository;
-    }
+        IUnitOfWork uow
+    )
+    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest
+{
+    private readonly ILogger<TrackingBehavior<TRequest, TResponse>> _logger = logger;
+    private readonly IEnumerable<IValidator<TRequest>> _validators = validators;
+    private readonly IUnitOfWork _uow = uow;
 
     public async Task<TResponse> Handle(
         TRequest request,
         RequestHandlerDelegate<TResponse> next,
-        CancellationToken cancellationToken)
+        CancellationToken ct)
     {
+        ct.ThrowIfCancellationRequested();
 
         if (_validators.Any())
         {
@@ -51,7 +35,7 @@ public sealed class TrackingBehavior<TRequest, TResponse>
                 var context = new ValidationContext<TRequest>(request);
 
                 ValidationResult[] validationResults = await Task.WhenAll(
-                    _validators.Select(v => v.ValidateAsync(context, cancellationToken)));
+                    _validators.Select(v => v.ValidateAsync(context, ct)));
 
                 var failures = validationResults
                     .Where(r => !r.IsValid)
@@ -60,7 +44,7 @@ public sealed class TrackingBehavior<TRequest, TResponse>
 
                 if (failures.Any())
                 {
-                    LogValidationFailures(failures);                 
+                    LogValidationFailures(failures);
                     throw new ValidationException(failures);
                 }
             }
@@ -71,36 +55,41 @@ public sealed class TrackingBehavior<TRequest, TResponse>
             }
         }
 
-        try
+        if (request is IBaseCommand)
         {
-            // checks if request was cancelled
-            cancellationToken.ThrowIfCancellationRequested();
+            ITransaction transaction = await _uow.BeginTransactionAsync(ct);
 
-            using IDbContextTransaction transaction = await _repository.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                TResponse response = await next().ConfigureAwait(false);
 
-            // check if next is null
-            ArgumentNullException.ThrowIfNull(next);
+                ArgumentNullException.ThrowIfNull(next);
 
-            // runs the actual handler logic
-            TResponse response = await next().ConfigureAwait(false);
+                if (response is IResult { IsSuccess: true })
+                {
+                    await transaction.CommitAsync(ct);
+                }
+                else
+                {
+                    await transaction.RollbackAsync(ct);
+                }
 
-            await transaction.CommitAsync(cancellationToken);
-
-            // tries to log business-level failure, if one occurred
-            TryLogBusinessFailure(response);
-
-            return response;
+                TryLogBusinessFailure(response);
+                return response;
+            }
+            catch (OperationCanceledException ex)
+            {
+                GeneralLogWarning.RequestCancelled(_logger, typeof(TRequest).Name, ex);
+                throw;
+            }
+            catch (Exception ex)
+            {
+                GeneralLogError.UnhandledException(_logger, typeof(TRequest).Name, ex);
+                throw;
+            }
         }
-        catch (OperationCanceledException ex)
-        {
-            GeneralLogWarning.RequestCancelled(_logger, typeof(TRequest).Name, ex);
-            throw;
-        }
-        catch (Exception ex)
-        {
-            GeneralLogError.UnhandledException(_logger, typeof(TRequest).Name, ex);
-            throw;
-        }
+
+        return await next();
     }
 
     private void LogValidationFailures(IEnumerable<ValidationFailure> failures)
@@ -117,38 +106,17 @@ public sealed class TrackingBehavior<TRequest, TResponse>
         }
     }
 
-    // result pattern response
-    private void TryLogBusinessFailure(object? response)
+    private void TryLogBusinessFailure(TResponse response)
     {
-        if (response is null)
+        if (response is IResult { IsSuccess: false } result && result.Error != null)
         {
-            return;
-        }
-
-        Type responseType = response.GetType();
-        PropertyInfo? isSuccessProp = responseType.GetProperty("IsSuccess");
-        PropertyInfo? errorProp = responseType.GetProperty("Error");
-
-        if (isSuccessProp is not null && errorProp is not null)
-        {       
-            object rawValue = isSuccessProp.GetValue(response);
-            
-            // sillently skip if null or not bool 
-            if (rawValue is not bool IsSuccess)
-            {
-                return;
-            }
-
-            // if Result<>.Failure(), try to log the error info
-            if (!IsSuccess)
-            {
-                object error = errorProp.GetValue(response);
-
-                string? errorMessage = error?.GetType().GetProperty("Message")?.GetValue(error)?.ToString();
-                string? errorCode = error?.GetType().GetProperty("Error")?.GetValue(error)?.ToString();
-
-                GeneralLogWarning.LogBussinessFailure(_logger, typeof(TRequest).Name, errorCode, errorMessage, default);
-            }
+            GeneralLogWarning.LogBussinessFailure(
+                _logger,
+                typeof(TRequest).Name,
+                result.Error.Code,
+                result.Error.Message,
+                default
+            );
         }
     }
 }

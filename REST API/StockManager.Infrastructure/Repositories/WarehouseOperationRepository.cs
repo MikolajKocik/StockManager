@@ -28,8 +28,8 @@ internal sealed class WarehouseOperationRepository(StockManagerDbContext db)
             .OrderByDescending(o => o.Date)
             .ToListAsync(ct);
 
-    public async Task<IReadOnlyList<Document>> GetDocumentsAsync(CancellationToken ct)
-        => await _db.Documents
-            .OrderByDescending(d => d.CreatedAt)
-            .ToListAsync(ct);
+    public IQueryable<Document> GetDocuments()
+        => GetAll()
+            .AsNoTracking()
+            .OfType<Document>();
 }

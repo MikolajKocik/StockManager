@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.General;
 
 namespace StockManager.Application.Common.Logging.General;
@@ -21,4 +16,10 @@ public static class GeneralLogInfo
             LogLevel.Information,
             GeneralLogEventIds.AuthorizationSuccess,
             "User: {@user} logged succesfully");
+
+    public static readonly Action<ILogger, string, Exception?> Information =
+        LoggerMessage.Define<string>(
+            LogLevel.Information,
+            GeneralLogEventIds.Information,
+            "{@message}");
 }

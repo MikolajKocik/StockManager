@@ -28,5 +28,5 @@ public static class GeneralLogEventIds
     // Information
     public static readonly EventId RegistrationSuccess = new(20, "RegistrationSuccess");
     public static readonly EventId AuthorizationSuccess = new(21, "AuthorizationSuccess");
-
+    public static readonly EventId Information = new(22, "Information");
 }

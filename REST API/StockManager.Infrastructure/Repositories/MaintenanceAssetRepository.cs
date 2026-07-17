@@ -11,7 +11,8 @@ internal sealed class MaintenanceAssetRepository(StockManagerDbContext db)
 {
     public IQueryable<MaintenanceAsset> GetAssets() 
         => GetAll()
-            .AsNoTracking();
+            .AsNoTracking()
+            .Include(a => a.BinLocation);
 
     public async Task<MaintenanceAsset?> GetAssetByIdAsync(Guid id, CancellationToken ct)
         => await _db.MaintenanceAssets.SingleOrDefaultAsync(x => x.Id == id, ct);

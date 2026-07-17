@@ -1,26 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace StockManager.Application.Configurations;
+﻿namespace StockManager.Application.Configurations;
 
 public sealed class CacheSettings
 {
+    public MemoryCacheSettings Memory { get; set; } = new();
+
+    public RedisCacheSettings Redis { get; set; } = new();
+
+    public EntityCacheSettings Product { get; set; } = new();
+
+    public EntityCacheSettings Supplier { get; set; } = new();
+
+    public EntityCacheSettings InventoryItem { get; set; } = new();
+}
+
+
+public sealed class MemoryCacheSettings
+{
+    public int DefaultTtlMinutes { get; set; } = 5;
+}
+
+
+public sealed class RedisCacheSettings
+{
     public int AbsoluteTtlHours { get; set; } = 6;
+
     public int SlidingTtlMinutes { get; set; } = 60;
+}
 
-    //
-    public int ProductAbsoluteTtlHours => AbsoluteTtlHours;
-    public int ProductSlidingTtlMinutes => SlidingTtlMinutes;
 
-    //
-    public int SupplierAbsoluteTtlHours => AbsoluteTtlHours;
-    public int SupplierSlidingTtlMinutes => SlidingTtlMinutes;
+public sealed class EntityCacheSettings
+{
+    public int AbsoluteTtlHours { get; set; } = 6;
 
-    //
-    public int InventoryItemAbsoluteTtlHours => AbsoluteTtlHours;
-    public int InventoryItemSlidingTtlMinutes => SlidingTtlMinutes;
-
+    public int SlidingTtlMinutes { get; set; } = 60;
 }

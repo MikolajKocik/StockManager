@@ -15,7 +15,11 @@ internal sealed class MaintenanceIncidentRepository(StockManagerDbContext db)
 
     public IQueryable<MaintenanceIncident> GetIncidents()
         => GetAll()
-            .AsNoTracking();
+            .AsNoTracking()      
+            .Include(i => i.ReportedBy)
+            .Include(i => i.AssignedTo)
+            .Include(i => i.Asset)
+            .Include(i => i.BinLocation);
 
     public async Task<MaintenanceIncident?> GetIncidentByIdAsync(int id, CancellationToken ct)
         => await _db.MaintenanceIncidents

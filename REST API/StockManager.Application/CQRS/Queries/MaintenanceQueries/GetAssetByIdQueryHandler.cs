@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.MaintenanceDtos;
 using StockManager.Application.Helpers.Error;
@@ -9,41 +10,43 @@ using StockManager.Core.Domain.Models.MaintenanceAssetEntity;
 
 namespace StockManager.Application.CQRS.Queries.MaintenanceQueries;
 
-public sealed class GetAssetByIdQueryHandler : IQueryHandler<GetAssetByIdQuery, MaintenanceAssetDto>
-{
-    private readonly IMaintenanceAssetRepository _assetRepository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<GetAssetByIdQueryHandler> _logger;
-
-    public GetAssetByIdQueryHandler(
+public sealed class GetAssetByIdQueryHandler(
         IMaintenanceAssetRepository assetRepository,
         IMapper mapper,
-        ILogger<GetAssetByIdQueryHandler> logger)
+        ILogger<GetAssetByIdQueryHandler> logger
+    ) : IQueryHandler<GetAssetByIdQuery, MaintenanceAssetDto>
+{
+    private readonly IMaintenanceAssetRepository _assetRepository = assetRepository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<GetAssetByIdQueryHandler> _logger = logger;
+
+    public async Task<Result<MaintenanceAssetDto>> Handle(GetAssetByIdQuery query, CancellationToken ct)
     {
-        _assetRepository = assetRepository;
-        _mapper = mapper;
-        _logger = logger;
-    }
+        MaintenanceAsset? asset = await _assetRepository.GetAssetWithDetailsByIdAsync(query.Id, ct);
 
-    public async Task<Result<MaintenanceAssetDto>> Handle(GetAssetByIdQuery query, CancellationToken cancellationToken)
-    {
-        try
+        if (asset is null)
         {
-            MaintenanceAsset? asset = await _assetRepository.GetAssetWithDetailsByIdAsync(query.Id, cancellationToken);
+            GeneralLogError.ArgumentException(
+                _logger,
+                $"Maintenance asset with ID {query.Id} was not found.",
+                default
+            );
 
-            if (asset == null)
-            {
-                return Result<MaintenanceAssetDto>.Failure(
-                    new Error($"Maintenance asset with ID {query.Id} was not found.", ErrorCodes.MaintenanceAssetNotFound));
-            }
+            return Result<MaintenanceAssetDto>.Failure(
+                new Error(
+                    $"Maintenance asset with ID {query.Id} was not found.",
+                    ErrorCodes.MaintenanceAssetNotFound
+                )
+            );
+        }
 
-            MaintenanceAssetDto dto = _mapper.Map<MaintenanceAssetDto>(asset);
-            return Result<MaintenanceAssetDto>.Success(dto);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to retrieve maintenance asset {AssetId}: {Message}", query.Id, ex.Message);
-            throw;
-        }
+        GeneralLogInfo.Information(
+                _logger,
+                $"Successfully retrieved maintenance asset with ID {query.Id}.",
+                default
+            );
+        
+        MaintenanceAssetDto dto = _mapper.Map<MaintenanceAssetDto>(asset);
+        return Result<MaintenanceAssetDto>.Success(dto);  
     }
 }

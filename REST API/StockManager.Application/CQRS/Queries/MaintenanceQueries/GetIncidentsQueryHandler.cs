@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.MaintenanceDtos;
 using StockManager.Application.Helpers.Error;
@@ -11,70 +12,73 @@ using StockManager.Core.Domain.Models.MaintenanceIncidentEntity;
 
 namespace StockManager.Application.CQRS.Queries.MaintenanceQueries;
 
-public sealed class GetIncidentsQueryHandler : IQueryHandler<GetIncidentsQuery, List<MaintenanceIncidentDto>>
-{
-    private readonly IMaintenanceIncidentRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<GetIncidentsQueryHandler> _logger;
-
-    public GetIncidentsQueryHandler(
+public sealed class GetIncidentsQueryHandler(
         IMaintenanceIncidentRepository repository,
         IMapper mapper,
-        ILogger<GetIncidentsQueryHandler> logger)
+        ILogger<GetIncidentsQueryHandler> logger
+    ) : IQueryHandler<GetIncidentsQuery, IReadOnlyList<MaintenanceIncidentDto>>
+{
+    private readonly IMaintenanceIncidentRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<GetIncidentsQueryHandler> _logger = logger;
+
+    public async Task<Result<IReadOnlyList<MaintenanceIncidentDto>>> Handle(GetIncidentsQuery query, CancellationToken ct)
     {
-        _repository = repository;
-        _mapper = mapper;
-        _logger = logger;
-    }
+        IQueryable<MaintenanceIncident> incidentsQuery = _repository.GetIncidents();
 
-    public async Task<Result<List<MaintenanceIncidentDto>>> Handle(GetIncidentsQuery query, CancellationToken cancellationToken)
-    {
-        try
+        if (!string.IsNullOrWhiteSpace(query.Status))
         {
-            IQueryable<MaintenanceIncident> incidentsQuery = _repository.GetIncidents()
-                .Include(i => i.ReportedBy)
-                .Include(i => i.AssignedTo)
-                .Include(i => i.Asset)
-                .Include(i => i.BinLocation)
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(query.Status))
+            if (Enum.TryParse<IncidentStatus>(query.Status, true, out IncidentStatus statusEnum))
             {
-                if (Enum.TryParse<IncidentStatus>(query.Status, true, out IncidentStatus statusEnum))
-                {
-                    incidentsQuery = incidentsQuery.Where(i => i.Status == statusEnum);
-                }
-                else
-                {
-                    return Result<List<MaintenanceIncidentDto>>.Failure(
-                        new Error("Invalid status filter value.", ErrorCodes.GeneralBadRequest));
-                }
+                incidentsQuery = incidentsQuery.Where(i => i.Status == statusEnum);
             }
-
-            if (!string.IsNullOrWhiteSpace(query.Priority))
+            else
             {
-                if (Enum.TryParse<IncidentPriority>(query.Priority, true, out IncidentPriority priorityEnum))
-                {
-                    incidentsQuery = incidentsQuery.Where(i => i.Priority == priorityEnum);
-                }
-                else
-                {
-                    return Result<List<MaintenanceIncidentDto>>.Failure(
-                        new Error("Invalid priority filter value.", ErrorCodes.GeneralBadRequest));
-                }
+                GeneralLogError.InvalidOperationException(
+                    _logger,
+                    $"Invalid status filter value: {query.Status}.",
+                    default
+                );
+
+                return Result<IReadOnlyList<MaintenanceIncidentDto>>.Failure(
+                    new Error(
+                        "Invalid status filter value.",
+                        ErrorCodes.GeneralBadRequest
+                    )
+                );
             }
-
-            List<MaintenanceIncident> incidents = await incidentsQuery
-                .OrderByDescending(i => i.CreatedAt)
-                .ToListAsync(cancellationToken);
-
-            List<MaintenanceIncidentDto> dtos = _mapper.Map<List<MaintenanceIncidentDto>>(incidents);
-            return Result<List<MaintenanceIncidentDto>>.Success(dtos);
         }
-        catch (Exception ex)
+
+        if (!string.IsNullOrWhiteSpace(query.Priority))
         {
-            _logger.LogError(ex, "An error occurred while fetching maintenance incidents: {Message}", ex.Message);
-            throw;
+             if (Enum.TryParse<IncidentPriority>(query.Priority, true, out IncidentPriority priorityEnum))
+            {
+                incidentsQuery = incidentsQuery.Where(i => i.Priority == priorityEnum);
+            }
+            else
+            {
+                GeneralLogError.InvalidOperationException(
+                    _logger,
+                    $"Invalid priority filter value: {query.Priority}.",
+                    default
+                );
+
+                return Result<IReadOnlyList<MaintenanceIncidentDto>>.Failure(
+                    new Error(
+                        "Invalid priority filter value.",
+                        ErrorCodes.GeneralBadRequest
+                    )
+                );
+            }
         }
+
+        List<MaintenanceIncident> incidents = await incidentsQuery
+            .OrderByDescending(i => i.CreatedAt)
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(ct);
+
+        List<MaintenanceIncidentDto> dtos = _mapper.Map<List<MaintenanceIncidentDto>>(incidents);
+        return Result<IReadOnlyList<MaintenanceIncidentDto>>.Success(dtos);
     }
 }

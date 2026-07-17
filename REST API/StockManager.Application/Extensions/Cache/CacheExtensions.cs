@@ -1,18 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
+﻿using System.Text.Json;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using StackExchange.Redis;
-using StockManager.Application.Common.Logging.Supplier.SupplierCache;
-using StockManager.Application.Configurations;
-using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 
-namespace StockManager.Application.Extensions.Redis;
+namespace StockManager.Application.Extensions.Cache;
 
 internal static class CacheExtensions
 {
@@ -30,13 +19,12 @@ internal static class CacheExtensions
     /// langword="true"/> if the value was successfully retrieved and deserialized; otherwise, <see
     /// langword="false"/>.</description></item> <item><description><c>Value</c>: The deserialized value of type
     /// <typeparamref name="T"/> if found; otherwise, <see langword="null"/>.</description></item> </list></returns>
-    public static async Task<(bool Found,T? Value)> TryGetFromCacheAsync<T>(  
+    public static async Task<(bool Found,T? Value)> ReadFromCacheAsync<T>(  
         this IDistributedCache cache,
         string cacheKey,
-        CancellationToken cancellationToken = default
-        ) where T : class
+        CancellationToken ct = default) 
     {
-        string? cachedJson = await cache.GetStringAsync(cacheKey, cancellationToken).ConfigureAwait(false);
+        string? cachedJson = await cache.GetStringAsync(cacheKey, ct).ConfigureAwait(false);
 
         if (string.IsNullOrWhiteSpace(cachedJson))
         {
@@ -56,7 +44,7 @@ internal static class CacheExtensions
         }
         catch(JsonException)
         {
-            await cache.RemoveAsync(cacheKey, cancellationToken).ConfigureAwait(false);
+            await cache.RemoveAsync(cacheKey, ct).ConfigureAwait(false);
             return (false, default);
         }
     }
@@ -76,13 +64,13 @@ internal static class CacheExtensions
     /// accessed. Must be greater than zero.</param>
     /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the operation to complete. Optional.</param>
     /// <returns>A task that represents the asynchronous operation.</returns>
-    public static async Task SetCacheObjectAsync<T>(
+    public static async Task SetCacheAsync<T>(
         this IDistributedCache cache,   
         string cacheKey,
         T value,
         int absoluteTtlHours,
         int slidingTtlMinutes,
-        CancellationToken cancellationToken = default
+        CancellationToken ct = default
         )
     {
         string json = JsonSerializer.Serialize(value);
@@ -92,56 +80,6 @@ internal static class CacheExtensions
             AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(absoluteTtlHours),
             SlidingExpiration = TimeSpan.FromMinutes(slidingTtlMinutes)
         };
-        await cache.SetStringAsync(cacheKey, json, options, cancellationToken).ConfigureAwait(false);
-    }
-
-    /// <summary>
-    /// Increments the value of a specified key in Redis and sets its expiration if the key is newly created.
-    /// </summary>
-    /// <remarks>If the key does not exist in Redis, it will be created with an initial value of 1, and the
-    /// specified expiration will be applied. If the key already exists, its value will be incremented, and the
-    /// expiration will not be modified.</remarks>
-    /// <param name="redis">The <see cref="IConnectionMultiplexer"/> instance used to interact with the Redis database.</param>
-    /// <param name="key">The key whose value will be incremented. Cannot be <see langword="null"/> or empty.</param>
-    /// <param name="absoluteExpiration">The duration after which the key will expire if it is newly created. This is only applied when the key is
-    /// incremented for the first time.</param>
-    /// <param name="cancellationToken">A <see cref="CancellationToken"/> to observe while waiting for the operation to complete. The default value is
-    /// <see cref="CancellationToken.None"/>.</param>
-    /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the new value of
-    /// the key after the increment.</returns>
-    public static async Task<long> IncrementKeyAsync(
-        this IConnectionMultiplexer redis,
-        string key,
-        TimeSpan absoluteExpiration,
-        CancellationToken cancellationToken = default
-        )
-    {
-        IDatabase db = redis.GetDatabase();
-        long count = await db.StringIncrementAsync(key).ConfigureAwait(false);
-
-        if (count == 1)
-        {
-            await db.KeyExpireAsync(key, absoluteExpiration).ConfigureAwait(false);
-        }
-
-        return count;
-    }
-
-    /// <summary>
-    /// Asynchronously removes the specified key from the Redis database.
-    /// </summary>
-    /// <param name="redis">The connection multiplexer used to interact with the Redis server.</param>
-    /// <param name="key">The key to be removed. Cannot be <see langword="null"/> or empty.</param>
-    /// <param name="flags">The command flags to use when executing the operation. The default is <see cref="CommandFlags.None"/>.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result is <see langword="true"/> if the key was
-    /// successfully removed; otherwise, <see langword="false"/>.</returns>
-    public static Task<bool> RemoveKeyAsync(
-        this IConnectionMultiplexer redis,
-        string key,
-        CommandFlags flags = CommandFlags.None
-        )
-    {
-        IDatabase db = redis.GetDatabase();
-        return db.KeyDeleteAsync(key, flags);
+        await cache.SetStringAsync(cacheKey, json, options, ct).ConfigureAwait(false);
     }
 }

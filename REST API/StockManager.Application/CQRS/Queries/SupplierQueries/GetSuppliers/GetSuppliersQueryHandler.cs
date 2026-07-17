@@ -1,33 +1,23 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
 using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
 
-public sealed class GetSuppliersQueryHandler : IQueryHandler<GetSuppliersQuery, IEnumerable<SupplierDto>>
+public sealed class GetSuppliersQueryHandler(
+    ISupplierRepository supplierRepository,
+    IMapper mapper) : IQueryHandler<GetSuppliersQuery, IReadOnlyList<SupplierDto>>
 {
-    private readonly ISupplierRepository _supplierRepository;
-    private readonly IMapper _mapper;
+    private readonly ISupplierRepository _supplierRepository = supplierRepository;
+    private readonly IMapper _mapper = mapper;
 
-    public GetSuppliersQueryHandler(
-        ISupplierRepository supplierRepository,
-        IMapper mapper
-        )
-    {
-        _supplierRepository = supplierRepository;
-        _mapper = mapper;
-    }
-
-    public async Task<Result<IEnumerable<SupplierDto>>> Handle(GetSuppliersQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<SupplierDto>>> Handle(GetSuppliersQuery query, CancellationToken ct)
     {
         IQueryable<Supplier> suppliers = _supplierRepository.GetSuppliers()
             .IfHasValue(
@@ -43,15 +33,12 @@ public sealed class GetSuppliersQueryHandler : IQueryHandler<GetSuppliersQuery, 
                 !string.IsNullOrWhiteSpace(query.Address?.PostalCode),
                 s => EF.Functions.Like(s.Address.PostalCode, $"%{query.Address!.PostalCode}%"));
 
-        IEnumerable<SupplierDto> dtos = await suppliers
+        List<SupplierDto> dtos = await suppliers
             .ProjectTo<SupplierDto>(_mapper.ConfigurationProvider)
             .Skip((query.PageNumber - 1) * query.PageSize)
             .Take(query.PageSize)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
 
-        return Result<IEnumerable<SupplierDto>>.Success(
-            dtos.Any() 
-            ? dtos
-            : Enumerable.Empty<SupplierDto>());
+        return Result<IReadOnlyList<SupplierDto>>.Success(dtos);
     }
 }

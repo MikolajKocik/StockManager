@@ -10,4 +10,4 @@ public sealed record GetSuppliersQuery(
     AddressDto? Address,
     int PageNumber = 1,
     int PageSize = 10
-    ) : IQuery<IEnumerable<SupplierDto>> { }
+) : IQuery<IReadOnlyList<SupplierDto>>;

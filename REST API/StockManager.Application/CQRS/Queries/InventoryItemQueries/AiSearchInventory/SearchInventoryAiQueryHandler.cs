@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading.Tasks;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
@@ -21,29 +17,21 @@ using StockManager.Core.Domain.Models.InventoryItemEntity;
 
 namespace StockManager.Application.CQRS.Queries.InventoryItemQueries.AiSearchInventory;
 
-public sealed class SearchInventoryAiQueryHandler : IQueryHandler<SearchInventoryAiQuery, List<InventoryItemDto>>
+public sealed class SearchInventoryAiQueryHandler(
+    IRetrievalService retrievalService,
+    IInventoryItemRepository repository,
+    IMapper mapper,
+    ILogger<SearchInventoryAiQueryHandler> logger) : IQueryHandler<SearchInventoryAiQuery, List<InventoryItemDto>>
 {
-    private readonly IRetrievalService _retrievalService;
-    private readonly IInventoryItemRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<SearchInventoryAiQueryHandler> _logger;
+    private readonly IRetrievalService _retrievalService = retrievalService;
+    private readonly IInventoryItemRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<SearchInventoryAiQueryHandler> _logger = logger;
 
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
-
-    public SearchInventoryAiQueryHandler(
-        IRetrievalService retrievalService,
-        IInventoryItemRepository repository,
-        IMapper mapper,
-        ILogger<SearchInventoryAiQueryHandler> logger)
-    {
-        _retrievalService = retrievalService;
-        _repository = repository;
-        _mapper = mapper;
-        _logger = logger;
-    }
 
     public async Task<Result<List<InventoryItemDto>>> Handle(SearchInventoryAiQuery request, CancellationToken cancellationToken)
     {

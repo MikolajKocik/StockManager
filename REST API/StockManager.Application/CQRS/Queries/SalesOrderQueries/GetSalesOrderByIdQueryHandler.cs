@@ -11,21 +11,14 @@ using StockManager.Core.Domain.Models.SalesOrderEntity;
 
 namespace StockManager.Application.CQRS.Queries.SalesOrderQueries;
 
-public sealed class GetSalesOrderByIdQueryHandler : IQueryHandler<GetSalesOrderByIdQuery, SalesOrderDto>
+public sealed class GetSalesOrderByIdQueryHandler(
+    ISalesOrderRepository repository,
+    IMapper mapper,
+    ILogger<GetSalesOrderByIdQueryHandler> logger) : IQueryHandler<GetSalesOrderByIdQuery, SalesOrderDto>
 {
-    private readonly ISalesOrderRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<GetSalesOrderByIdQueryHandler> _logger;
-
-    public GetSalesOrderByIdQueryHandler(
-        ISalesOrderRepository repository,
-        IMapper mapper,
-        ILogger<GetSalesOrderByIdQueryHandler> logger)
-    {
-        _repository = repository;
-        _mapper = mapper;
-        _logger = logger;
-    }
+    private readonly ISalesOrderRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<GetSalesOrderByIdQueryHandler> _logger = logger;
 
     public async Task<Result<SalesOrderDto>> Handle(GetSalesOrderByIdQuery query, CancellationToken ct)
     {

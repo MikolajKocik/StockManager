@@ -18,9 +18,7 @@ internal sealed class ProductRepository(StockManagerDbContext db)
 
     public IQueryable<Product> GetProducts()
         => GetAll()
-            .AsNoTracking()
-            .Include(s => s.Supplier)
-            .ThenInclude(a => a.Address);
+            .AsNoTracking();
 
     public void AddProduct(Product product)
         => Add(product);

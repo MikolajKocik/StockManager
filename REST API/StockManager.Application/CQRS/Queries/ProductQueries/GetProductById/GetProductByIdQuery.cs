@@ -3,12 +3,4 @@ using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
 
-public sealed class GetProductByIdQuery : IQuery<ProductDto>
-{
-    public int Id { get; set; }
-
-    public GetProductByIdQuery(int id)
-    {
-        Id = id;
-    }
-}
+public sealed record GetProductByIdQuery(int Id) : IQuery<ProductDto>;

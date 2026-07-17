@@ -8,8 +8,9 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.CustomerQueries.GetCustomers;
 
-public sealed class GetCustomersQueryHandler(ICustomerRepository repository,IMapper mapper) 
-    : IQueryHandler<GetCustomersQuery, IReadOnlyList<CustomerDto>>
+public sealed class GetCustomersQueryHandler(
+    ICustomerRepository repository,
+    IMapper mapper) : IQueryHandler<GetCustomersQuery, IReadOnlyList<CustomerDto>>
 {
     private readonly ICustomerRepository _repository = repository;
     private readonly IMapper _mapper = mapper;

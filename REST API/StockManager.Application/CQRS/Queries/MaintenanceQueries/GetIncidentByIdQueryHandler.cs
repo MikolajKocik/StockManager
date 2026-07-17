@@ -20,10 +20,9 @@ public sealed class GetIncidentByIdQueryHandler(
     private readonly IMapper _mapper = mapper;
     private readonly ILogger<GetIncidentByIdQueryHandler> _logger = logger;
 
-    public async Task<Result<MaintenanceIncidentDto>> Handle(GetIncidentByIdQuery query, CancellationToken cancellationToken)
-    {
-       
-        MaintenanceIncident incident = await _incidentRepository.GetIncidentWithDetailsByIdAsync(query.Id, cancellationToken);
+    public async Task<Result<MaintenanceIncidentDto>> Handle(GetIncidentByIdQuery query, CancellationToken ct)
+    { 
+        MaintenanceIncident incident = await _incidentRepository.GetIncidentWithDetailsByIdAsync(query.Id, ct);
 
         if (incident == null)
         {

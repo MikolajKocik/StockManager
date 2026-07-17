@@ -1,31 +1,25 @@
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
-using MediatR;
-using Microsoft.EntityFrameworkCore;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.WarehouseOperationDtos;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 
 namespace StockManager.Application.CQRS.Queries.WarehouseOperationQueries;
 
-public sealed class GetWarehouseOperationsQueryHandler : IQueryHandler<GetWarehouseOperationsQuery, List<WarehouseOperationDto>>
+public sealed class GetWarehouseOperationsQueryHandler(
+        IWarehouseOperationRepository repository,
+        IMapper mapper
+    ) : IQueryHandler<GetWarehouseOperationsQuery, IReadOnlyList<WarehouseOperationDto>>
 {
-    private readonly IWarehouseOperationRepository _repository;
-    private readonly IMapper _mapper;
+    private readonly IWarehouseOperationRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
-    public GetWarehouseOperationsQueryHandler(IWarehouseOperationRepository repository, IMapper mapper)
+    public async Task<Result<IReadOnlyList<WarehouseOperationDto>>> Handle(GetWarehouseOperationsQuery query, CancellationToken ct)
     {
-        _repository = repository;
-        _mapper = mapper;
-    }
+        IReadOnlyList<WarehouseOperation> operations = await _repository.GetOperationsWithItemsAsync(ct);
 
-    public async Task<Result<List<WarehouseOperationDto>>> Handle(GetWarehouseOperationsQuery query, CancellationToken cancellationToken)
-    {
-        var operations = await _repository.GetOperationsWithItemsAsync(cancellationToken);
-
-        var dtos = _mapper.Map<List<WarehouseOperationDto>>(operations);
-        return Result<List<WarehouseOperationDto>>.Success(dtos);
+        List<WarehouseOperationDto> dtos = _mapper.Map<List<WarehouseOperationDto>>(operations);
+        return Result<IReadOnlyList<WarehouseOperationDto>>.Success(dtos);
     }
 }

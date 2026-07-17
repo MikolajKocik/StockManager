@@ -11,18 +11,13 @@ using StockManager.Core.Domain.Models.ShipmentEntity;
 
 namespace StockManager.Application.CQRS.Queries.ShipmentQueries.GetShipments;
 
-public sealed class GetShipmentsQueryHandler : IQueryHandler<GetShipmentsQuery, IReadOnlyList<ShipmentDto>>
-{
-    private readonly IShipmentRepository _shipmentRepository;
-    private readonly IMapper _mapper;
-
-    public GetShipmentsQueryHandler(
+public sealed class GetShipmentsQueryHandler(
         IShipmentRepository shipmentRepository,
-        IMapper mapper)
-    {
-        _shipmentRepository = shipmentRepository;
-        _mapper = mapper;
-    }
+        IMapper mapper  
+    ) : IQueryHandler<GetShipmentsQuery, IReadOnlyList<ShipmentDto>>
+{
+    private readonly IShipmentRepository _shipmentRepository = shipmentRepository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<Result<IReadOnlyList<ShipmentDto>>> Handle(GetShipmentsQuery query, CancellationToken ct)
     {
@@ -54,11 +49,11 @@ public sealed class GetShipmentsQueryHandler : IQueryHandler<GetShipmentsQuery, 
         }
 
         List<ShipmentDto> dtos = await shipments
-                 .ProjectTo<ShipmentDto>(_mapper.ConfigurationProvider)
-                 .OrderByDescending(s => s.ShippedDate)
-                 .Skip((query.PageNumber - 1) * query.PageSize)
-                 .Take(query.PageSize)
-                 .ToListAsync(ct);
+            .ProjectTo<ShipmentDto>(_mapper.ConfigurationProvider)
+            .OrderByDescending(s => s.ShippedDate)
+            .Skip((query.PageNumber - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(ct);
 
         return Result<IReadOnlyList<ShipmentDto>>.Success(dtos);
     }

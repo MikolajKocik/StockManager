@@ -8,16 +8,12 @@ using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 
 namespace StockManager.Application.CQRS.Queries.PurchaseOrderQueries;
 
-public sealed class GetPurchaseOrdersQueryHandler : IQueryHandler<GetPurchaseOrdersQuery, IReadOnlyList<PurchaseOrderDto>>
+public sealed class GetPurchaseOrdersQueryHandler(
+    IPurchaseOrderRepository repository,
+    IMapper mapper) : IQueryHandler<GetPurchaseOrdersQuery, IReadOnlyList<PurchaseOrderDto>>
 {
-    private readonly IPurchaseOrderRepository _repository;
-    private readonly IMapper _mapper;
-
-    public GetPurchaseOrdersQueryHandler(IPurchaseOrderRepository repository, IMapper mapper)
-    {
-        _repository = repository;
-        _mapper = mapper;
-    }
+    private readonly IPurchaseOrderRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<Result<IReadOnlyList<PurchaseOrderDto>>> Handle(GetPurchaseOrdersQuery query, CancellationToken ct)
     {

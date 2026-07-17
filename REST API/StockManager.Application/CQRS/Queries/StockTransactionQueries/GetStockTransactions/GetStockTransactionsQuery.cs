@@ -11,4 +11,4 @@ public sealed record GetStockTransactionsQuery(
     DateTime? DateTo = null,
     int Page = 1,
     int PageSize = 10
-) : IQuery<IEnumerable<StockTransactionDto>>;
+) : IQuery<ICollection<StockTransactionDto>>;

@@ -51,11 +51,11 @@ public sealed class GetInventoryItemByIdQueryHandler(
         {
             InventoryItemCacheLog.ReturnCacheFromInventoryItem(_logger, $"[REDIS]: {cacheKey}", default);
 
-        _memoryCache.SetMemoryCache(
-            cacheKey,
-            dtoFromCache,
-            TimeSpan.FromMinutes(_cacheSettings.Value.Memory.DefaultTtlMinutes)
-        );
+            _memoryCache.SetMemoryCache(
+                cacheKey,
+                dtoFromCache,
+                TimeSpan.FromMinutes(_cacheSettings.Value.Memory.DefaultTtlMinutes)
+            );
 
             return Result<InventoryItemDto>.Success(dtoFromCache);
         }

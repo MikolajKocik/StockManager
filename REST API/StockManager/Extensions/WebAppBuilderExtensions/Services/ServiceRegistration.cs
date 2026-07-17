@@ -14,7 +14,6 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Infrastructure.DomainServices;
 using StockManager.Infrastructure.Jobs;
-using StockManager.Infrastructure.Repositories;
 using StockManager.Infrastructure.Services;
 
 
@@ -61,9 +60,7 @@ internal static class ServiceRegistration
         services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
         services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
         services.AddSingleton<IPdfService, PdfDocumentService>();
-
-        services.AddScoped<IWarehouseOperationRepository, WarehouseOperationRepository>();
-
+        
         // Background Workers
         services.AddHostedService<DocumentGenerationWorker>();
     }

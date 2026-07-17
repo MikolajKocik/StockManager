@@ -8,28 +8,20 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.CustomerQueries.GetCustomers;
 
-public sealed class GetCustomersQueryHandler : IQueryHandler<GetCustomersQuery, IReadOnlyList<CustomerDto>>
+public sealed class GetCustomersQueryHandler(ICustomerRepository repository,IMapper mapper) 
+    : IQueryHandler<GetCustomersQuery, IReadOnlyList<CustomerDto>>
 {
-    private readonly ICustomerRepository _repository;
-    private readonly IMapper _mapper;
+    private readonly ICustomerRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
-    public GetCustomersQueryHandler(
-        ICustomerRepository repository,
-        IMapper mapper
-        )
-    {
-        _repository = repository;
-        _mapper = mapper;
-    }
-
-    public async Task<Result<IReadOnlyList<CustomerDto>>> Handle(GetCustomersQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<CustomerDto>>> Handle(GetCustomersQuery query, CancellationToken ct)
     {
         List<CustomerDto> dtos = await _repository.GetCustomers()
             .ProjectTo<CustomerDto>(_mapper.ConfigurationProvider)
             .OrderBy(c => c.Id)
             .Skip((query.Page - 1) * query.PageSize)
             .Take(query.PageSize)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
 
         return Result<IReadOnlyList<CustomerDto>>.Success(dtos);
     }

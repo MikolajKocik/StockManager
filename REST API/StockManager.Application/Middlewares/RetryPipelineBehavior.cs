@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using Polly;
 using Polly.Retry;
 
-namespace StockManager.Application.Common.PipelineBehavior;
+namespace StockManager.Application.Middlewares;
 
 public sealed class RetryPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>

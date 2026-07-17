@@ -5,10 +5,10 @@ using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.Categories;
 using StockManager.Application.Common.Logging.General;
-using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Core.Domain.Interfaces.Common;
 
-namespace StockManager.Application.Common.PipelineBehavior;
+namespace StockManager.Application.Middlewares;
 
 public sealed class TrackingBehavior<TRequest, TResponse>(
         ILogger<TrackingBehavior<TRequest, TResponse>> logger,
@@ -80,11 +80,6 @@ public sealed class TrackingBehavior<TRequest, TResponse>(
             catch (OperationCanceledException ex)
             {
                 GeneralLogWarning.RequestCancelled(_logger, typeof(TRequest).Name, ex);
-                throw;
-            }
-            catch (Exception ex)
-            {
-                GeneralLogError.UnhandledException(_logger, typeof(TRequest).Name, ex);
                 throw;
             }
         }

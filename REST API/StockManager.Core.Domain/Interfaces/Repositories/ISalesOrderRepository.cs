@@ -1,8 +1,9 @@
 ﻿using StockManager.Core.Domain.Models.SalesOrderEntity;
+using StockManager.Core.Domain.Interfaces.Common;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface ISalesOrderRepository 
+public interface ISalesOrderRepository : IBaseRepository
 {
     IQueryable<SalesOrder> GetSalesOrders();
 

@@ -1,9 +1,9 @@
-﻿using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Core.Domain.Models.SupplierEntity;
+﻿using StockManager.Core.Domain.Models.SupplierEntity;
+using StockManager.Core.Domain.Interfaces.Common;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface ISupplierRepository
+public interface ISupplierRepository : IBaseRepository
 {
     Task<Supplier?> GetSupplierByIdAsync(Guid? supplierId, CancellationToken ct = default);
     void AddSupplier(Supplier supplier);

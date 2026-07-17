@@ -1,8 +1,9 @@
 using StockManager.Core.Domain.Models.PurchaseOrderEntity;
+using StockManager.Core.Domain.Interfaces.Common;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface IPurchaseOrderRepository
+public interface IPurchaseOrderRepository : IBaseRepository
 {
     IQueryable<PurchaseOrder> GetPurchaseOrders();
     void AddPurchaseOrder(PurchaseOrder purchaseOrder);    

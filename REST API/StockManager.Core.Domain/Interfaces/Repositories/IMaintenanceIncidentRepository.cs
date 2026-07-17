@@ -1,8 +1,9 @@
 using StockManager.Core.Domain.Models.MaintenanceIncidentEntity;
+using StockManager.Core.Domain.Interfaces.Common;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
-public interface IMaintenanceIncidentRepository
+public interface IMaintenanceIncidentRepository : IBaseRepository
 {
     IQueryable<MaintenanceIncident> GetIncidents();
     Task<MaintenanceIncident?> GetIncidentByIdAsync(int id, CancellationToken ct);

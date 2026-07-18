@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
@@ -10,8 +11,8 @@ namespace StockManager.Infrastructure.Repositories;
 internal sealed class MaintenanceIncidentRepository(StockManagerDbContext db) 
     : BaseOperations<MaintenanceIncident>(db), IMaintenanceIncidentRepository
 {
-    private readonly static IncidentStatus[] _activeStatuses =
-        [IncidentStatus.Reported, IncidentStatus.InProgress];
+    private static readonly HashSet<IncidentStatus> _activeStatuses =
+        new([IncidentStatus.Reported, IncidentStatus.InProgress]);
 
     public IQueryable<MaintenanceIncident> GetIncidents()
         => GetAll()

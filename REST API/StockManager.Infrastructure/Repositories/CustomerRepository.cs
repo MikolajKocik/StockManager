@@ -17,4 +17,7 @@ internal sealed class CustomerRepository(StockManagerDbContext db)
         => await _db.Customers
             .Where(x => x.Id == id)
             .SingleOrDefaultAsync(cancellationToken);
+
+    public void AddCustomer(Customer customer)
+        => Add(customer);
 }

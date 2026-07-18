@@ -7,4 +7,5 @@ public interface ICustomerRepository : IBaseRepository
 {
     IQueryable<Customer> GetCustomers();
     Task<Customer?> GetCustomerByIdAsync(int id, CancellationToken cancellationToken = default);
+    void AddCustomer(Customer customer);
 }

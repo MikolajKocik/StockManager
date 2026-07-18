@@ -58,12 +58,12 @@ public sealed class StockTransactionController : ControllerBase
 
         var query = new GetStockTransactionsQuery(inventoryItemId, type, dateFrom, dateTo);
 
-        Result<IEnumerable<StockTransactionDto>> result = await _mediator.Send(query, cancellationToken);
+        Result<ICollection<StockTransactionDto>> result = await _mediator.Send(query, cancellationToken);
 
         StockTransactionLogInfo.LogReturnedListOfStockTransactions(_logger, default);
 
-        return Ok(new StockTransactionDtoCollection 
-        { 
+        return Ok(new StockTransactionDtoCollection
+        {
             Data = result.Value!.ToList().AsReadOnly()
         });
     }
@@ -82,7 +82,7 @@ public sealed class StockTransactionController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<ActionResult<StockTransactionDto?>> GetStockTransactionById([FromRoute] int id, CancellationToken cancellationToken)
     {
-        
+
         Result<StockTransactionDto> result = await _mediator.Send(new GetStockTransactionByIdQuery(id), cancellationToken);
 
         if (result.IsSuccess)
@@ -93,9 +93,9 @@ public sealed class StockTransactionController : ControllerBase
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
 
-        return new ObjectResult(problem) 
-        { 
-            StatusCode = problem.Status 
+        return new ObjectResult(problem)
+        {
+            StatusCode = problem.Status
         };
     }
 
@@ -127,8 +127,8 @@ public sealed class StockTransactionController : ControllerBase
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
 
-        return new ObjectResult(problem) 
-        { 
+        return new ObjectResult(problem)
+        {
             StatusCode = problem.Status
         };
     }
@@ -173,7 +173,7 @@ public sealed class StockTransactionController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> DeleteStockTransaction([FromRoute] int id, CancellationToken cancellationToken)
-    {  
+    {
         Result<Unit> result = await _mediator.Send(new DeleteStockTransactionCommand(id), cancellationToken);
 
         if (result.IsSuccess)

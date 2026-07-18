@@ -1,14 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Security.Claims;
-using System.Threading;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.MaintenanceCommands;
 using StockManager.Application.CQRS.Queries.MaintenanceQueries;
@@ -44,7 +38,7 @@ public sealed class MaintenanceController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var query = new GetAssetsQuery(type, status);
-        Result<List<MaintenanceAssetDto>> result = await _mediator.Send(query, cancellationToken);
+        Result<IReadOnlyList<MaintenanceAssetDto>> result = await _mediator.Send(query, cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -81,7 +75,7 @@ public sealed class MaintenanceController : ControllerBase
         CancellationToken cancellationToken = default)
     {
         var query = new GetIncidentsQuery(status, priority);
-        Result<List<MaintenanceIncidentDto>> result = await _mediator.Send(query, cancellationToken);
+        Result<IReadOnlyList<MaintenanceIncidentDto>> result = await _mediator.Send(query, cancellationToken);
 
         if (result.IsSuccess)
         {

@@ -2,17 +2,17 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using StockManager.Application.CQRS.Queries.WarehouseOperationQueries;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.CQRS.Commands.DocumentsCommand;
+using StockManager.Application.CQRS.Queries.DocumentQueries;
+using StockManager.Application.CQRS.Queries.WarehouseOperationQueries;
+using StockManager.Application.Dtos.ModelsDto.InvoiceDtos;
 using StockManager.Application.Dtos.ModelsDto.WarehouseOperationDtos;
+using StockManager.Application.Extensions.ErrorExtensions;
+using StockManager.Core.Domain.Interfaces.Services;
+using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 using StockManager.Infrastructure.Ollama.Interfaces;
 using StockManager.Infrastructure.Ollama.Requests;
-using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Application.Extensions.ErrorExtensions;
-using StockManager.Core.Domain.Models.WarehouseOperationEntity;
-using StockManager.Application.CQRS.Commands.DocumentsCommand;
-using StockManager.Application.Dtos.ModelsDto.InvoiceDtos;
-using StockManager.Application.CQRS.Queries.DocumentQueries;
 
 namespace StockManager.Controllers;
 
@@ -41,7 +41,7 @@ public sealed class DocumentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDocuments(CancellationToken cancellationToken)
     {
-        Result<List<DocumentDto>> result = await _mediator.Send(new GetDocumentsQuery(), cancellationToken);
+        Result<IReadOnlyList<DocumentDto>> result = await _mediator.Send(new GetDocumentsQuery(), cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -55,7 +55,7 @@ public sealed class DocumentsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<FileMetadata>>> GetFilesMetadataAsync(CancellationToken cancellationToken)
     {
-        Result<List<FileMetadata>> result = await _mediator.Send(new GetFileMetadataQuery(), cancellationToken);
+        Result<IReadOnlyList<FileMetadata>> result = await _mediator.Send(new GetFileMetadataQuery(), cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -63,7 +63,7 @@ public sealed class DocumentsController : ControllerBase
         }
 
         return BadRequest(result.Error);
-    }      
+    }
 
     [HttpGet("invoice/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -90,8 +90,8 @@ public sealed class DocumentsController : ControllerBase
             return BadRequest("No file uploaded.");
         }
 
-        using Stream stream = file.OpenReadStream();
-        
+        await using Stream stream = file.OpenReadStream();
+
         var command = new UploadDocumentCommand(
             file.FileName,
             file.ContentType,
@@ -100,10 +100,10 @@ public sealed class DocumentsController : ControllerBase
         );
 
         Result<FileMetadata> result = await _mediator.Send(command, cancellationToken);
-        
+
         if (!result.IsSuccess)
         {
-            
+
             var problem = ErrorExtension.ToProblemDetails(result.Error!, 400);
 
             return new ObjectResult(problem)
@@ -118,13 +118,14 @@ public sealed class DocumentsController : ControllerBase
     [HttpPost("ai/ask")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> AskAsync(
-        [FromBody] AskQuestionRequest request, 
+        [FromBody] AskQuestionRequest request,
         [FromServices] IRetrievalService aiService,
         CancellationToken cancellationToken
     )
     {
         string answer = await aiService.AnswerQuestionAsync(request.Question, cancellationToken);
-        return Ok(new { 
+        return Ok(new
+        {
             Answer = answer,
         });
     }

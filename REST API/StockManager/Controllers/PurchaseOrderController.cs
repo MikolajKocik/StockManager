@@ -41,7 +41,7 @@ public sealed class PurchaseOrdersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<PurchaseOrderDto>>> GetAll(CancellationToken cancellationToken)
     {
-        Result<List<PurchaseOrderDto>> result = await _mediator.Send(new GetPurchaseOrdersQuery(), cancellationToken);
+        Result<IReadOnlyList<PurchaseOrderDto>> result = await _mediator.Send(new GetPurchaseOrdersQuery(), cancellationToken);
 
         if (result.IsSuccess)
         {

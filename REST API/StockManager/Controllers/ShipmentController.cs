@@ -1,9 +1,7 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Shipment;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.ShipmentCommands.AddShipment;
@@ -12,7 +10,6 @@ using StockManager.Application.CQRS.Commands.ShipmentCommands.DeleteShipment;
 using StockManager.Application.CQRS.Commands.ShipmentCommands.EditShipment;
 using StockManager.Application.CQRS.Commands.ShipmentCommands.MarkAsDelivered;
 using StockManager.Application.CQRS.Commands.ShipmentCommands.MarkAsReturned;
-using StockManager.Application.CQRS.Queries.ShipmentQueries;
 using StockManager.Application.CQRS.Queries.ShipmentQueries.GetShipmentById;
 using StockManager.Application.CQRS.Queries.ShipmentQueries.GetShipments;
 using StockManager.Application.Dtos.ModelsDto.ShipmentDtos;
@@ -51,7 +48,7 @@ public class ShipmentController : ControllerBase
         [FromQuery] string? trackingNumber = null,
         [FromQuery] string? status = null,
         [FromQuery] DateTime? shippedDate = null,
-        [FromQuery] DateTime? deliveredDate = null, 
+        [FromQuery] DateTime? deliveredDate = null,
         CancellationToken cancellationToken = default
         )
     {
@@ -62,11 +59,11 @@ public class ShipmentController : ControllerBase
             shippedDate,
             deliveredDate);
 
-        Result<IEnumerable<ShipmentDto>> result = await _mediator.Send(query, cancellationToken);
+        Result<IReadOnlyList<ShipmentDto>> result = await _mediator.Send(query, cancellationToken);
 
         ShipmentLogInfo.LogReturnedListOfShipments(_logger, result, default);
 
-        return Ok(new ShipmentDtoCollection 
+        return Ok(new ShipmentDtoCollection
         {
             Data = result.Value!.ToList().AsReadOnly()
         });
@@ -101,7 +98,7 @@ public class ShipmentController : ControllerBase
     /// <summary>
     /// Creates a new shipment based on the provided command.
     /// </summary>
-    /// <param name="command">The command containing the details required to create a shipment. Cannot be <see langword="null"/>.</param>
+    /// <param name="createDto">The command containing the details required to create a shipment. Cannot be <see langword="null"/>.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns a 201 Created response with the
     /// shipment details if successful, or a 400 Bad Request if the command is <see langword="null"/>.</returns>
@@ -125,7 +122,7 @@ public class ShipmentController : ControllerBase
     /// Updates the shipment details for the specified shipment ID.
     /// </summary>
     /// <param name="id">The unique identifier of the shipment to update.</param>
-    /// <param name="command">The command containing the updated shipment details. Must not be null and the ID must match the specified
+    /// <param name="shipmentUpdate">The command containing the updated shipment details. Must not be null and the ID must match the specified
     /// shipment ID.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <see cref="NoContentResult"/> if
@@ -135,7 +132,7 @@ public class ShipmentController : ControllerBase
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> UpdateShipment([FromRoute] int id, [FromBody] ShipmentUpdateDto shipmentUpdate, CancellationToken cancellationToken)
-    {      
+    {
         Result<Unit> result = await _mediator.Send(new EditShipmentCommand(id, shipmentUpdate), cancellationToken);
 
         if (result.IsSuccess)
@@ -200,8 +197,6 @@ public class ShipmentController : ControllerBase
     /// Marks a shipment as delivered based on the provided command.
     /// </summary>
     /// <param name="id">The identifier of the shipment to be marked as delivered.</param>
-    /// <param name="command">The command containing the details required to mark the shipment as delivered. Must not be null and the ID must
-    /// match the shipment ID.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An <see cref="IActionResult"/> indicating the result of the operation. Returns <see cref="NoContentResult"/> if
     /// the operation is successful, or <see cref="NotFoundResult"/> if the shipment is not found.</returns>

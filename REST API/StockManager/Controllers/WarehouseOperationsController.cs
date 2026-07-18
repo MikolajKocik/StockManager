@@ -2,10 +2,10 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
-using StockManager.Application.CQRS.Commands.WarehouseOperationCommands;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.WarehouseOperationDtos;
+using StockManager.Application.CQRS.Commands.WarehouseOperationCommands;
 using StockManager.Application.CQRS.Queries.WarehouseOperationQueries;
+using StockManager.Application.Dtos.ModelsDto.WarehouseOperationDtos;
 
 namespace StockManager.Controllers;
 
@@ -57,7 +57,7 @@ public sealed class WarehouseOperationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> Get(CancellationToken cancellationToken)
     {
-        Result<List<WarehouseOperationDto>> result = await _mediator.Send(new GetWarehouseOperationsQuery(), cancellationToken);
+        Result<IReadOnlyList<WarehouseOperationDto>> result = await _mediator.Send(new GetWarehouseOperationsQuery(), cancellationToken);
 
         if (result.IsSuccess)
         {

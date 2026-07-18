@@ -1,9 +1,8 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using StockManager.Application.Common.Logging.Supplier;
-using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.SupplierCommands.AddSupplier;
 using StockManager.Application.CQRS.Commands.SupplierCommands.DeleteSupplier;
@@ -28,7 +27,7 @@ public sealed class SupplierController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly ILogger<SupplierController> _logger;
-     
+
     public SupplierController(IMediator mediator, ILogger<SupplierController> logger)
     {
         _mediator = mediator;
@@ -40,13 +39,12 @@ public sealed class SupplierController : ControllerBase
     public async Task<ActionResult<SupplierDtoCollection>> GetSuppliers(
         [FromQuery] string? name = null,
         [FromQuery] AddressDto? address = null,
-        [FromQuery] IEnumerable<ProductDto>? products = null,
         CancellationToken cancellationToken = default
         )
     {
         var query = new GetSuppliersQuery(name, address);
 
-        Result<IEnumerable<SupplierDto>> result = await _mediator.Send(query, cancellationToken);
+        Result<IReadOnlyList<SupplierDto>> result = await _mediator.Send(query, cancellationToken);
 
         SupplierLogInfo.LogSuccesfullReturnedListOfSuppliers(_logger, result, default);
 
@@ -65,14 +63,14 @@ public sealed class SupplierController : ControllerBase
     {
         Result<SupplierDto> result = await _mediator.Send(new GetSupplierByIdQuery(id), cancellationToken);
 
-        if(result.IsSuccess)
+        if (result.IsSuccess)
         {
             SupplierLogInfo.LogSupplierFoundSuccessfull(_logger, result, default);
 
             return Ok(result.Value);
         }
 
-        var problem = ErrorExtension.ToProblemDetails(result.Error! , 404);
+        var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
         SupplierLogError.LogRetrievingSupplierById(_logger, id, result.Error!.Message, default);
 
         return new ObjectResult(problem)
@@ -90,7 +88,7 @@ public sealed class SupplierController : ControllerBase
     {
         Result<SupplierDto> result = await _mediator.Send(new AddSupplierCommand(supplierDto), cancellationToken);
 
-        if(result.IsSuccess)
+        if (result.IsSuccess)
         {
             SupplierLogInfo.LogReturningNewSupplier(_logger, supplierDto, default);
             return CreatedAtAction(nameof(GetSupplierById), new { id = result.Value!.Id }, result.Value);
@@ -116,7 +114,7 @@ public sealed class SupplierController : ControllerBase
     {
         Result<SupplierDto> result = await _mediator.Send(new EditSupplierCommand(id, supplierDto), cancellationToken);
 
-        if(result.IsSuccess)
+        if (result.IsSuccess)
         {
             SupplierLogInfo.LogSupplierModifiedSuccessfull(_logger, id, default);
             return NoContent();

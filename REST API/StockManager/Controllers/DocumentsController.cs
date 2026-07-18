@@ -5,13 +5,11 @@ using Microsoft.AspNetCore.RateLimiting;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.DocumentsCommand;
 using StockManager.Application.CQRS.Queries.DocumentQueries;
-using StockManager.Application.CQRS.Queries.WarehouseOperationQueries;
 using StockManager.Application.Dtos.ModelsDto.InvoiceDtos;
 using StockManager.Application.Dtos.ModelsDto.WarehouseOperationDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
-using StockManager.Infrastructure.Ollama.Interfaces;
 using StockManager.Infrastructure.Ollama.Requests;
 
 namespace StockManager.Controllers;
@@ -38,6 +36,7 @@ public sealed class DocumentsController : ControllerBase
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>A list of documents.</returns>
     [HttpGet]
+    [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetDocuments(CancellationToken cancellationToken)
     {
@@ -52,6 +51,7 @@ public sealed class DocumentsController : ControllerBase
     }
 
     [HttpGet("filesMetadata")]
+    [ResponseCache(Duration = 10, Location = ResponseCacheLocation.Any)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<FileMetadata>>> GetFilesMetadataAsync(CancellationToken cancellationToken)
     {
@@ -66,6 +66,7 @@ public sealed class DocumentsController : ControllerBase
     }
 
     [HttpGet("invoice/{id}")]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<InvoiceDto>> GetInvoiceById([FromRoute] int id, CancellationToken cancellationToken)
     {

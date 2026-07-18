@@ -1,5 +1,5 @@
 ﻿using StockManager.Application.Common.Logging.General;
-using StockManager.Application.Common.Logging.Supplier;
+using Microsoft.AspNetCore.Mvc;
 
 namespace StockManager.Middlewares;
 
@@ -11,33 +11,40 @@ public sealed class ErrorHandlingMiddleware(ILogger<ErrorHandlingMiddleware> log
         {
             await next.Invoke(context);
         }
-        catch(ArgumentNullException ex)
+        catch (ArgumentNullException ex)
         {
             GeneralLogError.ArgumentNullException(logger, ex.Message, ex);
-
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            await context.Response.WriteAsync(string.Join(", ", ex.Message));
+            await WriteProblemAsync(context, StatusCodes.Status404NotFound, "Not found.");
         }
         catch (ArgumentException ex)
         {
             GeneralLogError.ArgumentException(logger, ex.Message, ex);
-
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            await context.Response.WriteAsync(string.Join(", ", ex.Message));
+            await WriteProblemAsync(context, StatusCodes.Status400BadRequest, "Invalid request.");
         }
         catch (InvalidOperationException ex)
         {
             GeneralLogError.InvalidOperationException(logger, ex.Message, ex);
-
-            context.Response.StatusCode = StatusCodes.Status400BadRequest;  
-            await context.Response.WriteAsync(string.Join(", ", ex.Message));
+            await WriteProblemAsync(context, StatusCodes.Status400BadRequest, "Invalid operation.");
         }
         catch (Exception ex)
         {
             GeneralLogError.InternalServerError(logger, ex.InnerException?.Message ?? ex.Message, ex);
-
-            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
-            await context.Response.WriteAsync(string.Join(", ", ex.InnerException?.Message ?? ex.Message)); 
+            await WriteProblemAsync(context, StatusCodes.Status500InternalServerError, "Internal server error occured.");
         }
     }
+    
+    private static async Task WriteProblemAsync(HttpContext context, int statusCode, string title)
+    {
+        var problem = new ProblemDetails
+        {
+            Title = title,
+            Status = statusCode,
+            Extensions = { ["traceId"] = context.TraceIdentifier }
+        };
+
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/problem+json";
+
+        await context.Response.WriteAsJsonAsync(problem, context.RequestAborted);
+    } 
 }

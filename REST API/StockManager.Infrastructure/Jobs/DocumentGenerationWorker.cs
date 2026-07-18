@@ -10,22 +10,16 @@ using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Jobs;
 
-public sealed class DocumentGenerationWorker : BackgroundService
-{
-    private readonly ILogger<DocumentGenerationWorker> _logger;
-    private readonly IServiceScopeFactory _scopeFactory;
-    private readonly IMessageBus _messageBus;
-    private readonly static SemaphoreSlim _semaphore = new(5, 5);
-
-    public DocumentGenerationWorker(
+public sealed class DocumentGenerationWorker(
         ILogger<DocumentGenerationWorker> logger,
         IServiceScopeFactory scopeFactory,
-        IMessageBus messageBus)
-    {
-        _logger = logger;
-        _scopeFactory = scopeFactory;
-        _messageBus = messageBus;
-    }
+        IMessageBus messageBus
+    ) : BackgroundService
+{
+    private readonly ILogger<DocumentGenerationWorker> _logger = logger;
+    private readonly IServiceScopeFactory _scopeFactory = scopeFactory;
+    private readonly IMessageBus _messageBus = messageBus;
+    private readonly static SemaphoreSlim _semaphore = new(5, 5);
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {          
@@ -102,7 +96,7 @@ public sealed class DocumentGenerationWorker : BackgroundService
                 .ToList();
 
             // Generate PDF document
-            using Stream pdfStream = await pdfService.GenerateOperationDocumentAsync(operation, itemsWithNames, cancellationToken);
+            await using Stream pdfStream = await pdfService.GenerateOperationDocumentAsync(operation, itemsWithNames, cancellationToken);
             string fileName = $"{operation.Type}_{operation.Id}_{DateTime.UtcNow:yyyyMMddHHmmss}.pdf";
             string fileUrl = await blobStorage.UploadAsync(pdfStream, fileName, "application/pdf", cancellationToken);
     

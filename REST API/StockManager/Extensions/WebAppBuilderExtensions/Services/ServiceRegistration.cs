@@ -60,9 +60,10 @@ internal static class ServiceRegistration
         services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
         services.AddSingleton<IMessageBus, RabbitMQMessageBus>();
         services.AddSingleton<IPdfService, PdfDocumentService>();
-        
+
         // Background Workers
         services.AddHostedService<DocumentGenerationWorker>();
+        services.AddHostedService<DocumentExtractionWorker>();
     }
 
     private static void RegisterMediatorAdapters(this IServiceCollection services)

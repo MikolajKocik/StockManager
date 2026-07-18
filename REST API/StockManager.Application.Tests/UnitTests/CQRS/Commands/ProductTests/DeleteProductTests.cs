@@ -1,10 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
-using Castle.Core.Logging;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -12,24 +5,27 @@ using Moq;
 using StackExchange.Redis;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Commands.ProductCommands.DeleteProduct;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ProductEntity;
-using Testcontainers.Redis;
 using TestHelpers.ProductFactory;
 
 namespace StockManager.Application.Tests.UnitTests.CQRS.Commands.ProductTests;
+
 public sealed class DeleteProductTests
 {
     private readonly Mock<IProductRepository> _repository;
     private readonly Mock<IConnectionMultiplexer> _redis;
     private readonly Mock<IProductService> _service;
+    private readonly Mock<IUnitOfWork> _uow;
 
     public DeleteProductTests()
     {
         _service = new Mock<IProductService>();
         _repository = new Mock<IProductRepository>();
-        _redis = new Mock<IConnectionMultiplexer>(); 
+        _redis = new Mock<IConnectionMultiplexer>();
+        _uow = new Mock<IUnitOfWork>();
     }
 
     /// <summary>
@@ -69,7 +65,8 @@ public sealed class DeleteProductTests
             _repository.Object,
             logger,
             _redis.Object,
-            _service.Object
+            _service.Object,
+            _uow.Object
             );
 
         var command = new DeleteProductCommand(1);

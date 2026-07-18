@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using AutoMapper;
 using FluentAssertions;
 using MockQueryable;
@@ -10,11 +9,8 @@ using StockManager.Application.Mappings.ProductProfile;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
-using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.ProductEntity;
-using StockManager.Core.Domain.Models.SupplierEntity;
 using TestHelpers.ProductFactory;
-using Xunit.Sdk;
 
 namespace StockManager.Application.Tests.UnitTests.CQRS.Queries.ProductTests;
 
@@ -36,7 +32,7 @@ public sealed class GetProductsQueryHandlerTests
     {
         //
         var emptyList = new List<Product>();
-        IQueryable<Product> mockQueryable = emptyList.AsQueryable().BuildMock(); 
+        IQueryable<Product> mockQueryable = emptyList.AsQueryable().BuildMock();
 
         _repository
             .Setup(r => r.GetProducts())
@@ -63,7 +59,7 @@ public sealed class GetProductsQueryHandlerTests
             );
 
         //
-        Result<IEnumerable<ProductDto>> result = await handler.Handle(query, CancellationToken.None);
+        Result<IReadOnlyList<ProductDto>> result = await handler.Handle(query, CancellationToken.None);
 
         //
         result.Value.Should().BeEmpty();
@@ -121,7 +117,7 @@ public sealed class GetProductsQueryHandlerTests
             );
 
         //
-        Result<IEnumerable<ProductDto>> result = await handler.Handle(query, CancellationToken.None);
+        Result<IReadOnlyList<ProductDto>> result = await handler.Handle(query, CancellationToken.None);
 
         //
         var list = result.Value!.ToList();

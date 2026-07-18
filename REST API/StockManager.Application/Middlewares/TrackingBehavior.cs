@@ -14,8 +14,7 @@ public sealed class TrackingBehavior<TRequest, TResponse>(
         ILogger<TrackingBehavior<TRequest, TResponse>> logger,
         IEnumerable<IValidator<TRequest>> validators,
         IUnitOfWork uow
-    )
-    : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest
+    ) : IPipelineBehavior<TRequest, TResponse> where TRequest : IRequest
 {
     private readonly ILogger<TrackingBehavior<TRequest, TResponse>> _logger = logger;
     private readonly IEnumerable<IValidator<TRequest>> _validators = validators;

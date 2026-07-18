@@ -1,65 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Common.Logging.SalesOrder;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
+using StockManager.Core.Domain.Models.SalesOrderEntity;
 
 namespace StockManager.Application.CQRS.Commands.SalesOrderCommands.DeleteSalesOrder;
-public sealed class DeleteSalesOrderCommandHandler: ICommandHandler<DeleteSalesOrderCommand, Unit>
-{
-    private readonly ISalesOrderRepository _repository;
-    private readonly ILogger<DeleteSalesOrderCommandHandler> _logger;
 
-    public DeleteSalesOrderCommandHandler(
+public sealed class DeleteSalesOrderCommandHandler(
         ISalesOrderRepository repository,
-        ILogger<DeleteSalesOrderCommandHandler> logger
-        )
+        ILogger<DeleteSalesOrderCommandHandler> logger,
+        IUnitOfWork uow
+    ) : ICommandHandler<DeleteSalesOrderCommand, Unit>
+{
+    private readonly ISalesOrderRepository _repository = repository;
+    private readonly ILogger<DeleteSalesOrderCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
+
+    public async Task<Result<Unit>> Handle(DeleteSalesOrderCommand command, CancellationToken ct)
     {
-        _repository = repository;
-        _logger = logger;
-    }
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-    public async Task<Result<Unit>> Handle(DeleteSalesOrderCommand command, CancellationToken cancellationToken)
-    {
-        try
-        {
-            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+        SalesOrder? salesOrder = await _repository.GetSalesOrderByIdAsync(command.Id, ct);
 
-            Core.Domain.Models.SalesOrderEntity
-                .SalesOrder? salesOrder = await _repository.GetSalesOrderByIdAsync(command.Id, cancellationToken);
-
-            if (salesOrder is null)
-            {
-                return Result<Unit>.Failure(
-                    new Error(
-                        $"SalesOrder {command.Id} not found", 
-                        ErrorCodes.SalesOrderNotFound));
-            }
-
-            await _repository.DeleteSalesOrderAsync(salesOrder, cancellationToken);
-            return Result<Unit>.Success(Unit.Value);
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 547 })
+        if (salesOrder is null)
         {
             return Result<Unit>.Failure(
                 new Error(
-                    "Cannot delete: referenced by other records.", 
-                    ErrorCodes.SalesOrderConflict));
+                    $"SalesOrder {command.Id} not found",
+                    ErrorCodes.SalesOrderNotFound));
         }
-        catch (Exception ex)
-        {
-            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
-        }
+
+        await _repository.DeleteSalesOrderAsync(salesOrder.Id, ct);
+        await _uow.SaveChangesAsync(ct);
+        SalesOrderLogInfo.LogSalesOrderDeleted(_logger, salesOrder.Id, null);
+        return Result<Unit>.Success(Unit.Value);
     }
 }

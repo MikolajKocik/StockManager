@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
@@ -11,34 +6,30 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ShipmentEntity;
 
 namespace StockManager.Application.CQRS.Commands.ShipmentCommands.CancelShipment;
 
-public sealed class CancelShipmentCommandHandler : ICommandHandler<CancelShipmentCommand, Unit>
-{
-    private readonly IShipmentRepository _repository;
-    private readonly IShipmentService _service;
-    private readonly ILogger<CancelShipmentCommandHandler> _logger;
-
-    public CancelShipmentCommandHandler(
+public sealed class CancelShipmentCommandHandler(
         IShipmentRepository repository,
         ILogger<CancelShipmentCommandHandler> logger,
-        IShipmentService service
-        )
-    {
-        _repository = repository;
-        _logger = logger;
-        _service = service;
-    }
+        IShipmentService service,
+        IUnitOfWork uow
+    ) : ICommandHandler<CancelShipmentCommand, Unit>
+{
+    private readonly IShipmentRepository _repository = repository;
+    private readonly IShipmentService _service = service;
+    private readonly ILogger<CancelShipmentCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
 
-    public async Task<Result<Unit>> Handle(CancelShipmentCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(CancelShipmentCommand command, CancellationToken ct)
     {
-        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-        Shipment? shipment = await _repository.GetShipmentByIdAsync(command.Id, cancellationToken);
+        Shipment? shipment = await _repository.GetShipmentByIdAsync(command.Id, ct);
         if (shipment is null)
         {
             ShipmentLogWarning.LogShipmentNotFound(_logger, command.Id, default);
@@ -77,7 +68,7 @@ public sealed class CancelShipmentCommandHandler : ICommandHandler<CancelShipmen
 
         _service.Cancel(shipment);
 
-        await _repository.UpdateShipmentAsync(shipment, cancellationToken);
+        await _uow.SaveChangesAsync(ct);
 
         ShipmentLogInfo.LogShipmentCancelled(_logger, command.Id, default);
         return Result<Unit>.Success(Unit.Value);

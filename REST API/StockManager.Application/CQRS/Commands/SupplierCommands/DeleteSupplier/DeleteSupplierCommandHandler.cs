@@ -1,78 +1,59 @@
-﻿using AutoMapper;
+using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Supplier;
-using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
-using StockManager.Application.Extensions.Redis;
+using StockManager.Application.Extensions.Cache;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.SupplierEntity;
 
 namespace StockManager.Application.CQRS.Commands.SupplierCommands.DeleteSupplier;
 
-public sealed class DeleteSupplierCommandHandler : ICommandHandler<DeleteSupplierCommand, Unit>
-{
-    private readonly IMapper _mapper;
-    private readonly ISupplierRepository _supplierRepository;
-    private readonly ILogger<DeleteSupplierCommandHandler> _logger;
-    private readonly IConnectionMultiplexer _redis;
-
-    public DeleteSupplierCommandHandler(
-        IMapper mapper,
+public sealed class DeleteSupplierCommandHandler(
         ISupplierRepository repository,
         ILogger<DeleteSupplierCommandHandler> logger,
-          IConnectionMultiplexer redis)
+        IConnectionMultiplexer redis,
+        IUnitOfWork uow
+    ) : ICommandHandler<DeleteSupplierCommand, Unit>
+{
+    private readonly ISupplierRepository _supplierRepository = repository;
+    private readonly ILogger<DeleteSupplierCommandHandler> _logger = logger;
+    private readonly IConnectionMultiplexer _redis = redis;
+    private readonly IUnitOfWork _uow = uow;
+
+    public async Task<Result<Unit>> Handle(DeleteSupplierCommand command, CancellationToken ct)
     {
-        _mapper = mapper;
-        _supplierRepository = repository;
-        _logger = logger;
-        _redis = redis;
-    }
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-    public async Task<Result<Unit>> Handle(DeleteSupplierCommand command, CancellationToken cancellationToken)
-    {
-        try
+        Supplier? supplier = await _supplierRepository.GetSupplierByIdAsync(command.Id, ct);
+
+        if (supplier is not null)
         {
-            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+            SupplierLogInfo.LogRemovingSupplier(_logger, command.Id, default);
+            await _supplierRepository.DeleteSupplierAsync(command.Id, ct);
+            await _uow.SaveChangesAsync(ct);
 
-            Supplier supplier = await _supplierRepository.GetSupplierByIdAsync(command.Id, cancellationToken);
+            await _redis.RemoveKeyAsync($"supplier:{command.Id}:views")
+                .ConfigureAwait(false);
 
-            if (supplier is not null)
-            {
-                SupplierLogInfo.LogRemovingSupplier(_logger, command.Id, default);
-                Supplier remove = await _supplierRepository.DeleteSupplierAsync(supplier, cancellationToken);
+            await _redis.RemoveKeyAsync($"supplier:{command.Id}:details")
+                .ConfigureAwait(false);
 
-                await _redis.RemoveKeyAsync(
-                    $"supplier:{command.Id}:views")
-                    .ConfigureAwait(false);
-
-                await _redis.RemoveKeyAsync(
-                    $"suppleir:{command.Id}:details")
-                    .ConfigureAwait(false);
-
-                return Result<Unit>.Success(Unit.Value);
-            }
-
-            SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
-
-            var error = new Error(
-                $"Supplier with id {command.Id} not found",
-                ErrorCodes.SupplierNotFound
-            );
-
-            return Result<Unit>.Failure(error);
+            return Result<Unit>.Success(Unit.Value);
         }
-        catch (Exception ex)
-        {
-            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
-        }
+
+        SupplierLogWarning.LogSupplierNotFound(_logger, command.Id, default);
+
+        var error = new Error(
+            $"Supplier with id {command.Id} not found",
+            ErrorCodes.SupplierNotFound
+        );
+
+        return Result<Unit>.Failure(error);
     }
 }

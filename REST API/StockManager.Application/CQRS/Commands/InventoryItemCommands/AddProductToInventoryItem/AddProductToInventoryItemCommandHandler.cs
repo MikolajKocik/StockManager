@@ -1,5 +1,3 @@
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
@@ -8,6 +6,7 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
@@ -15,34 +14,27 @@ using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Commands.InventoryItemCommands.AddProductToInventoryItem;
 
-public sealed class AddProductToInventoryItemCommandHandler : ICommandHandler<AddProductToInventoryItemCommand, ProductDto>
-{
-    private readonly IInventoryItemRepository _inventoryItemRepository;
-    private readonly IProductRepository _productRepository;
-    private readonly IProductService _productService;
-    private readonly IMapper _mapper;
-    private readonly ILogger<AddProductToInventoryItemCommandHandler> _logger;
-
-    public AddProductToInventoryItemCommandHandler(
+public sealed class AddProductToInventoryItemCommandHandler(
         IInventoryItemRepository inventoryItemRepository,
         IProductRepository productRepository,
         IMapper mapper,
         ILogger<AddProductToInventoryItemCommandHandler> logger,
-        IProductService productService
-        )
-    {
-        _inventoryItemRepository = inventoryItemRepository;
-        _productRepository = productRepository;
-        _mapper = mapper;
-        _logger = logger;
-        _productService = productService;
-    }
+        IProductService productService,
+        IUnitOfWork uow
+    ) : ICommandHandler<AddProductToInventoryItemCommand, ProductDto>
+{
+    private readonly IInventoryItemRepository _inventoryItemRepository = inventoryItemRepository;
+    private readonly IProductRepository _productRepository = productRepository;
+    private readonly IProductService _productService = productService;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<AddProductToInventoryItemCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
 
-    public async Task<Result<ProductDto>> Handle(AddProductToInventoryItemCommand command, CancellationToken cancellationToken)
+    public async Task<Result<ProductDto>> Handle(AddProductToInventoryItemCommand command, CancellationToken ct)
     {
-        ResultFailureHelper.IfProvidedNullArgument(command.InventoryItemId);
+        ResultFailureHelper.AgainstDefaultValue(command.InventoryItemId);
 
-        InventoryItem? inventoryItem = await _inventoryItemRepository.GetInventoryItemByIdAsync(command.InventoryItemId, cancellationToken);
+        InventoryItem? inventoryItem = await _inventoryItemRepository.GetInventoryItemByIdAsync(command.InventoryItemId, ct);
         if (inventoryItem is null)
         {
             InventoryItemLogWarning.LogInventoryItemNotFound(_logger, command.InventoryItemId, default);
@@ -51,7 +43,7 @@ public sealed class AddProductToInventoryItemCommandHandler : ICommandHandler<Ad
                 ErrorCodes.InventoryItemNotFound));
         }
 
-        Product? product = await _productRepository.GetProductByIdAsync(command.Product.Id, cancellationToken);
+        Product? product = await _productRepository.GetProductByIdAsync(command.Product.Id, ct);
         if (product is null)
         {
             InventoryItemLogWarning.LogInventoryProductNotFound(_logger, command.Product.Id, default);
@@ -61,8 +53,7 @@ public sealed class AddProductToInventoryItemCommandHandler : ICommandHandler<Ad
         }
 
         _productService.SetProductToInventoryItem(product, inventoryItem);
-
-        await _inventoryItemRepository.UpdateInventoryItemAsync(inventoryItem, cancellationToken);
+        await _uow.SaveChangesAsync(ct);
 
         InventoryItemLogInfo.LogAddProductToInventoryItemSuccess(_logger, inventoryItem.Id, product.Id, default);
 

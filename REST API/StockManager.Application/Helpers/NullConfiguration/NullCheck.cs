@@ -1,22 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace StockManager.Application.Helpers.NullConfiguration;
 
 public static class NullCheck
 {
     /// <summary>
-    /// Determines whether all provided arguments are non-null and contain non-whitespace string representations.
+    /// Ensures that each provided argument is not null and, for strings, is not whitespace.
     /// </summary>
-    /// <param name="args">An array of objects to validate. Each object's string representation must be non-null and non-whitespace.</param>
-    public static void IsConfigured(params object[] args)
+    /// <param name="args">Arguments to validate.</param>
+    /// <exception cref="ArgumentException">Thrown when any argument is null or, if it is a string, empty/whitespace.</exception>
+    public static void IsConfigured(params object?[] args)
     {
-        foreach (object item in args)
+        foreach (object? item in args)
         {
-            ArgumentException.ThrowIfNullOrWhiteSpace(item.ToString());
+            if (item is null)
+            {
+                throw new ArgumentException("Argument cannot be null.");
+            }
+
+            if (item is string value && string.IsNullOrWhiteSpace(value))
+            {
+                throw new ArgumentException("String argument cannot be null, empty, or whitespace.");
+            }
         }
     }
 }

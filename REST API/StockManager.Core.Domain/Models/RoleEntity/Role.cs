@@ -15,9 +15,8 @@ public sealed partial class Role : Entity<int>
     public string Name { get; private set; }
 
     // relation *-* with permission
-    private readonly List<Permission> _permissions = new();
-    public IReadOnlyList<Permission> Permissions 
-        => _permissions.AsReadOnly();
+    private readonly HashSet<Permission> _permissions = [];
+    public IReadOnlyCollection<Permission> Permissions => _permissions;
 
     private Role() : base() { }
 

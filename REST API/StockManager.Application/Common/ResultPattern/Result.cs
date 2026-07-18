@@ -1,4 +1,4 @@
-﻿namespace StockManager.Application.Common.ResultPattern;
+namespace StockManager.Application.Common.ResultPattern;
 
 public sealed class Result<T> : IResult
 {

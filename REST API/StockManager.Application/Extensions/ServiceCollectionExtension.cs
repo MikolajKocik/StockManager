@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(SqlExceptionPipelineBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RetryPipelineBehavior<,>));
     }
 }

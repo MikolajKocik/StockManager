@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.Supplier;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.SupplierDtos;
@@ -18,8 +13,8 @@ public static class SupplierLogInfo
             SupplierLogEventIds.SupplierAddedSuccesfull,
             "Adding a new supplier {@supplier} to database");
 
-    public static readonly Action<ILogger, Result<IEnumerable<SupplierDto>>, Exception?> LogSuccesfullReturnedListOfSuppliers =
-        LoggerMessage.Define<Result<IEnumerable<SupplierDto>>>(
+    public static readonly Action<ILogger, Result<IReadOnlyList<SupplierDto>>, Exception?> LogSuccesfullReturnedListOfSuppliers =
+        LoggerMessage.Define<Result<IReadOnlyList<SupplierDto>>>(
             LogLevel.Information,
             SupplierLogEventIds.SuccesfullReturnedListOfSuppliers,
             "Successfully returned a list of suppliers: {@suppliers}");

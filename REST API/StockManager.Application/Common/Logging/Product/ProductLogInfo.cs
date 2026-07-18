@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.Product;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 
 namespace StockManager.Application.Common.Logging.Product;
-public static class ProductLogInfo 
+
+public static class ProductLogInfo
 {
     public static readonly Action<ILogger, int, string, Exception?> LogAddProductSuccesfull =
         LoggerMessage.Define<int, string>(
@@ -29,8 +25,8 @@ public static class ProductLogInfo
             ProductLogEventIds.ModyfingProduct,
             "Modifying the provided product:{@productId} with {@modifiedProduct}");
 
-    public static readonly Action<ILogger, Result<IEnumerable<ProductDto>>, Exception?> LogReturningListOfProductSuccessfull =
-        LoggerMessage.Define<Result<IEnumerable<ProductDto>>>(
+    public static readonly Action<ILogger, Result<IReadOnlyList<ProductDto>>, Exception?> LogReturningListOfProductSuccessfull =
+        LoggerMessage.Define<Result<IReadOnlyList<ProductDto>>>(
             LogLevel.Information,
             ProductLogEventIds.ReturningListOfProductSuccessfull,
             "Succesfully returns a list of products: {Products}");

@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Common.Logging.EventIds.InventoryItem.InventoryItemCache;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.BinLocationDtos;
 using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 
 namespace StockManager.Application.Common.Logging.InventoryItem;
+
 public static class InventoryItemLogInfo
 {
     public static readonly Action<ILogger, int, int, string, Exception?> LogAddInventoryItemSuccesfull =
@@ -30,8 +25,8 @@ public static class InventoryItemLogInfo
             InventoryItemLogEventIds.ModyfingInventoryItem,
             "Modifying the provided inventory item:{@inventoryItemId} with {@modifiedInventoryItem} and {@binLocationId}");
 
-    public static readonly Action<ILogger, Result<IEnumerable<InventoryItemDto>>, Exception?> LogReturningListOfInventoryItemSuccessfull =
-        LoggerMessage.Define<Result<IEnumerable<InventoryItemDto>>>(
+    public static readonly Action<ILogger, Result<IReadOnlyList<InventoryItemDto>>, Exception?> LogReturningListOfInventoryItemSuccessfull =
+        LoggerMessage.Define<Result<IReadOnlyList<InventoryItemDto>>>(
             LogLevel.Information,
             InventoryItemLogEventIds.ReturningListOfInventoryItemSuccessfull,
             "Succesfully returns a list of inventory items: {InventoryItems}");

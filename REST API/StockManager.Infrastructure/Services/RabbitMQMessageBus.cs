@@ -8,35 +8,33 @@ using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Infrastructure.Services;
 
-public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
+public sealed class RabbitMQMessageBus(
+    IConfiguration configuration,
+    ILogger<RabbitMQMessageBus> logger) : IMessageBus, IAsyncDisposable
 {
-    private readonly IConfiguration _configuration;
-    private readonly ILogger<RabbitMQMessageBus> _logger;
+    private readonly IConfiguration _configuration = configuration;
+    private readonly ILogger<RabbitMQMessageBus> _logger = logger;
     private IConnection? _connection;
-    private IChannel? _channel;
+    private IChannel? _publishChannel;
+    private readonly List<IChannel> _consumeChannels = new();
     private readonly SemaphoreSlim _initLock = new(1, 1);
+    private readonly SemaphoreSlim _publishLock = new(1, 1);
     private bool _initialized;
 
     private const int MaxRetries = 3;
     private static readonly TimeSpan RetryDelay = TimeSpan.FromSeconds(2);
 
-    public RabbitMQMessageBus(IConfiguration configuration, ILogger<RabbitMQMessageBus> logger)
+    private async Task EnsureConnectedAsync(CancellationToken ct)
     {
-        _configuration = configuration;
-        _logger = logger;
-    }
-
-    private async Task EnsureConnectedAsync(CancellationToken cancellationToken)
-    {
-        if (_initialized && _connection?.IsOpen is true && _channel?.IsOpen is true)
+        if (_initialized && _connection?.IsOpen is true && _publishChannel?.IsOpen is true)
         {
             return;
         }
 
-        await _initLock.WaitAsync(cancellationToken);
+        await _initLock.WaitAsync(ct);
         try
         {
-            if (_initialized && _connection?.IsOpen is true && _channel?.IsOpen is true)
+            if (_initialized && _connection?.IsOpen is true && _publishChannel?.IsOpen is true)
             {
                 return;
             }
@@ -48,28 +46,31 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
                 Password = _configuration["RabbitMQ:Password"] ?? "guest"
             };
 
+            Exception? lastException = null;
+
             for (int attempt = 1; attempt <= MaxRetries; attempt++)
             {
                 try
                 {
-                    _connection = await factory.CreateConnectionAsync(cancellationToken);
-                    _channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
+                    _connection = await factory.CreateConnectionAsync(ct);
+                    _publishChannel = await _connection.CreateChannelAsync(cancellationToken: ct);
                     _initialized = true;
                     _logger.LogInformation("RabbitMQ connected successfully on attempt {Attempt}", attempt);
                     return;
                 }
-                catch (Exception ex) when (attempt < MaxRetries)
+                catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "RabbitMQ connection attempt {Attempt}/{MaxRetries} failed, retrying in {Delay}s...",
-                        attempt, MaxRetries, RetryDelay.TotalSeconds);
-                    await Task.Delay(RetryDelay, cancellationToken);
+                    lastException = ex;
+                    if (attempt < MaxRetries)
+                    {
+                        _logger.LogWarning(ex, "RabbitMQ connection attempt {Attempt}/{MaxRetries} failed, retrying in {Delay}s...",
+                            attempt, MaxRetries, RetryDelay.TotalSeconds);
+                        await Task.Delay(RetryDelay, ct);
+                    }
                 }
             }
 
-            // Last attempt — let the exception propagate
-            _connection = await factory.CreateConnectionAsync(cancellationToken);
-            _channel = await _connection.CreateChannelAsync(cancellationToken: cancellationToken);
-            _initialized = true;
+            throw new InvalidOperationException("Failed to connect to RabbitMQ after all retries.", lastException);
         }
         finally
         {
@@ -77,32 +78,31 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
         }
     }
 
-
-    private async Task DeclareDlxQueueAsync(string queueName, CancellationToken cancellationToken)
+    private async Task DeclareDlxQueueAsync(IChannel channel, string queueName, CancellationToken ct)
     {
-        await _channel!.BasicQosAsync(prefetchSize: 0, prefetchCount: 10, global: false, cancellationToken: cancellationToken);
+        await channel!.BasicQosAsync(prefetchSize: 0, prefetchCount: 10, global: false, cancellationToken: ct);
 
         string dlxName = $"{queueName}-dlx";
         string errorQueueName = $"{queueName}-error";
 
-        await _channel!.ExchangeDeclareAsync(
+        await channel!.ExchangeDeclareAsync(
             exchange: dlxName,
             type: ExchangeType.Direct,
-            cancellationToken: cancellationToken
+            cancellationToken: ct
         );
-        await _channel.QueueDeclareAsync(
+        await channel.QueueDeclareAsync(
             queue: errorQueueName,
             durable: true,
             exclusive: false,
             autoDelete: false,
             arguments: null,
-            cancellationToken: cancellationToken
+            cancellationToken: ct
         );
-        await _channel.QueueBindAsync(
+        await channel.QueueBindAsync(
             queue: errorQueueName,
             exchange: dlxName,
             routingKey: queueName,
-            cancellationToken: cancellationToken
+            cancellationToken: ct
         );
 
         var arguments = new Dictionary<string, object>
@@ -111,46 +111,59 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
             { "x-dead-letter-routing-key", queueName }
         };
 
-        await _channel.QueueDeclareAsync(
+        await channel.QueueDeclareAsync(
             queue: queueName,
             durable: true,
             exclusive: false,
             autoDelete: false,
             arguments: arguments!,
-            cancellationToken: cancellationToken
+            cancellationToken: ct
         );
     }
 
-    public async Task PublishAsync<T>(T message, string queueName, CancellationToken cancellationToken) where T : class
+    public async Task PublishAsync<T>(T message, string queueName, CancellationToken ct) where T : class
     {
-        await EnsureConnectedAsync(cancellationToken);
+        await EnsureConnectedAsync(ct);
 
-        await DeclareDlxQueueAsync(queueName, cancellationToken);
-
-        string json = JsonSerializer.Serialize(message);
-        byte[] body = Encoding.UTF8.GetBytes(json);
-
-        var properties = new BasicProperties
+        await _publishLock.WaitAsync(ct);
+        try
         {
-            Persistent = true
-        };
+             await DeclareDlxQueueAsync(_publishChannel!, queueName, ct);
 
-        await _channel!.BasicPublishAsync(
-            exchange: string.Empty,
-            routingKey: queueName,
-            mandatory: false,
-            basicProperties: properties,
-            body: body,
-            cancellationToken: cancellationToken);
+            string json = JsonSerializer.Serialize(message);
+            byte[] body = Encoding.UTF8.GetBytes(json);
+
+            var properties = new BasicProperties
+            {
+                Persistent = true
+            };
+
+            await _publishChannel!.BasicPublishAsync(
+                exchange: string.Empty,
+                routingKey: queueName,
+                mandatory: false,
+                basicProperties: properties,
+                body: body,
+                cancellationToken: ct);
+        }
+        finally
+        {
+            _publishLock.Release();
+        }
     }
 
-    public async Task SubscribeAsync<T>(string queueName, Func<T, Task> onMessageReceived, CancellationToken cancellationToken) where T : class
+    public async Task SubscribeAsync<T>(string queueName, Func<T, Task> onMessageReceived, CancellationToken ct) where T : class
     {
-        await EnsureConnectedAsync(cancellationToken);
+        await EnsureConnectedAsync(ct);
 
-        await DeclareDlxQueueAsync(queueName, cancellationToken);
+        IChannel consumeChannel = await _connection!.CreateChannelAsync(cancellationToken: ct);
+        _consumeChannels.Add(consumeChannel);
 
-        var consumer = new AsyncEventingBasicConsumer(_channel!);
+        await DeclareDlxQueueAsync(consumeChannel, queueName, ct);
+        await consumeChannel.BasicQosAsync(prefetchSize: 0, prefetchCount: 10, global: false, cancellationToken: ct);
+
+
+        var consumer = new AsyncEventingBasicConsumer(consumeChannel);
         consumer.ReceivedAsync += async (_, ea) =>
         {
             try
@@ -159,37 +172,57 @@ public sealed class RabbitMQMessageBus : IMessageBus, IAsyncDisposable
                 string json = Encoding.UTF8.GetString(body);
                 T message = JsonSerializer.Deserialize<T>(json);
 
-                if (message != null)
+                if (message is not null)
                 {
                     await onMessageReceived(message);
                 }
 
-                await _channel!.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
+                await consumeChannel.BasicAckAsync(deliveryTag: ea.DeliveryTag, multiple: false);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                await _channel!.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
+                _logger.LogError(ex, "Failed to process message from {Queue}", queueName);
+                await consumeChannel.BasicNackAsync(deliveryTag: ea.DeliveryTag, multiple: false, requeue: false);
             }
         };
 
-        await _channel!.BasicConsumeAsync(
+        await consumeChannel!.BasicConsumeAsync(
             queue: queueName,
             autoAck: false,
             consumer: consumer,
-            cancellationToken: cancellationToken);
+            cancellationToken: ct);
     }
 
     public async ValueTask DisposeAsync()
     {
-        if (_channel?.IsOpen is true)
+        foreach (IChannel channel in _consumeChannels)
         {
-            await _channel.CloseAsync();
-            await _channel.DisposeAsync();
+            if (channel.IsOpen)
+            {
+                await channel.CloseAsync();
+            }
+            await channel.DisposeAsync();
         }
+
+        if (_publishChannel?.IsOpen is true)
+        {
+            await _publishChannel.CloseAsync();
+        }
+        if (_publishChannel is not null)
+        {
+            await _publishChannel.DisposeAsync();
+        }
+
         if (_connection?.IsOpen is true)
         {
             await _connection.CloseAsync();
+        }
+        if (_connection is not null)
+        {
             await _connection.DisposeAsync();
         }
+
+        _publishLock.Dispose();
+        _initLock.Dispose();
     }
 }

@@ -3,7 +3,6 @@ import Layout from '@/components/layout/Layout';
 import {
   Home,
   ProductList,
-  ProductDetails,
   Suppliers,
   Operations,
   Shipments,
@@ -12,7 +11,6 @@ import {
   NotFound
 } from '@/pages';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
-import api from './api/config/api';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated, isAuthenticating } = useAuth();
@@ -42,7 +40,6 @@ export default function App() {
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<Home />} />
             <Route path="/products" element={<ProductList />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/operations" element={<Operations />} />
             <Route path="/shipments" element={<Shipments />} />

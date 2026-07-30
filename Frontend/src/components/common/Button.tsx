@@ -1,26 +1,28 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'primary' | 'secondary' | 'outline' | 'ai' | 'danger';
+    variant?: 'primary' | 'secondary' | 'outline' | 'lavender' | 'danger' | 'accent' | 'ghost' | 'success' | 'warning';
     size?: 'sm' | 'md' | 'lg';
     isLoading?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({ 
-    children, 
-    variant = 'primary', 
-    size = 'md', 
-    isLoading, 
-    className = '', 
+export const Button: React.FC<ButtonProps> = ({
+    children,
+    variant,
+    size,
+    isLoading,
+    className = '',
     disabled,
-    ...props 
+    ...props
 }) => {
-    const classes = `btn btn-${variant} btn-${size} ${className} ${isLoading ? 'btn-loading' : ''}`;
-    
+    const classes = ['btn', variant && `btn-${variant}`, size && `btn-${size}`, className, isLoading && 'btn-loading']
+        .filter(Boolean)
+        .join(' ');
+
     return (
-        <button 
-            className={classes} 
-            disabled={disabled || isLoading} 
+        <button
+            className={classes}
+            disabled={disabled || isLoading}
             {...props}
         >
             {isLoading ? <span className="loader"></span> : children}

@@ -2,8 +2,8 @@
 
 @import "./pages/home/Home.css";
 @import "./components/layout/Navbar.css";
-@import "./components//common/Modal.css";
-
+@import "./components/common/Modal.css";
+@import "./components/common/Button.css";
 @layer base {
     h1 {
         @apply text-4xl text-white;

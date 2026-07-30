@@ -1,9 +1,6 @@
 @layer components {
     .dash-button {
-        @apply text-[1rem];
         @apply w-auto p-2 border-2 border-white;
-        @apply hover:scale-105 transition-all duration-300;
-        @apply cursor-pointer;
     }
 
     .card {

@@ -1,70 +1,31 @@
 import { Button, Modal, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common';
-import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import { inventoryApi } from '@/api/internal/inventoryApi';
-import type { InventoryItemCollection } from '@/models/inventoryItem';
-import type { DistributionData } from '@/models/statistics';
-import { statisticsApi } from '@/api/internal/statisticsApi';
-import type { SalesOrder } from '@/models/salesOrder';
-import { salesApi } from '@/api/internal/salesApi';
-import { purchaseApi } from '@/api/internal/purchaseApi';
-import type { PurchaseOrder } from '@/models/purchaseOrder';
 import { LiveActivityFeed } from '@/components/LiveActivityFeed';
-import { maintenanceApi } from '@/api/internal/maintenanceApi';
-import { type MaintenanceIncident } from '@/models/maintenance';
+import { genericSort } from '@/utils/sort';
+import { useInventoryItems } from '@/pages/inventoryItems/hooks/useInventoryItems';
+import { useDistributionData } from '@/hooks/queries/useStatistics';
+import { useSalesOrders } from '@/hooks/queries/useSalesOrders';
+import { usePurchaseOrders } from '@/hooks/queries/usePurchaseOrders';
+import { useMaintenanceIncidents } from '@/pages/maintenance/hooks/useMaintenanceIncidents';
 
 type Sorted = 'name' | 'type' | 'usage' | 'category' | 'count' |
     'product' | 'unit' | 'quantity' | 'price' | 'sum' | 'orderType' |
     'client' | 'NIP' | 'date';
 const LIMIT = 500;
 
-function genericSort<T>(array: T[], activeSort: string | null, keyMap?: Record<string, string>) {
-    if (!activeSort) return array;
-    const propKey = keyMap ? keyMap[activeSort] : activeSort;
-    if (!propKey) return array;
-
-    return [...array].sort((a, b) => {
-        const valA = a[propKey as keyof T];
-        const valB = b[propKey as keyof T];
-
-        if (typeof valA === 'number' && typeof valB === 'number') {
-            return valA - valB;
-        }
-        return String(valA || '').localeCompare(String(valB || ''));
-    });
-}
-
 export default function Home() {
-    const { data: items = { data: [] }, refetch: refetchItems } = useQuery<InventoryItemCollection>({
-        queryKey: ['locations'],
-        queryFn: inventoryApi.getItems
-    });
-    const responseitems = items?.data || [];
-
-    const { data: statistics = [], refetch: refetchStatistics } = useQuery<DistributionData[]>({
-        queryKey: ['statistics'],
-        queryFn: statisticsApi.getDistribution
-    });
-
-    const { data: salesOrders = [], refetch: refetchSalesOrders } = useQuery<SalesOrder[]>({
-        queryKey: ['salesOrders'],
-        queryFn: salesApi.getAll
-    });
-
-    const { data: purchaseOrders = [], refetch: refetchPurchaseOrders } = useQuery<PurchaseOrder[]>({
-        queryKey: ['purchasesOrders'],
-        queryFn: purchaseApi.getAll
-    });
-
-    const { data: incidents = [], refetch: refetchIncidents } = useQuery<MaintenanceIncident[]>({
-        queryKey: ['incidents'],
-        queryFn: () => maintenanceApi.getIncidents()
-    });
+    const { data: items = { data: [] }, refetch: refetchItems } = useInventoryItems();
+    const { data: statistics = [], refetch: refetchStatistics } = useDistributionData();
+    const { data: salesOrders = [], refetch: refetchSalesOrders } = useSalesOrders();
+    const { data: purchaseOrders = [], refetch: refetchPurchaseOrders } = usePurchaseOrders();
+    const { data: incidents = [], refetch: refetchIncidents } = useMaintenanceIncidents();
 
     const [activeSort, setActiveSort] = useState<Sorted | null>(null);
     const [isOpenCustomize, setOpenCustomize] = useState(false);
     const [isOpenReport, setOpenReport] = useState(false);
     const [isOpenIncident, setOpenIncident] = useState(false);
+
+    const responseitems = items?.data || [];
 
     const toggleFilter = (key: Sorted) => {
         setActiveSort(prev => prev === key ? null : key);
@@ -137,10 +98,10 @@ export default function Home() {
         <div className='h-full grid grid-cols-6 grid-rows-[auto_1fr_1fr] gap-4'>
             <div className="col-span-6">
                 <div className="flex flex-row-reverse gap-4">
-                    <Button className="bg-[#CC6557] dash-button" onClick={() => setOpenIncident(true)}>Report Incident</Button>
-                    <Button className="bg-amber-300 dash-button" onClick={() => setOpenCustomize(true)}>Customize View</Button>
-                    <Button className="bg-[#9BB477] dash-button" onClick={() => setOpenReport(true)}>Generate Report</Button>
-                    <Button className="bg-[#77A4B4] dash-button" onClick={() => handleRefresh}>Refresh</Button>
+                    <Button variant="danger" className="p-1" onClick={() => setOpenIncident(true)}>Report Incident</Button>
+                    <Button variant="warning" className="p-1" onClick={() => setOpenCustomize(true)}>Customize View</Button>
+                    <Button variant="success" className="p-1" onClick={() => setOpenReport(true)}>Generate Report</Button>
+                    <Button variant="accent" className="p-1 m-[0.4rem]" onClick={() => handleRefresh}>Refresh</Button>
                 </div>
 
                 <Modal

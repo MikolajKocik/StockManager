@@ -1,5 +1,7 @@
 import type { InventoryItemCollection } from "@/models/inventoryItem";
 import api from "../config/api"
+import { USE_MOCKS } from "../config/mock";
+import { mockInventoryItems } from "@/mocks/inventory.mocks";
 
 interface SearchRequest {
     question: string,
@@ -10,6 +12,10 @@ interface SearchRequest {
 
 export const inventoryApi = { 
     getItems: async (): Promise<InventoryItemCollection> => {
+        if (USE_MOCKS) {
+            return { data: mockInventoryItems };
+        }
+
         const res = await api.get("/inventory-items");
         return res.data;
     },

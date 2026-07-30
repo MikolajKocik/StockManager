@@ -1,31 +1,52 @@
 import type { Product, ProductCollection, ProductCreateForm, ProductUpdateForm } from "@/models/product";
 import api from "../config/api";
+import { USE_MOCKS } from "../config/mock";
+import { mockProduct } from "@/mocks/product.mocks";
 
 export const productsApi = {
-    getProducts: async (): Promise<ProductCollection> => {
-        const res = await api.get("/products");
+    getProducts: async (signal?: AbortSignal): Promise<ProductCollection> => {
+        if (USE_MOCKS) {
+            return { data: mockProduct };
+        }
+        
+        const res = await api.get("/products", {
+            signal
+        });
         return res.data;
     },
-    getProductById: async (id: string): Promise<Product> => {
-        const res = await api.get(`/products/${Number(id)}`);
+    getProductById: async (id: string, signal?: AbortSignal): Promise<Product> => {
+        if (USE_MOCKS) return mockProduct.find(p => p.id === Number(id)) as Product;
+        const res = await api.get(`/products/${Number(id)}`, {
+            signal
+        });
         return res.data;
     },
-    createProduct: async (data: ProductCreateForm): Promise<Product> => {
-        const res = await api.post("/products", data);
+    createProduct: async (data: ProductCreateForm, signal?: AbortSignal): Promise<Product> => {
+        const res = await api.post("/products", data, {
+            signal
+        });
         return res.data;
     },
-    updateProduct: async (id: string, data: ProductUpdateForm): Promise<void> => {
-        await api.put(`/products/${Number(id)}`, data);
+    updateProduct: async (id: string, data: ProductUpdateForm, signal?: AbortSignal): Promise<void> => {
+        await api.put(`/products/${Number(id)}`, data, {
+            signal
+        });
     },
-    deleteProduct: async (id: string): Promise<void> => {
-        await api.delete(`/products/${Number(id)}`);
+    deleteProduct: async (id: string, signal?: AbortSignal): Promise<void> => {
+        await api.delete(`/products/${Number(id)}`, {
+            signal
+        });
     },
-    getWarehouses: async (): Promise<string[]> => {
-        const res = await api.get("/products/warehouses");
+    getWarehouses: async (signal?: AbortSignal): Promise<string[]> => {
+        const res = await api.get("/products/warehouses", {
+            signal
+        });
         return res.data;
     },
-    getGenres: async (): Promise<string[]> => {
-        const res = await api.get("/products/genres");
+    getGenres: async (signal?: AbortSignal): Promise<string[]> => {
+        const res = await api.get("/products/genres", {
+            signal
+        });
         return res.data;
     }
 }

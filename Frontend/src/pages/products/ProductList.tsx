@@ -1,25 +1,24 @@
-import { useState } from 'react';
-import { useProducts } from './hooks/useProducts';
-import { useDeleteProduct } from './hooks/useDeleteProduct';
-import { Button, Modal, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common';
+import { useState, useMemo } from 'react';
+import toast from 'react-hot-toast';
+import { useProducts, useDeleteProduct } from './hooks';
+import { Button, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common';
 import { useInventoryItems } from '../inventoryItems/hooks/useInventoryItems';
-import { useQueryClient } from '@tanstack/react-query';
-import { ProductDetailsModal } from './components/ProductDetailsModal';
+import { ProductDetailsForm, ProductEditForm, ProductCreateForm as ProductCreateModal } from './components';
 import { genericSort } from '@/utils/sort';
+import ConfirmModal from '@/components/common/ConfirmModal';
 
 export default function ProductList() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
-    const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState<boolean>(false);
+    const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
     const [activeSort, setActiveSort] = useState<string | null>(null);
 
-    const queryClient = useQueryClient();
-    const { data, isError, isLoading, refetch } = useProducts();
+    const { data, isError, isLoading, refetch, isFetching } = useProducts();
     const { data: inventoryData, isLoading: isInventoryLoading } = useInventoryItems();
-    const deleteProductMutation = useDeleteProduct();
 
-    // TODO
-    // const editProductMutation = useEditProduct();
+    const deleteProductMutation = useDeleteProduct();
 
     const productList = data?.data ?? [];
     const inventoryItems = inventoryData?.data ?? [];
@@ -34,31 +33,40 @@ export default function ProductList() {
         setActiveSort(prev => prev === key ? null : key);
     };
 
-    // TOOD
-    const handleEdit = (id: number) => {
-        // state with modal and edit form here
-    }
+    const displayedProducts = useMemo(() => {
+        return genericSort(productList, activeSort);
+    }, [productList, activeSort]);
 
     const handleDelete = (id: number) => {
-        if (window.confirm('Are you sure you want to delete this product?')) {
-            deleteProductMutation.mutate(id.toString());
-        }
+        deleteProductMutation.mutate(id.toString(), {
+            onSuccess: () => {
+                toast.success('Product deleted successfully');
+            },
+            onError: () => {
+                toast.error('Failed to delete product');
+            }
+        });
     };
+
+    const handleRefetch = () => {
+        toast.promise(
+            refetch(),
+            {
+                loading: 'Refreshing...',
+                success: <b>Refreshed!</b>,
+                error: <b>Failed to refresh</b>
+            },
+            { id: 'refetch-toast' }
+        )
+    }
 
     const handleOpenDetails = (id: number) => {
         setSelectedProductId(id.toString());
         setIsDetailsModalOpen(true);
     };
 
-    const handleCreateSuccess = () => {
-        setIsCreateModalOpen(false);
-        queryClient.invalidateQueries({ queryKey: ['products'] });
-    };
-
     if (isLoading || isInventoryLoading) return <div className="loading">Loading products...</div>;
     if (isError) return <div className="error-message">Error occurred. Try again later.</div>;
-
-    const displayedProducts = genericSort(productList, activeSort);
 
     return (
         <div>
@@ -72,7 +80,9 @@ export default function ProductList() {
                     <Button
                         variant="accent"
                         className="p-1 m-[0.4rem]"
-                        onClick={() => refetch()}>
+                        onClick={() => handleRefetch()}
+                        disabled={isFetching}
+                    >
                         Refresh
                     </Button>
                 </div>
@@ -157,11 +167,13 @@ export default function ProductList() {
                                             >
                                                 Details
                                             </Button>
-                                            {/* disabled={editProductMutation.isPending} */}
                                             <Button
                                                 variant="warning"
                                                 size="sm"
-                                                onClick={() => handleEdit(p.id)}
+                                                onClick={() => {
+                                                    setSelectedProductId(p.id.toString());
+                                                    setIsEditModalOpen(true);
+                                                }}
                                             >
                                                 Edit
                                             </Button>
@@ -169,7 +181,10 @@ export default function ProductList() {
                                                 <Button
                                                     variant="danger"
                                                     size="sm"
-                                                    onClick={() => handleDelete(p.id)}
+                                                    onClick={() => {
+                                                        setSelectedProductId(p.id.toString())
+                                                        setIsConfirmModalOpen(true)
+                                                    }}
                                                     disabled={deleteProductMutation.isPending}
                                                 >
                                                     Delete
@@ -184,23 +199,38 @@ export default function ProductList() {
                 </div>
             </div>
 
-            {/* MOCK - TODO */}
-            <Modal isOpen={isCreateModalOpen} onClose={() => setIsCreateModalOpen(false)}>
-                <div className="p-6 w-[500px] max-w-full">
-                    <h2 className="text-xl font-bold mb-4">Create New Product</h2>
-                    <p className="text-gray-600 mb-6">Form to create a product will go here.</p>
-                    <div className="flex justify-end gap-3 mt-6">
-                        <Button variant="outline" onClick={() => setIsCreateModalOpen(false)}>Cancel</Button>
-                        <Button variant="primary" onClick={handleCreateSuccess}>Save (Mock)</Button>
-                    </div>
-                </div>
-            </Modal>
+            {isConfirmModalOpen && selectedProductId && (
+                <ConfirmModal
+                    isOpen={isConfirmModalOpen}
+                    onClose={() => setIsConfirmModalOpen(false)}
+                    onConfirm={() => handleDelete(Number(selectedProductId))}
+                    title="Confirm Deletion"
+                    message="Are you sure you want to delete this product?"
+                />
+            )}
 
-            <ProductDetailsModal
-                productId={selectedProductId}
-                isOpen={isDetailsModalOpen}
-                onClose={() => setIsDetailsModalOpen(false)}
-            />
+            {isCreateModalOpen && (
+                <ProductCreateModal
+                    isOpen={isCreateModalOpen}
+                    onClose={() => setIsCreateModalOpen(false)}
+                />
+            )}
+
+            {isEditModalOpen && selectedProductId && (
+                <ProductEditForm
+                    isOpen={isEditModalOpen}
+                    productId={selectedProductId}
+                    onClose={() => setIsEditModalOpen(false)}
+                />
+            )}
+
+            {isDetailsModalOpen && (
+                <ProductDetailsForm
+                    productId={selectedProductId}
+                    isOpen={isDetailsModalOpen}
+                    onClose={() => setIsDetailsModalOpen(false)}
+                />
+            )}
         </div>
     )
 }

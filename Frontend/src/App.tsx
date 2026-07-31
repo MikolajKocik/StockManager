@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Layout from '@/components/layout/Layout';
 import {
   Home,
@@ -35,6 +36,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <AuthProvider>
+      <Toaster position="bottom-right" />
       <BrowserRouter>
         <Routes>
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>

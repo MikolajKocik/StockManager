@@ -4,6 +4,22 @@
     }
 
     .modal-content {
-        @apply relative bg-white p-6 shadow-2xl;
+        @apply relative bg-white p-6 shadow-2xl rounded-lg w-full m-4;
+    }
+
+    .modal-sm {
+        @apply max-w-md;
+    }
+
+    .modal-md {
+        @apply max-w-xl min-h-100;
+    }
+
+    .modal-lg {
+        @apply max-w-3xl min-h-150;
+    }
+
+    .close-button {
+        @apply absolute top-3 right-4 text-3xl text-gray-400 hover:text-gray-700 transition-colors leading-none cursor-pointer;
     }
 }

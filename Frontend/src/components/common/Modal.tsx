@@ -13,7 +13,7 @@ export default function Modal({ isOpen, onClose, children, size = 'md' }: ModalP
     return (
         <div className="modal-overlay" onClick={onClose}>
             <div className={`modal-content modal-${size}`} onClick={(e) => e.stopPropagation()}>
-                <button className="close-button" onClick={onClose}>
+                <button className="close-button cursor-pointer " onClick={onClose}>
                     &times;
                 </button>
                 {children}

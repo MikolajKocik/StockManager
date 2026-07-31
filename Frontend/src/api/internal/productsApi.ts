@@ -1,14 +1,14 @@
 import type { Product, ProductCollection, ProductCreateForm, ProductUpdateForm } from "@/models/product";
 import api from "../config/api";
 import { USE_MOCKS } from "../config/mock";
-import { mockProduct } from "@/mocks/product.mocks";
+import { mockProduct, mockGenres, mockWarehouses } from "@/mocks";
 
 export const productsApi = {
     getProducts: async (signal?: AbortSignal): Promise<ProductCollection> => {
         if (USE_MOCKS) {
             return { data: mockProduct };
         }
-        
+
         const res = await api.get("/products", {
             signal
         });
@@ -38,12 +38,14 @@ export const productsApi = {
         });
     },
     getWarehouses: async (signal?: AbortSignal): Promise<string[]> => {
+        if (USE_MOCKS) return mockWarehouses;
         const res = await api.get("/products/warehouses", {
             signal
         });
         return res.data;
     },
     getGenres: async (signal?: AbortSignal): Promise<string[]> => {
+        if (USE_MOCKS) return mockGenres;
         const res = await api.get("/products/genres", {
             signal
         });

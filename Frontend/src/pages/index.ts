@@ -1,6 +1,5 @@
 export { default as Home } from './home/Home';
 export { default as ProductList } from './products/ProductList';
-export { default as ProductDetails } from './products/ProductDetails';
 export { default as Suppliers } from './suppliers/Suppliers';
 export { default as Operations } from './operations/Operations';
 export { default as Shipments } from './shipments/Shipments';

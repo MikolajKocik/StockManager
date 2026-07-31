@@ -1,11 +1,13 @@
 import type { ProductCreateForm } from "@/models/product";
 import { useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { productsApi } from '@/api/internal/productsApi';
+import './ProductForm.css';
 import Modal from '@/components/common/Modal';
 import { Input } from '@/components/common/Input';
 import { Select } from '@/components/common/Select';
 import { Button } from '@/components/common/Button';
+import { useGenres } from "@/hooks/queries/useGenres";
+import { useWTypes } from "@/hooks/queries/useWTypes";
+import { useCreateProduct } from "../hooks";
 
 interface ProductCreateModalProps {
     isOpen: boolean;
@@ -14,7 +16,6 @@ interface ProductCreateModalProps {
 }
 
 export default function ProductCreateForm({ isOpen, onClose, onSuccess }: ProductCreateModalProps) {
-    const queryClient = useQueryClient();
     const [form, setForm] = useState<ProductCreateForm>({
         name: '',
         genre: '',
@@ -25,26 +26,9 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
         expirationDate: ''
     });
 
-    const { data: genres = [], isLoading: isGenresLoading } = useQuery({
-        queryKey: ['genres'],
-        queryFn: productsApi.getGenres,
-        enabled: isOpen
-    });
-
-    const { data: types = [], isLoading: isTypesLoading } = useQuery({
-        queryKey: ['warehouses'],
-        queryFn: productsApi.getWarehouses,
-        enabled: isOpen
-    });
-
-    const { mutate: createProduct, isPending: isCreating, error: mutationError } = useMutation({
-        mutationFn: (data: ProductCreateForm) => productsApi.createProduct(data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
-            onSuccess?.();
-            onClose();
-        }
-    });
+    const { data: genres = [], isLoading: isGenresLoading } = useGenres(isOpen);
+    const { data: types = [], isLoading: isTypesLoading } = useWTypes(isOpen);
+    const { mutate: createProduct, isPending: isCreating, error: mutationError } = useCreateProduct();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
@@ -54,7 +38,7 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         createProduct(form);
     };
@@ -64,7 +48,7 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="lg">
-            <h2>Add new product</h2>
+            <h2 className="text-2xl font-bold">Add new product</h2>
 
             {isLoading ? (
                 <p>Loading...</p>
@@ -133,10 +117,10 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
                     />
 
                     <div className="form-actions">
-                        <Button type="button" id="cancel" variant="danger" onClick={onClose}>
+                        <Button type="button" id="cancel" variant="danger" className="p-1" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button type="submit" variant="primary" isLoading={isCreating}>
+                        <Button type="submit" variant="primary" className="p-1" isLoading={isCreating}>
                             {isCreating ? 'Adding...' : 'Add Product'}
                         </Button>
                     </div>

@@ -31,7 +31,7 @@ export const BinMapCanvas: React.FC<BinMapCanvasProps> = ({
     return (
         <div className="card border border-slate-300">
             <div className="flex flex-row justify-between items-center px-3 py-1.5 border-b border-slate-300 bg-slate-200">
-                <h2 className="card-header m-0 p-0 text-base font-semibold text-slate-700">
+                <h2 className="card-header m-0 p-0 text-slate-900 font-bold">
                     Warehouse Bin Layout & Heatmap
                 </h2>
                 <span className="text-xs text-slate-500 font-normal">

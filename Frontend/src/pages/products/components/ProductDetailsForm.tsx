@@ -87,24 +87,26 @@ export const ProductDetailsForm: React.FC<ProductDetailsModalProps> = ({ product
                             {activeTab === 'stock' && (
                                 <div>
                                     {productStock.length === 0 ? (
-                                        <p className="text-gray-500 text-center py-8">No stock records found for this product.</p>
+                                        <p className="text-slate-400 text-center py-8 text-xs italic">No stock records found for this product.</p>
                                     ) : (
-                                        <table className="w-full text-left border-collapse">
-                                            <thead>
-                                                <tr className="bg-gray-100">
-                                                    <th className="p-2 border">Bin Location</th>
-                                                    <th className="p-2 border">Quantity</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {productStock.map(item => (
-                                                    <tr key={item.id}>
-                                                        <td className="p-2 border font-mono">{item.binLocationId}</td>
-                                                        <td className="p-2 border">{item.quantityOnHand}</td>
+                                        <div className="rounded-md border border-slate-300 overflow-hidden shadow-xs">
+                                            <table className="w-full text-xs text-left border-collapse">
+                                                <thead className="bg-slate-800 text-white font-bold uppercase text-[11px] tracking-wider border-b border-slate-700">
+                                                    <tr>
+                                                        <th className="py-2.5 px-3 bg-slate-800 text-white font-bold">Bin Location</th>
+                                                        <th className="py-2.5 px-3 bg-slate-800 text-white font-bold text-right">Quantity</th>
                                                     </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-200 bg-white">
+                                                    {productStock.map(item => (
+                                                        <tr key={item.id} className="odd:bg-white even:bg-slate-50/80 hover:bg-slate-100 transition-colors">
+                                                            <td className="py-2.5 px-3 font-mono font-bold text-slate-800">{item.binLocationId}</td>
+                                                            <td className="py-2.5 px-3 font-mono text-right font-bold text-slate-900">{item.quantityOnHand}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
                                     )}
                                 </div>
                             )}

@@ -31,12 +31,12 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
 
     return (
         <div className="card border border-slate-300">
-            <div className="flex flex-row justify-between items-center px-3 py-2 border-b border-slate-300 bg-slate-200">
-                <h2 className="card-header m-0 p-0 text-base font-semibold text-slate-700">
-                    Archiwum Faktur Sprzedażowych
+            <div className="flex flex-row justify-between items-center pb-2 mb-2 border-b border-slate-300">
+                <h2 className="card-header m-0 p-0 text-slate-900 font-bold">
+                    Invoice List
                 </h2>
                 <Button variant="accent" size="sm" onClick={onNewInvoice}>
-                    + Wystaw Nową Fakturę
+                    Issue a New Invoice
                 </Button>
             </div>
 
@@ -46,7 +46,7 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                     <div className="w-64">
                         <Input
                             type="text"
-                            placeholder="Szukaj po numerze, firmie, NIP..."
+                            placeholder="Search by invoice number, tax ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -56,10 +56,10 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                         onChange={(e) => setStatusFilter(e.target.value)}
                         className="bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-700 font-medium outline-none"
                     >
-                        <option value="ALL">Wszystkie statusy</option>
-                        <option value="Issued">Wystawione</option>
-                        <option value="Paid">Opłacone</option>
-                        <option value="Draft">Szkice</option>
+                        <option value="ALL">All statuses</option>
+                        <option value="Issued">Exhibited</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Draft">Sketches</option>
                     </select>
                 </div>
 
@@ -68,26 +68,26 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                     <table className="w-full text-xs text-left border-collapse">
                         <thead>
                             <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300 text-[11px] uppercase">
-                                <th className="py-2.5 px-3">Nr Faktury</th>
-                                <th className="py-2.5 px-3">Nabywca</th>
-                                <th className="py-2.5 px-3">Data wystawienia</th>
-                                <th className="py-2.5 px-3">Termin płatności</th>
+                                <th className="py-2.5 px-3">Invoice Number</th>
+                                <th className="py-2.5 px-3">Customer</th>
+                                <th className="py-2.5 px-3">Issue Date</th>
+                                <th className="py-2.5 px-3">Due Date</th>
                                 <th className="py-2.5 px-3 text-center">Status</th>
-                                <th className="py-2.5 px-3 text-right">Wartość Brutto</th>
-                                <th className="py-2.5 px-3 text-center">Akcje</th>
+                                <th className="py-2.5 px-3 text-right">Gross Amount</th>
+                                <th className="py-2.5 px-3 text-center">Actions</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 bg-white">
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={7} className="py-8 text-center text-slate-500">
-                                        Wczytywanie faktur...
+                                        Loading invoices...
                                     </td>
                                 </tr>
                             ) : filteredInvoices.length === 0 ? (
                                 <tr>
                                     <td colSpan={7} className="py-8 text-center text-slate-500">
-                                        Brak faktur spełniających kryteria wyszukiwania.
+                                        No invoices match your search criteria.
                                     </td>
                                 </tr>
                             ) : (
@@ -114,13 +114,12 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                                         </td>
                                         <td className="py-2.5 px-3 text-center">
                                             <span
-                                                className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${
-                                                    inv.status === 'Paid'
-                                                        ? 'bg-emerald-100 text-emerald-800'
-                                                        : inv.status === 'Issued'
+                                                className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${inv.status === 'Paid'
+                                                    ? 'bg-emerald-100 text-emerald-800'
+                                                    : inv.status === 'Issued'
                                                         ? 'bg-blue-100 text-blue-800'
                                                         : 'bg-amber-100 text-amber-800'
-                                                }`}
+                                                    }`}
                                             >
                                                 {inv.status}
                                             </span>
@@ -134,7 +133,7 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                                                 size="sm"
                                                 onClick={() => onSelectInvoice(inv.id)}
                                             >
-                                                Edytuj w WYSIWYG
+                                                Edit in Visual Editor
                                             </Button>
                                         </td>
                                     </tr>

@@ -27,7 +27,7 @@ export const BinMapDetails: React.FC<BinMapDetailsProps> = ({
     return (
         <div className="card border border-slate-300">
             <div className="flex flex-row justify-between items-center px-3 py-1.5 border-b border-slate-300 bg-slate-200">
-                <h2 className="card-header m-0 p-0 text-base font-semibold text-slate-700">
+                <h2 className="card-header m-0 p-0 text-slate-900 font-bold">
                     {selectedZone ? `Bin Location ${selectedZone.id}` : 'Bin Details'}
                 </h2>
                 {selectedZone && (

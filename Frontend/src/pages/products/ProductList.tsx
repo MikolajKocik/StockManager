@@ -71,15 +71,21 @@ export default function ProductList() {
     return (
         <div>
             <div className="flex flex-row-reverse gap-4 mb-4">
-                <Button variant="primary" className="p-2" onClick={() => setIsCreateModalOpen(true)}>Add Product</Button>
+                <Button 
+                    variant="primary" 
+                    size="md"
+                    onClick={() => setIsCreateModalOpen(true)}
+                >
+                    + Add Product
+                </Button>
             </div>
 
             <div className="col-span-2 card">
-                <div className="flex flex-row justify-between items-center">
-                    <h2 className="card-header">Product List</h2>
+                <div className="flex flex-row justify-between items-center pb-2 mb-2 border-b border-slate-300">
+                    <h2 className="card-header m-0 p-0">Product List</h2>
                     <Button
-                        variant="accent"
-                        className="p-1 m-[0.4rem]"
+                        variant="secondary"
+                        size="sm"
                         onClick={() => handleRefetch()}
                         disabled={isFetching}
                     >
@@ -87,81 +93,65 @@ export default function ProductList() {
                     </Button>
                 </div>
                 <div className="card-body">
-                    <Table className="w-full h-full border-collapse mb-2 border [&_td]:p-1 [&_th]:p-1">
-                        <TableHead className="bg-slate-200 border">
-                            <TableRow className="text-center bg-slate-300">
-                                <TableHeaderCell>
-                                    Identificator
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Name
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Slug
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Genre
-                                </TableHeaderCell>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableHeaderCell>ID</TableHeaderCell>
+                                <TableHeaderCell>Name</TableHeaderCell>
+                                <TableHeaderCell>Slug</TableHeaderCell>
+                                <TableHeaderCell>Genre</TableHeaderCell>
                                 <TableHeaderCell isFiltered={activeSort === 'unit'} onClick={() => toggleFilter('unit')}>
                                     Unit
                                 </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Expiration-Date
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Delivered-At
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Batch-number
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Supplier-identifactor
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Supplier-name
-                                </TableHeaderCell>
-                                <TableHeaderCell>
-                                    Actions
-                                </TableHeaderCell>
+                                <TableHeaderCell>Exp. Date</TableHeaderCell>
+                                <TableHeaderCell>Delivered At</TableHeaderCell>
+                                <TableHeaderCell>Batch No.</TableHeaderCell>
+                                <TableHeaderCell>Supplier ID</TableHeaderCell>
+                                <TableHeaderCell>Supplier Name</TableHeaderCell>
+                                <TableHeaderCell className="text-center">Actions</TableHeaderCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {displayedProducts.map(p => (
                                 <TableRow key={p.id}>
-                                    <TableCell className="border">
-                                        {p.id}
+                                    <TableCell className="font-mono font-bold text-slate-700">
+                                        #{p.id}
                                     </TableCell>
-                                    <TableCell className="border">
+                                    <TableCell className="font-semibold text-slate-900">
                                         {p.name}
                                     </TableCell>
-                                    <TableCell className="border">
+                                    <TableCell className="text-slate-500 font-mono text-[11px]">
                                         {p.slug}
                                     </TableCell>
-                                    <TableCell className="border">
-                                        {p.genre}
+                                    <TableCell>
+                                        <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                                            {p.genre}
+                                        </span>
                                     </TableCell>
-                                    <TableCell className="border text-center">
-                                        {p.unit}
+                                    <TableCell>
+                                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                                            {p.unit}
+                                        </span>
                                     </TableCell>
-                                    <TableCell className="border">
+                                    <TableCell className="text-slate-600">
                                         {p.expirationDate}
                                     </TableCell>
-                                    <TableCell className="border">
+                                    <TableCell className="text-slate-600">
                                         {p.deliveredAt}
                                     </TableCell>
-                                    <TableCell className="border">
+                                    <TableCell className="font-mono text-xs text-slate-600">
                                         {p.batchNumber}
                                     </TableCell>
-                                    <TableCell className="border">
+                                    <TableCell className="font-mono text-xs text-slate-500">
                                         {p.supplierId}
                                     </TableCell>
-                                    <TableCell className="border">
+                                    <TableCell className="font-medium text-slate-800">
                                         {p.supplierName}
                                     </TableCell>
-                                    <TableCell className="border text-center">
-                                        <div className="flex justify-center gap-2">
+                                    <TableCell className="text-center">
+                                        <div className="flex justify-center items-center gap-1.5">
                                             <Button
-                                                variant="ghost"
+                                                variant="secondary"
                                                 size="sm"
                                                 onClick={() => handleOpenDetails(p.id)}
                                             >
@@ -182,8 +172,8 @@ export default function ProductList() {
                                                     variant="danger"
                                                     size="sm"
                                                     onClick={() => {
-                                                        setSelectedProductId(p.id.toString())
-                                                        setIsConfirmModalOpen(true)
+                                                        setSelectedProductId(p.id.toString());
+                                                        setIsConfirmModalOpen(true);
                                                     }}
                                                     disabled={deleteProductMutation.isPending}
                                                 >

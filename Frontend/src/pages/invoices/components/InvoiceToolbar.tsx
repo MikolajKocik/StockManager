@@ -49,7 +49,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                         : 'text-slate-700 hover:bg-slate-300'
                         }`}
                 >
-                    Edytor WYSIWYG
+                    Visual Editor
                 </button>
                 <button
                     type="button"
@@ -59,7 +59,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                         : 'text-slate-700 hover:bg-slate-300'
                         }`}
                 >
-                    Archiwum Faktur ({invoicesCount})
+                    Invoice Archive ({invoicesCount})
                 </button>
             </div>
 
@@ -67,15 +67,15 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
             {viewMode === 'editor' && (
                 <div className="flex items-center gap-3 text-xs">
                     <div className="flex items-center gap-1.5">
-                        <span className="text-slate-600 font-medium">Typ:</span>
+                        <span className="text-slate-600 font-medium">Type:</span>
                         <select
                             value={type}
                             onChange={(e) => onTypeChange(e.target.value as InvoiceType)}
                             className="bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 text-xs font-semibold outline-none"
                         >
-                            <option value="Sales">Faktura VAT Sprzedaży</option>
-                            <option value="Proforma">Faktura Proforma</option>
-                            <option value="Correction">Faktura Korygująca</option>
+                            <option value="Sales">Sales Invoice</option>
+                            <option value="Proforma">Proforma Invoice</option>
+                            <option value="Correction">Correction Invoice</option>
                         </select>
                     </div>
 
@@ -86,15 +86,15 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                             onChange={(e) => onStatusChange(e.target.value as InvoiceStatus)}
                             className="bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 text-xs font-semibold outline-none"
                         >
-                            <option value="Draft">Szkic (Draft)</option>
-                            <option value="Issued">Wystawiona</option>
-                            <option value="Paid">Opłacona</option>
-                            <option value="Cancelled">Anulowana</option>
+                            <option value="Draft">Draft</option>
+                            <option value="Issued">Issued</option>
+                            <option value="Paid">Paid</option>
+                            <option value="Cancelled">Cancelled</option>
                         </select>
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                        <span className="text-slate-600 font-medium">Waluta:</span>
+                        <span className="text-slate-600 font-medium">Currency:</span>
                         <select
                             value={currency}
                             onChange={(e) => onCurrencyChange(e.target.value as InvoiceCurrency)}
@@ -107,7 +107,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                        <span className="text-slate-600 font-medium">Język:</span>
+                        <span className="text-slate-600 font-medium">Language:</span>
                         <select
                             value={language}
                             onChange={(e) => onLanguageChange(e.target.value as InvoiceLanguage)}
@@ -128,7 +128,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                     className="bg-white text-slate-700 hover:bg-slate-100"
                     onClick={onNewInvoice}
                 >
-                    + Nowa Faktura
+                    + New Invoice
                 </Button>
 
                 {viewMode === 'editor' && (
@@ -139,7 +139,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                             className="bg-slate-700 text-white hover:bg-slate-800"
                             onClick={onPrintInvoice}
                         >
-                            Drukuj / PDF
+                            Print / PDF
                         </Button>
                         <Button
                             variant="accent"
@@ -147,7 +147,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                             onClick={onSaveInvoice}
                             isLoading={isSaving}
                         >
-                            Zapisz Dokument
+                            Save Document
                         </Button>
                     </>
                 )}

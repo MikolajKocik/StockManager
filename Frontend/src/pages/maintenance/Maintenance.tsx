@@ -1,11 +1,7 @@
-
-
-
 export default function Maintenance() {
-
-
-
     return (
-        <h1></h1>
-    )
+        <div>
+            <h2>Maintenance</h2>
+        </div>
+    );
 }

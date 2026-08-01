@@ -9,6 +9,16 @@ import {
   Shipments,
   Documents,
   InventoryItems,
+  Maintenance,
+  BarCodes,
+  Analyze,
+  BinMap,
+  Manage,
+  ReorderRules,
+  Customers,
+  Returns,
+  AuditLog,
+  Invoices,
   NotFound
 } from '@/pages';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
@@ -41,12 +51,24 @@ export default function App() {
         <Routes>
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Home />} />
             <Route path="/products" element={<ProductList />} />
             <Route path="/suppliers" element={<Suppliers />} />
             <Route path="/operations" element={<Operations />} />
             <Route path="/shipments" element={<Shipments />} />
             <Route path="/documents" element={<Documents />} />
+            <Route path="/stock" element={<InventoryItems />} />
             <Route path="/inventory-items" element={<InventoryItems />} />
+            <Route path="/barcodes" element={<BarCodes />} />
+            <Route path="/maintenance" element={<Maintenance />} />
+            <Route path="/analyze" element={<Analyze />} />
+            <Route path="/bin-map" element={<BinMap />} />
+            <Route path="/manage" element={<Manage />} />
+            <Route path="/reorder-rules" element={<ReorderRules />} />
+            <Route path="/customers" element={<Customers />} />
+            <Route path="/returns" element={<Returns />} />
+            <Route path="/audit-log" element={<AuditLog />} />
+            <Route path="/invoices" element={<Invoices />} />
 
             {/* Catch all route - 404 */}
             <Route path="*" element={<NotFound />} />

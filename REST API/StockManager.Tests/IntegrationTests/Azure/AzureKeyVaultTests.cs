@@ -1,5 +1,3 @@
-﻿using System.ComponentModel;
-using System.Linq;
 using Azure;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
@@ -9,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 
 namespace StockManager.Tests.IntegrationTests.Azure;
 
-[Category("IntegrationTests")]
+[Trait("Category", "IntegrationTests")]
 [Trait("Category", "Azure")]
 public sealed class AzureKeyVaultTests
 {
@@ -17,16 +15,16 @@ public sealed class AzureKeyVaultTests
     {
         try
         {
-            string? kvUri = "https://stockmanager-keyvault.vault.azure.net/";
+            const string? kvUri = "https://stockmanager-keyvault.vault.azure.net/";
             var client = new SecretClient(new Uri(kvUri), new DefaultAzureCredential());
             // Actually test the connection by listing secrets with a timeout
             SecretProperties secrets = client.GetPropertiesOfSecrets().FirstOrDefault();
             return true;
         }
-        catch (Exception ex) when (ex.Message.Contains("Name or service not known") || 
+        catch (Exception ex) when (ex.Message.Contains("Name or service not known") ||
                                    ex.Message.Contains("could not be resolved") ||
                                    ex is RequestFailedException ||
-                                   ex.InnerException?.Message.Contains("Name or service not known") == true)
+                                   ex.InnerException?.Message.Contains("Name or service not known") is true)
         {
             return false;
         }

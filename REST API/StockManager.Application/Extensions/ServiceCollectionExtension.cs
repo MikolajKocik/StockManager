@@ -1,17 +1,11 @@
-﻿using System.Reflection;
+using System.Reflection;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using StockManager.Application.Common.PipelineBehavior;
 using StockManager.Application.Configurations;
-using StockManager.Application.CQRS.Queries.ProductQueries.GetProductById;
-using StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
-using StockManager.Application.CQRS.Queries.SupplierQueries.GetSupplierById;
-using StockManager.Application.CQRS.Queries.SupplierQueries.GetSuppliers;
-using StockManager.Application.Services;
+using StockManager.Application.Middlewares;
 
 namespace StockManager.Application.Extensions;
 
@@ -34,6 +28,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpContextAccessor();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(SqlExceptionPipelineBehavior<,>));
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(RetryPipelineBehavior<,>));
     }
 }

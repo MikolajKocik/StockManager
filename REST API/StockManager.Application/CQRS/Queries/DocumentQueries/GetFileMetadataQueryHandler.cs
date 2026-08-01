@@ -1,29 +1,36 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Query;
+using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
 
 namespace StockManager.Application.CQRS.Queries.DocumentQueries;
 
-public sealed class GetFileMetadataQueryHandler : IQueryHandler<GetFileMetadataQuery, List<FileMetadata>>
+public sealed class GetFileMetadataQueryHandler(
+    IDocumentRepository docRepository, ILogger<GetFileMetadataQueryHandler> logger)
+    : IQueryHandler<GetFileMetadataQuery, IReadOnlyList<FileMetadata>>
 {
-    private readonly IDocumentRepository _docRepository;
+    private readonly IDocumentRepository _docRepository = docRepository;
+    private readonly ILogger<GetFileMetadataQueryHandler> _logger = logger;
 
-    public GetFileMetadataQueryHandler(IDocumentRepository docRepository)
+    public async Task<Result<IReadOnlyList<FileMetadata>>> Handle(GetFileMetadataQuery query, CancellationToken cancellationToken)
     {
-        _docRepository = docRepository;
-    }
+        List<FileMetadata> files = await _docRepository
+            .GetAllFiles()
+            .AsNoTracking()
+            .OrderByDescending(f => f.UploadedAt)
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(cancellationToken);
+        
+        GeneralLogInfo.Information(
+            _logger,
+            $"Retrieved {files.Count} file metadata records for page {query.Page} with page size {query.PageSize}.",
+            default
+        );
 
-    public async Task<Result<List<FileMetadata>>> Handle(GetFileMetadataQuery query, CancellationToken cancellationToken)
-    {
-        List<FileMetadata> files  = await _docRepository.GetAllFilesAsync(cancellationToken);
-    
-        return files.Any() 
-            ? Result<List<FileMetadata>>.Success(files)
-            : Result<List<FileMetadata>>.Success([]);
+        return Result<IReadOnlyList<FileMetadata>>.Success(files);
     }
 }

@@ -1,9 +1,10 @@
 import { Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Select, Input, Button, Header } from "@/components/common";
 import { useState } from "react"
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { inventoryApi } from "@/api/internal/inventoryApi";
-import { productsApi } from "@/api/internal/productsApi";
 import type { InventoryItemCollection } from "@/models/inventoryItem";
+import { useInventoryItems } from "./hooks/useInventoryItems";
+import { useGenres, useWTypes } from "@/hooks/queries";
 
 export default function InventoryItems() {
     const [question, setQuestion] = useState<string>("");
@@ -11,20 +12,11 @@ export default function InventoryItems() {
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
     const [aiItems, setAiItems] = useState<InventoryItemCollection | null>(null);
 
-    const { data: items = { data: [] } } = useQuery({
-        queryKey: ['items'],
-        queryFn: inventoryApi.getItems
-    });
+    const { data: items = { data: [] } } = useInventoryItems();
 
-    const { data: genres = [] } = useQuery({
-        queryKey: ['genres'],
-        queryFn: productsApi.getGenres
-    });
+    // const { data: genres = [] } = useGenres();
 
-    const { data: warehouses = [] } = useQuery({
-        queryKey: ['warehouses'],
-        queryFn: productsApi.getWarehouses
-    });
+    // const { data: warehouses = [] } = useWTypes();
 
     const { mutate: searchAI, isPending: isSearching } = useMutation({
         mutationFn: inventoryApi.searchAI,

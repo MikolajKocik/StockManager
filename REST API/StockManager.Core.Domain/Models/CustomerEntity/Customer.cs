@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StockManager.Core.Domain.Common;
+﻿using StockManager.Core.Domain.Common;
 using StockManager.Core.Domain.GuardMethods;
 using StockManager.Core.Domain.Models.AddressEntity;
 using StockManager.Core.Domain.Models.SalesOrderEntity;
@@ -75,5 +70,11 @@ public sealed class Customer : Entity<int>
         {
             throw new ArgumentException("E‑mail bad format");
         }
+    }
+    
+    private void ChangeName(string newName)
+    {
+        Guard.AgainstNullOrWhiteSpace(newName);
+        Name = newName;
     }
 }

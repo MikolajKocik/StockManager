@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
@@ -10,33 +5,30 @@ using StockManager.Application.Common.Logging.Invoice;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.InvoiceEntity;
 
 namespace StockManager.Application.CQRS.Commands.InvoiceCommands.PayInvoice;
-public sealed class PayInvoiceCommandHandler : ICommandHandler<PayInvoiceCommand, Unit>
-{
-    private readonly IInvoiceRepository _repo;
-    private readonly ILogger<PayInvoiceCommandHandler> _logger;
-    private readonly IInvoiceService _service;
 
-    public PayInvoiceCommandHandler(
-        IInvoiceRepository repo, 
+public sealed class PayInvoiceCommandHandler(
+        IInvoiceRepository repo,
         ILogger<PayInvoiceCommandHandler> logger,
-        IInvoiceService service
-        )
-    {
-        _repo = repo;
-        _service = service;
-        _logger = logger;
-    }
+        IInvoiceService service,
+        IUnitOfWork uow
+    ) : ICommandHandler<PayInvoiceCommand, Unit>
+{
+    private readonly IInvoiceRepository _repo = repo;
+    private readonly IInvoiceService _service = service;
+    private readonly ILogger<PayInvoiceCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
 
-    public async Task<Result<Unit>> Handle(PayInvoiceCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(PayInvoiceCommand command, CancellationToken ct)
     {
-        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-        Invoice? invoice = await _repo.GetInvoiceByIdAsync(command.Id, cancellationToken);
+        Invoice? invoice = await _repo.GetInvoiceByIdAsync(command.Id, ct);
         if (invoice is null)
         {
             InvoiceLogWarning.InvoiceNotFound(_logger, command.Id, default);
@@ -47,8 +39,8 @@ public sealed class PayInvoiceCommandHandler : ICommandHandler<PayInvoiceCommand
 
         try
         {
-            _service.Pay(invoice, command.PaymentDate);    
-            await _repo.UpdateInvoiceAsync(invoice, cancellationToken);
+            _service.Pay(invoice, command.PaymentDate);
+            await _uow.SaveChangesAsync(ct);
 
             InvoiceLogInfo.LogInvoicePayed(_logger, invoice.Id, DateTime.UtcNow, default);
             return Result<Unit>.Success(Unit.Value);

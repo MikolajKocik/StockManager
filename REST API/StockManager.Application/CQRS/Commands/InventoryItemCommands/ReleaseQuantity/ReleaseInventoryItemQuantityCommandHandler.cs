@@ -1,44 +1,36 @@
-using System.Threading;
-using System.Threading.Tasks;
 using AutoMapper;
-using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
 using StockManager.Application.Common.Logging.InventoryItem;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 using StockManager.Application.Helpers.CQRS.NullResult;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace StockManager.Application.CQRS.Commands.InventoryItemCommands.ReleaseQuantity;
 
-public sealed class ReleaseInventoryItemQuantityCommandHandler : ICommandHandler<ReleaseInventoryItemQuantityCommand, InventoryItemDto>
-{
-    private readonly IInventoryItemRepository _repository;
-    private readonly IInventoryItemService _service;
-    private readonly IMapper _mapper;
-    private readonly ILogger<ReleaseInventoryItemQuantityCommandHandler> _logger;
-
-    public ReleaseInventoryItemQuantityCommandHandler(
+public sealed class ReleaseInventoryItemQuantityCommandHandler(
         IInventoryItemRepository repository,
         IInventoryItemService service,
         IMapper mapper,
-        ILogger<ReleaseInventoryItemQuantityCommandHandler> logger)
-    {
-        _repository = repository;
-        _service = service;
-        _mapper = mapper;
-        _logger = logger;
-    }
+        ILogger<ReleaseInventoryItemQuantityCommandHandler> logger,
+        IUnitOfWork uow
+    ) : ICommandHandler<ReleaseInventoryItemQuantityCommand, InventoryItemDto>
+{
+    private readonly IInventoryItemRepository _repository = repository;
+    private readonly IInventoryItemService _service = service;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<ReleaseInventoryItemQuantityCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
 
-    public async Task<Result<InventoryItemDto>> Handle(ReleaseInventoryItemQuantityCommand command, CancellationToken cancellationToken)
+    public async Task<Result<InventoryItemDto>> Handle(ReleaseInventoryItemQuantityCommand command, CancellationToken ct)
     {
-        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-        InventoryItem? inventoryItem = await _repository.GetInventoryItemByIdAsync(command.Id, cancellationToken);
+        InventoryItem? inventoryItem = await _repository.GetInventoryItemByIdAsync(command.Id, ct);
         if (inventoryItem is null)
         {
             InventoryItemLogWarning.LogInventoryItemNotFound(_logger, command.Id, default);
@@ -49,7 +41,7 @@ public sealed class ReleaseInventoryItemQuantityCommandHandler : ICommandHandler
         }
 
         _service.ReleaseQuantity(inventoryItem, command.Amount);
-        await _repository.UpdateInventoryItemAsync(inventoryItem, cancellationToken);
+        await _uow.SaveChangesAsync(ct);
 
         InventoryItemLogInfo.LogInventoryItemQuantityReleased(_logger, command.Id, command.Amount, default);
 

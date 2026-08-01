@@ -1,113 +1,46 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.BinLocationEntity;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
-using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
-public sealed class InventoryItemRepository : IInventoryItemRepository
+internal sealed class InventoryItemRepository(StockManagerDbContext db) 
+    : BaseOperations<InventoryItem>(db), IInventoryItemRepository
 {
-    private readonly StockManagerDbContext _dbContext;
-    public InventoryItemRepository(StockManagerDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    /// <summary>
-    /// Asynchronously retrieves an inventory item by its unique identifier.
-    /// </summary>
-    /// <remarks>The method includes related <see cref="Product"/> and <see cref="BinLocation"/> entities  in
-    /// the result. Ensure the <paramref name="cancellationToken"/> is properly managed to  handle operation
-    /// cancellation.</remarks>
-    /// <param name="id">The unique identifier of the inventory item to retrieve.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the  <see cref="InventoryItem"/> if
-    /// found; otherwise, <see langword="null"/>.</returns>
-    public Task<InventoryItem?> GetInventoryItemByIdAsync(int id, CancellationToken cancellationToken)
-         => _dbContext.InventoryItems
+    public async Task<InventoryItem?> GetInventoryItemByIdAsync(int id, CancellationToken ct)
+         => await _db.InventoryItems
                 .Include(i => i.Product)
                 .Include(i => i.BinLocation)
-                .FirstOrDefaultAsync(i => i.Id == id, cancellationToken);
+                .FirstOrDefaultAsync(i => i.Id == id, ct);
 
-    /// <summary>
-    /// Retrieves a queryable collection of inventory items with related product and bin location data.
-    /// </summary>
-    /// <remarks>The returned collection includes related data from the Product and BinLocation entities. The
-    /// query is executed with no tracking, which improves performance for read-only operations.</remarks>
-    /// <returns>An <see cref="IQueryable{T}"/> of <see cref="InventoryItem"/> representing the inventory items.</returns>
     public IQueryable<InventoryItem> GetInventoryItems()
-        => _dbContext.InventoryItems
-                .IgnoreQueryFilters()
-                .Include(i => i.Product)
-                .Include(i => i.BinLocation)
-                .AsNoTracking();
+        => GetAll()
+            .IgnoreQueryFilters()
+            .Include(i => i.Product)
+            .Include(i => i.BinLocation)
+            .AsNoTracking();
 
-    /// <summary>
-    /// Asynchronously adds a new inventory item to the database.
-    /// </summary>
-    /// <remarks>This method saves the changes to the database and returns the added inventory item.</remarks>
-    /// <param name="inventoryItem">The inventory item to add. Cannot be null.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>The added <see cref="InventoryItem"/> instance.</returns>
-    public Task<InventoryItem> AddInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken)
-        => RepositoryQueriesHelpers.AddEntityAsync(_dbContext, inventoryItem, cancellationToken);
+    public void AddInventoryItem(InventoryItem inventoryItem)
+        =>  Add(inventoryItem);
 
-    /// <summary>
-    /// Updates the specified inventory item in the database asynchronously.
-    /// </summary>
-    /// <param name="inventoryItem">The inventory item to update. Must not be null and should have a valid identifier.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>The updated <see cref="InventoryItem"/> instance.</returns>
-    public async Task<InventoryItem> UpdateInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken)
-    {
-        _dbContext.InventoryItems.Update(inventoryItem);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return inventoryItem;
-    }
+    public async Task<BinLocation?> GetBinLocationByIdAsync(int binLocationId, CancellationToken ct)
+        => await _db.BinLocations
+            .AsNoTracking()
+            .FirstOrDefaultAsync(bl => bl.Id == binLocationId, ct);
 
-    /// <summary>
-    /// Asynchronously retrieves a <see cref="BinLocation"/> by its unique identifier.
-    /// </summary>
-    /// <param name="binLocationId">The unique identifier of the bin location to retrieve.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>A task that represents the asynchronous operation. The task result contains the <see cref="BinLocation"/> if
-    /// found; otherwise, <see langword="null"/>.</returns>
-    public Task<BinLocation?> GetBinLocationByIdAsync(int binLocationId, CancellationToken cancellationToken)
-        => _dbContext.BinLocations
-            .FirstOrDefaultAsync(bl => bl.Id == binLocationId, cancellationToken);
-
-    /// <summary>
-    /// Asynchronously retrieves a list of <see cref="InventoryItem"/> entities associated with a specific product.
-    /// </summary>
-    /// <param name="productId">The unique identifier of the product.</param>
-    /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-    /// <returns>
-    /// A task that represents the asynchronous operation. The task result contains a list of <see cref="InventoryItem"/>
-    /// entities that match the specified product ID.
-    /// </returns>
-    public Task<List<InventoryItem>> GetInventoryItemsByProductIdAsync(int productId, CancellationToken cancellationToken)
-        => _dbContext.InventoryItems
+    public async Task<IReadOnlyList<InventoryItem>> GetInventoryItemsByProductIdAsync(int productId, CancellationToken ct)
+        => await _db.InventoryItems
             .Where(i => i.ProductId == productId)
-            .ToListAsync(cancellationToken);
+            .AsNoTracking()
+            .ToListAsync(ct);
 
-    /// <summary>
-    /// Asynchronously deletes the specified inventory item from the database.
-    /// </summary>
-    /// <param name="inventoryItem"></param>
-    /// <param name="cancellationToken"></param>
-    /// <returns></returns>
-    public async Task<InventoryItem?> DeleteInventoryItemAsync(InventoryItem inventoryItem, CancellationToken cancellationToken)
+    public async Task DeleteInventoryItemAsync(int id , CancellationToken ct)
     {
-        InventoryItem inventoryItemExist = await RepositoryQueriesHelpers.EntityFindAsync<InventoryItem, int>(_dbContext, inventoryItem.Id, cancellationToken);
-
-        _dbContext.InventoryItems.Remove(inventoryItemExist!);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return inventoryItem;
+        InventoryItem item = await _db.FindAsync<InventoryItem>([id], ct)
+            ?? throw new InvalidOperationException($"Inventory item with ID {id} not found.");
+        _db.Remove(item);
     }
-
-    public Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => _dbContext.Database.BeginTransactionAsync(cancellationToken);
 }

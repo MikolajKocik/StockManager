@@ -8,27 +8,23 @@ using StockManager.Core.Domain.Models.SalesOrderEntity;
 
 namespace StockManager.Application.CQRS.Queries.SalesOrderQueries;
 
-public sealed class GetSalesOrdersQueryHandler : IQueryHandler<GetSalesOrdersQuery, List<SalesOrderDto>>
+public sealed class GetSalesOrdersQueryHandler(
+    ISalesOrderRepository repository,
+    IMapper mapper) : IQueryHandler<GetSalesOrdersQuery, IReadOnlyList<SalesOrderDto>>
 {
-    private readonly ISalesOrderRepository _repository;
-    private readonly IMapper _mapper;
+    private readonly ISalesOrderRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
 
-    public GetSalesOrdersQueryHandler(ISalesOrderRepository repository, IMapper mapper)
-    {
-        _repository = repository;
-        _mapper = mapper;
-    }
-
-    public async Task<Result<List<SalesOrderDto>>> Handle(GetSalesOrdersQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<SalesOrderDto>>> Handle(GetSalesOrdersQuery query, CancellationToken cancellationToken)
     {
         List<SalesOrder> orders = await _repository.GetSalesOrders()
-            .Include(o => o.Customer)
-            .Include(o => o.SalesOrderLines)
-                .ThenInclude(l => l.Product)
+            .OrderByDescending(o => o.DeliveredDate)
+            .Skip((query.Page - 1) * query.PageSize)
+            .Take(query.PageSize)
             .ToListAsync(cancellationToken);
 
         List<SalesOrderDto> dtos = _mapper.Map<List<SalesOrderDto>>(orders);
 
-        return Result<List<SalesOrderDto>>.Success(dtos);
+        return Result<IReadOnlyList<SalesOrderDto>>.Success(dtos);
     }
 }

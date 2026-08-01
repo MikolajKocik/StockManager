@@ -1,50 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.InvoiceEntity;
-using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
-public sealed class InvoiceRepository : IInvoiceRepository
+internal sealed class InvoiceRepository(StockManagerDbContext db) 
+    : BaseOperations<Invoice>(db), IInvoiceRepository
 {
-    private readonly StockManagerDbContext _dbContext;
-
-    public InvoiceRepository(StockManagerDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public IQueryable<Invoice> GetInvoices() => _dbContext.Invoices;
+    public IQueryable<Invoice> GetInvoices() 
+        => GetAll()
+            .AsNoTracking();
   
-    public async Task<Invoice?> GetInvoiceByIdAsync(int id, CancellationToken cancellationToken)
-        => await _dbContext.Invoices
+    public async Task<Invoice?> GetInvoiceByIdAsync(int id, CancellationToken ct)
+        => await _db.Invoices
                 .Where(x => x.Id == id)
                 .Include(x => x.PurchaseOrderId)
                 .Include(x => x.SalesOrderId)
-                .FirstOrDefaultAsync(cancellationToken);  
-    
-    public async Task<Invoice> AddInvoiceAsync(Invoice entity, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, entity, cancellationToken);
+                .FirstOrDefaultAsync(ct);
 
-    public async Task<Invoice> UpdateInvoiceAsync(Invoice entity, CancellationToken cancellationToken)
-    {
-        if (_dbContext.Entry(entity).State == EntityState.Detached)
-        {
-            _dbContext.Invoices.Attach(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
-        }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return entity;
-    }
-
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+    public void AddInvoice(Invoice invoice)
+        => Add(invoice);
 }

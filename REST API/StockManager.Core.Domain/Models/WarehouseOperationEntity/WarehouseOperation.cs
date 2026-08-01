@@ -33,7 +33,9 @@ public sealed class WarehouseOperation : Entity<int>
     public void AddItem(int productId, decimal quantity)
     {
         if (quantity <= 0)
+        {
             throw new ArgumentException("Quantity must be greater than zero.", nameof(quantity));
+        }
 
         _items.Add(new OperationItem(Id, productId, quantity));
     }
@@ -41,7 +43,9 @@ public sealed class WarehouseOperation : Entity<int>
     public void Complete()
     {
         if (Status != OperationStatus.Pending)
+        {
             throw new InvalidOperationException("Only pending operations can be completed.");
+        }
 
         Status = OperationStatus.Completed;
     }
@@ -49,8 +53,10 @@ public sealed class WarehouseOperation : Entity<int>
     public void Cancel()
     {
         if (Status != OperationStatus.Pending)
+        {
             throw new InvalidOperationException("Only pending operations can be cancelled.");
-
+        }
+        
         Status = OperationStatus.Cancelled;
     }
 }

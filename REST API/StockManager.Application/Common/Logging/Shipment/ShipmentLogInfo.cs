@@ -45,8 +45,8 @@ public static class ShipmentLogInfo
             ShipmentLogEventIds.ShipmentMarkedReturned,
             "Shipment marked as returned: {ShipmentId}");
 
-    public static readonly Action<ILogger, Result<IEnumerable<ShipmentDto>>, Exception?> LogReturnedListOfShipments =
-        LoggerMessage.Define<Result<IEnumerable<ShipmentDto>>>(
+    public static readonly Action<ILogger, Result<IReadOnlyList<ShipmentDto>>, Exception?> LogReturnedListOfShipments =
+        LoggerMessage.Define<Result<IReadOnlyList<ShipmentDto>>>(
             LogLevel.Information,
             ShipmentLogEventIds.ReturnedListOfShipments,
             "Returned list of shipments: {@shipments}");

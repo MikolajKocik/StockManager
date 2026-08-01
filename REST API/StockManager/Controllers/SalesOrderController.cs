@@ -13,10 +13,10 @@ using StockManager.Application.CQRS.Commands.SalesOrderCommands.DeleteSalesOrder
 using StockManager.Application.CQRS.Commands.SalesOrderCommands.DeliverSalesOrder;
 using StockManager.Application.CQRS.Commands.SalesOrderCommands.EditSalesOrder;
 using StockManager.Application.CQRS.Commands.SalesOrderCommands.ShipSalesOrder;
+using StockManager.Application.CQRS.Queries.SalesOrderQueries;
 using StockManager.Application.Dtos.ModelsDto.SalesOrderDtos;
 using StockManager.Application.Extensions.ErrorExtensions;
 using StockManager.Core.Domain.Enums;
-using StockManager.Application.CQRS.Queries.SalesOrderQueries;
 
 namespace StockManager.Controllers;
 
@@ -42,7 +42,7 @@ public sealed class SalesOrdersController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<ActionResult<List<SalesOrderDto>>> GetAll(CancellationToken cancellationToken)
     {
-        Result<List<SalesOrderDto>> result = await _mediator.Send(new GetSalesOrdersQuery(), cancellationToken);
+        Result<IReadOnlyList<SalesOrderDto>> result = await _mediator.Send(new GetSalesOrdersQuery(), cancellationToken);
 
         if (result.IsSuccess)
         {
@@ -109,7 +109,7 @@ public sealed class SalesOrdersController : ControllerBase
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
 
-        return new ObjectResult(problem) 
+        return new ObjectResult(problem)
         {
             StatusCode = problem.Status
         };
@@ -168,7 +168,7 @@ public sealed class SalesOrdersController : ControllerBase
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
 
-        return new ObjectResult(problem) 
+        return new ObjectResult(problem)
         {
             StatusCode = problem.Status
         };
@@ -190,7 +190,7 @@ public sealed class SalesOrdersController : ControllerBase
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
 
         return new ObjectResult(problem)
-        { 
+        {
             StatusCode = problem.Status
         };
     }
@@ -209,9 +209,9 @@ public sealed class SalesOrdersController : ControllerBase
         }
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
-        return new ObjectResult(problem) 
-        { 
-            StatusCode = problem.Status 
+        return new ObjectResult(problem)
+        {
+            StatusCode = problem.Status
         };
     }
 
@@ -235,9 +235,9 @@ public sealed class SalesOrdersController : ControllerBase
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
 
-        return new ObjectResult(problem) 
+        return new ObjectResult(problem)
         {
-            StatusCode = problem.Status 
+            StatusCode = problem.Status
         };
     }
 

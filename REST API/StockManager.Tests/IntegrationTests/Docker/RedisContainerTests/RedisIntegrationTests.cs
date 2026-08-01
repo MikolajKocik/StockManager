@@ -1,12 +1,11 @@
-﻿using System.ComponentModel;
 using DotNet.Testcontainers.Containers;
 using FluentAssertions;
 using StackExchange.Redis;
 using Testcontainers.Redis;
 
-namespace StockManager.Application.Tests.IntegrationTests.Docker.RedisContainerTests;
+namespace StockManager.Tests.IntegrationTests.Docker.RedisContainerTests;
 
-[Category("IntegrationTests")]
+[Trait("Category", "IntegrationTests")]
 public sealed class RedisIntegrationTests : IAsyncLifetime
 {
     private readonly RedisContainer _redisContainer = new RedisBuilder().Build();

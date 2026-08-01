@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.CQRS.Queries.StatisticsQueries;
 using StockManager.Application.Dtos.StatisticsDtos;
 using StockManager.Core.Domain.Interfaces.Services;
@@ -35,16 +36,18 @@ public sealed class StatisticsController : ControllerBase
     }
 
     [HttpGet("operations-trend")]
+    [ResponseCache(Duration = 300, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> GetOperationsTrend([FromQuery] int days = 30, CancellationToken ct = default)
     {
-        var result = await _mediator.Send(new GetOperationsTrendQuery(days), ct);
+        Result<IEnumerable<OperationsTrendDto>> result = await _mediator.Send(new GetOperationsTrendQuery(days), ct);
         return Ok(result.Value);
     }
 
     [HttpGet("stock-distribution")]
+    [ResponseCache(Duration = 60, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> GetStockDistribution(CancellationToken ct = default)
     {
-        var result = await _mediator.Send(new GetStockDistributionQuery(), ct);
+        Result<ICollection<StockDistributionDto>> result = await _mediator.Send(new GetStockDistributionQuery(), ct);
         return Ok(result.Value);
     }
 }

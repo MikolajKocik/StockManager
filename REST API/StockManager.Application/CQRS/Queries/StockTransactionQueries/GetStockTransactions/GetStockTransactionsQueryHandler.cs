@@ -1,34 +1,29 @@
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.Logging.StockTransaction;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.ShipmentDtos;
 using StockManager.Application.Dtos.ModelsDto.StockTransactionDtos;
 using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.ShipmentEntity;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
 
 namespace StockManager.Application.CQRS.Queries.StockTransactionQueries.GetStockTransactions;
 
-public class GetStockTransactionsQueryHandler : IRequestHandler<GetStockTransactionsQuery, Result<IEnumerable<StockTransactionDto>>>
+public sealed class GetStockTransactionsQueryHandler(
+        IStockTransactionRepository repository,
+        IMapper mapper,
+        ILogger<GetStockTransactionsQueryHandler> logger
+    ) : IQueryHandler<GetStockTransactionsQuery, ICollection<StockTransactionDto>>
 {
-    private readonly IStockTransactionRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<GetStockTransactionsQueryHandler> _logger;
+    private readonly IStockTransactionRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<GetStockTransactionsQueryHandler> _logger = logger;
 
-    public GetStockTransactionsQueryHandler(IStockTransactionRepository repository, IMapper mapper, ILogger<GetStockTransactionsQueryHandler> logger)
-    {
-        _repository = repository;
-        _mapper = mapper;
-        _logger = logger;
-    }
-
-    public async Task<Result<IEnumerable<StockTransactionDto>>> Handle(GetStockTransactionsQuery query, CancellationToken cancellationToken)
+    public async Task<Result<ICollection<StockTransactionDto>>> Handle(GetStockTransactionsQuery query, CancellationToken ct)
     {
         IQueryable<StockTransaction> stockTransactions = _repository.GetStockTransactions()
             .IfHasValue(
@@ -57,18 +52,17 @@ public class GetStockTransactionsQueryHandler : IRequestHandler<GetStockTransact
 
         StockTransactionLogInfo.LogReturnedListOfStockTransactions(_logger, default);
 
-        stockTransactions = stockTransactions.OrderByDescending(s => s.Date).ThenBy(s => s.Id);
+        stockTransactions = stockTransactions
+            .OrderByDescending(s => s.Date)
+            .ThenBy(s => s.Id);
 
-        IEnumerable<StockTransactionDto> dtos = await stockTransactions
+        List<StockTransactionDto> dtos = await stockTransactions
                .ProjectTo<StockTransactionDto>(_mapper.ConfigurationProvider)
                .Skip((query.Page - 1) * query.PageSize)
                .Take(query.PageSize)
-               .ToListAsync(cancellationToken);
+               .ToListAsync(ct);
 
-        return Result<IEnumerable<StockTransactionDto>>.Success(
-            dtos.Any()
-            ? dtos
-            : Enumerable.Empty<StockTransactionDto>());
+        return Result<ICollection<StockTransactionDto>>.Success(dtos);
 
     }
 }

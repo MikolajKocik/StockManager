@@ -1,12 +1,12 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.Data;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Testcontainers.MsSql;
 
-namespace StockManager.Application.Tests.IntegrationTests.Docker.SqlContainerTests;
+namespace StockManager.Tests.IntegrationTests.Docker.SqlContainerTests;
 
-[Category("IntegrationTests")]
+[Trait("Category", "IntegrationTests")]
 public sealed class MsSqlIntegrationTests : IAsyncLifetime
 {
     private readonly MsSqlContainer _db = new MsSqlBuilder().Build();

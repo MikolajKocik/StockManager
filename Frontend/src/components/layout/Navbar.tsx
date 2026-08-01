@@ -71,42 +71,43 @@ export default function Navbar() {
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/inventory-items" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/stock" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={stockIcon} className="nav-icon" alt="Stock" />
                         {!isCollapsed && <span>Stock</span>}
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/inventory-items" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/barcodes" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={barCodeIcon} className="nav-icon" alt="BarCodes" />
                         {!isCollapsed && <span>BarCodes</span>}
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/maintenance" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={technicalIcon} className="nav-icon" alt="Maintenance" />
                         {!isCollapsed && <span>Maintenance</span>}
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/analyze" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={analyzeIcon} className="nav-icon" alt="Analyze" />
                         {!isCollapsed && <span>Analyze</span>}
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/bin-map" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={binMap} className="nav-icon" alt="Bin Map" />
                         {!isCollapsed && <span>Bin Map</span>}
                     </NavLink>
-                </li><li className="nav-box">
-                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
-                        <img src={mngIcon} className="nav-icon" alt="Bin Map" />
+                </li>
+                <li className="nav-box">
+                    <NavLink to="/manage" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                        <img src={mngIcon} className="nav-icon" alt="Manage" />
                         {!isCollapsed && <span>Manage</span>}
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/reorder-rules" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={rulesIcon} className="nav-icon" alt="Reorder rules" />
                         {!isCollapsed && <span>Reorder rules</span>}
                     </NavLink>
@@ -124,13 +125,13 @@ export default function Navbar() {
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/audit-log" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={auditIcon} className="nav-icon" alt="Audit Log" />
                         {!isCollapsed && <span>Audit Log</span>}
                     </NavLink>
                 </li>
                 <li className="nav-box">
-                    <NavLink to="/" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
+                    <NavLink to="/invoices" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={invoiceIcon} className="nav-icon" alt="Invoices" />
                         {!isCollapsed && <span>Invoices</span>}
                     </NavLink>

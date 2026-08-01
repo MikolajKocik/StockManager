@@ -1,0 +1,57 @@
+@layer components {
+    .btn {
+        @apply inline-flex items-center justify-center font-medium rounded transition-colors duration-150 cursor-pointer select-none text-xs;
+    }
+
+    .btn-primary {
+        @apply bg-blue-700 text-white hover:bg-blue-800 shadow-xs;
+    }
+
+    .btn-secondary {
+        @apply bg-slate-700 text-white hover:bg-slate-800 shadow-xs;
+    }
+
+    .btn-danger {
+        @apply bg-rose-700 text-white hover:bg-rose-800 shadow-xs;
+    }
+
+    .btn-accent {
+        @apply bg-slate-800 text-white hover:bg-slate-900 shadow-xs;
+    }
+
+    .btn-outline {
+        @apply border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 shadow-2xs;
+    }
+
+    .btn-ghost {
+        @apply bg-transparent text-slate-700 hover:bg-slate-200/70 border border-transparent;
+    }
+
+    .btn-lavender {
+        @apply bg-purple-700 text-white hover:bg-purple-800 shadow-xs;
+    }
+
+    .btn-success {
+        @apply bg-emerald-700 text-white hover:bg-emerald-800 shadow-xs;
+    }
+
+    .btn-warning {
+        @apply bg-amber-600 text-white hover:bg-amber-700 shadow-xs;
+    }
+
+    .btn-sm {
+        @apply px-2.5 py-1 text-[11px] font-semibold;
+    }
+
+    .btn-md {
+        @apply px-3 py-1.5 text-xs font-semibold;
+    }
+
+    .btn-lg {
+        @apply px-5 py-2 text-sm font-semibold;
+    }
+
+    .btn-loading {
+        @apply opacity-70 cursor-wait;
+    }
+}

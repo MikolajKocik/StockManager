@@ -1,21 +1,18 @@
 import type { ProductUpdateForm } from "@/models/product";
 import { useState, useEffect } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { productsApi } from '@/api/internal/productsApi';
-import Modal from '@/components/common/Modal';
-import { Input } from '@/components/common/Input';
-import { Select } from '@/components/common/Select';
-import { Button } from '@/components/common/Button';
+import './ProductForm.css';
+import { Modal, Input, Select, Button } from '@/components/common';
+import { useGenres, useWTypes } from "@/hooks/queries";
+import { useEditProduct, useProduct } from "../hooks";
 
 interface ProductEditFormProps {
     isOpen: boolean;
-    productId: string;
+    productId: string | null;
     onClose: () => void;
     onSuccess?: () => void;
 }
 
 export default function ProductEditForm({ isOpen, productId, onClose, onSuccess }: ProductEditFormProps) {
-    const queryClient = useQueryClient();
     const [form, setForm] = useState<ProductUpdateForm>({
         id: null,
         name: '',
@@ -27,33 +24,10 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
         expirationDate: ''
     });
 
-    const { data: genres = [], isLoading: isGenresLoading } = useQuery({
-        queryKey: ['genres'],
-        queryFn: productsApi.getGenres,
-        enabled: isOpen
-    });
-
-    const { data: types = [], isLoading: isTypesLoading } = useQuery({
-        queryKey: ['warehouses'],
-        queryFn: productsApi.getWarehouses,
-        enabled: isOpen
-    });
-
-    const { data: product, isLoading: isProductLoading, error: productError } = useQuery({
-        queryKey: ['product', productId],
-        queryFn: () => productsApi.getProductById(productId),
-        enabled: isOpen && !!productId
-    });
-
-    const { mutate: updateProduct, isPending: isUpdating, error: mutationError } = useMutation({
-        mutationFn: (data: ProductUpdateForm) => productsApi.updateProduct(productId, data),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['products'] });
-            queryClient.invalidateQueries({ queryKey: ['product', productId] });
-            onSuccess?.();
-            onClose();
-        }
-    });
+    const { data: genres = [], isLoading: isGenresLoading } = useGenres(isOpen);
+    const { data: types = [], isLoading: isTypesLoading } = useWTypes(isOpen);
+    const { data: product, isLoading: isProductLoading, error: productError } = useProduct(productId);
+    const { mutate: updateProduct, isPending: isUpdating, error: mutationError } = useEditProduct(productId);
 
     useEffect(() => {
         if (product) {
@@ -69,9 +43,9 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
         setForm({ ...form, [e.target.name]: e.target.value });
     }
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        updateProduct(form);
+        updateProduct({ data: form });
     };
 
     const isLoading = isGenresLoading || isTypesLoading || isProductLoading;
@@ -79,7 +53,7 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
 
     return (
         <Modal isOpen={isOpen} onClose={onClose} size="lg">
-            <h2>Edit product</h2>
+            <h2 className="text-2xl font-bold">Edit product</h2>
 
             {isLoading ? (
                 <p>Loading...</p>
@@ -151,10 +125,10 @@ export default function ProductEditForm({ isOpen, productId, onClose, onSuccess 
                     />
 
                     <div className="form-actions">
-                        <Button type="button" variant="danger" onClick={onClose}>
+                        <Button type="button" variant="danger" className="p-1" onClick={onClose}>
                             Cancel
                         </Button>
-                        <Button type="submit" variant="primary" isLoading={isUpdating}>
+                        <Button type="submit" variant="primary" className="p-1" isLoading={isUpdating}>
                             {isUpdating ? 'Saving...' : 'Save Changes'}
                         </Button>
                     </div>

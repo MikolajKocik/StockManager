@@ -32,6 +32,15 @@ public abstract class Entity<TId> where TId : IEquatable<TId>
         Id = id;
     }
 
+    public bool Equals(Entity<TId>? other)
+    {
+        if (other is null || other.GetType() != GetType())
+        {
+            return false;
+        }
+        return Id.Equals(other.Id);
+    }
+
     /// <summary>
     /// Determines whether the specified object is equal to the current entity based on its unique identity.
     /// </summary>
@@ -52,16 +61,7 @@ public abstract class Entity<TId> where TId : IEquatable<TId>
     /// </para>
     /// </remarks>
     public override bool Equals(object? obj)
-    {
-        if (obj is null || obj.GetType() != GetType())
-        {
-            return false;
-        }
-
-        var entity = (Entity<TId>)obj;
-
-        return Id.Equals(entity.Id);
-    }
+        => Equals(obj as Entity<TId>);
 
     public override int GetHashCode()
     {

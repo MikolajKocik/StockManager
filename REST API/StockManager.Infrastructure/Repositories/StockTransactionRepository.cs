@@ -1,65 +1,33 @@
-using System.Linq;
-using System.Reflection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.ProductEntity;
 using StockManager.Core.Domain.Models.StockTransactionEntity;
-using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
-public class StockTransactionRepository : IStockTransactionRepository
+internal sealed class StockTransactionRepository(StockManagerDbContext db) 
+    : BaseOperations<StockTransaction>(db), IStockTransactionRepository
 {
-    private readonly StockManagerDbContext _dbContext;
+    public void AddStockTransaction(StockTransaction stockTransaction)
+        => Add(stockTransaction);
 
-    public StockTransactionRepository(StockManagerDbContext dbContext)
+    public async Task DeleteStockTransactionAsync(int id , CancellationToken ct)
     {
-        _dbContext = dbContext;
+        StockTransaction? transaction = await _db.StockTransactions.FindAsync([id], ct)
+            ?? throw new InvalidOperationException($"StockTransaction with id {id} not found.");
+        Delete(transaction);
     }
 
-    public async Task<StockTransaction> AddStockTransactionAsync(StockTransaction stockTransaction, CancellationToken cancellationToken)
-            => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, stockTransaction, cancellationToken);
-
-
-    public async Task<StockTransaction?> DeleteStockTransactionAsync(StockTransaction stockTransaction, CancellationToken cancellationToken)
-    {
-        StockTransaction? exist = await _dbContext.StockTransactions
-            .Where(st => st.Id == stockTransaction.Id)
-            .FirstOrDefaultAsync(cancellationToken);
-
-        if(exist is null)
-        {
-            return null;
-        }
-
-        _dbContext.StockTransactions.Remove(exist);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return exist;
-    }
-
-    public Task<StockTransaction?> GetStockTransactionByIdAsync(int id, CancellationToken cancellationToken)
-        => _dbContext.StockTransactions
+    public Task<StockTransaction?> GetStockTransactionByIdAsync(int id, CancellationToken ct)
+        => _db.StockTransactions
             .Include(st => st.InventoryItemId)
             .Include(st => st.TargetLocationId)
-            .Where(st => st.Id == id)
-            .FirstOrDefaultAsync(cancellationToken);
+            .SingleOrDefaultAsync(st => st.Id == id, ct);
 
     public IQueryable<StockTransaction> GetStockTransactions()
-        => _dbContext.StockTransactions
+        => GetAll()
             .AsNoTracking()
             .Include(st => st.InventoryItemId)
             .Include(st => st.TargetLocationId);
-
-
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
-
-    public async Task<StockTransaction?> UpdateStockTransactionAsync(StockTransaction stockTransaction, CancellationToken cancellationToken)
-    {
-        _dbContext.StockTransactions.Update(stockTransaction);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return stockTransaction;
-    }
 }

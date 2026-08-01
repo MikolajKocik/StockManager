@@ -1,9 +1,6 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Storage;
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using System.Data.Common;
+using Microsoft.EntityFrameworkCore.Storage;
+using StockManager.Core.Domain.Interfaces.Common;
 
 namespace TestHelpers.Fixture;
 
@@ -22,7 +19,7 @@ internal sealed class TestDbContextTransaction : IDbContextTransaction
 
     public DbTransaction GetDbTransaction()
     {
-        return null!; 
+        return null!;
     }
 
     public void Commit()

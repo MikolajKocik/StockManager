@@ -1,27 +1,24 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using StockManager.Application.Common.PipelineBehavior;
-using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.CQRS.Commands.ProductCommands.AddProduct;
-using StockManager.Application.Dtos.ModelsDto.ProductDtos;
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
-using TestHelpers.ProductFactory;
+using StockManager.Application.Abstractions.CQRS.Command;
+using StockManager.Application.Middlewares;
+using StockManager.Core.Domain.Interfaces.Common;
 
-namespace StockManager.Application.Tests.UnitTests.Common.CancellationToken;
+namespace StockManager.Tests.UnitTests.Common.CancellationToken;
 
 public sealed class TrackingBehaviorTests
 {
-    private readonly Mock<IEnumerable<IValidator<AddProductCommand>>> _validators;
-    private readonly Mock<IBaseRepository> _baseRepository;
+    private readonly Mock<IUnitOfWork> _uow;
 
     public TrackingBehaviorTests()
     {
-        _validators = new Mock<IEnumerable<IValidator<AddProductCommand>>>();
-        _baseRepository = new Mock<IBaseRepository>();
+        _uow = new Mock<IUnitOfWork>();
     }
+
+    public class TestRequest : IRequest, IBaseCommand { }
 
     /// <summary>
     /// Verifies that the <see cref="TrackingBehavior{TRequest, TResponse}.Handle"/> method throws an  <see
@@ -34,36 +31,25 @@ public sealed class TrackingBehaviorTests
     /// <returns></returns>
     [Fact]
     public async Task Handle_Should_Throw_When_Cancellation_Requested()
-    {   
-        //
-        _validators.Setup(v => v.GetEnumerator())
-            .Returns(Enumerable.Empty<IValidator<AddProductCommand>>().GetEnumerator());
+    {
+        NullLogger<TrackingBehavior<TestRequest, Unit>> logger =
+            NullLogger<TrackingBehavior<TestRequest, Unit>>.Instance;
 
-        NullLogger<TrackingBehavior<AddProductCommand, Result<ProductDto>>> logger = 
-            NullLogger<TrackingBehavior<AddProductCommand, Result<ProductDto>>>.Instance;
+        var validatorsMock = new Mock<IEnumerable<IValidator<TestRequest>>>();
+        validatorsMock.Setup(v => v.GetEnumerator())
+            .Returns(Enumerable.Empty<IValidator<TestRequest>>().GetEnumerator());
 
-        var behavior = new TrackingBehavior<AddProductCommand, Result<ProductDto>>(
-            logger, _validators.Object, _baseRepository.Object
+        var behavior = new TrackingBehavior<TestRequest, Unit>(
+            logger, validatorsMock.Object, _uow.Object
             );
 
         using var cancellationToken = new CancellationTokenSource();
         await cancellationToken.CancelAsync();
 
-        ProductCreateDto data = ProductTestDtoFactory.CreateTestDto();
-        var command = new AddProductCommand(data);
-        var productDto = new ProductDto 
-        { 
-            Id = 1, 
-            Name = data.Name, 
-            Slug = "test-slug",
-            Genre = "test-genre",
-            Unit = "test-unit",
-            Type = "test-type",
-            BatchNumber = "test-batch"
-        };
+        var command = new TestRequest();
 
         //
-        var next = new RequestHandlerDelegate<Result<ProductDto>>(() => Task.FromResult(Result<ProductDto>.Success(productDto)));
+        var next = new RequestHandlerDelegate<Unit>(() => Task.FromResult(Unit.Value));
 
         Func<Task> act = async () => await behavior.Handle(command, next, cancellationToken.Token);
 

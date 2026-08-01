@@ -40,8 +40,8 @@ public sealed class ProductController : ControllerBase
     /// If no parameters are provided returns all products.
     /// </summary>
     /// <param name="name">product name</param>
-    /// <param name="genre">product's genre</param>
     /// <param name="warehouse">product's warehouse</param>
+    /// <param name="genre">product's genre</param>
     /// <param name="unit">unit of product</param>
     /// <param name="expirationDate">product expiration date</param>
     /// <param name="deliveredAt">product delivery date</param>
@@ -61,18 +61,18 @@ public sealed class ProductController : ControllerBase
     {
         var query = new GetProductsQuery(
             name,
-            warehouse, 
-            genre, 
-            unit, 
+            warehouse,
+            genre,
+            unit,
             expirationDate,
             deliveredAt);
 
-        Result<IEnumerable<ProductDto>> result = await _mediator.Send(query, cancellationToken);
+        Result<IReadOnlyList<ProductDto>> result = await _mediator.Send(query, cancellationToken);
 
         ProductLogInfo.LogReturningListOfProductSuccessfull(_logger, result, default);
 
-        return Ok(new ProductDtoCollection 
-        { 
+        return Ok(new ProductDtoCollection
+        {
             Data = result.Value!.ToList().AsReadOnly()
         });
     }
@@ -100,7 +100,7 @@ public sealed class ProductController : ControllerBase
 
         var problem = ErrorExtension.ToProblemDetails(result.Error!, 404);
 
-        ProductLogWarning.LogProductNotFound(_logger, id, default);   
+        ProductLogWarning.LogProductNotFound(_logger, id, default);
 
         return new ObjectResult(problem)
         {
@@ -111,7 +111,7 @@ public sealed class ProductController : ControllerBase
     /// <summary>
     /// Add product action with HttpPost header.
     /// </summary>
-    /// <param name="productDto">Data transfer object returned for client in WinForms</param>
+    /// <param name="createDto">Data transfer object returned for client in WinForms</param>
     /// <param name="cancellationToken">Cancel current action on database</param>
     /// <returns>ProductDto</returns>
 

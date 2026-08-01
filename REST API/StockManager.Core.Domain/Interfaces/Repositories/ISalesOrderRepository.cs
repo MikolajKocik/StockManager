@@ -1,10 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
-using StockManager.Core.Domain.Models.SalesOrderEntity;
+﻿using StockManager.Core.Domain.Models.SalesOrderEntity;
+using StockManager.Core.Domain.Interfaces.Common;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
@@ -12,11 +7,9 @@ public interface ISalesOrderRepository : IBaseRepository
 {
     IQueryable<SalesOrder> GetSalesOrders();
 
-    Task<SalesOrder?> GetSalesOrderByIdAsync(int id, CancellationToken cancellationToken);
+    Task<SalesOrder?> GetSalesOrderByIdAsync(int id, CancellationToken ct);
 
-    Task<SalesOrder> AddSalesOrderAsync(SalesOrder entity, CancellationToken cancellationToken);
+    void AddSalesOrder(SalesOrder order);
 
-    Task<SalesOrder> UpdateSalesOrderAsync(SalesOrder entity, CancellationToken cancellationToken);
-
-    Task<SalesOrder> DeleteSalesOrderAsync(SalesOrder entity, CancellationToken cancellationToken);
+    Task DeleteSalesOrderAsync(int id, CancellationToken ct = default);
 }

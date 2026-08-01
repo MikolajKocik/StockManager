@@ -1,11 +1,10 @@
-using StockManager.Core.Domain.Interfaces.Repositories.BaseRepository;
 using StockManager.Core.Domain.Models.WarehouseOperationEntity;
+using StockManager.Core.Domain.Interfaces.Common;
 
 namespace StockManager.Core.Domain.Interfaces.Repositories;
 
 public interface IDocumentRepository : IBaseRepository
 {
-    Task AddDocumentAsync(FileMetadata fileMetadata, CancellationToken cancellationToken);
-
-    Task<List<FileMetadata>> GetAllFilesAsync(CancellationToken cancellationToken);
+    IQueryable<FileMetadata> GetAllFiles();
+    void AddDocument(FileMetadata fileMetadata);
 }

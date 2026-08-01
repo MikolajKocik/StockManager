@@ -6,22 +6,20 @@ using StockManager.Core.Domain.Interfaces.Repositories;
 
 namespace StockManager.Application.CQRS.Queries.StatisticsQueries;
 
-public sealed class GetStockDistributionQueryHandler : IQueryHandler<GetStockDistributionQuery, IEnumerable<StockDistributionDto>>
+public sealed class GetStockDistributionQueryHandler(
+    IProductRepository productRepository) : IQueryHandler<GetStockDistributionQuery, ICollection<StockDistributionDto>>
 {
-    private readonly IProductRepository _productRepository;
+    private readonly IProductRepository _productRepository = productRepository;
 
-    public GetStockDistributionQueryHandler(IProductRepository productRepository)
+    public async Task<Result<ICollection<StockDistributionDto>>> Handle(GetStockDistributionQuery query, CancellationToken ct)
     {
-        _productRepository = productRepository;
-    }
-
-    public async Task<Result<IEnumerable<StockDistributionDto>>> Handle(GetStockDistributionQuery query, CancellationToken cancellationToken)
-    {
-        var distribution = await _productRepository.GetProducts()
+        List<StockDistributionDto> distribution = await _productRepository.GetProducts()
             .GroupBy(p => p.Genre)
-            .Select(g => new StockDistributionDto(g.Key.ToString(), g.Count() * 1000))
-            .ToListAsync(cancellationToken);
+            .Select(g => new StockDistributionDto(
+                g.Key.ToString(),
+                g.Count() * 1000))
+            .ToListAsync(ct);
 
-        return Result<IEnumerable<StockDistributionDto>>.Success(distribution);
+        return Result<ICollection<StockDistributionDto>>.Success(distribution);
     }
 }

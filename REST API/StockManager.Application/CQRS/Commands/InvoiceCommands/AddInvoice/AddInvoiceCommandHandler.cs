@@ -1,65 +1,40 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using AutoMapper;
-using MediatR;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.Invoice;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.InvoiceDtos;
 using StockManager.Application.Helpers.CQRS.NullResult;
-using StockManager.Application.Helpers.Error;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.InvoiceEntity;
 
 namespace StockManager.Application.CQRS.Commands.InvoiceCommands.AddInvoice;
-public sealed class AddInvoiceCommandHandler : ICommandHandler<AddInvoiceCommand, InvoiceDto>
-{
-    private readonly IInvoiceRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<AddInvoiceCommandHandler> _logger;
 
-    public AddInvoiceCommandHandler(
+public sealed class AddInvoiceCommandHandler(
         IInvoiceRepository repository,
-        IMapper mapper, ILogger<AddInvoiceCommandHandler> logger
-        )
+        IMapper mapper,
+        ILogger<AddInvoiceCommandHandler> logger,
+        IUnitOfWork uow
+    ) : ICommandHandler<AddInvoiceCommand, InvoiceDto>
+{
+    private readonly IInvoiceRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<AddInvoiceCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
+
+    public async Task<Result<InvoiceDto>> Handle(AddInvoiceCommand command, CancellationToken ct)
     {
-        _repository = repository;
-        _mapper = mapper;
-        _logger = logger;
-    }
+        ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
 
-    public async Task<Result<InvoiceDto>> Handle(AddInvoiceCommand command, CancellationToken cancellationToken)
-    {
-        try
-        {
-            ResultFailureHelper.IfProvidedNullArgument(command.CreateDto);
+        Invoice entity = _mapper.Map<Invoice>(command.CreateDto);
 
-            Invoice entity = _mapper.Map<Invoice>(command.CreateDto);
+        _repository.AddInvoice(entity);
+        await _uow.SaveChangesAsync(ct);
 
-            Invoice created = await _repository.AddInvoiceAsync(entity, cancellationToken);
-            InvoiceDto dto = _mapper.Map<InvoiceDto>(created);
+        InvoiceDto dto = _mapper.Map<InvoiceDto>(entity);
 
-            InvoiceLogInfo.LogInvoiceCreated(_logger, created.Id, default);
-            return Result<InvoiceDto>.Success(dto);
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 2601 or 2627 })
-        {
-            return Result<InvoiceDto>.Failure(
-                new Error(
-                    "Duplicate invoice.", 
-                    ErrorCodes.InvoiceConflict));
-        }
-        catch (Exception ex)
-        {
-            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
-        }
+        InvoiceLogInfo.LogInvoiceCreated(_logger, dto.Id, null);
+        return Result<InvoiceDto>.Success(dto);
     }
 }

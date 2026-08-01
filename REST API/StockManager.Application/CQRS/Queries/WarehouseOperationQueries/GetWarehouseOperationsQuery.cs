@@ -4,4 +4,4 @@ using StockManager.Application.Dtos.ModelsDto.WarehouseOperationDtos;
 
 namespace StockManager.Application.CQRS.Queries.WarehouseOperationQueries;
 
-public sealed record GetWarehouseOperationsQuery : IQuery<List<WarehouseOperationDto>>;
+public sealed record GetWarehouseOperationsQuery : IQuery<IReadOnlyList<WarehouseOperationDto>>;

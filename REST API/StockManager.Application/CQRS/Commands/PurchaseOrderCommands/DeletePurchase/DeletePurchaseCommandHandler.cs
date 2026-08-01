@@ -1,68 +1,44 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediatR;
-using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.PurchaseOrder;
 using StockManager.Application.Common.ResultPattern;
+using StockManager.Application.CQRS.Commands.PurchaseOrder.DeletePurchase;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 
-namespace StockManager.Application.CQRS.Commands.PurchaseOrder.DeletePurchase;
+namespace StockManager.Application.CQRS.Commands.PurchaseOrderCommands.DeletePurchase;
 
-public sealed class DeletePurchaseOrderCommandHandler : ICommandHandler<DeletePurchaseOrderCommand, Unit>
+public sealed class DeletePurchaseOrderCommandHandler(
+        IPurchaseOrderRepository repository,
+        ILogger<DeletePurchaseOrderCommandHandler> logger,
+        IUnitOfWork uow
+    ) : ICommandHandler<DeletePurchaseOrderCommand, Unit>
 {
-    private readonly IPurchaseOrderRepository _repository;
-    private readonly ILogger<DeletePurchaseOrderCommandHandler> _logger;
+    private readonly IPurchaseOrderRepository _repository = repository;
+    private readonly ILogger<DeletePurchaseOrderCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
 
-    public DeletePurchaseOrderCommandHandler(
-        IPurchaseOrderRepository repository, 
-        ILogger<DeletePurchaseOrderCommandHandler> logger)
+    public async Task<Result<Unit>> Handle(DeletePurchaseOrderCommand command, CancellationToken ct)
     {
-        _repository = repository;
-        _logger = logger;
-    }
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-    public async Task<Result<Unit>> Handle(DeletePurchaseOrderCommand command, CancellationToken cancellationToken)
-    {
-        try
+        Core.Domain.Models.PurchaseOrderEntity.PurchaseOrder? entity = await _repository.GetPurchaseOrderByIdAsync(command.Id, ct);
+
+        if (entity is null)
         {
-            ResultFailureHelper.IfProvidedNullArgument(command.Id);
+            PurchaseOrderLogWarning.LogPurchaseOrderNotFound(_logger, command.Id, default);
 
-            Core.Domain.Models.PurchaseOrderEntity
-                .PurchaseOrder? entity = await _repository.GetPurchaseOrderByIdAsync(command.Id, cancellationToken);
-
-            if (entity is null)
-            {
-                PurchaseOrderLogWarning.LogPurchaseOrderNotFound(_logger, command.Id, default);
-
-                return Result<Unit>.Failure(
-                    new Error(
-                        $"PurchaseOrder {command.Id} not found",
-                        ErrorCodes.PurchaseOrderNotFound));
-            }
-
-            await _repository.DeletePurchaseOrderAsync(entity, cancellationToken);
-            return Result<Unit>.Success(Unit.Value);
-        }
-        catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 547 })
-        {
             return Result<Unit>.Failure(
                 new Error(
-                    "Cannot delete: referenced by other records.", 
-                    ErrorCodes.PurchaseOrderConflict));
+                    $"PurchaseOrder {command.Id} not found",
+                    ErrorCodes.PurchaseOrderNotFound));
         }
-        catch (Exception ex)
-        {
-            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
-        }
+
+        await _repository.DeletePurchaseOrder(entity.Id, ct);
+        await _uow.SaveChangesAsync(ct);
+        return Result<Unit>.Success(Unit.Value);
     }
 }

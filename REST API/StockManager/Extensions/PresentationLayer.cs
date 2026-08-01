@@ -1,11 +1,7 @@
-using System.Reflection;
-using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.AspNetCore.RateLimiting;
-using StockManager.Application.Helpers.NullConfiguration;
 using StockManager.Extensions.WebAppBuilderExtensions.Azure;
 using StockManager.Extensions.WebAppBuilderExtensions.Cors;
 using StockManager.Extensions.WebAppBuilderExtensions.JWT;
@@ -15,6 +11,7 @@ using StockManager.Extensions.WebAppBuilderExtensions.Serilog;
 using StockManager.Extensions.WebAppBuilderExtensions.Services;
 using StockManager.Extensions.WebAppBuilderExtensions.Swagger;
 using StockManager.Middlewares;
+using StockManager.Application.Configurations;
 
 namespace StockManager.Extensions;
 
@@ -24,6 +21,8 @@ public static class PresentationLayer
     {
         // Azure key-vault
         builder.AzureConfigure();
+
+        builder.Services.Configure<CacheSettings>(builder.Configuration.GetSection("Cache"));
 
         // Rate limitting
         builder.Services.AddRateLimiter(opts =>

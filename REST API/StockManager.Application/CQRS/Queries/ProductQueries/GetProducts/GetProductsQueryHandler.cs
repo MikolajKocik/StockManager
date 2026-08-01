@@ -3,28 +3,21 @@ using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.ResultPattern;
-using StockManager.Application.Dtos.ModelsDto.InventoryItemDtos;
 using StockManager.Application.Dtos.ModelsDto.ProductDtos;
 using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
-using StockManager.Core.Domain.Models.InventoryItemEntity;
 using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Queries.ProductQueries.GetProducts;
 
-public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, IEnumerable<ProductDto>>
+public sealed class GetProductsQueryHandler(IMapper mapper, IProductRepository repository)
+    : IQueryHandler<GetProductsQuery, IReadOnlyList<ProductDto>>
 {
-    private readonly IMapper _mapper;
-    private readonly IProductRepository _repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly IProductRepository _repository = repository;
 
-    public GetProductsQueryHandler(IMapper mapper, IProductRepository repository)
-    {
-        _mapper = mapper;
-        _repository = repository;
-    }
-
-    public async Task<Result<IEnumerable<ProductDto>>> Handle(GetProductsQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<ProductDto>>> Handle(GetProductsQuery query, CancellationToken ct)
     {
         IQueryable<Product> products = _repository.GetProducts()
             .IfHasValue(
@@ -36,7 +29,6 @@ public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, IEnumerab
             .IfHasValue(
                 query.DeliveredAt.HasValue,
                 p => p.DeliveredAt.Date == query.DeliveredAt!.Value.Date); 
-
 
         if (!string.IsNullOrWhiteSpace(query.Warehouse))
         {
@@ -65,13 +57,12 @@ public class GetProductsQueryHandler : IQueryHandler<GetProductsQuery, IEnumerab
             products = products.Where(p => p.ExpirationDate >= DateTime.Today && p.ExpirationDate <= soon);
         }
 
-        IEnumerable<ProductDto> dtos = await products
-                 .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
-                 .Skip((query.PageNumber - 1) * query.PageSize)
-                 .Take(query.PageSize)
-                 .ToListAsync(cancellationToken);
+        List<ProductDto> dtos = await products
+            .ProjectTo<ProductDto>(_mapper.ConfigurationProvider)
+            .Skip((query.PageNumber - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .ToListAsync(ct);
 
-        return Result<IEnumerable<ProductDto>>.Success(
-            dtos.Any() ? dtos : Enumerable.Empty<ProductDto>());
+        return Result<IReadOnlyList<ProductDto>>.Success(dtos);
     }
 }

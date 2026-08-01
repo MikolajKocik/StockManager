@@ -1,7 +1,7 @@
-﻿using AutoMapper;
+using AutoMapper;
 using FluentAssertions;
-using FluentAssertions.Common;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
@@ -22,21 +22,24 @@ public sealed class GetProductByIdQueryHandlerTests
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IDistributedCache> _cache;
     private readonly GetProductByIdQueryHandler _handler;
-    private readonly Mock<IOptions<CacheSettings>> _cacheOptions;
+    private readonly Mock<IOptionsSnapshot<CacheSettings>> _cacheOptions;
+    private readonly IMemoryCache _memoryCache;
 
     public GetProductByIdQueryHandlerTests()
     {
         _productRepositoryMock = new Mock<IProductRepository>();
         _mapperMock = new Mock<IMapper>();
         _cache = new Mock<IDistributedCache>();
-        _cacheOptions = new Mock<IOptions<CacheSettings>>();
+        _cacheOptions = new Mock<IOptionsSnapshot<CacheSettings>>();
+        _memoryCache = new MemoryCache(new MemoryCacheOptions());
         ILogger<GetProductByIdQueryHandler> logger = NullLogger<GetProductByIdQueryHandler>.Instance;
         _handler = new GetProductByIdQueryHandler(
             _mapperMock.Object,
             _productRepositoryMock.Object,
             _cache.Object,
             _cacheOptions.Object,
-            logger);
+            logger,
+            _memoryCache);
     }
 
     /// <summary>
@@ -51,8 +54,7 @@ public sealed class GetProductByIdQueryHandlerTests
     public async Task Handle_Should_Return_ProductDto_When_Products_Exists()
     {
         // 
-        Core.Domain.Models.ProductEntity.
-            Product? product = ProductTestFactory.CreateTestProduct();
+        Core.Domain.Models.ProductEntity.Product? product = ProductTestFactory.CreateTestProduct();
         var query = new GetProductByIdQuery(1);
 
         // repo
@@ -87,7 +89,8 @@ public sealed class GetProductByIdQueryHandlerTests
             _productRepositoryMock.Object,
             _cache.Object,
             _cacheOptions.Object,
-            logger);
+            logger,
+            _memoryCache);
 
         // 
         Result<ProductDto> result = await handler.Handle(query, CancellationToken.None);

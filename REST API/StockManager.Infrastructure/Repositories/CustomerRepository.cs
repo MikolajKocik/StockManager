@@ -1,48 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
+﻿using Microsoft.EntityFrameworkCore;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.CustomerEntity;
-using StockManager.Infrastructure.Helpers;
+using StockManager.Infrastructure.Common;
 using StockManager.Infrastructure.Persistence.Data;
 
 namespace StockManager.Infrastructure.Repositories;
 
-public sealed class CustomerRepository : ICustomerRepository
+internal sealed class CustomerRepository(StockManagerDbContext db) 
+    : BaseOperations<Customer>(db), ICustomerRepository
 {
-    private readonly StockManagerDbContext _dbContext;
+    public IQueryable<Customer> GetCustomers() 
+        => GetAll()
+            .AsNoTracking();
 
-    public CustomerRepository(StockManagerDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
-
-    public IQueryable<Customer> GetCustomers() => _dbContext.Customers;
-    
     public async Task<Customer?> GetCustomerByIdAsync(int id, CancellationToken cancellationToken)
-        => await _dbContext.Customers
-        .Where(x => x.Id == id)
-        .SingleOrDefaultAsync(cancellationToken);
+        => await _db.Customers
+            .Where(x => x.Id == id)
+            .SingleOrDefaultAsync(cancellationToken);
 
-    public async Task<Customer> AddCustomerAsync(Customer customer, CancellationToken cancellationToken)
-        => await RepositoryQueriesHelpers.AddEntityAsync(_dbContext, customer, cancellationToken);
-
-    public async Task<Customer> UpdateCustomerAsync(Customer entity, CancellationToken cancellationToken)
-    {
-        if (_dbContext.Entry(entity).State == EntityState.Detached)
-        {
-            _dbContext.Customers.Attach(entity);
-            _dbContext.Entry(entity).State = EntityState.Modified;
-        }
-
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return entity;
-    }
-
-    public async Task<IDbContextTransaction> BeginTransactionAsync(CancellationToken cancellationToken)
-        => await _dbContext.Database.BeginTransactionAsync(cancellationToken);
+    public void AddCustomer(Customer customer)
+        => Add(customer);
 }

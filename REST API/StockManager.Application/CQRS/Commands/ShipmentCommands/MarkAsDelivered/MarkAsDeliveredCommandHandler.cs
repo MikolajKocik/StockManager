@@ -1,8 +1,3 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
@@ -11,34 +6,30 @@ using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
 using StockManager.Core.Domain.Enums;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 using StockManager.Core.Domain.Models.ShipmentEntity;
 
 namespace StockManager.Application.CQRS.Commands.ShipmentCommands.MarkAsDelivered;
 
-public sealed class MarkShipmentAsDeliveredCommandHandler : ICommandHandler<MarkShipmentAsDeliveredCommand, Unit>
-{
-    private readonly IShipmentRepository _repository;
-    private readonly IShipmentService _shipmentService;
-    private readonly ILogger<MarkShipmentAsDeliveredCommandHandler> _logger;
-
-    public MarkShipmentAsDeliveredCommandHandler(
+public sealed class MarkShipmentAsDeliveredCommandHandler(
         IShipmentRepository repository,
         ILogger<MarkShipmentAsDeliveredCommandHandler> logger,
-        IShipmentService shipmentService
-        )
-    {
-        _repository = repository;
-        _logger = logger;
-        _shipmentService = shipmentService;
-    }
+        IShipmentService shipmentService,
+        IUnitOfWork uow
+    ) : ICommandHandler<MarkShipmentAsDeliveredCommand, Unit>
+{
+    private readonly IShipmentRepository _repository = repository;
+    private readonly IShipmentService _shipmentService = shipmentService;
+    private readonly ILogger<MarkShipmentAsDeliveredCommandHandler> _logger = logger;
+    private readonly IUnitOfWork _uow = uow;
 
-    public async Task<Result<Unit>> Handle(MarkShipmentAsDeliveredCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(MarkShipmentAsDeliveredCommand command, CancellationToken ct)
     {
-        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-        Shipment? shipment = await _repository.GetShipmentByIdAsync(command.Id, cancellationToken);
+        Shipment? shipment = await _repository.GetShipmentByIdAsync(command.Id, ct);
         if (shipment is null)
         {
             ShipmentLogWarning.LogShipmentNotFound(_logger, command.Id, default);
@@ -76,7 +67,7 @@ public sealed class MarkShipmentAsDeliveredCommandHandler : ICommandHandler<Mark
 
         _shipmentService.MarkDelivered(shipment, DateTime.UtcNow);
 
-        await _repository.UpdateShipmentAsync(shipment, cancellationToken);
+        await _uow.SaveChangesAsync(ct);
 
         ShipmentLogInfo.LogShipmentMarkedDelivered(_logger, command.Id, default);
         return Result<Unit>.Success(Unit.Value);

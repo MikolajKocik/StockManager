@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
 using Microsoft.EntityFrameworkCore;
 using StockManager.Application.Abstractions.CQRS.Query;
@@ -13,22 +8,16 @@ using StockManager.Application.Extensions.CQRS.Query;
 using StockManager.Core.Domain.Enums;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Models.InventoryItemEntity;
-using StockManager.Core.Domain.Models.ProductEntity;
 
 namespace StockManager.Application.CQRS.Queries.InventoryItemQueries.GetInventoryItems;
 
-public sealed class GetInventoryItemsQueryHandler : IQueryHandler<GetInventoryItemsQuery, IEnumerable<InventoryItemDto>>
+public sealed class GetInventoryItemsQueryHandler(IMapper mapper, IInventoryItemRepository repository)
+    : IQueryHandler<GetInventoryItemsQuery, IReadOnlyList<InventoryItemDto>>
 {
-    private readonly IMapper _mapper;
-    private readonly IInventoryItemRepository _repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly IInventoryItemRepository _repository = repository;
 
-    public GetInventoryItemsQueryHandler(IMapper mapper, IInventoryItemRepository repository)
-    {
-        _mapper = mapper;
-        _repository = repository;
-    }
-
-    public async Task<Result<IEnumerable<InventoryItemDto>>> Handle(GetInventoryItemsQuery query, CancellationToken cancellationToken)
+    public async Task<Result<IReadOnlyList<InventoryItemDto>>> Handle(GetInventoryItemsQuery query, CancellationToken ct)
     {
         IQueryable<InventoryItem> inventoryItems = _repository.GetInventoryItems()
            .IfHasValue(
@@ -57,13 +46,12 @@ public sealed class GetInventoryItemsQueryHandler : IQueryHandler<GetInventoryIt
             }
         }
 
-        IEnumerable<InventoryItemDto> dtos = await inventoryItems
+        IReadOnlyList<InventoryItemDto> dtos = await inventoryItems
             .ProjectTo<InventoryItemDto>(_mapper.ConfigurationProvider)
             .Skip((query.PageNumber - 1) * query.PageSize)
             .Take(query.PageSize)
-            .ToListAsync(cancellationToken);
+            .ToListAsync(ct);
 
-        return Result<IEnumerable<InventoryItemDto>>.Success(
-            dtos.Any() ? dtos : []);
+        return Result<IReadOnlyList<InventoryItemDto>>.Success(dtos);
     }
 }

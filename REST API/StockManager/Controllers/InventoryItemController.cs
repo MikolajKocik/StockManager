@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -56,8 +56,6 @@ public sealed class InventoryItemController : ControllerBase
     /// <param name="quantityAvailable">The minimum quantity available to filter the inventory items. Can be null to include all quantities.</param>
     /// <param name="quantityOnHand">The minimum quantity on hand to filter the inventory items. Can be null to include all quantities.</param>
     /// <param name="quantityReserved">The minimum quantity reserved to filter the inventory items. Can be null to include all quantities.</param>
-    /// <param name="pageNumber">The page number for pagination. Must be greater than zero. Defaults to 1.</param>
-    /// <param name="pageSize">The number of items per page for pagination. Must be greater than zero. Defaults to 10.</param>
     /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
     /// <returns>An <see cref="ActionResult"/> containing a collection of <see cref="InventoryItemDto"/> that match the filter
     /// criteria.</returns>
@@ -83,7 +81,7 @@ public sealed class InventoryItemController : ControllerBase
             quantityReserved
             );
 
-        Result<IEnumerable<InventoryItemDto>> result = await _mediator.Send(query, cancellationToken);
+        Result<IReadOnlyList<InventoryItemDto>> result = await _mediator.Send(query, cancellationToken);
 
         InventoryItemLogInfo.LogReturningListOfInventoryItemSuccessfull(_logger, result, default);
 
@@ -373,7 +371,7 @@ public sealed class InventoryItemController : ControllerBase
     [HttpPost("ai/search")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> SearchInventoryAiAsync(
-        [FromBody] AskQuestionRequest request, 
+        [FromBody] AskQuestionRequest request,
         [FromServices] IMediator mediator,
         CancellationToken cancellationToken
     )
@@ -386,8 +384,9 @@ public sealed class InventoryItemController : ControllerBase
             return BadRequest(result.Error);
         }
 
-        return Ok(new { 
-            Items = result.Value 
-        }); 
+        return Ok(new
+        {
+            Items = result.Value
+        });
     }
 }

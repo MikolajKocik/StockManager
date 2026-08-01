@@ -1,7 +1,6 @@
 using AutoMapper;
-using MediatR;
 using Microsoft.Extensions.Logging;
-using StockManager.Application.Common.Logging.General;
+using StockManager.Application.Abstractions.CQRS.Query;
 using StockManager.Application.Common.Logging.StockTransaction;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Dtos.ModelsDto.StockTransactionDtos;
@@ -11,44 +10,35 @@ using StockManager.Core.Domain.Models.StockTransactionEntity;
 
 namespace StockManager.Application.CQRS.Queries.StockTransactionQueries.GetStockTransactionById;
 
-public class GetStockTransactionByIdQueryHandler : IRequestHandler<GetStockTransactionByIdQuery, Result<StockTransactionDto>>
+public sealed class GetStockTransactionByIdQueryHandler(
+        IStockTransactionRepository repository,
+        IMapper mapper,
+        ILogger<GetStockTransactionByIdQueryHandler> logger
+    ) : IQueryHandler<GetStockTransactionByIdQuery, StockTransactionDto>
 {
-    private readonly IStockTransactionRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<GetStockTransactionByIdQueryHandler> _logger;
+    private readonly IStockTransactionRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<GetStockTransactionByIdQueryHandler> _logger = logger;
 
-    public GetStockTransactionByIdQueryHandler(IStockTransactionRepository repository, IMapper mapper, ILogger<GetStockTransactionByIdQueryHandler> logger)
+    public async Task<Result<StockTransactionDto>> Handle(GetStockTransactionByIdQuery query, CancellationToken ct)
     {
-        _repository = repository;
-        _mapper = mapper;
-        _logger = logger;
-    }
+        StockTransaction? transaction = await _repository.GetStockTransactionByIdAsync(query.Id, ct);
 
-    public async Task<Result<StockTransactionDto>> Handle(GetStockTransactionByIdQuery query, CancellationToken cancellationToken)
-    {
-        try
+        if (transaction is null)
         {
-            StockTransaction? transaction = await _repository.GetStockTransactionByIdAsync(query.Id, cancellationToken);
+            StockTransactionLogWarning.LogStockTransactionNotFound(_logger, query.Id, default);
 
-            if (transaction is null)
-            {
-                StockTransactionLogWarning.LogStockTransactionNotFound(_logger, query.Id, default);
-
-                return Result<StockTransactionDto>.Failure(
-                    new Error(
-                        $"StockTransaction with id {query.Id} not found", 
-                        ErrorCodes.StockTransactionNotFound));
-            }
-
-            StockTransactionDto dto = _mapper.Map<StockTransactionDto>(transaction);
-
-            StockTransactionLogInfo.LogStockTransactionFound(_logger, query.Id, default);
-            return Result<StockTransactionDto>.Success(dto);
+            return Result<StockTransactionDto>.Failure(
+                new Error(
+                    $"StockTransaction with id {query.Id} not found",
+                    ErrorCodes.StockTransactionNotFound
+                )
+            );
         }
-        catch (Exception ex)
-        {
-            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
-        }
+
+        StockTransactionDto dto = _mapper.Map<StockTransactionDto>(transaction);
+
+        StockTransactionLogInfo.LogStockTransactionFound(_logger, query.Id, default);
+        return Result<StockTransactionDto>.Success(dto);
     }
 }

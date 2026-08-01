@@ -10,21 +10,14 @@ using StockManager.Core.Domain.Models.PurchaseOrderEntity;
 
 namespace StockManager.Application.CQRS.Queries.PurchaseOrderQueries;
 
-public sealed class GetPurchaseOrderByIdQueryHandler : IQueryHandler<GetPurchaseOrderByIdQuery, PurchaseOrderDto>
+public sealed class GetPurchaseOrderByIdQueryHandler(
+    IPurchaseOrderRepository repository,
+    IMapper mapper,
+    ILogger<GetPurchaseOrderByIdQueryHandler> logger) : IQueryHandler<GetPurchaseOrderByIdQuery, PurchaseOrderDto>
 {
-    private readonly IPurchaseOrderRepository _repository;
-    private readonly IMapper _mapper;
-    private readonly ILogger<GetPurchaseOrderByIdQueryHandler> _logger;
-
-    public GetPurchaseOrderByIdQueryHandler(
-        IPurchaseOrderRepository repository,
-        IMapper mapper,
-        ILogger<GetPurchaseOrderByIdQueryHandler> logger)
-    {
-        _repository = repository;
-        _mapper = mapper;
-        _logger = logger;
-    }
+    private readonly IPurchaseOrderRepository _repository = repository;
+    private readonly IMapper _mapper = mapper;
+    private readonly ILogger<GetPurchaseOrderByIdQueryHandler> _logger = logger;
 
     public async Task<Result<PurchaseOrderDto>> Handle(GetPurchaseOrderByIdQuery query, CancellationToken cancellationToken)
     {

@@ -1,39 +1,33 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using StockManager.Application.Abstractions.CQRS.Command;
-using StockManager.Application.Common.Logging.General;
 using StockManager.Application.Common.Logging.PurchaseOrder;
 using StockManager.Application.Common.ResultPattern;
 using StockManager.Application.Helpers.CQRS.NullResult;
 using StockManager.Application.Helpers.Error;
+using StockManager.Core.Domain.Interfaces.Common;
 using StockManager.Core.Domain.Interfaces.Repositories;
 using StockManager.Core.Domain.Interfaces.Services;
 
 namespace StockManager.Application.CQRS.Commands.PurchaseOrderCommands.SetPurchaseOrderExpectedDate;
 
-public sealed class SetPurchaseOrderExpectedDateCommandHandler : ICommandHandler<SetPurchaseOrderExpectedDateCommand, Unit>
-{
-    private readonly IPurchaseOrderRepository _repository;
-    private readonly ILogger<SetPurchaseOrderExpectedDateCommandHandler> _logger;
-    private readonly IPurchaseOrderService _service;
-
-    public SetPurchaseOrderExpectedDateCommandHandler(
+public sealed class SetPurchaseOrderExpectedDateCommandHandler(
         IPurchaseOrderRepository repository,
         ILogger<SetPurchaseOrderExpectedDateCommandHandler> logger,
-        IPurchaseOrderService service
-        )
-    {
-        _repository = repository;
-        _logger = logger;
-        _service = service;
-    }
+        IPurchaseOrderService service,
+        IUnitOfWork uow
+    ) : ICommandHandler<SetPurchaseOrderExpectedDateCommand, Unit>
+{
+    private readonly IPurchaseOrderRepository _repository = repository;
+    private readonly ILogger<SetPurchaseOrderExpectedDateCommandHandler> _logger = logger;
+    private readonly IPurchaseOrderService _service = service;
+    private readonly IUnitOfWork _uow = uow;
 
-    public async Task<Result<Unit>> Handle(SetPurchaseOrderExpectedDateCommand command, CancellationToken cancellationToken)
+    public async Task<Result<Unit>> Handle(SetPurchaseOrderExpectedDateCommand command, CancellationToken ct)
     {
-        ResultFailureHelper.IfProvidedNullArgument(command.Id);
+        ResultFailureHelper.AgainstDefaultValue(command.Id);
 
-        Core.Domain.Models.PurchaseOrderEntity
-            .PurchaseOrder? purchaseOrder = await _repository.GetPurchaseOrderByIdAsync(command.Id, cancellationToken);
+        Core.Domain.Models.PurchaseOrderEntity.PurchaseOrder? purchaseOrder = await _repository.GetPurchaseOrderByIdAsync(command.Id, ct);
 
         if (purchaseOrder is null)
         {
@@ -44,20 +38,12 @@ public sealed class SetPurchaseOrderExpectedDateCommandHandler : ICommandHandler
                     ErrorCodes.PurchaseOrderNotFound));
         }
 
-        try
+        if (purchaseOrder.ExpectedDate.HasValue)
         {
-            if (purchaseOrder.ExpectedDate.HasValue)
-            {
-                _service.SetExpectedDate(purchaseOrder, purchaseOrder.ExpectedDate.Value);
-            }
+            _service.SetExpectedDate(purchaseOrder, purchaseOrder.ExpectedDate.Value);
+        }
 
-            await _repository.UpdatePurchaseOrderAsync(purchaseOrder, cancellationToken);
-            return Result<Unit>.Success(Unit.Value);
-        }
-        catch (Exception ex)
-        {
-            GeneralLogError.UnhandledException(_logger, ex.Message, ex);
-            throw;
-        }
+        await _uow.SaveChangesAsync(ct);
+        return Result<Unit>.Success(Unit.Value);
     }
 }

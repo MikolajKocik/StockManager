@@ -43,7 +43,7 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                             <th className="py-1.5 px-1 text-center w-12">{t.itemsTable.qty}</th>
                             <th className="py-1.5 px-1 text-center w-14">{t.itemsTable.unit}</th>
                             <th className="py-1.5 px-1.5 text-right w-16">{t.itemsTable.netPrice}</th>
-                            <th className="py-1.5 px-1 text-center w-11">{t.itemsTable.vatRate}</th>
+                            <th className="py-1.5 px-1 text-center w-14">{t.itemsTable.vatRate}</th>
                             <th className="py-1.5 px-1.5 text-right w-18">{t.itemsTable.netTotal}</th>
                             <th className="py-1.5 px-1.5 text-right w-16">{t.itemsTable.vatTotal}</th>
                             <th className="py-1.5 px-1.5 text-right w-18">{t.itemsTable.grossTotal}</th>
@@ -77,21 +77,34 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                     </td>
 
                                     {/* Name & SKU */}
-                                    <td className="py-1 px-2">
+                                    <td className="py-1 px-2 max-w-55 print:max-w-none print:whitespace-normal print:overflow-visible">
+                                        {/* Screen interactive input */}
                                         <input
                                             type="text"
                                             value={item.name}
+                                            title={item.name}
                                             onChange={(e) => onUpdateLineItem(item.id, 'name', e.target.value)}
                                             placeholder="Wpisz nazwę pozycji towarowej..."
-                                            className="w-full font-medium text-slate-900 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.5 outline-none print:p-0"
+                                            className="w-full font-medium text-slate-900 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.5 outline-none truncate focus:whitespace-normal print:hidden"
                                         />
+                                        {/* Print clean multi-line wrapping text */}
+                                        <div className="hidden print:block font-medium text-slate-900 leading-tight whitespace-normal break-words">
+                                            {item.name || '-'}
+                                        </div>
+
                                         <input
                                             type="text"
                                             value={item.sku || ''}
+                                            title={item.sku || ''}
                                             onChange={(e) => onUpdateLineItem(item.id, 'sku', e.target.value)}
                                             placeholder="Kod SKU (opcjonalnie)..."
-                                            className="w-full text-[10px] text-slate-400 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.2 outline-none print:p-0"
+                                            className="w-full text-[10px] text-slate-400 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.2 outline-none truncate print:hidden"
                                         />
+                                        {item.sku && (
+                                            <div className="hidden print:block text-[9px] text-slate-500 font-mono leading-tight whitespace-normal break-words mt-0.5">
+                                                SKU: {item.sku}
+                                            </div>
+                                        )}
                                     </td>
 
                                     {/* Quantity */}

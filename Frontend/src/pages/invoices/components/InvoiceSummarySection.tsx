@@ -59,13 +59,20 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                         <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                             {t.notesTitle}
                         </span>
+                        {/* Interactive screen textarea with no ugly resize handle */}
                         <textarea
                             value={invoice.notes || ''}
                             onChange={(e) => onUpdateField('notes', e.target.value)}
                             placeholder={t.notesPlaceholder}
                             rows={2}
-                            className="w-full text-xs text-slate-700 bg-transparent border border-slate-300 hover:border-slate-400 focus:border-slate-800 focus:bg-amber-50/50 p-1.5 rounded outline-none transition-colors print:border-none print:p-0"
+                            className="w-full text-xs text-slate-700 bg-transparent border border-slate-300 hover:border-slate-400 focus:border-slate-800 focus:bg-amber-50/50 p-1.5 rounded outline-none resize-y transition-colors print:hidden"
                         />
+                        {/* Flawless print text without textarea borders or handle */}
+                        {invoice.notes ? (
+                            <div className="hidden print:block text-xs text-slate-700 whitespace-pre-wrap leading-relaxed">
+                                {invoice.notes}
+                            </div>
+                        ) : null}
                     </div>
                 </div>
 

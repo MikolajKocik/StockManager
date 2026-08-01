@@ -11,7 +11,7 @@ export const suppliersApi = {
     },
     getById: async (id: string): Promise<Supplier> => {
         if (USE_MOCKS) return mockSuppliers.find(s => s.id === id) as Supplier;
-        const res = await api.get(`suppliers/${id}`);
+        const res = await api.get(`/suppliers/${id}`);
         return res.data;
     }
-}
+};

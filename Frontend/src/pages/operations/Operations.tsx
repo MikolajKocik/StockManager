@@ -1,69 +1,164 @@
 import { useState } from 'react';
-import type { WarehouseOperation } from '@/models/warehouseOperation';
-import { Table, TableHead, TableHeaderCell, TableRow, TableBody, TableCell } from '@/components/common/Table';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { operationsApi } from '@/api/internal/operationsApi';
-import { productsApi } from '@/api/internal/productsApi';
-import ProductCreateForm from '../products/components/ProductCreateForm';
-import { Header, Button, Select, Input, Modal } from '@/components/common';
+import { OperationsHeader } from './components/OperationsHeader';
+import { WorkflowKanbanBoard } from './components/WorkflowKanbanBoard';
+import { OperationDetailsModal } from './components/OperationDetailsModal';
+import { CreateOperationModal } from './components/CreateOperationModal';
+
+import { KANBAN_COLUMNS, INITIAL_OPERATIONS } from './mocks/operationKanban.mocks';
+import type {
+    KanbanOperation,
+    OperationStatus,
+    OperationPriority,
+    OperationType
+} from './models/operationKanban';
+import toast from 'react-hot-toast';
 
 export default function Operations() {
-    const queryClient = useQueryClient();
+    const [operations, setOperations] = useState<KanbanOperation[]>(INITIAL_OPERATIONS);
+    const [filterType, setFilterType] = useState<OperationType | 'ALL'>('ALL');
+    const [filterPriority, setFilterPriority] = useState<OperationPriority | 'ALL'>('ALL');
+    const [searchQuery, setSearchQuery] = useState('');
 
-    const [showModal, setShowModal] = useState(false);
-    const [showProductModal, setShowProductModal] = useState(false);
-    const [newOp, setNewOp] = useState({
-        type: 0, // PZ
-        date: new Date().toISOString().split('T')[0],
-        description: '',
-        items: [{ productId: '', quantity: 1 }]
-    });
+    const [selectedOperation, setSelectedOperation] = useState<KanbanOperation | null>(null);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const { data: operations = [] } = useQuery({
-        queryKey: ['operations'],
-        queryFn: operationsApi.getOperations
-    });
+    {/* Metric Counts */}
+    const inProgressCount = operations.filter(op => op.status === 'IN_PROGRESS').length;
+    const blockedCount = operations.filter(op => op.status === 'BLOCKED').length;
+    const activeFloorCount = operations.filter(op => op.status !== 'COMPLETED').length;
+    const isBottleneckActive = inProgressCount >= 5;
 
-    const { data: products = { data: [] } } = useQuery({
-        queryKey: ['products'],
-        queryFn: productsApi.getProducts
-    });
+    {/* Move / Transition Operation Status via Drag & Drop */}
+    const handleMoveOperation = (opId: string, newStatus: OperationStatus) => {
+        const targetOp = operations.find(o => o.id === opId);
+        if (!targetOp) return;
 
-    const { mutate: createOperation, isPending: isCreating } = useMutation({
-        mutationFn: (op: WarehouseOperation) => operationsApi.createOperation(op),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['operations'] });
-            setShowModal(false);
-        },
-        onError: (err) => {
-            alert("Error creating operation");
-            console.error(err);
-        }
-    });
+        if (targetOp.status === newStatus) return;
 
-    const handleCreate = async () => {
-        createOperation({
-            ...newOp,
-            type: parseInt(newOp.type.toString()),
-            items: newOp.items.map(i => ({ ...i, productId: parseInt(i.productId) }))
-        } as WarehouseOperation);
+        setOperations(prev => prev.map(op => {
+            if (op.id !== opId) return op;
+            return {
+                ...op,
+                status: newStatus,
+                blockedReason: newStatus === 'BLOCKED' ? (op.blockedReason || 'Flagged manually by shift foreman') : undefined
+            };
+        }));
+
+        toast.success(`Moved ${targetOp.operationNumber} to ${newStatus.replace('_', ' ')}`);
     };
 
-    const addItem = () => setNewOp({
-        ...newOp,
-        items: [...newOp.items, { productId: '', quantity: 1 }]
+    {/* Fast-Track / Reorder to Priority #1 and broadcast UpdateOperationPriorityCommand */}
+    const handleFastTrackPriority = (opId: string) => {
+        const targetOp = operations.find(o => o.id === opId);
+        if (!targetOp) return;
+
+        setOperations(prev => {
+            const others = prev.filter(o => o.id !== opId);
+            const elevated: KanbanOperation = {
+                ...targetOp,
+                priority: 'CRITICAL',
+                status: targetOp.status === 'QUEUED' ? 'IN_PROGRESS' : targetOp.status
+            };
+            return [elevated, ...others];
+        });
+
+        toast.success(
+            `Dispatched UpdateOperationPriorityCommand: ${targetOp.operationNumber} promoted to Priority #1 on all handheld terminals!`,
+            { duration: 4000 }
+        );
+    };
+
+    const handleUpdatePriority = (opId: string, priority: OperationPriority) => {
+        setOperations(prev => prev.map(o => o.id === opId ? { ...o, priority } : o));
+        if (selectedOperation && selectedOperation.id === opId) {
+            setSelectedOperation(prev => prev ? { ...prev, priority } : null);
+        }
+        toast.success(`Updated priority to ${priority}`);
+    };
+
+    const handleUpdateStatus = (opId: string, status: OperationStatus) => {
+        setOperations(prev => prev.map(o => o.id === opId ? { ...o, status } : o));
+        if (selectedOperation && selectedOperation.id === opId) {
+            setSelectedOperation(prev => prev ? { ...prev, status } : null);
+        }
+        toast.success(`Status updated to ${status}`);
+    };
+
+    const handleResolveBlocked = (opId: string) => {
+        setOperations(prev => prev.map(o => {
+            if (o.id !== opId) return o;
+            return {
+                ...o,
+                status: 'IN_PROGRESS',
+                blockedReason: undefined
+            };
+        }));
+        if (selectedOperation && selectedOperation.id === opId) {
+            setSelectedOperation(prev => prev ? { ...prev, status: 'IN_PROGRESS', blockedReason: undefined } : null);
+        }
+        toast.success('Hazard cleared! Task returned to In Progress queue');
+    };
+
+    const handleCreateOperation = (newOp: KanbanOperation) => {
+        setOperations(prev => [newOp, ...prev]);
+    };
+
+    {/* Filtering */}
+    const filteredOperations = operations.filter(op => {
+        const matchesType = filterType === 'ALL' || op.type === filterType;
+        const matchesPriority = filterPriority === 'ALL' || op.priority === filterPriority;
+        const matchesSearch =
+            op.operationNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            op.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            op.zone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            (op.assignedOperatorName && op.assignedOperatorName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+            op.items.some(i => i.sku.toLowerCase().includes(searchQuery.toLowerCase()) || i.productName.toLowerCase().includes(searchQuery.toLowerCase()));
+
+        return matchesType && matchesPriority && matchesSearch;
     });
 
-    const operationTypes = [
-        { value: 0, label: 'PZ (Goods Receipt)' },
-        { value: 1, label: 'WZ (Goods Issue)' },
-        { value: 2, label: 'RW (Internal Consumption)' },
-        { value: 3, label: 'MM (Stock Transfer)' }
-    ];
-
     return (
-        <div>
-            <h2>Operations</h2>
+        <div className="w-full space-y-4 pb-12">
+            {/* Header & KPI Summary */}
+            <OperationsHeader
+                filterType={filterType}
+                onFilterTypeChange={setFilterType}
+                filterPriority={filterPriority}
+                onFilterPriorityChange={setFilterPriority}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                onOpenCreateModal={() => setIsCreateModalOpen(true)}
+                activeFloorCount={activeFloorCount}
+                inProgressCount={inProgressCount}
+                blockedCount={blockedCount}
+                isBottleneckActive={isBottleneckActive}
+            />
+
+            {/* Interactive Workflow Kanban Board */}
+            <WorkflowKanbanBoard
+                columns={KANBAN_COLUMNS}
+                operations={filteredOperations}
+                onMoveOperation={handleMoveOperation}
+                onFastTrackPriority={handleFastTrackPriority}
+                onSelectOperation={setSelectedOperation}
+            />
+
+            {/* Operation Details & SKUs Modal */}
+            <OperationDetailsModal
+                isOpen={!!selectedOperation}
+                operation={selectedOperation}
+                onClose={() => setSelectedOperation(null)}
+                onUpdatePriority={handleUpdatePriority}
+                onUpdateStatus={handleUpdateStatus}
+                onResolveBlocked={handleResolveBlocked}
+            />
+
+            {/* Create & Dispatch Operation Modal */}
+            <CreateOperationModal
+                isOpen={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onCreate={handleCreateOperation}
+            />
         </div>
     );
 }

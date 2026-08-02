@@ -1,4 +1,4 @@
-import { Button, Modal, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common';
+import { Button, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { LiveActivityFeed } from '@/components/LiveActivityFeed';
@@ -120,7 +120,7 @@ export default function Home() {
 
     const activeIncidents = incidents.filter(
         incident => incident.status !== 'Resolved' &&
-            incident.status !== 'Cancelled'
+            incident.status !== 'Closed'
     );
 
     return (
@@ -158,32 +158,22 @@ export default function Home() {
                     </Button>
                 </div>
 
-                <Modal
+                <ReportIncidentForm
                     isOpen={isOpenIncident}
                     onClose={() => setOpenIncident(false)}
-                >
-                    <ReportIncidentForm onClose={() => setOpenIncident(false)} />
-                </Modal>
+                />
 
-
-                <Modal
+                <CustomizeViewForm
                     isOpen={isOpenCustomize}
+                    widgets={widgets}
+                    onChange={toggleWidget}
                     onClose={() => setOpenCustomize(false)}
-                >
-                    <CustomizeViewForm
-                        widgets={widgets}
-                        onChange={toggleWidget}
-                        onClose={() => setOpenCustomize(false)}
-                    />
-                </Modal>
+                />
 
-
-                <Modal
+                <GenerateReportForm
                     isOpen={isOpenReport}
                     onClose={() => setOpenReport(false)}
-                >
-                    <GenerateReportForm onClose={() => setOpenReport(false)} />
-                </Modal>
+                />
             </div>
 
             {widgets.locationBin && (

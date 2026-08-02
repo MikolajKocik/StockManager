@@ -1,10 +1,6 @@
 import type { ProductCreateForm } from "@/models/product";
 import { useState } from 'react';
-import './ProductForm.css';
-import Modal from '@/components/common/Modal';
-import { Input } from '@/components/common/Input';
-import { Select } from '@/components/common/Select';
-import { Button } from '@/components/common/Button';
+import { Button, Input, Select } from '@/components/common';
 import { useGenres } from "@/hooks/queries/useGenres";
 import { useWTypes } from "@/hooks/queries/useWTypes";
 import { useCreateProduct } from "../hooks";
@@ -15,7 +11,7 @@ interface ProductCreateModalProps {
     onSuccess?: () => void;
 }
 
-export default function ProductCreateForm({ isOpen, onClose, onSuccess }: ProductCreateModalProps) {
+export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModalProps) {
     const [form, setForm] = useState<ProductCreateForm>({
         name: '',
         genre: '',
@@ -30,102 +26,188 @@ export default function ProductCreateForm({ isOpen, onClose, onSuccess }: Produc
     const { data: types = [], isLoading: isTypesLoading } = useWTypes(isOpen);
     const { mutate: createProduct, isPending: isCreating, error: mutationError } = useCreateProduct();
 
+    if (!isOpen) return null;
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
-    }
+    };
 
     const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value });
-    }
+    };
 
-    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
-        createProduct(form);
+        createProduct(form, {
+            onSuccess: () => {
+                onClose();
+            }
+        });
     };
 
     const isLoading = isGenresLoading || isTypesLoading;
-    const error = mutationError ? "Error occurred while saving data..." : null;
+    const error = mutationError ? "Error occurred while saving product data." : null;
 
     return (
-        <Modal isOpen={isOpen} onClose={onClose} size="lg">
-            <h2 className="text-2xl font-bold">Add new product</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
+            <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-xl w-full overflow-hidden text-slate-800 animate-scale-in">
+                {/* Header */}
+                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
+                    <h3 className="font-bold text-sm text-white">
+                        Add New Warehouse Product
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
+                    >
+                        &#10005;
+                    </button>
+                </div>
 
-            {isLoading ? (
-                <p>Loading...</p>
-            ) : error ? (
-                <p style={{ color: 'red' }}>{error}</p>
-            ) : (
-                <form onSubmit={handleSubmit} className="product-form-grid">
-                    <Input
-                        label="Product Name"
-                        name="name"
-                        type="text"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                    />
+                {isLoading ? (
+                    <div className="p-8 text-center text-xs text-slate-500">Loading form options...</div>
+                ) : (
+                    <form onSubmit={handleSubmit}>
+                        <div className="p-4 space-y-3 text-xs">
+                            {error && (
+                                <div className="p-2 bg-rose-50 border border-rose-200 text-rose-700 rounded text-xs">
+                                    {error}
+                                </div>
+                            )}
 
-                    <Select
-                        label="Genre/Category"
-                        name="genre"
-                        value={form.genre}
-                        onChange={handleSelectChange}
-                        options={genres}
-                        required
-                    />
+                            {/* Section 1: Basic Information */}
+                            <div>
+                                <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block mb-2">
+                                    General Information
+                                </span>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label className="font-semibold text-slate-700 block mb-1">
+                                            Product Name <span className="text-red-500">*</span>
+                                        </label>
+                                        <Input
+                                            name="name"
+                                            type="text"
+                                            value={form.name}
+                                            onChange={handleChange}
+                                            placeholder="E.g. Hydraulic Valve 24V"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="font-semibold text-slate-700 block mb-1">
+                                            Category / Genre <span className="text-red-500">*</span>
+                                        </label>
+                                        <Select
+                                            name="genre"
+                                            value={form.genre}
+                                            onChange={handleSelectChange}
+                                            options={[
+                                                { label: 'Select genre', value: '' },
+                                                ...genres.map(g => ({ label: g, value: g }))
+                                            ]}
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                            </div>
 
-                    <Input
-                        label="Unit"
-                        name="unit"
-                        type="text"
-                        value={form.unit}
-                        onChange={handleChange}
-                        required
-                    />
+                            {/* Section 2: Units and Storage Type */}
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="font-semibold text-slate-700 block mb-1">
+                                        Unit <span className="text-red-500">*</span>
+                                    </label>
+                                    <Input
+                                        name="unit"
+                                        type="text"
+                                        value={form.unit}
+                                        onChange={handleChange}
+                                        placeholder="E.g. pcs, kg, box"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="font-semibold text-slate-700 block mb-1">
+                                        Warehouse Storage Type <span className="text-red-500">*</span>
+                                    </label>
+                                    <Select
+                                        name="type"
+                                        value={form.type}
+                                        onChange={handleSelectChange}
+                                        options={[
+                                            { label: 'Select type', value: '' },
+                                            ...types.map(t => ({ label: t, value: t }))
+                                        ]}
+                                        required
+                                    />
+                                </div>
+                            </div>
 
-                    <Select
-                        label="Warehouse Type"
-                        name="type"
-                        value={form.type}
-                        onChange={handleSelectChange}
-                        options={types}
-                        required
-                    />
+                            {/* Section 3: Traceability & Supplier */}
+                            <div className="pt-2 border-t border-slate-200">
+                                <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block mb-2">
+                                    Traceability & Supplier Link
+                                </span>
+                                <div className="grid grid-cols-3 gap-2">
+                                    <div>
+                                        <label className="font-semibold text-slate-700 block mb-1">Batch Number</label>
+                                        <Input
+                                            name="batchNumber"
+                                            type="text"
+                                            value={form.batchNumber}
+                                            onChange={handleChange}
+                                            placeholder="BATCH-2026-X"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="font-semibold text-slate-700 block mb-1">Supplier ID</label>
+                                        <Input
+                                            name="supplierId"
+                                            type="text"
+                                            value={form.supplierId}
+                                            onChange={handleChange}
+                                            placeholder="SUP-01"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="font-semibold text-slate-700 block mb-1">Expiration Date</label>
+                                        <Input
+                                            name="expirationDate"
+                                            type="date"
+                                            value={form.expirationDate}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                    <Input
-                        label="Batch Number"
-                        name="batchNumber"
-                        type="text"
-                        value={form.batchNumber}
-                        onChange={handleChange}
-                    />
-
-                    <Input
-                        label="Supplier ID"
-                        name="supplierId"
-                        type="text"
-                        value={form.supplierId}
-                        onChange={handleChange}
-                    />
-
-                    <Input
-                        label="Expiration Date"
-                        name="expirationDate"
-                        type="date"
-                        value={form.expirationDate}
-                        onChange={handleChange}
-                    />
-
-                    <div className="form-actions">
-                        <Button type="button" id="cancel" variant="danger" className="p-1" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button type="submit" variant="primary" className="p-1" isLoading={isCreating}>
-                            {isCreating ? 'Adding...' : 'Add Product'}
-                        </Button>
-                    </div>
-                </form>
-            )}
-        </Modal>
-    )
+                        {/* Footer */}
+                        <div className="flex justify-end gap-2 p-3 bg-slate-50 border-t border-slate-200">
+                            <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                onClick={onClose}
+                                disabled={isCreating}
+                                className="text-xs"
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                type="submit"
+                                variant="primary"
+                                size="sm"
+                                isLoading={isCreating}
+                                className="text-xs font-semibold"
+                            >
+                                {isCreating ? 'Adding...' : 'Add Product'}
+                            </Button>
+                        </div>
+                    </form>
+                )}
+            </div>
+        </div>
+    );
 }

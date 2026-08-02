@@ -1,90 +1,137 @@
-import { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
-import { useQuery } from '@tanstack/react-query';
-import { shipmentsApi } from '@/api/internal/shipmentsApi';
-import { geocodingApi } from '@/api/external/geocodingApi';
-import type { Shipment } from '@/models/shipment';
+import { useState } from 'react';
+import { ShipmentsHeader, type ShipmentsViewMode } from './components/ShipmentsHeader';
+import { DockSchedulerGantt } from './components/DockSchedulerGantt';
+import { ShipmentsListTable } from './components/ShipmentsListTable';
+import { ShipmentDetailsModal } from './components/ShipmentDetailsModal';
+import { ShipmentCreateModal } from './components/ShipmentCreateModal';
 
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-
-let DefaultIcon = L.icon({
-    iconUrl: icon,
-    shadowUrl: iconShadow,
-    iconSize: [25, 41],
-    iconAnchor: [12, 41]
-});
-
-L.Marker.prototype.options.icon = DefaultIcon;
-
-function ChangeView({ center, zoom }: { center: [number, number], zoom: number }) {
-    const map = useMap();
-    map.setView(center, zoom);
-    return null;
-}
+import { MOCK_RAMPS, MOCK_SHIPMENTS } from './mocks/shipments.mocks';
+import type { DockRamp, DockShipment } from './models/dockScheduler';
 
 export default function Shipments() {
-    const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(null);
-    const [mapCenter, setMapCenter] = useState<[number, number]>([52.2297, 21.0122]); // Default Warsaw
-    const [zoom, setZoom] = useState(5);
-    const [locations, setLocations] = useState<Record<string, [number, number]>>({});
+    const [viewMode, setViewMode] = useState<ShipmentsViewMode>('GANTT');
+    const [ramps, setRamps] = useState<DockRamp[]>(MOCK_RAMPS);
+    const [shipments, setShipments] = useState<DockShipment[]>(MOCK_SHIPMENTS);
+    const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
-    const { data: shipments = { data: [] }, isLoading, isError } = useQuery({
-        queryKey: ['shipments'],
-        queryFn: shipmentsApi.getAll
-    });
+    const [selectedShipment, setSelectedShipment] = useState<DockShipment | null>(null);
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 
-    useEffect(() => {
-        const geocode = async () => {
-            const newLocations: Record<string, [number, number]> = { ...locations };
-            let changed = false;
+    {/* Handlers */ }
+    const handleUpdateShipment = (id: string, updates: Partial<DockShipment>) => {
+        setShipments(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+    };
 
-            for (const s of shipments.data) {
-                if (s.destinationCity && s.destinationCountry) {
-                    const key = `${s.destinationCity}, ${s.destinationCountry}`;
-                    if (!newLocations[key]) {
-                        const coords = await geocodingApi.search(s.destinationCity, s.destinationCountry);
-                        if (coords) {
-                            newLocations[key] = coords;
-                            changed = true;
-                        }
-                    }
-                }
-                if (s.originCity && s.originCountry) {
-                    const key = `${s.originCity}, ${s.originCountry}`;
-                    if (!newLocations[key]) {
-                        const coords = await geocodingApi.search(s.originCity, s.originCountry);
-                        if (coords) {
-                            newLocations[key] = coords;
-                            changed = true;
-                        }
-                    }
-                }
-            }
-
-            if (changed) setLocations(newLocations);
-        };
-
-        if (shipments.data.length > 0) geocode();
-    }, [shipments.data]);
-
-    const handleShipmentClick = (s: Shipment) => {
-        setSelectedShipment(s);
-        const destKey = `${s.destinationCity}, ${s.destinationCountry}`;
-        if (locations[destKey]) {
-            setMapCenter(locations[destKey]);
-            setZoom(7);
+    const handleDeleteShipment = (id: string) => {
+        setShipments(prev => prev.filter(s => s.id !== id));
+        if (selectedShipment?.id === id) {
+            setSelectedShipment(null);
+            setIsDetailsModalOpen(false);
         }
     };
 
-    if (isLoading) return <div className="shipments-loading">Loading logistics data...</div>;
-    if (isError) return <div className="error-message">Failed to load shipments.</div>;
+    const handleCreateShipment = (newShipment: DockShipment) => {
+        setShipments(prev => [newShipment, ...prev]);
+    };
+
+    const handleSelectShipment = (shipment: DockShipment) => {
+        setSelectedShipment(shipment);
+        setIsDetailsModalOpen(true);
+    };
+
+    {/* Metric Calculations */ }
+    const totalShipments = shipments.length;
+    const occupiedRampIds = new Set(shipments.filter(s => s.status === 'LOADING' || s.status === 'ARRIVED_ON_TIME').map(s => s.rampId));
+    const activeRampsCount = occupiedRampIds.size;
+    const delayedCount = shipments.filter(s => s.status === 'DELAYED').length;
+    const totalPallets = shipments.reduce((acc, s) => acc + (s.palletCount || 0), 0);
+
+    // Check for collisions
+    let conflictsCount = 0;
+    for (let i = 0; i < shipments.length; i++) {
+        for (let j = i + 1; j < shipments.length; j++) {
+            const s1 = shipments[i];
+            const s2 = shipments[j];
+            if (s1.rampId === s2.rampId && s1.status !== 'CANCELLED' && s2.status !== 'CANCELLED') {
+                const start1 = s1.startHour;
+                const end1 = s1.startHour + s1.durationHours;
+                const start2 = s2.startHour;
+                const end2 = s2.startHour + s2.durationHours;
+                if (start1 < end2 && end1 > start2) {
+                    conflictsCount++;
+                }
+            }
+        }
+    }
 
     return (
-        <div>
-            <h2>Shipments</h2>
+        <div className="w-full space-y-4 pb-12">
+            {/* Header & Metrics */}
+            <ShipmentsHeader
+                viewMode={viewMode}
+                onViewModeChange={setViewMode}
+                onOpenCreateModal={() => setIsCreateModalOpen(true)}
+                totalShipments={totalShipments}
+                activeRampsCount={activeRampsCount}
+                delayedCount={delayedCount}
+                totalPallets={totalPallets}
+                conflictsCount={conflictsCount}
+                selectedDate={selectedDate}
+                onDateChange={setSelectedDate}
+            />
+
+            {/* Main Interactive Work Area */}
+            {viewMode === 'GANTT' ? (
+                <div className="w-full space-y-4">
+                    <DockSchedulerGantt
+                        ramps={ramps}
+                        shipments={shipments}
+                        onUpdateShipment={handleUpdateShipment}
+                        onSelectShipment={handleSelectShipment}
+                        selectedShipmentId={selectedShipment?.id}
+                    />
+
+                    {/* Secondary Quick List Table below Gantt */}
+                    <div className="pt-2">
+                        <div className="mb-2 flex items-center justify-between">
+                            <h3 className="font-bold text-sm text-slate-800">
+                                Active Fleet & Waybills Registry
+                            </h3>
+                            <span className="text-xs text-slate-500 font-mono">
+                                Showing all {shipments.length} assigned dock operations
+                            </span>
+                        </div>
+                        <ShipmentsListTable
+                            shipments={shipments}
+                            ramps={ramps}
+                            onSelectShipment={handleSelectShipment}
+                        />
+                    </div>
+                </div>
+            ) : (
+                <ShipmentsListTable
+                    shipments={shipments}
+                    ramps={ramps}
+                    onSelectShipment={handleSelectShipment}
+                />
+            )}
+
+            <ShipmentDetailsModal
+                isOpen={isDetailsModalOpen}
+                shipment={selectedShipment}
+                ramps={ramps}
+                onClose={() => setIsDetailsModalOpen(false)}
+                onUpdate={handleUpdateShipment}
+                onDelete={handleDeleteShipment}
+            />
+
+            <ShipmentCreateModal
+                isOpen={isCreateModalOpen}
+                ramps={ramps}
+                onClose={() => setIsCreateModalOpen(false)}
+                onCreate={handleCreateShipment}
+            />
         </div>
     );
 }

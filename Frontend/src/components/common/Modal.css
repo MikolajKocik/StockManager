@@ -1,10 +1,10 @@
 @layer components {
     .modal-overlay {
-        @apply fixed inset-0 bg-black/50 flex items-center justify-center z-50;
+        @apply fixed inset-0 bg-slate-900/50 backdrop-blur-xs flex items-center justify-center z-50 p-4;
     }
 
     .modal-content {
-        @apply relative bg-white p-6 shadow-2xl rounded-lg w-full m-4;
+        @apply relative bg-white border border-slate-300 shadow-2xl rounded-lg w-full overflow-hidden text-slate-800;
     }
 
     .modal-sm {
@@ -12,14 +12,18 @@
     }
 
     .modal-md {
-        @apply max-w-xl min-h-100;
+        @apply max-w-lg;
     }
 
     .modal-lg {
-        @apply max-w-3xl min-h-150;
+        @apply max-w-2xl;
+    }
+
+    .modal-xl {
+        @apply max-w-4xl;
     }
 
     .close-button {
-        @apply absolute top-3 right-4 text-3xl text-gray-400 hover:text-gray-700 transition-colors leading-none cursor-pointer;
+        @apply text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer transition-colors;
     }
 }

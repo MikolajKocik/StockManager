@@ -3,35 +3,38 @@ import { Button, Input, Select } from '@/components/common';
 import toast from 'react-hot-toast';
 
 interface GenerateReportFormProps {
+    isOpen?: boolean;
     onClose: () => void;
 }
 
-export default function GenerateReportForm({ onClose }: GenerateReportFormProps) {
+export default function GenerateReportForm({ isOpen = true, onClose }: GenerateReportFormProps) {
     const [reportType, setReportType] = useState('Inventory Summary');
     const [format, setFormat] = useState('PDF');
     const [dateFrom, setDateFrom] = useState('');
     const [dateTo, setDateTo] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
 
+    if (!isOpen) return null;
+
     const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault();
 
         if (!dateFrom || !dateTo) {
-            toast.error('Please select a date range');
+            toast.error('Please select a valid date range');
             return;
         }
 
         setIsGenerating(true);
 
         const generatePromise = new Promise((resolve) => {
-            setTimeout(resolve, 2000);
+            setTimeout(resolve, 1500);
         });
 
         toast.promise(
             generatePromise,
             {
-                loading: 'Generating report...',
-                success: <b>Report downloaded!</b>,
+                loading: 'Compiling analytics & generating report...',
+                success: <b>Report downloaded successfully!</b>,
                 error: <b>Failed to generate report</b>
             },
             { id: 'generate-report' }
@@ -42,77 +45,101 @@ export default function GenerateReportForm({ onClose }: GenerateReportFormProps)
     };
 
     return (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <h2 className="text-xl font-bold mb-2 text-gray-800">Generate Report</h2>
-
-            <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-gray-600">Report Type</label>
-                <Select
-                    value={reportType}
-                    onChange={(e) => setReportType(e.target.value)}
-                    options={[
-                        { label: 'Inventory Summary', value: 'Inventory Summary' },
-                        { label: 'Financial Report', value: 'Financial Report' },
-                        { label: 'Maintenance Log', value: 'Maintenance Log' },
-                        { label: 'Order History', value: 'Order History' }
-                    ]}
-                />
-            </div>
-
-            <div className="flex flex-col gap-1">
-                <label className="text-sm font-semibold text-gray-600">Export Format</label>
-                <Select
-                    value={format}
-                    onChange={(e) => setFormat(e.target.value)}
-                    options={[
-                        { label: 'PDF Document (.pdf)', value: 'PDF' },
-                        { label: 'Excel Spreadsheet (.xlsx)', value: 'Excel' },
-                        { label: 'CSV File (.csv)', value: 'CSV' }
-                    ]}
-                />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-semibold text-gray-600">Date From</label>
-                    <Input
-                        type="date"
-                        value={dateFrom}
-                        onChange={(e) => setDateFrom(e.target.value)}
-                        required
-                    />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
+            <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-md w-full overflow-hidden text-slate-800 animate-scale-in">
+                {/* Header */}
+                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
+                    <h3 className="font-bold text-sm text-white">
+                        Generate Warehouse Analytical Report
+                    </h3>
+                    <button
+                        onClick={onClose}
+                        className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
+                    >
+                        &#10005;
+                    </button>
                 </div>
 
-                <div className="flex flex-col gap-1">
-                    <label className="text-sm font-semibold text-gray-600">Date To</label>
-                    <Input
-                        type="date"
-                        value={dateTo}
-                        onChange={(e) => setDateTo(e.target.value)}
-                        required
-                    />
-                </div>
-            </div>
+                <form onSubmit={handleSubmit}>
+                    <div className="p-4 space-y-3 text-xs">
+                        <div>
+                            <label className="font-semibold text-slate-700 block mb-1">
+                                Report Dataset
+                            </label>
+                            <Select
+                                value={reportType}
+                                onChange={(e) => setReportType(e.target.value)}
+                                options={[
+                                    { label: 'Inventory Stock Valuation & Aging', value: 'Inventory Summary' },
+                                    { label: 'Fleet Maintenance & Incident Log', value: 'Maintenance Log' },
+                                    { label: 'Order Processing & Lead Time KPI', value: 'Order History' },
+                                    { label: 'B2B Client Wholesale Volume Report', value: 'Financial Report' }
+                                ]}
+                            />
+                        </div>
 
-            <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 mt-2">
-                <Button
-                    type="button"
-                    variant="outline"
-                    className="p-1"
-                    onClick={onClose}
-                    disabled={isGenerating}
-                >
-                    Cancel
-                </Button>
-                <Button
-                    type="submit"
-                    variant="success"
-                    className="p-1"
-                    disabled={isGenerating}
-                >
-                    {isGenerating ? 'Generating...' : 'Generate & Download'}
-                </Button>
+                        <div>
+                            <label className="font-semibold text-slate-700 block mb-1">
+                                Export Format
+                            </label>
+                            <Select
+                                value={format}
+                                onChange={(e) => setFormat(e.target.value)}
+                                options={[
+                                    { label: 'PDF Document (.pdf)', value: 'PDF' },
+                                    { label: 'Excel Spreadsheet (.xlsx)', value: 'Excel' },
+                                    { label: 'Raw CSV Data (.csv)', value: 'CSV' }
+                                ]}
+                            />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-3 pt-1">
+                            <div>
+                                <label className="font-semibold text-slate-700 block mb-1">Date From</label>
+                                <Input
+                                    type="date"
+                                    value={dateFrom}
+                                    onChange={(e) => setDateFrom(e.target.value)}
+                                    required
+                                />
+                            </div>
+
+                            <div>
+                                <label className="font-semibold text-slate-700 block mb-1">Date To</label>
+                                <Input
+                                    type="date"
+                                    value={dateTo}
+                                    onChange={(e) => setDateTo(e.target.value)}
+                                    required
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Footer */}
+                    <div className="flex justify-end gap-2 p-3 bg-slate-50 border-t border-slate-200">
+                        <Button
+                            type="button"
+                            variant="secondary"
+                            size="sm"
+                            onClick={onClose}
+                            disabled={isGenerating}
+                            className="text-xs"
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            type="submit"
+                            variant="primary"
+                            size="sm"
+                            isLoading={isGenerating}
+                            className="text-xs font-semibold"
+                        >
+                            {isGenerating ? 'Generating...' : 'Export & Download'}
+                        </Button>
+                    </div>
+                </form>
             </div>
-        </form>
+        </div>
     );
 }

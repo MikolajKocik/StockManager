@@ -48,7 +48,7 @@ export const binMapApi = {
 
         const inventoryItems: InventoryItem[] = inventoryRes.data || [];
         const activeIncidents: MaintenanceIncident[] = (incidents || []).filter(
-            inc => inc.status !== 'Resolved' && inc.status !== 'Cancelled'
+            inc => inc.status !== 'Resolved' && inc.status !== 'Closed'
         );
 
         // Group inventory items by Bin Location Code / ID

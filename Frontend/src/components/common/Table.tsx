@@ -6,6 +6,7 @@ interface TableElementProps {
     children?: ReactNode;
     className?: string;
     isFiltered?: boolean;
+    colSpan?: number;
     onClick?: () => void;
 }
 
@@ -46,9 +47,12 @@ export function TableRow({ children, className = '', onClick }: TableElementProp
     );
 }
 
-export function TableHeaderCell({ children, className = '', isFiltered, onClick }: TableElementProps) {
+export function TableHeaderCell({ children, className = '', isFiltered, colSpan, onClick }: TableElementProps) {
     return (
-        <th className={`bg-slate-800 text-white py-2.5 px-3 font-bold uppercase text-[11px] tracking-wider select-none border-b border-slate-700 ${className}`}>
+        <th 
+            colSpan={colSpan}
+            className={`bg-slate-800 text-white py-2.5 px-3 font-bold uppercase text-[11px] tracking-wider select-none border-b border-slate-700 ${className}`}
+        >
             <div className="inline-flex items-center gap-1.5 text-white">
                 <span className="text-white font-bold">{children}</span>
                 {isFiltered !== undefined && (
@@ -70,9 +74,9 @@ export function TableHeaderCell({ children, className = '', isFiltered, onClick 
     );
 }
 
-export function TableCell({ children, className = '' }: TableElementProps) {
+export function TableCell({ children, className = '', colSpan }: TableElementProps) {
     return (
-        <td className={`py-2 px-3 text-slate-800 align-middle ${className}`}>
+        <td colSpan={colSpan} className={`py-2 px-3 text-slate-800 align-middle ${className}`}>
             {children}
         </td>
     );

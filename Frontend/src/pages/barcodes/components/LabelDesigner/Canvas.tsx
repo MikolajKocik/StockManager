@@ -174,7 +174,7 @@ export const Canvas: React.FC<CanvasProps> = ({
         >
             {/* Top Toolbar for Canvas Controls */}
             <div
-                className="w-full max-w-2xl bg-white border border-slate-300 rounded-md px-3 py-1.5 mb-3 flex items-center justify-between shadow-xs text-xs"
+                className="w-full bg-white border border-slate-300 rounded-md px-3 py-1.5 mb-3 flex items-center justify-between shadow-xs text-xs"
                 onClick={(e) => e.stopPropagation()}
             >
                 <div className="flex items-center gap-2">

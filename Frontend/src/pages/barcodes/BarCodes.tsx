@@ -123,7 +123,7 @@ export default function BarCodes() {
     };
 
     return (
-        <div className="space-y-4 max-w-7xl mx-auto pb-12">
+        <div className="w-full space-y-4 pb-12">
             {/* Header & Mode Switcher */}
             <BarcodesHeader
                 activeTab={activeTab}

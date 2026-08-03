@@ -1,18 +1,38 @@
 @import "tailwindcss";
 
+@theme {
+    --color-brand-header: #2b6675;
+    --color-brand-accent: #AA9559;
+}
+
 @import "./pages/home/Home.css";
 @import "./components/layout/Navbar.css";
 @import "./components/common/Modal.css";
 @import "./components/common/Button.css";
+@import "./components/common/Badge.css";
+@import "./components/common/Meter.css";
+@import "./components/common/Form.css";
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }
 
 @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.97); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+        opacity: 0;
+        transform: scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .animate-fade-in {

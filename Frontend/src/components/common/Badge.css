@@ -1,0 +1,33 @@
+@layer components {
+    .blue {
+        @apply bg-slate-50 text-[#2b6675] border border-[#2b6675]/40;
+    }
+
+    .purple {
+        @apply bg-slate-50 text-slate-800 border border-slate-400;
+    }
+
+    .amber {
+        @apply bg-amber-50/60 text-[#8f7d49] border border-[#AA9559]/50;
+    }
+
+    .emerald {
+        @apply bg-emerald-50/60 text-[#0e5f32] border border-[#0e5f32]/40;
+    }
+
+    .orange {
+        @apply bg-amber-50/60 text-[#8f7d49] border border-[#AA9559]/50;
+    }
+
+    .indigo {
+        @apply bg-slate-50 text-slate-800 border border-slate-400;
+    }
+
+    .rose {
+        @apply bg-red-50/70 text-[#991b1b] border border-red-300;
+    }
+
+    .slate {
+        @apply bg-slate-100 text-slate-700 border border-slate-300;
+    }
+}

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { OperationsHeader } from './components/OperationsHeader';
 import { WorkflowKanbanBoard } from './components/WorkflowKanbanBoard';
 import { OperationDetailsModal } from './components/OperationDetailsModal';
@@ -20,13 +20,33 @@ export default function Operations() {
     const [searchQuery, setSearchQuery] = useState('');
 
     const [selectedOperation, setSelectedOperation] = useState<KanbanOperation | null>(null);
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+    const createModalRef = useRef<HTMLDialogElement>(null);
+    const detailsModalRef = useRef<HTMLDialogElement>(null);
 
     {/* Metric Counts */}
     const inProgressCount = operations.filter(op => op.status === 'IN_PROGRESS').length;
     const blockedCount = operations.filter(op => op.status === 'BLOCKED').length;
     const activeFloorCount = operations.filter(op => op.status !== 'COMPLETED').length;
     const isBottleneckActive = inProgressCount >= 5;
+
+    const handleOpenCreateModal = () => {
+        createModalRef.current?.showModal();
+    };
+
+    const handleCloseCreateModal = () => {
+        createModalRef.current?.close();
+    };
+
+    const handleSelectOperation = (op: KanbanOperation) => {
+        setSelectedOperation(op);
+        detailsModalRef.current?.showModal();
+    };
+
+    const handleCloseDetailsModal = () => {
+        detailsModalRef.current?.close();
+        setSelectedOperation(null);
+    };
 
     {/* Move / Transition Operation Status via Drag & Drop */}
     const handleMoveOperation = (opId: string, newStatus: OperationStatus) => {
@@ -127,7 +147,7 @@ export default function Operations() {
                 onFilterPriorityChange={setFilterPriority}
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
-                onOpenCreateModal={() => setIsCreateModalOpen(true)}
+                onOpenCreateModal={handleOpenCreateModal}
                 activeFloorCount={activeFloorCount}
                 inProgressCount={inProgressCount}
                 blockedCount={blockedCount}
@@ -140,14 +160,14 @@ export default function Operations() {
                 operations={filteredOperations}
                 onMoveOperation={handleMoveOperation}
                 onFastTrackPriority={handleFastTrackPriority}
-                onSelectOperation={setSelectedOperation}
+                onSelectOperation={handleSelectOperation}
             />
 
             {/* Operation Details & SKUs Modal */}
             <OperationDetailsModal
-                isOpen={!!selectedOperation}
+                ref={detailsModalRef}
                 operation={selectedOperation}
-                onClose={() => setSelectedOperation(null)}
+                onClose={handleCloseDetailsModal}
                 onUpdatePriority={handleUpdatePriority}
                 onUpdateStatus={handleUpdateStatus}
                 onResolveBlocked={handleResolveBlocked}
@@ -155,8 +175,8 @@ export default function Operations() {
 
             {/* Create & Dispatch Operation Modal */}
             <CreateOperationModal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
+                ref={createModalRef}
+                onClose={handleCloseCreateModal}
                 onCreate={handleCreateOperation}
             />
         </div>

@@ -10,7 +10,7 @@ export default function Layout() {
 
             <div className="grid grid-cols-[max-content_1fr] flex-1 overflow-hidden">
                 <Navbar />
-                <main className="overflow-y-auto p-4 bg-[#C1C3C3]">
+                <main className="overflow-y-auto p-4 bg-[#dbe1ec]">
                     <Outlet />
                 </main>
             </div>

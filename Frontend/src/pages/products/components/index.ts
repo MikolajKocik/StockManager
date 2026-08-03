@@ -1,4 +1,5 @@
-export { default as ProductCreateForm } from './ProductCreateForm';
+export * from './ProductKpiSummary';
+export * from './ProductTable';
 export * from './ProductCreateForm';
-export { default as ProductEditForm } from './ProductEditForm';
+export * from './ProductEditForm';
 export * from './ProductDetailsForm';

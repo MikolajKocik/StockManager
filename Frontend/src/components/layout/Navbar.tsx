@@ -23,13 +23,13 @@ export default function Navbar() {
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     return (
-        <nav className={`relative flex flex-col pr-4 bg-[#D9D9D9] border-r-[0.1rem] border-r-[#779ABC] transition-[width] duration-300 ease-in-out
+        <nav className={`relative flex flex-col pr-4 bg-[#84a7ad] border-r-[0.1rem] border-r-[#3b3c3d] transition-[width] duration-300 ease-in-out
             ${isCollapsed ? 'w-18' : 'w-54'}
         `}>
 
             <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="absolute top-1/3 -right-4.5 z-50 p-1 bg-[#D9D9D9] border-[#779ABC] rounded border cursor-pointer hover:bg-[#B5B4B4]">
+                className="absolute top-1/3 -right-4.5 z-50 p-1 bg-[#84a7ad] border-[#3b3c3d] rounded border cursor-pointer hover:bg-[#B5B4B4]">
                 <img src={arrowIcon} alt="Panel" />
             </button>
 

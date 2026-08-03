@@ -28,7 +28,7 @@ export default function ConfirmModal({
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
             <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-md w-full overflow-hidden text-slate-800 animate-scale-in">
                 {/* Header */}
-                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
+                <div className="bg-[#2b6675] text-white px-4 py-3 flex items-center justify-between border-b border-[#204e5a]">
                     <h3 className="font-bold text-sm text-white">
                         {title}
                     </h3>

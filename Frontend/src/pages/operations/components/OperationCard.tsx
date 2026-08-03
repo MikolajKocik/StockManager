@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components/common';
 import type { KanbanOperation } from '../models/operationKanban';
 
 interface OperationCardProps {
@@ -22,45 +23,44 @@ export const OperationCard: React.FC<OperationCardProps> = ({
 
     const isCritical = operation.priority === 'CRITICAL';
     const isHigh = operation.priority === 'HIGH';
+    const isBlocked = operation.status === 'BLOCKED';
 
     return (
         <div
             draggable
             onDragStart={(e) => onDragStart(e, operation.id)}
             onClick={() => onSelect(operation)}
-            className={`w-full bg-white rounded-lg p-3 border shadow-xs hover:shadow-md transition-all cursor-grab active:cursor-grabbing select-none space-y-2 text-xs relative group ${isCritical
-                    ? 'border-rose-400 bg-rose-50/30 ring-1 ring-rose-400/40'
+            className={`w-full bg-white rounded-md p-3 border shadow-2xs hover:shadow-xs transition-all cursor-grab active:cursor-grabbing select-none space-y-2 text-xs relative group ${
+                isBlocked
+                    ? 'border-red-400 bg-red-50/20'
+                    : isCritical
+                    ? 'border-red-300 bg-red-50/10'
                     : isHigh
-                        ? 'border-amber-300 bg-amber-50/20'
-                        : operation.status === 'BLOCKED'
-                            ? 'border-rose-500 bg-rose-50/50'
-                            : 'border-slate-300 hover:border-slate-400'
-                }`}
+                    ? 'border-amber-300'
+                    : 'border-slate-300 hover:border-slate-400'
+            }`}
         >
-            {/* Top Row: Priority Badge & Operation Number */}
+            {/* Top Row: Operation Number & Type Tag */}
             <div className="flex items-center justify-between gap-1">
                 <div className="flex items-center gap-1.5 min-w-0">
-                    <span className={`w-2 h-2 rounded-full shrink-0 ${isCritical ? 'bg-rose-600 animate-ping' :
-                            isHigh ? 'bg-amber-500' :
-                                operation.status === 'COMPLETED' ? 'bg-emerald-500' :
-                                    'bg-slate-400'
-                        }`} />
+                    <span className={`w-2 h-2 rounded-full shrink-0 ${
+                        isCritical ? 'bg-[#991b1b]' :
+                        isHigh ? 'bg-[#AA9559]' :
+                        operation.status === 'COMPLETED' ? 'bg-[#0e5f32]' :
+                        'bg-slate-400'
+                    }`} />
                     <span className="font-bold font-mono text-slate-900 truncate">
                         {operation.operationNumber}
                     </span>
                     {index === 0 && operation.status === 'IN_PROGRESS' && (
-                        <span className="bg-rose-700 text-white font-mono text-[9px] px-1 py-0.2 rounded font-black tracking-tight shrink-0">
+                        <span className="bg-slate-800 text-white font-mono text-[9px] px-1 py-0.2 rounded-xs font-bold uppercase tracking-tight shrink-0">
                             #1 PRIORITY
                         </span>
                     )}
                 </div>
 
                 {/* Operation Type Tag */}
-                <span className={`text-[9px] px-1.5 py-0.5 rounded font-mono font-bold shrink-0 uppercase ${operation.type === 'PICKING' ? 'bg-blue-100 text-blue-900 border border-blue-200' :
-                        operation.type === 'PUTAWAY' ? 'bg-emerald-100 text-emerald-900 border border-emerald-200' :
-                            operation.type === 'REPLENISHMENT' ? 'bg-purple-100 text-purple-900 border border-purple-200' :
-                                'bg-slate-100 text-slate-800 border border-slate-200'
-                    }`}>
+                <span className="text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold shrink-0 uppercase bg-slate-100 text-slate-700 border border-slate-300">
                     {operation.type}
                 </span>
             </div>
@@ -69,21 +69,21 @@ export const OperationCard: React.FC<OperationCardProps> = ({
             <div className="space-y-0.5 text-[11px]">
                 <div className="flex justify-between items-center">
                     <span className="text-slate-500">Order:</span>
-                    <span className="font-mono font-bold text-slate-800 truncate max-w-35">
+                    <span className="font-mono font-bold text-slate-800 truncate max-w-36">
                         {operation.orderNumber}
                     </span>
                 </div>
                 <div className="flex justify-between items-center">
                     <span className="text-slate-500">Location:</span>
-                    <span className="font-medium text-slate-700 truncate max-w-37.5">
+                    <span className="font-medium text-slate-700 truncate max-w-36">
                         {operation.zone}
                     </span>
                 </div>
             </div>
 
             {/* Blocked Warning Reason if Halted */}
-            {operation.status === 'BLOCKED' && operation.blockedReason && (
-                <div className="bg-rose-100 border border-rose-300 rounded p-1.5 text-[10px] text-rose-900 font-medium">
+            {isBlocked && operation.blockedReason && (
+                <div className="bg-red-50 border border-red-200 rounded p-1.5 text-[10px] text-red-900 font-medium">
                     <span className="font-bold block">HAZARD / STOP:</span>
                     {operation.blockedReason}
                 </div>
@@ -92,12 +92,12 @@ export const OperationCard: React.FC<OperationCardProps> = ({
             {/* Operator Assignment Info */}
             <div className="bg-slate-50 p-1.5 rounded border border-slate-200 flex items-center justify-between text-[10px]">
                 <div className="truncate min-w-0">
-                    <span className="text-slate-500">Operator: </span>
+                    <span className="text-slate-500">Staff: </span>
                     <span className="font-bold text-slate-800">
                         {operation.assignedOperatorName || 'Unassigned Queue'}
                     </span>
                 </div>
-                <span className="font-mono text-slate-500 text-[9px] shrink-0">
+                <span className="font-mono text-slate-600 text-[9px] shrink-0 font-medium">
                     {operation.elapsedMinutes}m / {operation.estimatedMinutes}m
                 </span>
             </div>
@@ -111,15 +111,16 @@ export const OperationCard: React.FC<OperationCardProps> = ({
                 </div>
                 <div className="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
                     <div
-                        className={`h-full rounded-full transition-all ${progressPct === 100 ? 'bg-emerald-600' :
-                                isCritical ? 'bg-rose-600' : 'bg-blue-600'
-                            }`}
+                        className={`h-full rounded-full transition-all ${
+                            progressPct === 100 ? 'bg-[#0e5f32]' :
+                            isCritical ? 'bg-[#991b1b]' : 'bg-[#2b6675]'
+                        }`}
                         style={{ width: `${progressPct}%` }}
                     />
                 </div>
             </div>
 
-            {/* Action Bar / Fast Priority Elevation */}
+            {/* Action Bar */}
             <div className="flex items-center justify-between pt-1 border-t border-slate-200 text-[10px]">
                 <button
                     type="button"
@@ -127,23 +128,24 @@ export const OperationCard: React.FC<OperationCardProps> = ({
                         e.stopPropagation();
                         onSelect(operation);
                     }}
-                    className="text-blue-700 hover:text-blue-900 font-semibold cursor-pointer"
+                    className="text-[#2b6675] hover:underline font-semibold cursor-pointer"
                 >
                     View Items &rarr;
                 </button>
 
                 {operation.status !== 'COMPLETED' && (
-                    <button
-                        type="button"
+                    <Button
+                        variant="warning"
+                        size="sm"
                         onClick={(e) => {
                             e.stopPropagation();
                             onFastTrackPriority(operation.id);
                         }}
                         title="Promote to Top Priority (Broadcasts UpdateOperationPriorityCommand)"
-                        className="bg-amber-100 hover:bg-amber-200 text-amber-950 font-bold px-1.5 py-0.5 rounded border border-amber-300 font-mono text-[9px] cursor-pointer transition-colors"
+                        className="text-[9px] px-1.5 py-0.5 font-mono"
                     >
                         Fast-Track #1
-                    </button>
+                    </Button>
                 )}
             </div>
         </div>

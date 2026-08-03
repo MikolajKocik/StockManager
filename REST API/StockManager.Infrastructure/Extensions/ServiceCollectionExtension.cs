@@ -66,12 +66,12 @@ public static class ServiceCollectionExtension
         services.Scan(s =>
         {
             s.FromAssemblies(infrastructureAssembly)
-                .AddClasses(c => c.Where(t => t.Name.EndsWith("Repository", StringComparison.OrdinalIgnoreCase)))
+                .AddClasses(c => c.Where(t => t.Name.EndsWith("Repository", StringComparison.OrdinalIgnoreCase)), publicOnly: false)
                 .AsImplementedInterfaces()
                 .WithScopedLifetime();
 
             s.FromAssemblies(infrastructureAssembly)
-                .AddClasses(c => c.Where(t => t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase)))
+                .AddClasses(c => c.Where(t => t.Name.EndsWith("Service", StringComparison.OrdinalIgnoreCase)), publicOnly: false)
                 .AsImplementedInterfaces()
                 .WithScopedLifetime();
         });

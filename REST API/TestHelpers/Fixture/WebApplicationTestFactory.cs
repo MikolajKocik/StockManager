@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using StackExchange.Redis;
@@ -19,13 +20,23 @@ public sealed class WebApplicationTestFactory : WebApplicationFactory<Program>
     public WebApplicationTestFactory()
     {
         Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Test");
+        Environment.SetEnvironmentVariable("AzureStorage__ConnectionString", "UseDevelopmentStorage=true");
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.UseEnvironment("Test");
 
-        builder.ConfigureAppConfiguration((context, _) => context.HostingEnvironment.EnvironmentName = "Test");
+        builder.ConfigureAppConfiguration((context, config) =>
+        {
+            context.HostingEnvironment.EnvironmentName = "Test";
+            var inMemorySettings = new Dictionary<string, string?>
+            {
+                ["AzureStorage:ConnectionString"] = "UseDevelopmentStorage=true",
+                ["AzureStorage:ContainerName"] = "test-documents"
+            };
+            config.AddInMemoryCollection(inMemorySettings);
+        });
 
         builder.ConfigureTestServices(services =>
         {

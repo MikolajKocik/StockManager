@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.Configure<CacheSettings>(
             config.GetSection("CacheSettings"));
 
+        services.AddMemoryCache();
         services.AddHttpContextAccessor();
 
         services.AddTransient(typeof(IPipelineBehavior<,>), typeof(TrackingBehavior<,>));

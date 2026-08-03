@@ -3,7 +3,7 @@ export function genericSort<T>(array: T[], activeSort: string | null, keyMap?: R
     const propKey = keyMap ? keyMap[activeSort] : activeSort;
     if (!propKey) return array;
 
-    return [...array].sort((a, b) => {
+    return array.toSorted((a, b) => {
         const valA = a[propKey as keyof T];
         const valB = b[propKey as keyof T];
 

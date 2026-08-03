@@ -4,19 +4,19 @@
     }
 
     .btn-primary {
-        @apply bg-blue-700 text-white hover:bg-blue-800 shadow-xs;
+        @apply bg-[#2b6675] text-white hover:bg-[#204e5a] shadow-xs;
     }
 
     .btn-secondary {
-        @apply bg-slate-700 text-white hover:bg-slate-800 shadow-xs;
+        @apply bg-[#5a6c7d] text-white hover:bg-[#485765] shadow-xs;
     }
 
     .btn-danger {
-        @apply bg-rose-700 text-white hover:bg-rose-800 shadow-xs;
+        @apply bg-[#991b1b] text-white hover:bg-[#7f1d1d] shadow-xs;
     }
 
     .btn-accent {
-        @apply bg-slate-800 text-white hover:bg-slate-900 shadow-xs;
+        @apply bg-[#37393B] text-white hover:bg-[#242627] shadow-xs;
     }
 
     .btn-outline {
@@ -28,15 +28,15 @@
     }
 
     .btn-lavender {
-        @apply bg-purple-700 text-white hover:bg-purple-800 shadow-xs;
+        @apply bg-[#635985] text-white hover:bg-[#4d4469] shadow-xs;
     }
 
     .btn-success {
-        @apply bg-emerald-700 text-white hover:bg-emerald-800 shadow-xs;
+        @apply bg-[#0e5f32] text-white hover:bg-[#0a4625] shadow-xs;
     }
 
     .btn-warning {
-        @apply bg-amber-600 text-white hover:bg-amber-700 shadow-xs;
+        @apply bg-[#AA9559] text-white hover:bg-[#8f7d49] shadow-xs;
     }
 
     .btn-sm {

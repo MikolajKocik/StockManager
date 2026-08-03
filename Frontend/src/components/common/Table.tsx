@@ -22,7 +22,7 @@ export function Table({ children, className = '' }: TableElementProps) {
 
 export function TableHead({ children, className = '' }: TableElementProps) {
     return (
-        <thead className={`bg-slate-800 text-white font-bold uppercase text-[11px] tracking-wider border-b border-slate-700 ${className}`}>
+        <thead className={`bg-[#2b6675] text-white font-bold uppercase text-[11px] tracking-wider border-b border-slate-700 ${className}`}>
             {children}
         </thead>
     );
@@ -38,7 +38,7 @@ export function TableBody({ children, className = '' }: TableElementProps) {
 
 export function TableRow({ children, className = '', onClick }: TableElementProps) {
     return (
-        <tr 
+        <tr
             onClick={onClick}
             className={`transition-colors odd:bg-white even:bg-slate-50/70 hover:bg-slate-100/80 ${className}`}
         >
@@ -49,22 +49,22 @@ export function TableRow({ children, className = '', onClick }: TableElementProp
 
 export function TableHeaderCell({ children, className = '', isFiltered, colSpan, onClick }: TableElementProps) {
     return (
-        <th 
+        <th
             colSpan={colSpan}
-            className={`bg-slate-800 text-white py-2.5 px-3 font-bold uppercase text-[11px] tracking-wider select-none border-b border-slate-700 ${className}`}
+            className={`bg-[#2b6675] text-white py-2.5 px-3 font-bold uppercase text-[11px] tracking-wider select-none border-b border-slate-700 ${className}`}
         >
             <div className="inline-flex items-center gap-1.5 text-white">
                 <span className="text-white font-bold">{children}</span>
                 {isFiltered !== undefined && (
-                    <button 
+                    <button
                         type="button"
-                        className="inline-flex items-center justify-center p-1 rounded bg-slate-700/60 hover:bg-slate-600 transition-colors cursor-pointer" 
+                        className="inline-flex items-center justify-center p-1 rounded bg-slate-700/60 hover:bg-slate-600 transition-colors cursor-pointer"
                         onClick={onClick}
                         title="Sort / Filter"
                     >
-                        <img 
-                            src={isFiltered ? filterIcon : filterNoneIcon} 
-                            alt="filter" 
+                        <img
+                            src={isFiltered ? filterIcon : filterNoneIcon}
+                            alt="filter"
                             className="w-3.5 h-3.5 invert opacity-95 hover:opacity-100"
                         />
                     </button>
@@ -74,9 +74,23 @@ export function TableHeaderCell({ children, className = '', isFiltered, colSpan,
     );
 }
 
-export function TableCell({ children, className = '', colSpan }: TableElementProps) {
+export type TableCellVariant = 'default' | 'strong' | 'muted' | 'code' | 'highlight';
+
+export interface TableCellProps extends TableElementProps {
+    variant?: TableCellVariant;
+}
+
+export function TableCell({ children, className = '', colSpan, variant = 'default' }: TableCellProps) {
+    const variantClasses: Record<TableCellVariant, string> = {
+        default: 'text-slate-800',
+        strong: 'font-semibold text-slate-900',
+        muted: 'text-slate-500 text-xs',
+        code: 'font-mono text-slate-800 text-xs',
+        highlight: 'font-mono font-bold text-slate-900'
+    };
+
     return (
-        <td colSpan={colSpan} className={`py-2 px-3 text-slate-800 align-middle ${className}`}>
+        <td colSpan={colSpan} className={`py-2 px-3 align-middle ${variantClasses[variant]} ${className}`}>
             {children}
         </td>
     );

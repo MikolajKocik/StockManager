@@ -1,9 +1,11 @@
 import React from 'react';
 import { Button } from '@/components/common';
-import type { Customer } from '@/models/customer';
 
 interface CustomerKpiSummaryProps {
-    customers: Customer[];
+    totalCustomers: number;
+    activeCustomers: number;
+    totalSpentSum: number;
+    totalCreditSum: number;
     onOpenCreateModal: () => void;
     filterQuery: string;
     onFilterChange: (val: string) => void;
@@ -13,7 +15,10 @@ interface CustomerKpiSummaryProps {
 }
 
 export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
-    customers,
+    totalCustomers,
+    activeCustomers,
+    totalSpentSum,
+    totalCreditSum,
     onOpenCreateModal,
     filterQuery,
     onFilterChange,
@@ -21,19 +26,18 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
     onSegmentChange,
     segments
 }) => {
-    const totalCustomers = customers.length;
-    const activeCustomers = customers.filter(c => (c.status || 'Active') === 'Active').length;
-    const totalSpentSum = customers.reduce((acc, c) => acc + (c.totalSpent || 0), 0);
-    const totalCreditSum = customers.reduce((acc, c) => acc + (c.creditLimit || 0), 0);
-
     const formatCurrency = (amount: number) => {
         if (amount >= 1000000) return `€${(amount / 1000000).toFixed(2)}M`;
         if (amount >= 1000) return `€${(amount / 1000).toFixed(0)}k`;
         return `€${amount}`;
     };
 
+    const activePercent = totalCustomers > 0
+        ? Math.round((activeCustomers / totalCustomers) * 100)
+        : 100;
+
     return (
-        <div className="bg-white border border-slate-300 rounded-lg shadow-sm p-4 space-y-4">
+        <div className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
             {/* Header row with Title, Search & Quick Action */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
                 <div>
@@ -41,7 +45,7 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
                         Customers & Key Accounts Directory
                     </h1>
                     <p className="text-xs text-slate-500">
-                        Manage B2B wholesale client relationships, credit terms, regional billing, and order histories
+                        Manage B2B wholesale client relationships, credit limits, regional billing, and order histories
                     </p>
                 </div>
 
@@ -53,10 +57,11 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
                             value={filterQuery}
                             onChange={(e) => onFilterChange(e.target.value)}
                             placeholder="Search customer, tax ID, email, city..."
-                            className="text-xs bg-slate-50 border border-slate-300 hover:border-slate-400 focus:border-slate-800 focus:bg-white px-3 py-1.5 rounded-md outline-none w-64 transition-colors shadow-inner"
+                            className="text-xs bg-slate-50 border border-slate-300 hover:border-slate-400 focus:border-slate-800 focus:bg-white px-3 py-1.5 rounded outline-none w-64 transition-colors shadow-inner font-medium text-slate-800 placeholder:text-slate-400"
                         />
                         {filterQuery && (
                             <button
+                                type="button"
                                 onClick={() => onFilterChange('')}
                                 className="absolute right-2 top-1.5 text-xs text-slate-400 hover:text-slate-700 cursor-pointer"
                             >
@@ -70,7 +75,7 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
                         value={selectedSegment}
                         onChange={(e) => onSegmentChange(e.target.value)}
                         aria-label="Filter customers by segment"
-                        className="text-xs bg-slate-50 border border-slate-300 rounded-md px-2.5 py-1.5 font-medium text-slate-700 outline-none focus:border-slate-800"
+                        className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 outline-none focus:border-slate-800 cursor-pointer"
                     >
                         <option value="">All Segments ({segments.length})</option>
                         {segments.map(s => (
@@ -81,63 +86,60 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
                     {/* Add Customer button */}
                     <Button
                         variant="primary"
-                        size="sm"
+                        size="md"
                         onClick={onOpenCreateModal}
-                        className="shadow-sm text-xs font-semibold whitespace-nowrap"
+                        className="shadow-2xs font-semibold whitespace-nowrap"
                     >
                         Add Customer
                     </Button>
                 </div>
             </div>
 
-            {/* KPI Cards Grid */}
+            {/* Technical Industrial KPI Cards Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {/* 1. Total Customers */}
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-2.5 flex flex-col justify-between">
-                    <span className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+                <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
+                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                         B2B Accounts
                     </span>
-                    <div className="flex items-baseline justify-between mt-1">
-                        <span className="text-xl font-bold text-slate-800 font-mono">{totalCustomers}</span>
-                        <span className="text-xs text-slate-500">enterprises</span>
+                    <div className="flex items-baseline justify-between mt-2">
+                        <span className="text-xl font-bold font-mono text-slate-900">{totalCustomers}</span>
+                        <span className="text-xs text-slate-500 font-medium">enterprises</span>
                     </div>
                 </div>
 
                 {/* 2. Active Ratio */}
-                <div className="bg-emerald-50/60 border border-emerald-200 rounded-lg p-2.5 flex flex-col justify-between">
-                    <span className="text-[11px] font-medium text-emerald-800 uppercase tracking-wider flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
+                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                         Active Clients
                     </span>
-                    <div className="flex items-baseline justify-between mt-1">
-                        <span className="text-xl font-bold text-emerald-700 font-mono">{activeCustomers}</span>
-                        <span className="text-xs font-semibold text-emerald-600">
-                            {totalCustomers > 0 ? `${Math.round((activeCustomers / totalCustomers) * 100)}%` : '100%'}
+                    <div className="flex items-baseline justify-between mt-2">
+                        <span className="text-xl font-bold font-mono text-slate-900">{activeCustomers}</span>
+                        <span className="text-xs text-slate-500 font-medium">
+                            {activePercent}% active
                         </span>
                     </div>
                 </div>
 
                 {/* 3. Cumulative Lifetime Revenue */}
-                <div className="bg-blue-50/60 border border-blue-200 rounded-lg p-2.5 flex flex-col justify-between">
-                    <span className="text-[11px] font-medium text-blue-800 uppercase tracking-wider flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                        Total Billed Volume
+                <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
+                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                        Total Volume
                     </span>
-                    <div className="flex items-baseline justify-between mt-1">
-                        <span className="text-xl font-bold text-blue-700 font-mono">{formatCurrency(totalSpentSum)}</span>
-                        <span className="text-xs text-blue-600 font-medium">sales revenue</span>
+                    <div className="flex items-baseline justify-between mt-2">
+                        <span className="text-xl font-bold font-mono text-slate-900">{formatCurrency(totalSpentSum)}</span>
+                        <span className="text-xs text-slate-500 font-medium">sales revenue</span>
                     </div>
                 </div>
 
                 {/* 4. Total Credit Limit Extended */}
-                <div className="bg-purple-50/60 border border-purple-200 rounded-lg p-2.5 flex flex-col justify-between">
-                    <span className="text-[11px] font-medium text-purple-800 uppercase tracking-wider flex items-center gap-1">
-                        <span className="w-2 h-2 rounded-full bg-purple-500"></span>
+                <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
+                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
                         Total Credit Limit
                     </span>
-                    <div className="flex items-baseline justify-between mt-1">
-                        <span className="text-xl font-bold text-purple-800 font-mono">{formatCurrency(totalCreditSum)}</span>
-                        <span className="text-xs text-purple-700 font-semibold">commercial credit</span>
+                    <div className="flex items-baseline justify-between mt-2">
+                        <span className="text-xl font-bold font-mono text-slate-900">{formatCurrency(totalCreditSum)}</span>
+                        <span className="text-xs text-slate-500 font-medium">commercial credit</span>
                     </div>
                 </div>
             </div>

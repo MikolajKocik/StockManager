@@ -1,23 +1,20 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 
 interface ModalProps {
-    isOpen: boolean;
-    onClose: () => void;
     children: React.ReactNode;
     title?: string;
     size?: 'sm' | 'md' | 'lg' | 'xl';
     className?: string;
+    onClose?: () => void;
 }
 
-export default function Modal({
-    isOpen,
-    onClose,
+const Modal = forwardRef<HTMLDialogElement, ModalProps>(({
     children,
     title,
     size = 'md',
-    className = ''
-}: ModalProps) {
-    if (!isOpen) return null;
+    className = '',
+    onClose
+}, ref) => {
 
     const sizeClasses = {
         sm: 'max-w-md',
@@ -26,39 +23,54 @@ export default function Modal({
         xl: 'max-w-4xl'
     };
 
+    const closeDialog = () => {
+        if (typeof ref !== 'function' && ref?.current) {
+            ref.current.close();
+        }
+        onClose?.();
+    };
+
+    const closeOnBackdrop = (e: React.MouseEvent<HTMLDialogElement>) => {
+        if (e.target === e.currentTarget) {
+            closeDialog();
+        }
+    };
+
     return (
-        <div 
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in"
-            onClick={onClose}
+        <dialog
+            ref={ref}
+            className={`m-auto p-0 bg-white rounded-lg shadow-2xl w-full ${sizeClasses[size]} border-0 outline-none overflow-hidden text-slate-800 backdrop:bg-slate-900/60 backdrop:backdrop-blur-xs open:animate-scale-in ${className}`}
+            onClick={closeOnBackdrop}
+            onClose={onClose}
         >
-            <div 
-                className={`bg-white border border-slate-300 rounded-lg shadow-2xl w-full ${sizeClasses[size] || sizeClasses.md} overflow-hidden text-slate-800 animate-scale-in ${className}`}
-                onClick={(e) => e.stopPropagation()}
-            >
+            <div className="w-full flex flex-col overflow-hidden">
                 {title ? (
-                    <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
-                        <h3 className="font-bold text-sm text-white">
+                    <div className="bg-[#2b6675] text-white px-4 py-3 flex items-center justify-between border-b border-[#204e5a] select-none">
+                        <h3 className="font-bold text-sm text-white tracking-wide">
                             {title}
                         </h3>
-                        <button 
+                        <button
                             type="button"
-                            onClick={onClose} 
-                            className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
+                            onClick={closeDialog}
+                            className="text-slate-200 hover:text-white text-lg leading-none p-1 cursor-pointer transition-colors"
                         >
                             &#10005;
                         </button>
                     </div>
                 ) : (
-                    <button 
+                    <button
                         type="button"
-                        onClick={onClose} 
-                        className="absolute top-2.5 right-3 text-slate-400 hover:text-slate-700 text-lg leading-none p-1 cursor-pointer z-10"
+                        onClick={closeDialog}
+                        className="absolute top-2.5 right-3 text-slate-400 hover:text-slate-700 text-lg leading-none p-1 cursor-pointer z-10 transition-colors"
                     >
                         &#10005;
                     </button>
                 )}
                 {children}
             </div>
-        </div>
+        </dialog>
     );
-}
+});
+
+Modal.displayName = 'Modal'
+export default Modal;

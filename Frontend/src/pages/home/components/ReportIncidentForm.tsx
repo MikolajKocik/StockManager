@@ -1,46 +1,48 @@
-import React, { useState } from 'react';
-import { Button, Input, Select } from '@/components/common';
+import { Button, FormBody, FormFooter, Input, Select, Textarea } from '@/components/common';
 import { useReportIncident } from '@/pages/maintenance/hooks/useReportIncident';
 import toast from 'react-hot-toast';
 import { type ReportIncident } from '@/models/maintenance';
+import type { DialogProps } from '../models';
 
-interface ReportIncidentFormProps {
-    isOpen?: boolean;
-    onClose: () => void;
-}
+const PRIORITY_OPTIONS = [
+    { label: 'Low', value: 'Low' },
+    { label: 'Medium', value: 'Medium' },
+    { label: 'High', value: 'High' },
+    { label: 'Critical', value: 'Critical' }
+];
 
-export default function ReportIncidentForm({ isOpen = true, onClose }: ReportIncidentFormProps) {
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
-    const [priority, setPriority] = useState('Low');
-    const [assetId, setAssetId] = useState('');
-    const [binLocationId, setBinLocationId] = useState('');
-
+export default function ReportIncidentForm({ onSuccess, onCancel }: DialogProps) {
     const reportMutation = useReportIncident();
 
-    if (!isOpen) return null;
-
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!title.trim() || !description.trim()) {
+        const data = Object.fromEntries(new FormData(e.currentTarget));
+
+        const title = String(data.title || '').trim();
+        const description = String(data.description || '').trim();
+        const assetId = String(data.assetId || '').trim() || null;
+        const priority = String(data.priority || '').trim();
+        const binLocationId = Number(data.binLocationId) || null;
+
+        if (!title || !description) {
             toast.error('Title and description are required');
             return;
         }
 
         const payload: ReportIncident = {
-            title: title.trim(),
-            description: description.trim(),
-            priority,
-            assetId: assetId.trim() || null,
-            binLocationId: binLocationId ? Number(binLocationId) : null,
+            title: title,
+            description: description,
+            priority: priority,
+            assetId: assetId,
+            binLocationId: binLocationId,
             photoUrl: null
         };
 
         reportMutation.mutate(payload, {
             onSuccess: () => {
                 toast.success('Incident reported successfully');
-                onClose();
+                onSuccess();
             },
             onError: () => {
                 toast.error('Failed to report incident');
@@ -49,108 +51,67 @@ export default function ReportIncidentForm({ isOpen = true, onClose }: ReportInc
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
-            <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden text-slate-800 animate-scale-in">
-                {/* Header */}
-                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-white">
-                        Report Technical Incident / Fault
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
-                    >
-                        &#10005;
-                    </button>
+        <form onSubmit={handleSubmit}>
+            <FormBody>
+                <Input
+                    label="Incident Title"
+                    placeholder="E.g. Forklift FL-01 hydraulic fluid leak"
+                    name="title"
+                    required
+                />
+
+                <Textarea
+                    label="Description & Details"
+                    placeholder="Detailed explanation of the incident..."
+                    name="description"
+                    required
+                />
+
+                <div className="grid grid-cols-3 gap-2">
+                    <Select
+                        label="Priority"
+                        defaultValue="Low"
+                        name="priority"
+                        options={PRIORITY_OPTIONS}
+                    />
+
+                    <Input
+                        label="Asset ID (Opt.)"
+                        placeholder="FL-01"
+                        name="assetId"
+                    />
+
+                    <Input
+                        label="Bin ID (Opt.)"
+                        type="number"
+                        placeholder="104"
+                        name="binLocationId"
+                    />
                 </div>
+            </FormBody>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="p-4 space-y-3 text-xs">
-                        <div>
-                            <label className="font-semibold text-slate-700 block mb-1">
-                                Incident Title <span className="text-red-500">*</span>
-                            </label>
-                            <Input
-                                placeholder="E.g. Forklift FL-01 hydraulic fluid leak"
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div>
-                            <label className="font-semibold text-slate-700 block mb-1">
-                                Description & Details <span className="text-red-500">*</span>
-                            </label>
-                            <textarea
-                                className="w-full bg-slate-50 border border-slate-300 rounded p-2 text-xs font-normal outline-none focus:border-slate-800 focus:bg-white min-h-24 resize-none transition-colors"
-                                placeholder="Provide exact symptom, equipment sounds, or error codes..."
-                                value={description}
-                                onChange={(e) => setDescription(e.target.value)}
-                                required
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-3 gap-2">
-                            <div>
-                                <label className="font-semibold text-slate-700 block mb-1">Priority</label>
-                                <Select
-                                    value={priority}
-                                    onChange={(e) => setPriority(e.target.value)}
-                                    options={[
-                                        { label: 'Low', value: 'Low' },
-                                        { label: 'Medium', value: 'Medium' },
-                                        { label: 'High', value: 'High' },
-                                        { label: 'Critical', value: 'Critical' }
-                                    ]}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-slate-700 block mb-1">Asset ID (Opt.)</label>
-                                <Input
-                                    placeholder="FL-01"
-                                    value={assetId}
-                                    onChange={(e) => setAssetId(e.target.value)}
-                                />
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-slate-700 block mb-1">Bin ID (Opt.)</label>
-                                <Input
-                                    type="number"
-                                    placeholder="104"
-                                    value={binLocationId}
-                                    onChange={(e) => setBinLocationId(e.target.value)}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="flex justify-end gap-2 p-3 bg-slate-50 border-t border-slate-200">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={reportMutation.isPending}
-                            className="text-xs"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="danger"
-                            size="sm"
-                            isLoading={reportMutation.isPending}
-                            className="text-xs font-semibold"
-                        >
-                            {reportMutation.isPending ? 'Submitting...' : 'Submit Incident'}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            <FormFooter>
+                <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={onCancel}
+                    disabled={reportMutation.isPending}
+                    className="text-xs"
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    variant="danger"
+                    size="sm"
+                    isLoading={reportMutation.isPending}
+                    className="text-xs font-semibold"
+                >
+                    {reportMutation.isPending ? 'Submitting...' : 'Submit Incident'}
+                </Button>
+            </FormFooter>
+        </form>
     );
 }
+

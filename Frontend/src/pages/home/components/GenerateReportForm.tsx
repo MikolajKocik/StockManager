@@ -1,31 +1,37 @@
 import React, { useState } from 'react';
-import { Button, Input, Select } from '@/components/common';
+import { Button, FormBody, FormFooter, Input, Select } from '@/components/common';
 import toast from 'react-hot-toast';
+import type { DialogProps } from '../models';
 
-interface GenerateReportFormProps {
-    isOpen?: boolean;
-    onClose: () => void;
-}
+const REPORT_DATASET_OPTIONS = [
+    { label: 'Inventory Stock Valuation & Aging', value: 'Inventory Summary' },
+    { label: 'Fleet Maintenance & Incident Log', value: 'Maintenance Log' },
+    { label: 'Order Processing & Lead Time KPI', value: 'Order History' },
+    { label: 'B2B Client Wholesale Volume Report', value: 'Financial Report' }
+];
 
-export default function GenerateReportForm({ isOpen = true, onClose }: GenerateReportFormProps) {
-    const [reportType, setReportType] = useState('Inventory Summary');
-    const [format, setFormat] = useState('PDF');
-    const [dateFrom, setDateFrom] = useState('');
-    const [dateTo, setDateTo] = useState('');
+const EXPORT_FORMAT_OPTIONS = [
+    { label: 'PDF Document (.pdf)', value: 'PDF' },
+    { label: 'Excel Spreadsheet (.xlsx)', value: 'Excel' },
+    { label: 'Raw CSV Data (.csv)', value: 'CSV' }
+];
+
+export default function GenerateReportForm({ onSuccess, onCancel }: DialogProps) {
     const [isGenerating, setIsGenerating] = useState(false);
 
-    if (!isOpen) return null;
-
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!dateFrom || !dateTo) {
+        const data = Object.fromEntries(new FormData(e.currentTarget));
+
+        if (!data.dateFrom || !data.dateTo) {
             toast.error('Please select a valid date range');
             return;
         }
 
         setIsGenerating(true);
 
+        // generating fake process
         const generatePromise = new Promise((resolve) => {
             setTimeout(resolve, 1500);
         });
@@ -40,106 +46,65 @@ export default function GenerateReportForm({ isOpen = true, onClose }: GenerateR
             { id: 'generate-report' }
         ).then(() => {
             setIsGenerating(false);
-            onClose();
+            onSuccess();
         });
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
-            <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-md w-full overflow-hidden text-slate-800 animate-scale-in">
-                {/* Header */}
-                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-white">
-                        Generate Warehouse Analytical Report
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
-                    >
-                        &#10005;
-                    </button>
+        <form onSubmit={handleSubmit}>
+            <FormBody>
+                <Select
+                    label="Report Dataset"
+                    name="reportType"
+                    defaultValue="Inventory Summary"
+                    options={REPORT_DATASET_OPTIONS}
+                />
+
+                <Select
+                    label="Export Format"
+                    name="format"
+                    defaultValue="PDF"
+                    options={EXPORT_FORMAT_OPTIONS}
+                />
+
+                <div className="grid grid-cols-2 gap-3 pt-1">
+                    <Input
+                        label="Date From"
+                        type="date"
+                        name="dateFrom"
+                        required
+                    />
+
+                    <Input
+                        label="Date To"
+                        type="date"
+                        name="dateTo"
+                        required
+                    />
                 </div>
+            </FormBody>
 
-                <form onSubmit={handleSubmit}>
-                    <div className="p-4 space-y-3 text-xs">
-                        <div>
-                            <label className="font-semibold text-slate-700 block mb-1">
-                                Report Dataset
-                            </label>
-                            <Select
-                                value={reportType}
-                                onChange={(e) => setReportType(e.target.value)}
-                                options={[
-                                    { label: 'Inventory Stock Valuation & Aging', value: 'Inventory Summary' },
-                                    { label: 'Fleet Maintenance & Incident Log', value: 'Maintenance Log' },
-                                    { label: 'Order Processing & Lead Time KPI', value: 'Order History' },
-                                    { label: 'B2B Client Wholesale Volume Report', value: 'Financial Report' }
-                                ]}
-                            />
-                        </div>
-
-                        <div>
-                            <label className="font-semibold text-slate-700 block mb-1">
-                                Export Format
-                            </label>
-                            <Select
-                                value={format}
-                                onChange={(e) => setFormat(e.target.value)}
-                                options={[
-                                    { label: 'PDF Document (.pdf)', value: 'PDF' },
-                                    { label: 'Excel Spreadsheet (.xlsx)', value: 'Excel' },
-                                    { label: 'Raw CSV Data (.csv)', value: 'CSV' }
-                                ]}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 pt-1">
-                            <div>
-                                <label className="font-semibold text-slate-700 block mb-1">Date From</label>
-                                <Input
-                                    type="date"
-                                    value={dateFrom}
-                                    onChange={(e) => setDateFrom(e.target.value)}
-                                    required
-                                />
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-slate-700 block mb-1">Date To</label>
-                                <Input
-                                    type="date"
-                                    value={dateTo}
-                                    onChange={(e) => setDateTo(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Footer */}
-                    <div className="flex justify-end gap-2 p-3 bg-slate-50 border-t border-slate-200">
-                        <Button
-                            type="button"
-                            variant="secondary"
-                            size="sm"
-                            onClick={onClose}
-                            disabled={isGenerating}
-                            className="text-xs"
-                        >
-                            Cancel
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="primary"
-                            size="sm"
-                            isLoading={isGenerating}
-                            className="text-xs font-semibold"
-                        >
-                            {isGenerating ? 'Generating...' : 'Export & Download'}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-        </div>
+            <FormFooter>
+                <Button
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    disabled={isGenerating}
+                    className="text-xs"
+                    onClick={onCancel}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    type="submit"
+                    variant="primary"
+                    size="sm"
+                    isLoading={isGenerating}
+                    className="text-xs font-semibold"
+                >
+                    {isGenerating ? 'Generating...' : 'Export & Download'}
+                </Button>
+            </FormFooter>
+        </form>
     );
-}
+};

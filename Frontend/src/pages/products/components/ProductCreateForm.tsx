@@ -1,213 +1,181 @@
-import type { ProductCreateForm } from "@/models/product";
-import { useState } from 'react';
-import { Button, Input, Select } from '@/components/common';
+import { forwardRef } from 'react';
+import type { ProductCreateForm as ProductCreateFormPayload } from "@/models/product";
+import { Button, FormBody, FormFooter, Modal } from '@/components/common';
 import { useGenres } from "@/hooks/queries/useGenres";
 import { useWTypes } from "@/hooks/queries/useWTypes";
 import { useCreateProduct } from "../hooks";
 
 interface ProductCreateModalProps {
-    isOpen: boolean;
     onClose: () => void;
     onSuccess?: () => void;
 }
 
-export default function ProductCreateForm({ isOpen, onClose }: ProductCreateModalProps) {
-    const [form, setForm] = useState<ProductCreateForm>({
-        name: '',
-        genre: '',
-        unit: '',
-        type: '',
-        batchNumber: '',
-        supplierId: '',
-        expirationDate: ''
-    });
-
-    const { data: genres = [], isLoading: isGenresLoading } = useGenres(isOpen);
-    const { data: types = [], isLoading: isTypesLoading } = useWTypes(isOpen);
+export const ProductCreateForm = forwardRef<HTMLDialogElement, ProductCreateModalProps>(({
+    onClose,
+    onSuccess
+}, ref) => {
+    const { data: genres = [], isLoading: isGenresLoading } = useGenres(true);
+    const { data: types = [], isLoading: isTypesLoading } = useWTypes(true);
     const { mutate: createProduct, isPending: isCreating, error: mutationError } = useCreateProduct();
 
-    if (!isOpen) return null;
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleSelectChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
-        createProduct(form, {
+        const formData = new FormData(e.currentTarget);
+        const formValues = Object.fromEntries(formData.entries()) as unknown as ProductCreateFormPayload;
+
+        createProduct(formValues, {
             onSuccess: () => {
                 onClose();
+                onSuccess?.();
             }
         });
     };
 
     const isLoading = isGenresLoading || isTypesLoading;
-    const error = mutationError ? "Error occurred while saving product data." : null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
-            <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-xl w-full overflow-hidden text-slate-800 animate-scale-in">
-                {/* Header */}
-                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
-                    <h3 className="font-bold text-sm text-white">
-                        Add New Warehouse Product
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
-                    >
-                        &#10005;
-                    </button>
-                </div>
+        <Modal
+            ref={ref}
+            title="Add New Warehouse Master Product"
+            size="lg"
+            onClose={onClose}
+        >
+            {isLoading ? (
+                <div className="p-8 text-center text-xs text-slate-500">Loading catalog options...</div>
+            ) : (
+                <form onSubmit={handleSubmit}>
+                    <FormBody className="max-h-[75vh] space-y-4">
+                        {mutationError && (
+                            <div className="p-2 bg-red-50 border border-red-200 text-red-700 rounded text-xs">
+                                Error occurred while saving product data.
+                            </div>
+                        )}
 
-                {isLoading ? (
-                    <div className="p-8 text-center text-xs text-slate-500">Loading form options...</div>
-                ) : (
-                    <form onSubmit={handleSubmit}>
-                        <div className="p-4 space-y-3 text-xs">
-                            {error && (
-                                <div className="p-2 bg-rose-50 border border-rose-200 text-rose-700 rounded text-xs">
-                                    {error}
+                        {/* General Information */}
+                        <div>
+                            <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block mb-2 font-mono">
+                                General Information
+                            </span>
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="font-bold text-slate-700 block mb-1">
+                                        Product Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        name="name"
+                                        type="text"
+                                        required
+                                        placeholder="e.g. Hydraulic Valve 24V"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 focus:bg-white text-xs"
+                                    />
                                 </div>
-                            )}
-
-                            {/* Section 1: Basic Information */}
-                            <div>
-                                <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block mb-2">
-                                    General Information
-                                </span>
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="font-semibold text-slate-700 block mb-1">
-                                            Product Name <span className="text-red-500">*</span>
-                                        </label>
-                                        <Input
-                                            name="name"
-                                            type="text"
-                                            value={form.name}
-                                            onChange={handleChange}
-                                            placeholder="E.g. Hydraulic Valve 24V"
-                                            required
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="font-semibold text-slate-700 block mb-1">
-                                            Category / Genre <span className="text-red-500">*</span>
-                                        </label>
-                                        <Select
-                                            name="genre"
-                                            value={form.genre}
-                                            onChange={handleSelectChange}
-                                            options={[
-                                                { label: 'Select genre', value: '' },
-                                                ...genres.map(g => ({ label: g, value: g }))
-                                            ]}
-                                            required
-                                        />
-                                    </div>
+                                <div>
+                                    <label className="font-bold text-slate-700 block mb-1">
+                                        Category / Genre <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        name="genre"
+                                        required
+                                        defaultValue=""
+                                        className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 cursor-pointer text-xs"
+                                    >
+                                        <option value="" disabled>Select category</option>
+                                        {genres.map(g => (
+                                            <option key={g} value={g}>{g}</option>
+                                        ))}
+                                    </select>
                                 </div>
                             </div>
+                        </div>
 
-                            {/* Section 2: Units and Storage Type */}
+                        {/* Units and Storage Type */}
+                        <div className="grid grid-cols-2 gap-3">
+                            <div>
+                                <label className="font-bold text-slate-700 block mb-1">
+                                    Unit of Measure <span className="text-red-500">*</span>
+                                </label>
+                                <input
+                                    name="unit"
+                                    type="text"
+                                    required
+                                    placeholder="e.g. pcs, kg, m, box"
+                                    className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 focus:bg-white text-xs"
+                                />
+                            </div>
+                            <div>
+                                <label className="font-bold text-slate-700 block mb-1">
+                                    Warehouse Zone Type <span className="text-red-500">*</span>
+                                </label>
+                                <select
+                                    name="type"
+                                    required
+                                    defaultValue=""
+                                    className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 cursor-pointer text-xs"
+                                >
+                                    <option value="" disabled>Select storage type</option>
+                                    {types.map(t => (
+                                        <option key={t} value={t}>{t}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Traceability & Supply */}
+                        <div className="p-3 bg-slate-50/80 border border-slate-300 rounded space-y-3">
+                            <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block font-mono">
+                                Supply & Traceability
+                            </span>
+
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
                                     <label className="font-semibold text-slate-700 block mb-1">
-                                        Unit <span className="text-red-500">*</span>
+                                        Batch / Lot Number
                                     </label>
-                                    <Input
-                                        name="unit"
+                                    <input
+                                        name="batchNumber"
                                         type="text"
-                                        value={form.unit}
-                                        onChange={handleChange}
-                                        placeholder="E.g. pcs, kg, box"
-                                        required
+                                        placeholder="e.g. BATCH-2026-X"
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 font-mono outline-none focus:border-slate-800 text-xs"
                                     />
                                 </div>
                                 <div>
                                     <label className="font-semibold text-slate-700 block mb-1">
-                                        Warehouse Storage Type <span className="text-red-500">*</span>
+                                        Supplier Reference / ID
                                     </label>
-                                    <Select
-                                        name="type"
-                                        value={form.type}
-                                        onChange={handleSelectChange}
-                                        options={[
-                                            { label: 'Select type', value: '' },
-                                            ...types.map(t => ({ label: t, value: t }))
-                                        ]}
-                                        required
+                                    <input
+                                        name="supplierId"
+                                        type="text"
+                                        placeholder="e.g. SUP-0012"
+                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 font-mono outline-none focus:border-slate-800 text-xs"
                                     />
                                 </div>
                             </div>
 
-                            {/* Section 3: Traceability & Supplier */}
-                            <div className="pt-2 border-t border-slate-200">
-                                <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block mb-2">
-                                    Traceability & Supplier Link
-                                </span>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <div>
-                                        <label className="font-semibold text-slate-700 block mb-1">Batch Number</label>
-                                        <Input
-                                            name="batchNumber"
-                                            type="text"
-                                            value={form.batchNumber}
-                                            onChange={handleChange}
-                                            placeholder="BATCH-2026-X"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="font-semibold text-slate-700 block mb-1">Supplier ID</label>
-                                        <Input
-                                            name="supplierId"
-                                            type="text"
-                                            value={form.supplierId}
-                                            onChange={handleChange}
-                                            placeholder="SUP-01"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="font-semibold text-slate-700 block mb-1">Expiration Date</label>
-                                        <Input
-                                            name="expirationDate"
-                                            type="date"
-                                            value={form.expirationDate}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
+                            <div>
+                                <label className="font-semibold text-slate-700 block mb-1">
+                                    Expiration Date
+                                </label>
+                                <input
+                                    name="expirationDate"
+                                    type="date"
+                                    className="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 text-xs font-mono"
+                                />
                             </div>
                         </div>
+                    </FormBody>
 
-                        {/* Footer */}
-                        <div className="flex justify-end gap-2 p-3 bg-slate-50 border-t border-slate-200">
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                size="sm"
-                                onClick={onClose}
-                                disabled={isCreating}
-                                className="text-xs"
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                type="submit"
-                                variant="primary"
-                                size="sm"
-                                isLoading={isCreating}
-                                className="text-xs font-semibold"
-                            >
-                                {isCreating ? 'Adding...' : 'Add Product'}
-                            </Button>
-                        </div>
-                    </form>
-                )}
-            </div>
-        </div>
+                    <FormFooter>
+                        <Button variant="secondary" size="md" type="button" onClick={onClose}>
+                            Cancel
+                        </Button>
+                        <Button variant="primary" size="md" type="submit" disabled={isCreating}>
+                            {isCreating ? 'Saving...' : 'Create Master Product'}
+                        </Button>
+                    </FormFooter>
+                </form>
+            )}
+        </Modal>
     );
-}
+});
+
+ProductCreateForm.displayName = 'ProductCreateForm';

@@ -1,20 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { forwardRef, useState, useEffect } from 'react';
 import type { Supplier } from '@/models/supplier';
-import { Button } from '@/components/common';
+import { Button, FormBody, FormFooter, Modal } from '@/components/common';
 
 interface CreateSupplierModalProps {
-    isOpen: boolean;
     initialData?: Supplier | null;
     onClose: () => void;
-    onSubmit: (supplierData: Partial<Supplier>) => void;
+    onSubmit: (supplierData: Partial<Supplier>, editingId?: string) => void;
 }
 
-export const CreateSupplierModal: React.FC<CreateSupplierModalProps> = ({
-    isOpen,
+export const CreateSupplierModal = forwardRef<HTMLDialogElement, CreateSupplierModalProps>(({
     initialData,
     onClose,
     onSubmit
-}) => {
+}, ref) => {
     const isEditMode = !!initialData;
 
     const [name, setName] = useState('');
@@ -61,9 +59,7 @@ export const CreateSupplierModal: React.FC<CreateSupplierModalProps> = ({
             setLeadTimeDays(5);
             setStatus('Active');
         }
-    }, [initialData, isOpen]);
-
-    if (!isOpen) return null;
+    }, [initialData]);
 
     const handleNameChange = (val: string) => {
         setName(val);
@@ -99,27 +95,19 @@ export const CreateSupplierModal: React.FC<CreateSupplierModalProps> = ({
             }
         };
 
-        onSubmit(payload);
+        onSubmit(payload, initialData?.id);
+        onClose();
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
-            <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-lg w-full overflow-hidden text-slate-800 animate-scale-in">
-                {/* Modal Header */}
-                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
-                    <h3 className="font-bold text-sm">
-                        {isEditMode ? `Edit Supplier: ${initialData.name}` : 'Add New Vendor / Supplier'}
-                    </h3>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
-                    >
-                        &#10005;
-                    </button>
-                </div>
-
-                {/* Form */}
-                <form onSubmit={handleSubmit} className="p-4 space-y-3 text-xs max-h-[80vh] overflow-y-auto">
+        <Modal
+            ref={ref}
+            title={isEditMode ? `Edit Supplier: ${initialData?.name}` : 'Add New Vendor / Supplier'}
+            size="lg"
+            onClose={onClose}
+        >
+            <form onSubmit={handleSubmit}>
+                <FormBody className="max-h-[75vh] space-y-3">
                     {/* Basic Info */}
                     <div className="grid grid-cols-2 gap-3">
                         <div>
@@ -223,7 +211,7 @@ export const CreateSupplierModal: React.FC<CreateSupplierModalProps> = ({
                     </div>
 
                     {/* Address Information */}
-                    <div className="p-2.5 bg-slate-50 border border-slate-200 rounded space-y-2">
+                    <div className="p-3 bg-slate-50 border border-slate-300 rounded space-y-2">
                         <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block">
                             Address & Regional Details
                         </span>
@@ -271,7 +259,7 @@ export const CreateSupplierModal: React.FC<CreateSupplierModalProps> = ({
                             <select
                                 value={paymentTerms}
                                 onChange={(e) => setPaymentTerms(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 font-medium outline-none focus:border-slate-800"
+                                className="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 font-medium outline-none focus:border-slate-800 cursor-pointer"
                             >
                                 <option value="Net 14">Net 14</option>
                                 <option value="Net 30">Net 30</option>
@@ -302,7 +290,7 @@ export const CreateSupplierModal: React.FC<CreateSupplierModalProps> = ({
                             <select
                                 value={status}
                                 onChange={(e) => setStatus(e.target.value as 'Active' | 'Under Review' | 'Inactive')}
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 font-semibold outline-none focus:border-slate-800"
+                                className="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 font-semibold outline-none focus:border-slate-800 cursor-pointer"
                             >
                                 <option value="Active">Active</option>
                                 <option value="Under Review">Under Review</option>
@@ -310,18 +298,19 @@ export const CreateSupplierModal: React.FC<CreateSupplierModalProps> = ({
                             </select>
                         </div>
                     </div>
+                </FormBody>
 
-                    {/* Modal Footer */}
-                    <div className="flex justify-end gap-2 pt-3 border-t border-slate-200">
-                        <Button variant="secondary" size="sm" type="button" onClick={onClose}>
-                            Cancel
-                        </Button>
-                        <Button variant="primary" size="sm" type="submit">
-                            {isEditMode ? 'Save Changes' : 'Create Supplier'}
-                        </Button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <FormFooter>
+                    <Button variant="secondary" size="md" type="button" onClick={onClose}>
+                        Cancel
+                    </Button>
+                    <Button variant="primary" size="md" type="submit">
+                        {isEditMode ? 'Save Changes' : 'Create Supplier'}
+                    </Button>
+                </FormFooter>
+            </form>
+        </Modal>
     );
-};
+});
+
+CreateSupplierModal.displayName = 'CreateSupplierModal';

@@ -1,6 +1,6 @@
 import { forwardRef } from 'react';
 import type { KanbanOperation, OperationPriority, OperationStatus } from '../models/operationKanban';
-import { Button, FormBody, FormFooter, Modal } from '@/components/common';
+import { Button, FormBody, FormFooter, Modal, Badge, Select } from '@/components/common';
 
 interface OperationDetailsModalProps {
     operation: KanbanOperation | null;
@@ -73,38 +73,30 @@ export const OperationDetailsModal = forwardRef<HTMLDialogElement, OperationDeta
 
                 {/* Status & Priority Controller */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white p-3 rounded-md border border-slate-300">
-                    <div>
-                        <label className="text-[11px] font-bold text-slate-700 font-mono uppercase block mb-1">
-                            Workflow Status:
-                        </label>
-                        <select
-                            value={operation.status}
-                            onChange={(e) => onUpdateStatus(operation.id, e.target.value as OperationStatus)}
-                            className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs font-semibold text-slate-800 outline-none focus:border-slate-800 cursor-pointer"
-                        >
-                            <option value="QUEUED">Queued Backlog</option>
-                            <option value="ASSIGNED">Assigned to Terminal</option>
-                            <option value="IN_PROGRESS">In Progress (Active Floor)</option>
-                            <option value="BLOCKED">Blocked / Hazard</option>
-                            <option value="COMPLETED">Completed & Staged</option>
-                        </select>
-                    </div>
+                    <Select
+                        label="Workflow Status"
+                        value={operation.status}
+                        onChange={(e) => onUpdateStatus(operation.id, e.target.value as OperationStatus)}
+                        options={[
+                            { value: 'QUEUED', label: 'Queued Backlog' },
+                            { value: 'ASSIGNED', label: 'Assigned to Terminal' },
+                            { value: 'IN_PROGRESS', label: 'In Progress (Active Floor)' },
+                            { value: 'BLOCKED', label: 'Blocked / Hazard' },
+                            { value: 'COMPLETED', label: 'Completed & Staged' },
+                        ]}
+                    />
 
-                    <div>
-                        <label className="text-[11px] font-bold text-slate-700 font-mono uppercase block mb-1">
-                            Dispatch Priority:
-                        </label>
-                        <select
-                            value={operation.priority}
-                            onChange={(e) => onUpdatePriority(operation.id, e.target.value as OperationPriority)}
-                            className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs font-semibold font-mono text-slate-800 outline-none focus:border-slate-800 cursor-pointer"
-                        >
-                            <option value="CRITICAL">CRITICAL (Emergency Fast-Track)</option>
-                            <option value="HIGH">HIGH Priority</option>
-                            <option value="NORMAL">NORMAL</option>
-                            <option value="LOW">LOW</option>
-                        </select>
-                    </div>
+                    <Select
+                        label="Dispatch Priority"
+                        value={operation.priority}
+                        onChange={(e) => onUpdatePriority(operation.id, e.target.value as OperationPriority)}
+                        options={[
+                            { value: 'CRITICAL', label: 'CRITICAL (Emergency Fast-Track)' },
+                            { value: 'HIGH', label: 'HIGH Priority' },
+                            { value: 'NORMAL', label: 'NORMAL' },
+                            { value: 'LOW', label: 'LOW' },
+                        ]}
+                    />
                 </div>
 
                 {/* SKU Item Specification Table */}
@@ -137,21 +129,17 @@ export const OperationDetailsModal = forwardRef<HTMLDialogElement, OperationDeta
                                             <td className="py-2 px-2.5 font-bold text-slate-900">{item.sku}</td>
                                             <td className="py-2 px-2.5 font-sans font-medium text-slate-900">{item.productName}</td>
                                             <td className="py-2 px-2.5 text-[10px] text-slate-600">
-                                                <span className="bg-slate-100 px-1 py-0.5 rounded border border-slate-300">{item.sourceBin}</span>
-                                                <span className="mx-1">&rarr;</span>
-                                                <span className="bg-slate-100 px-1 py-0.5 rounded border border-slate-300 font-bold text-slate-800">{item.targetBin}</span>
+                                                <Badge variant="slate" className="mr-1">{item.sourceBin}</Badge>
+                                                &rarr;
+                                                <Badge variant="slate" className="ml-1 font-bold text-slate-800">{item.targetBin}</Badge>
                                             </td>
                                             <td className="py-2 px-2.5 text-right font-bold text-slate-900">
                                                 {item.pickedQuantity} / {item.quantity} {item.unit}
                                             </td>
                                             <td className="py-2 px-2.5 text-center">
-                                                <span className={`px-1.5 py-0.5 rounded-xs text-[9px] font-bold ${
-                                                    isDone
-                                                        ? 'bg-emerald-50 text-[#0e5f32] border border-emerald-300'
-                                                        : 'bg-amber-50 text-[#8f7d49] border border-amber-300'
-                                                }`}>
+                                                <Badge variant={isDone ? 'success' : 'warning'}>
                                                     {isDone ? 'COMPLETED' : 'IN FLOW'}
-                                                </span>
+                                                </Badge>
                                             </td>
                                         </tr>
                                     );

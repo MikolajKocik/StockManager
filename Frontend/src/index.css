@@ -7,11 +7,13 @@
 
 @import "./pages/home/Home.css";
 @import "./components/layout/Navbar.css";
-@import "./components/common/Modal.css";
-@import "./components/common/Button.css";
-@import "./components/common/Badge.css";
-@import "./components/common/Meter.css";
-@import "./components/common/Form.css";
+@import "./components/common/core/Button.css";
+@import "./components/common/core/Input.css";
+@import "./components/common/core/Select.css";
+@import "./components/common/core/Textarea.css";
+@import "./components/common/core/Form.css";
+@import "./components/common/custom/Badge.css";
+@import "./components/common/custom/Meter.css";
 
 @keyframes fadeIn {
     from {

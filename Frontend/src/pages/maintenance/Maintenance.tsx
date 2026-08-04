@@ -3,6 +3,7 @@ import { FleetKpiSummary } from './components/FleetKpiSummary';
 import { FleetZoneContainer } from './components/FleetZoneContainer';
 import { MachineInspectorPanel } from './components/MachineInspectorPanel';
 import { ReportIncidentModal } from './components/ReportIncidentModal';
+import { Button } from '@/components/common/core';
 
 export default function Maintenance() {
     const {
@@ -44,21 +45,22 @@ export default function Maintenance() {
 
             {/* Active Incidents Banner (if any) */}
             {openIncidents.length > 0 && (
-                <div className="bg-amber-50 border border-amber-300 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs animate-fade-in">
+                <div className="bg-amber-50 border border-amber-300 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
                     <div>
-                        <h4 className="text-xs font-bold text-amber-900">
+                        <h4 className="text-xs font-bold text-amber-900 uppercase font-mono tracking-wider">
                             Active Maintenance Incidents ({openIncidents.length})
                         </h4>
-                        <p className="text-[11px] text-amber-800 mt-0.5">
+                        <p className="text-xs text-amber-900 mt-0.5">
                             {openIncidents[0].title} – <span className="font-semibold">{openIncidents[0].assetName}</span> ({openIncidents[0].priority} priority)
                         </p>
                     </div>
-                    <button
+                    <Button
+                        variant="outline"
+                        size="sm"
                         onClick={() => resolveIncident(openIncidents[0].id, 'Confirmed and resolved by fleet dispatcher')}
-                        className="text-xs font-bold bg-amber-200/80 hover:bg-amber-300 text-amber-900 border border-amber-400 px-3 py-1.5 rounded transition-colors self-start sm:self-center cursor-pointer"
                     >
-                        ✓ Resolve ticket #{openIncidents[0].id}
-                    </button>
+                        Resolve ticket #{openIncidents[0].id}
+                    </Button>
                 </div>
             )}
 

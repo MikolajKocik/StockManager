@@ -1,5 +1,6 @@
 import React from 'react';
-import type { MaintenanceMachine } from '@/models/maintenance';
+import type { MachineStatus, MaintenanceMachine } from '@/models/maintenance';
+import { Badge } from '@/components/common/custom';
 
 interface FleetMachineCardProps {
     machine: MaintenanceMachine;
@@ -10,6 +11,13 @@ interface FleetMachineCardProps {
     onDragEnd: () => void;
 }
 
+const STATUS_BADGE_MAP: Record<MachineStatus, 'success' | 'brand' | 'warning' | 'danger'> = {
+    OPERATIONAL: 'success',
+    CHARGING: 'brand',
+    MAINTENANCE: 'warning',
+    CRITICAL_FAULT: 'danger'
+};
+
 export const FleetMachineCard: React.FC<FleetMachineCardProps> = ({
     machine,
     isSelected,
@@ -18,37 +26,12 @@ export const FleetMachineCard: React.FC<FleetMachineCardProps> = ({
     onDragStart,
     onDragEnd
 }) => {
-    // Status visual mapping
-    const statusConfig = {
-        OPERATIONAL: {
-            label: 'Operational',
-            bg: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-            dot: 'bg-emerald-500'
-        },
-        CHARGING: {
-            label: 'Charging',
-            bg: 'bg-blue-100 text-blue-800 border-blue-300',
-            dot: 'bg-blue-500 animate-pulse'
-        },
-        MAINTENANCE: {
-            label: 'Maintenance',
-            bg: 'bg-amber-100 text-amber-800 border-amber-300',
-            dot: 'bg-amber-500'
-        },
-        CRITICAL_FAULT: {
-            label: 'Fault',
-            bg: 'bg-rose-100 text-rose-800 border-rose-300',
-            dot: 'bg-rose-500 animate-ping'
-        }
-    }[machine.status];
-
-    // Battery bar color
     const batteryColor =
         machine.batteryLevel > 50
-            ? 'bg-emerald-500'
+            ? 'bg-emerald-600'
             : machine.batteryLevel > 20
-                ? 'bg-amber-500'
-                : 'bg-rose-500';
+                ? 'bg-amber-600'
+                : 'bg-red-600';
 
     return (
         <div
@@ -56,36 +39,36 @@ export const FleetMachineCard: React.FC<FleetMachineCardProps> = ({
             onDragStart={onDragStart}
             onDragEnd={onDragEnd}
             onClick={onSelect}
-            className={`group relative bg-white rounded-lg border p-2.5 transition-all duration-150 cursor-grab active:cursor-grabbing select-none shadow-sm hover:shadow-md ${isSelected
-                ? 'border-blue-600 ring-2 ring-blue-500/30 bg-blue-50/20'
-                : 'border-slate-300 hover:border-slate-400'
-                } ${isDragging ? 'opacity-40 scale-95' : 'opacity-100'}`}
+            className={`group relative bg-white rounded-md border p-2.5 transition-all duration-150 cursor-grab active:cursor-grabbing select-none shadow-2xs hover:shadow-xs ${
+                isSelected
+                    ? 'border-[#2b6675] ring-2 ring-[#2b6675]/30 bg-[#f0f7f8]/30'
+                    : 'border-slate-300 hover:border-slate-400'
+            } ${isDragging ? 'opacity-40 scale-95' : 'opacity-100'}`}
         >
             {/* Top Row: Code Badge, Drag grip & Status */}
             <div className="flex items-center justify-between gap-1 mb-2">
                 <div className="flex items-center gap-1.5">
-                    <span className="font-mono font-bold text-xs bg-slate-800 text-white px-1.5 py-0.5 rounded shadow-sm">
+                    <span className="font-mono font-bold text-[11px] bg-slate-800 text-white px-1.5 py-0.5 rounded-xs shadow-2xs">
                         {machine.code}
                     </span>
-                    <span className={`text-[10px] font-semibold px-1.5 py-0.2 rounded-full border flex items-center gap-1 ${statusConfig.bg}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dot}`}></span>
-                        {statusConfig.label}
-                    </span>
+                    <Badge variant={STATUS_BADGE_MAP[machine.status] || 'neutral'}>
+                        {machine.status}
+                    </Badge>
                 </div>
-                <span className="text-slate-400 group-hover:text-slate-600 text-xs font-bold leading-none" title="Drag and drop to assign">
-                    ⋮⋮
+                <span className="text-slate-400 group-hover:text-slate-600 text-xs font-mono font-bold leading-none" title="Drag to reassign">
+                    ::
                 </span>
             </div>
 
             {/* Middle: Machine Image in centered container */}
-            <div className="w-full h-24 bg-slate-50 border border-slate-100 rounded flex items-center justify-center p-1.5 overflow-hidden relative">
+            <div className="w-full h-24 bg-slate-50 border border-slate-200 rounded flex items-center justify-center p-1.5 overflow-hidden relative">
                 <img
                     src={machine.image}
                     alt={machine.name}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-sm group-hover:scale-105 transition-transform"
+                    className="max-h-full max-w-full object-contain filter drop-shadow-2xs group-hover:scale-105 transition-transform"
                 />
                 {machine.isCharging && (
-                    <span className="absolute top-1 right-1 bg-blue-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                    <span className="absolute top-1 right-1 bg-[#2b6675] text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded-xs shadow-2xs">
                         Charging
                     </span>
                 )}
@@ -97,19 +80,19 @@ export const FleetMachineCard: React.FC<FleetMachineCardProps> = ({
                     {machine.name}
                 </h4>
 
-                <div className="flex items-center justify-between text-[11px] text-slate-500">
-                    <span className="truncate max-w-27.5" title={machine.assignedOperator || 'Unassigned'}>
+                <div className="flex items-center justify-between text-[11px] text-slate-500 font-mono">
+                    <span className="truncate max-w-[110px]" title={machine.assignedOperator || 'Unassigned'}>
                         Op: {machine.assignedOperator ? machine.assignedOperator.split(' ')[0] : 'None'}
                     </span>
-                    <span className="font-mono font-bold text-slate-700">
-                        {machine.batteryLevel}% 🔋
+                    <span className="font-bold text-slate-800">
+                        {machine.batteryLevel}%
                     </span>
                 </div>
 
                 {/* Mini Battery Level Bar */}
-                <div className="w-full h-1.5 bg-slate-200 rounded-full overflow-hidden">
+                <div className="w-full h-1.5 bg-slate-200 rounded overflow-hidden">
                     <div
-                        className={`h-full rounded-full transition-all duration-300 ${batteryColor}`}
+                        className={`h-full transition-all duration-300 ${batteryColor}`}
                         style={{ width: `${machine.batteryLevel}%` }}
                     />
                 </div>

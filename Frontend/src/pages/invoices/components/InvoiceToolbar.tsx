@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/common';
+import { Button, Select } from '@/components/common';
 import type { InvoiceCurrency, InvoiceLanguage, InvoiceStatus, InvoiceType } from '@/models/invoice';
 
 interface InvoiceToolbarProps {
@@ -19,6 +19,30 @@ interface InvoiceToolbarProps {
     onLanguageChange: (language: InvoiceLanguage) => void;
     onTypeChange: (type: InvoiceType) => void;
 }
+
+export const INVOICE_TYPE_OPTIONS = [
+    { value: 'Sales', label: 'Sales Invoice' },
+    { value: 'Proforma', label: 'Proforma Invoice' },
+    { value: 'Correction', label: 'Correction Invoice' }
+] as const;
+
+export const INVOICE_STATUS_OPTIONS = [
+    { value: 'Draft', label: 'Draft' },
+    { value: 'Issued', label: 'Issued' },
+    { value: 'Paid', label: 'Paid' },
+    { value: 'Cancelled', label: 'Cancelled' }
+] as const;
+
+export const INVOICE_CURRENCY_OPTIONS = [
+    { value: 'PLN', label: 'PLN' },
+    { value: 'EUR', label: 'EUR' },
+    { value: 'USD', label: 'USD' }
+] as const;
+
+export const INVOICE_LANGUAGE_OPTIONS = [
+    { value: 'ENG', label: 'English (ENG)' },
+    { value: 'PL', label: 'Polish (PL)' }
+] as const;
 
 export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
     viewMode,
@@ -41,26 +65,22 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
         <div className="no-print flex flex-wrap items-center justify-between gap-3 bg-[#D9D9D9] p-2.5 shadow-md border border-slate-300">
             {/* View Mode Switcher */}
             <div className="flex items-center gap-1.5 bg-slate-200 p-1 rounded border border-slate-300">
-                <button
-                    type="button"
+                <Button
+                    variant={viewMode === 'editor' ? 'primary' : 'ghost'}
+                    size="sm"
                     onClick={() => onViewModeChange('editor')}
-                    className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${viewMode === 'editor'
-                        ? 'bg-[#37393B] text-white shadow-sm'
-                        : 'text-slate-700 hover:bg-slate-300'
-                        }`}
+                    className="text-xs"
                 >
                     Visual Editor
-                </button>
-                <button
-                    type="button"
+                </Button>
+                <Button
+                    variant={viewMode === 'list' ? 'primary' : 'ghost'}
+                    size="sm"
                     onClick={() => onViewModeChange('list')}
-                    className={`px-3 py-1 text-xs font-semibold rounded transition-colors ${viewMode === 'list'
-                        ? 'bg-[#37393B] text-white shadow-sm'
-                        : 'text-slate-700 hover:bg-slate-300'
-                        }`}
+                    className="text-xs"
                 >
                     Invoice Archive ({invoicesCount})
-                </button>
+                </Button>
             </div>
 
             {/* Quick document properties (visible when in editor mode) */}
@@ -68,54 +88,50 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                 <div className="flex items-center gap-3 text-xs">
                     <div className="flex items-center gap-1.5">
                         <span className="text-slate-600 font-medium">Type:</span>
-                        <select
-                            value={type}
-                            onChange={(e) => onTypeChange(e.target.value as InvoiceType)}
-                            className="bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 text-xs font-semibold outline-none"
-                        >
-                            <option value="Sales">Sales Invoice</option>
-                            <option value="Proforma">Proforma Invoice</option>
-                            <option value="Correction">Correction Invoice</option>
-                        </select>
+                        <div className="w-36">
+                            <Select
+                                value={type}
+                                onChange={(e) => onTypeChange(e.target.value as InvoiceType)}
+                                options={INVOICE_TYPE_OPTIONS}
+                                className="text-xs py-1"
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-1.5">
                         <span className="text-slate-600 font-medium">Status:</span>
-                        <select
-                            value={status}
-                            onChange={(e) => onStatusChange(e.target.value as InvoiceStatus)}
-                            className="bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 text-xs font-semibold outline-none"
-                        >
-                            <option value="Draft">Draft</option>
-                            <option value="Issued">Issued</option>
-                            <option value="Paid">Paid</option>
-                            <option value="Cancelled">Cancelled</option>
-                        </select>
+                        <div className="w-28">
+                            <Select
+                                value={status}
+                                onChange={(e) => onStatusChange(e.target.value as InvoiceStatus)}
+                                options={INVOICE_STATUS_OPTIONS}
+                                className="text-xs py-1"
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-1.5">
                         <span className="text-slate-600 font-medium">Currency:</span>
-                        <select
-                            value={currency}
-                            onChange={(e) => onCurrencyChange(e.target.value as InvoiceCurrency)}
-                            className="bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 text-xs font-semibold outline-none"
-                        >
-                            <option value="PLN">PLN</option>
-                            <option value="EUR">EUR</option>
-                            <option value="USD">USD</option>
-                        </select>
+                        <div className="w-24">
+                            <Select
+                                value={currency}
+                                onChange={(e) => onCurrencyChange(e.target.value as InvoiceCurrency)}
+                                options={INVOICE_CURRENCY_OPTIONS}
+                                className="text-xs py-1"
+                            />
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-1.5">
                         <span className="text-slate-600 font-medium">Language:</span>
-                        <select
-                            value={language}
-                            onChange={(e) => onLanguageChange(e.target.value as InvoiceLanguage)}
-                            className="bg-white border border-slate-300 rounded px-2 py-1 text-slate-800 text-xs font-semibold outline-none"
-                        >
-                            <option value="PL">🇵🇱 PL (Polski)</option>
-                            <option value="ENG">🇬🇧 ENG (English)</option>
-                        </select>
+                        <div className="w-32">
+                            <Select
+                                value={language}
+                                onChange={(e) => onLanguageChange(e.target.value as InvoiceLanguage)}
+                                options={INVOICE_LANGUAGE_OPTIONS}
+                                className="text-xs py-1"
+                            />
+                        </div>
                     </div>
                 </div>
             )}
@@ -128,7 +144,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                     className="bg-white text-slate-700 hover:bg-slate-100"
                     onClick={onNewInvoice}
                 >
-                    + New Invoice
+                    New Invoice
                 </Button>
 
                 {viewMode === 'editor' && (
@@ -142,7 +158,7 @@ export const InvoiceToolbar: React.FC<InvoiceToolbarProps> = ({
                             Print / PDF
                         </Button>
                         <Button
-                            variant="accent"
+                            variant="primary"
                             size="sm"
                             onClick={onSaveInvoice}
                             isLoading={isSaving}

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { InvoiceLanguage, InvoiceLineItem, VatRate } from '@/models/invoice';
 import { getInvoiceTranslations } from '../utils/invoiceTranslations';
+import { Button } from '@/components/common';
 
 interface InvoiceItemsTableProps {
     items: InvoiceLineItem[];
@@ -16,9 +17,27 @@ interface InvoiceItemsTableProps {
     onDragEnd: () => void;
 }
 
+export const INVOICE_UNIT_OPTIONS = [
+    { value: 'pcs', label: 'pcs' },
+    { value: 'set', label: 'set' },
+    { value: 'srv', label: 'srv' },
+    { value: 'kg', label: 'kg' },
+    { value: 'm', label: 'm' },
+    { value: 'roll', label: 'roll' },
+    { value: 'hr', label: 'hr' },
+    { value: 'szt', label: 'szt' }
+] as const;
+
+export const INVOICE_VAT_RATE_OPTIONS = [
+    { value: 23, label: '23%' },
+    { value: 8, label: '8%' },
+    { value: 5, label: '5%' },
+    { value: 0, label: '0%' },
+    { value: -1, label: 'exempt' }
+] as const;
+
 export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
     items,
-    currency,
     language,
     draggedIndex,
     onUpdateLineItem,
@@ -66,7 +85,7 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                 >
                                     {/* Drag & Drop Handle */}
                                     <td className="py-1 px-1 text-center text-slate-400 cursor-grab active:cursor-grabbing select-none no-print">
-                                        <span title="Przeciągnij, aby zmienić kolejność" className="text-base font-bold">
+                                        <span title="Drag to reorder" className="text-base font-bold">
                                             ⋮⋮
                                         </span>
                                     </td>
@@ -84,7 +103,7 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                             value={item.name}
                                             title={item.name}
                                             onChange={(e) => onUpdateLineItem(item.id, 'name', e.target.value)}
-                                            placeholder="Wpisz nazwę pozycji towarowej..."
+                                            placeholder="Enter item description..."
                                             className="w-full font-medium text-slate-900 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.5 outline-none truncate focus:whitespace-normal print:hidden"
                                         />
                                         {/* Print clean multi-line wrapping text */}
@@ -97,7 +116,7 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                             value={item.sku || ''}
                                             title={item.sku || ''}
                                             onChange={(e) => onUpdateLineItem(item.id, 'sku', e.target.value)}
-                                            placeholder="Kod SKU (opcjonalnie)..."
+                                            placeholder="SKU Code (optional)..."
                                             className="w-full text-[10px] text-slate-400 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.2 outline-none truncate print:hidden"
                                         />
                                         {item.sku && (
@@ -126,13 +145,11 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                             onChange={(e) => onUpdateLineItem(item.id, 'unit', e.target.value)}
                                             className="w-full text-center bg-transparent text-slate-700 font-medium text-xs border-b border-transparent hover:border-slate-300 focus:border-slate-800 outline-none print:border-none"
                                         >
-                                            <option value="szt">szt</option>
-                                            <option value="kpl">kpl</option>
-                                            <option value="usł">usł</option>
-                                            <option value="kg">kg</option>
-                                            <option value="mb">mb</option>
-                                            <option value="rolka">rolka</option>
-                                            <option value="godz">godz</option>
+                                            {INVOICE_UNIT_OPTIONS.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </option>
+                                            ))}
                                         </select>
                                     </td>
 
@@ -152,14 +169,14 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                     <td className="py-1 px-1 text-center">
                                         <select
                                             value={item.vatRate}
-                                            onChange={(e) => onUpdateLineItem(item.id, 'vatRate', parseInt(e.target.value) as VatRate)}
+                                            onChange={(e) => onUpdateLineItem(item.id, 'vatRate', parseInt(e.target.value, 10) as VatRate)}
                                             className="w-full text-center bg-transparent text-slate-700 font-semibold text-xs border-b border-transparent hover:border-slate-300 focus:border-slate-800 outline-none print:border-none"
                                         >
-                                            <option value={23}>23%</option>
-                                            <option value={8}>8%</option>
-                                            <option value={5}>5%</option>
-                                            <option value={0}>0%</option>
-                                            <option value={-1}>zw.</option>
+                                            {INVOICE_VAT_RATE_OPTIONS.map((opt) => (
+                                                <option key={opt.value} value={opt.value}>
+                                                    {opt.label}
+                                                </option>
+                                            ))}
                                         </select>
                                     </td>
 
@@ -181,22 +198,24 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                     {/* Row Actions */}
                                     <td className="py-1 px-1 text-center no-print">
                                         <div className="flex items-center justify-center gap-1">
-                                            <button
-                                                type="button"
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
                                                 onClick={() => onCloneLineItem(item.id)}
-                                                title="Duplikuj wiersz"
-                                                className="text-slate-400 hover:text-slate-700 p-1 text-xs"
+                                                title="Duplicate row"
+                                                className="px-1 py-0.5 text-xs text-slate-500 hover:text-slate-800"
                                             >
-                                                📋
-                                            </button>
-                                            <button
-                                                type="button"
+                                                Copy
+                                            </Button>
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
                                                 onClick={() => onRemoveLineItem(item.id)}
-                                                title="Usuń pozycję"
-                                                className="text-rose-400 hover:text-rose-700 p-1 text-xs font-bold"
+                                                title="Delete line"
+                                                className="px-1.5 py-0.5 text-xs"
                                             >
-                                                ✕
-                                            </button>
+                                                Remove
+                                            </Button>
                                         </div>
                                     </td>
                                 </tr>
@@ -208,13 +227,14 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
 
             {/* Add Line Item Button */}
             <div className="mt-2 no-print flex justify-start">
-                <button
-                    type="button"
+                <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={onAddLineItem}
-                    className="flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 hover:bg-slate-200 border border-dashed border-slate-400 px-3 py-1.5 rounded transition-colors"
+                    className="text-xs font-semibold"
                 >
-                    <span className="text-base leading-none">+</span> {t.itemsTable.addItem.replace('+ ', '')}
-                </button>
+                    {t.itemsTable.addItem.replace('+ ', '')}
+                </Button>
             </div>
         </div>
     );

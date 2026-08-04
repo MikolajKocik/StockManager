@@ -13,6 +13,13 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
 }) => {
     const t = getInvoiceTranslations(invoice.language);
 
+    const paymentMethodOptions = [
+        { value: 'Transfer', label: t.paymentMethods.Transfer },
+        { value: 'Card', label: t.paymentMethods.Card },
+        { value: 'Cash', label: t.paymentMethods.Cash },
+        { value: 'SplitPayment', label: t.paymentMethods.SplitPayment }
+    ];
+
     return (
         <div className="mt-4 pt-3 border-t-2 border-slate-700">
             <div className="grid grid-cols-2 gap-4 items-start">
@@ -26,10 +33,11 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                                 onChange={(e) => onUpdateField('paymentMethod', e.target.value as PaymentMethod)}
                                 className="bg-white border border-slate-300 rounded px-2 py-0.5 font-semibold text-slate-800 text-xs outline-none print:border-none print:p-0"
                             >
-                                <option value="Transfer">{t.paymentMethods.Transfer}</option>
-                                <option value="Card">{t.paymentMethods.Card}</option>
-                                <option value="Cash">{t.paymentMethods.Cash}</option>
-                                <option value="SplitPayment">{t.paymentMethods.SplitPayment}</option>
+                                {paymentMethodOptions.map((opt) => (
+                                    <option key={opt.value} value={opt.value}>
+                                        {opt.label}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 

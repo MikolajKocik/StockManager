@@ -26,6 +26,176 @@ export function calculateEanCheckDigit(digits: string): number {
     return rem === 0 ? 0 : 10 - rem;
 }
 
+const SYMBOLOGY_VALIDATORS: Record<BarcodeSymbology, (raw: string) => BarcodeValidationResult> = {
+    EAN13: (raw) => {
+        if (!/^\d+$/.test(raw)) {
+            return {
+                isValid: false,
+                error: 'EAN-13 standard requires purely numeric digits (0-9). Non-numeric characters detected.',
+                formattedValue: raw
+            };
+        }
+        if (raw.length !== 12 && raw.length !== 13) {
+            return {
+                isValid: false,
+                error: `EAN-13 requires exactly 12 (auto-checksum) or 13 digits. Current length: ${raw.length}.`,
+                formattedValue: raw
+            };
+        }
+        const core12 = raw.slice(0, 12);
+        const calculatedCheck = calculateEanCheckDigit(core12);
+        if (raw.length === 13) {
+            const givenCheck = parseInt(raw[12], 10);
+            if (givenCheck !== calculatedCheck) {
+                return {
+                    isValid: false,
+                    error: `Invalid EAN-13 check digit. Expected ${calculatedCheck}, received ${givenCheck}.`,
+                    formattedValue: `${core12}${calculatedCheck}`,
+                    checkDigit: String(calculatedCheck),
+                    warning: `Auto-correcting checksum digit from '${givenCheck}' to '${calculatedCheck}'.`
+                };
+            }
+        }
+        return {
+            isValid: true,
+            error: null,
+            formattedValue: raw.length === 12 ? `${core12}${calculatedCheck}` : raw,
+            checkDigit: String(calculatedCheck)
+        };
+    },
+
+    EAN8: (raw) => {
+        if (!/^\d+$/.test(raw)) {
+            return {
+                isValid: false,
+                error: 'EAN-8 requires purely numeric digits (0-9).',
+                formattedValue: raw
+            };
+        }
+        if (raw.length !== 7 && raw.length !== 8) {
+            return {
+                isValid: false,
+                error: `EAN-8 requires exactly 7 (auto-checksum) or 8 digits. Current length: ${raw.length}.`,
+                formattedValue: raw
+            };
+        }
+        const core7 = raw.slice(0, 7);
+        const calculatedCheck = calculateEanCheckDigit(core7);
+        if (raw.length === 8 && parseInt(raw[7], 10) !== calculatedCheck) {
+            return {
+                isValid: false,
+                error: `Invalid EAN-8 check digit. Expected ${calculatedCheck}, received ${raw[7]}.`,
+                formattedValue: `${core7}${calculatedCheck}`,
+                checkDigit: String(calculatedCheck)
+            };
+        }
+        return {
+            isValid: true,
+            error: null,
+            formattedValue: raw.length === 7 ? `${core7}${calculatedCheck}` : raw,
+            checkDigit: String(calculatedCheck)
+        };
+    },
+
+    UPCA: (raw) => {
+        if (!/^\d+$/.test(raw)) {
+            return {
+                isValid: false,
+                error: 'UPC-A requires purely numeric digits (0-9).',
+                formattedValue: raw
+            };
+        }
+        if (raw.length !== 11 && raw.length !== 12) {
+            return {
+                isValid: false,
+                error: `UPC-A requires exactly 11 or 12 digits. Current length: ${raw.length}.`,
+                formattedValue: raw
+            };
+        }
+        const core11 = raw.slice(0, 11);
+        const calculatedCheck = calculateEanCheckDigit(core11);
+        return {
+            isValid: true,
+            error: null,
+            formattedValue: raw.length === 11 ? `${core11}${calculatedCheck}` : raw,
+            checkDigit: String(calculatedCheck)
+        };
+    },
+
+    ITF14: (raw) => {
+        if (!/^\d+$/.test(raw)) {
+            return {
+                isValid: false,
+                error: 'ITF-14 logistics carton barcode requires purely numeric digits.',
+                formattedValue: raw
+            };
+        }
+        if (raw.length !== 13 && raw.length !== 14) {
+            return {
+                isValid: false,
+                error: `ITF-14 requires exactly 14 digits (or 13 + auto-checksum). Current length: ${raw.length}.`,
+                formattedValue: raw
+            };
+        }
+        const core13 = raw.slice(0, 13);
+        const check = calculateEanCheckDigit(core13);
+        return {
+            isValid: true,
+            error: null,
+            formattedValue: raw.length === 13 ? `${core13}${check}` : raw,
+            checkDigit: String(check)
+        };
+    },
+
+    CODE39: (raw) => {
+        const upper = raw.toUpperCase();
+        if (!/^[0-9A-Z\-\.\ \$\/\+\%]+$/.test(upper)) {
+            return {
+                isValid: false,
+                error: 'Code 39 only supports uppercase A-Z, 0-9, and symbols (- . $ / + % space).',
+                formattedValue: upper
+            };
+        }
+        return {
+            isValid: true,
+            error: null,
+            formattedValue: upper
+        };
+    },
+
+    CODE128: (raw) => {
+        for (let i = 0; i < raw.length; i++) {
+            if (raw.charCodeAt(i) > 127) {
+                return {
+                    isValid: false,
+                    error: `Non-ASCII character '${raw[i]}' detected. Code 128 supports standard ASCII (0-127).`,
+                    formattedValue: raw
+                };
+            }
+        }
+        return {
+            isValid: true,
+            error: null,
+            formattedValue: raw
+        };
+    },
+
+    QR: (raw) => {
+        if (raw.length > 1000) {
+            return {
+                isValid: false,
+                error: 'QR Payload exceeds recommended 1000 character limit for fast scanning.',
+                formattedValue: raw
+            };
+        }
+        return {
+            isValid: true,
+            error: null,
+            formattedValue: raw
+        };
+    }
+};
+
 export function validateBarcode(symbology: BarcodeSymbology, value: string): BarcodeValidationResult {
     const raw = (value || '').trim();
 
@@ -37,180 +207,12 @@ export function validateBarcode(symbology: BarcodeSymbology, value: string): Bar
         };
     }
 
-    switch (symbology) {
-        case 'EAN13': {
-            const digitsOnly = raw.replace(/\D/g, '');
-            if (!/^\d+$/.test(raw)) {
-                return {
-                    isValid: false,
-                    error: 'EAN-13 standard requires purely numeric digits (0-9). Non-numeric characters detected.',
-                    formattedValue: raw
-                };
-            }
-            if (raw.length !== 12 && raw.length !== 13) {
-                return {
-                    isValid: false,
-                    error: `EAN-13 requires exactly 12 (auto-checksum) or 13 digits. Current length: ${raw.length}.`,
-                    formattedValue: raw
-                };
-            }
-            const core12 = raw.slice(0, 12);
-            const calculatedCheck = calculateEanCheckDigit(core12);
-            if (raw.length === 13) {
-                const givenCheck = parseInt(raw[12], 10);
-                if (givenCheck !== calculatedCheck) {
-                    return {
-                        isValid: false,
-                        error: `Invalid EAN-13 check digit. Expected ${calculatedCheck}, received ${givenCheck}.`,
-                        formattedValue: `${core12}${calculatedCheck}`,
-                        checkDigit: String(calculatedCheck),
-                        warning: `Auto-correcting checksum digit from '${givenCheck}' to '${calculatedCheck}'.`
-                    };
-                }
-            }
-            return {
-                isValid: true,
-                error: null,
-                formattedValue: raw.length === 12 ? `${core12}${calculatedCheck}` : raw,
-                checkDigit: String(calculatedCheck)
-            };
-        }
-
-        case 'EAN8': {
-            if (!/^\d+$/.test(raw)) {
-                return {
-                    isValid: false,
-                    error: 'EAN-8 requires purely numeric digits (0-9).',
-                    formattedValue: raw
-                };
-            }
-            if (raw.length !== 7 && raw.length !== 8) {
-                return {
-                    isValid: false,
-                    error: `EAN-8 requires exactly 7 (auto-checksum) or 8 digits. Current length: ${raw.length}.`,
-                    formattedValue: raw
-                };
-            }
-            const core7 = raw.slice(0, 7);
-            const calculatedCheck = calculateEanCheckDigit(core7);
-            if (raw.length === 8 && parseInt(raw[7], 10) !== calculatedCheck) {
-                return {
-                    isValid: false,
-                    error: `Invalid EAN-8 check digit. Expected ${calculatedCheck}, received ${raw[7]}.`,
-                    formattedValue: `${core7}${calculatedCheck}`,
-                    checkDigit: String(calculatedCheck)
-                };
-            }
-            return {
-                isValid: true,
-                error: null,
-                formattedValue: raw.length === 7 ? `${core7}${calculatedCheck}` : raw,
-                checkDigit: String(calculatedCheck)
-            };
-        }
-
-        case 'UPCA': {
-            if (!/^\d+$/.test(raw)) {
-                return {
-                    isValid: false,
-                    error: 'UPC-A requires purely numeric digits (0-9).',
-                    formattedValue: raw
-                };
-            }
-            if (raw.length !== 11 && raw.length !== 12) {
-                return {
-                    isValid: false,
-                    error: `UPC-A requires exactly 11 or 12 digits. Current length: ${raw.length}.`,
-                    formattedValue: raw
-                };
-            }
-            const core11 = raw.slice(0, 11);
-            const calculatedCheck = calculateEanCheckDigit(core11);
-            return {
-                isValid: true,
-                error: null,
-                formattedValue: raw.length === 11 ? `${core11}${calculatedCheck}` : raw,
-                checkDigit: String(calculatedCheck)
-            };
-        }
-
-        case 'ITF14': {
-            if (!/^\d+$/.test(raw)) {
-                return {
-                    isValid: false,
-                    error: 'ITF-14 logistics carton barcode requires purely numeric digits.',
-                    formattedValue: raw
-                };
-            }
-            if (raw.length !== 13 && raw.length !== 14) {
-                return {
-                    isValid: false,
-                    error: `ITF-14 requires exactly 14 digits (or 13 + auto-checksum). Current length: ${raw.length}.`,
-                    formattedValue: raw
-                };
-            }
-            const core13 = raw.slice(0, 13);
-            const check = calculateEanCheckDigit(core13);
-            return {
-                isValid: true,
-                error: null,
-                formattedValue: raw.length === 13 ? `${core13}${check}` : raw,
-                checkDigit: String(check)
-            };
-        }
-
-        case 'CODE39': {
-            const upper = raw.toUpperCase();
-            if (!/^[0-9A-Z\-\.\ \$\/\+\%]+$/.test(upper)) {
-                return {
-                    isValid: false,
-                    error: 'Code 39 only supports uppercase A-Z, 0-9, and symbols (- . $ / + % space).',
-                    formattedValue: upper
-                };
-            }
-            return {
-                isValid: true,
-                error: null,
-                formattedValue: upper
-            };
-        }
-
-        case 'CODE128': {
-            // Supports standard ASCII chars 0 to 127
-            for (let i = 0; i < raw.length; i++) {
-                if (raw.charCodeAt(i) > 127) {
-                    return {
-                        isValid: false,
-                        error: `Non-ASCII character '${raw[i]}' detected. Code 128 supports standard ASCII (0-127).`,
-                        formattedValue: raw
-                    };
-                }
-            }
-            return {
-                isValid: true,
-                error: null,
-                formattedValue: raw
-            };
-        }
-
-        case 'QR': {
-            if (raw.length > 1000) {
-                return {
-                    isValid: false,
-                    error: 'QR Payload exceeds recommended 1000 character limit for fast scanning.',
-                    formattedValue: raw
-                };
-            }
-            return {
-                isValid: true,
-                error: null,
-                formattedValue: raw
-            };
-        }
-
-        default:
-            return { isValid: true, error: null, formattedValue: raw };
+    const validator = SYMBOLOGY_VALIDATORS[symbology];
+    if (validator) {
+        return validator(raw);
     }
+
+    return { isValid: true, error: null, formattedValue: raw };
 }
 
 // -------------------------------------------------------------

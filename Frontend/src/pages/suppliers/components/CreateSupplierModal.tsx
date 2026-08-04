@@ -1,12 +1,26 @@
-import React, { forwardRef, useState, useEffect } from 'react';
+import React, { forwardRef } from 'react';
 import type { Supplier } from '@/models/supplier';
-import { Button, FormBody, FormFooter, Modal } from '@/components/common';
+import { Button, FormBody, FormFooter, Modal, Input, Select, Section } from '@/components/common';
 
 interface CreateSupplierModalProps {
     initialData?: Supplier | null;
     onClose: () => void;
     onSubmit: (supplierData: Partial<Supplier>, editingId?: string) => void;
 }
+
+export const SUPPLIER_PAYMENT_TERMS_OPTIONS = [
+    { value: 'Net 14', label: 'Net 14' },
+    { value: 'Net 30', label: 'Net 30' },
+    { value: 'Net 45', label: 'Net 45' },
+    { value: 'Net 60', label: 'Net 60' },
+    { value: 'Prepayment', label: 'Prepayment' }
+] as const;
+
+export const SUPPLIER_STATUS_OPTIONS = [
+    { value: 'Active', label: 'Active' },
+    { value: 'Under Review', label: 'Under Review' },
+    { value: 'Inactive', label: 'Inactive' }
+] as const;
 
 export const CreateSupplierModal = forwardRef<HTMLDialogElement, CreateSupplierModalProps>(({
     initialData,
@@ -15,82 +29,35 @@ export const CreateSupplierModal = forwardRef<HTMLDialogElement, CreateSupplierM
 }, ref) => {
     const isEditMode = !!initialData;
 
-    const [name, setName] = useState('');
-    const [slug, setSlug] = useState('');
-    const [taxId, setTaxId] = useState('');
-    const [contactPerson, setContactPerson] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [website, setWebsite] = useState('');
-    const [country, setCountry] = useState('Poland');
-    const [city, setCity] = useState('');
-    const [postalCode, setPostalCode] = useState('');
-    const [paymentTerms, setPaymentTerms] = useState('Net 30');
-    const [leadTimeDays, setLeadTimeDays] = useState(5);
-    const [status, setStatus] = useState<'Active' | 'Under Review' | 'Inactive'>('Active');
-
-    useEffect(() => {
-        if (initialData) {
-            setName(initialData.name || '');
-            setSlug(initialData.slug || '');
-            setTaxId(initialData.taxId || '');
-            setContactPerson(initialData.contactPerson || '');
-            setEmail(initialData.email || '');
-            setPhone(initialData.phone || '');
-            setWebsite(initialData.website || '');
-            setCountry(initialData.address?.country || 'Poland');
-            setCity(initialData.address?.city || '');
-            setPostalCode(initialData.address?.postalCode || '');
-            setPaymentTerms(initialData.paymentTerms || 'Net 30');
-            setLeadTimeDays(initialData.leadTimeDays || 5);
-            setStatus(initialData.status || 'Active');
-        } else {
-            setName('');
-            setSlug('');
-            setTaxId('');
-            setContactPerson('');
-            setEmail('');
-            setPhone('');
-            setWebsite('');
-            setCountry('Poland');
-            setCity('');
-            setPostalCode('');
-            setPaymentTerms('Net 30');
-            setLeadTimeDays(5);
-            setStatus('Active');
-        }
-    }, [initialData]);
-
-    const handleNameChange = (val: string) => {
-        setName(val);
-        if (!isEditMode && !slug) {
-            setSlug(val.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''));
-        }
-    };
-
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!name.trim()) return;
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries()) as Record<string, string>;
+
+        const name = data.name?.trim() || '';
+        if (!name) return;
+
+        const slug = data.slug?.trim() || name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
         const payload: Partial<Supplier> = {
             id: initialData?.id || `SUP-${Date.now().toString().slice(-4)}`,
-            name: name.trim(),
-            slug: slug.trim() || name.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-'),
-            taxId: taxId.trim(),
-            contactPerson: contactPerson.trim(),
-            email: email.trim(),
-            phone: phone.trim(),
-            website: website.trim(),
-            paymentTerms,
-            leadTimeDays: Number(leadTimeDays) || 5,
-            status,
+            name,
+            slug,
+            taxId: data.taxId?.trim() || '',
+            contactPerson: data.contactPerson?.trim() || '',
+            email: data.email?.trim() || '',
+            phone: data.phone?.trim() || '',
+            website: data.website?.trim() || '',
+            paymentTerms: data.paymentTerms || 'Net 30',
+            leadTimeDays: Number(data.leadTimeDays) || 5,
+            status: (data.status as 'Active' | 'Under Review' | 'Inactive') || 'Active',
             activeItemsCount: initialData?.activeItemsCount || 0,
             rating: initialData?.rating || 4.8,
             address: {
                 id: initialData?.address?.id || `ADDR-${Date.now().toString().slice(-4)}`,
-                country: country.trim(),
-                city: city.trim(),
-                postalCode: postalCode.trim(),
+                country: data.country?.trim() || 'Poland',
+                city: data.city?.trim() || '',
+                postalCode: data.postalCode?.trim() || '',
                 supplierId: initialData?.id || '0'
             }
         };
@@ -106,198 +73,133 @@ export const CreateSupplierModal = forwardRef<HTMLDialogElement, CreateSupplierM
             size="lg"
             onClose={onClose}
         >
-            <form onSubmit={handleSubmit}>
-                <FormBody className="max-h-[75vh] space-y-3">
+            <form key={initialData?.id || 'new'} onSubmit={handleSubmit}>
+                <FormBody className="max-h-[75vh] space-y-4">
                     {/* Basic Info */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Company Name *
-                            </label>
-                            <input
-                                type="text"
+                    <Section title="Company Identification">
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                label="Company Name *"
+                                name="name"
                                 required
-                                value={name}
-                                onChange={(e) => handleNameChange(e.target.value)}
-                                placeholder="e.g. Acme Industrial Logistics"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 focus:bg-white"
+                                defaultValue={initialData?.name || ''}
+                                placeholder="e.g. Apex Industrial Supplies"
+                            />
+
+                            <Input
+                                label="Identifier / Slug"
+                                name="slug"
+                                defaultValue={initialData?.slug || ''}
+                                placeholder="apex-industrial"
+                                className="font-mono"
                             />
                         </div>
 
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Vendor Slug / Identifier
-                            </label>
-                            <input
-                                type="text"
-                                value={slug}
-                                onChange={(e) => setSlug(e.target.value)}
-                                placeholder="e.g. acme-industrial"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-mono outline-none focus:border-slate-800 focus:bg-white"
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                label="Tax ID / VAT Registration"
+                                name="taxId"
+                                defaultValue={initialData?.taxId || ''}
+                                placeholder="PL1234567890"
+                                className="font-mono"
+                            />
+
+                            <Input
+                                label="Official Website"
+                                name="website"
+                                defaultValue={initialData?.website || ''}
+                                placeholder="https://apexindustrial.com"
                             />
                         </div>
-                    </div>
+                    </Section>
 
-                    {/* Tax ID & Contact Person */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Tax / VAT ID
-                            </label>
-                            <input
-                                type="text"
-                                value={taxId}
-                                onChange={(e) => setTaxId(e.target.value)}
-                                placeholder="e.g. PL-5252819401"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-mono outline-none focus:border-slate-800 focus:bg-white"
+                    {/* Contact details */}
+                    <Section variant="subtle" title="Primary Contact & Logistics Lead">
+                        <div className="grid grid-cols-3 gap-3">
+                            <Input
+                                label="Contact Person"
+                                name="contactPerson"
+                                defaultValue={initialData?.contactPerson || ''}
+                                placeholder="John Doe"
+                                className="bg-white"
                             />
-                        </div>
 
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Contact Person
-                            </label>
-                            <input
-                                type="text"
-                                value={contactPerson}
-                                onChange={(e) => setContactPerson(e.target.value)}
-                                placeholder="e.g. James Wilson"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 focus:bg-white"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Email & Phone */}
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Procurement Email
-                            </label>
-                            <input
+                            <Input
+                                label="Email Address"
+                                name="email"
                                 type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="e.g. procurement@supplier.com"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 focus:bg-white"
+                                defaultValue={initialData?.email || ''}
+                                placeholder="orders@supplier.com"
+                                className="bg-white font-mono"
+                            />
+
+                            <Input
+                                label="Phone Number"
+                                name="phone"
+                                defaultValue={initialData?.phone || ''}
+                                placeholder="+48 123 456 789"
+                                className="bg-white font-mono"
                             />
                         </div>
+                    </Section>
 
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Contact Phone
-                            </label>
-                            <input
-                                type="text"
-                                value={phone}
-                                onChange={(e) => setPhone(e.target.value)}
-                                placeholder="e.g. +48 22 590 12 34"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 focus:bg-white"
+                    {/* Address section */}
+                    <Section variant="subtle" title="Warehouse & Headquarter Address">
+                        <div className="grid grid-cols-3 gap-3">
+                            <Input
+                                label="Country"
+                                name="country"
+                                defaultValue={initialData?.address?.country || 'Poland'}
+                                placeholder="Poland"
+                                className="bg-white"
+                            />
+
+                            <Input
+                                label="City"
+                                name="city"
+                                defaultValue={initialData?.address?.city || ''}
+                                placeholder="Warsaw"
+                                className="bg-white"
+                            />
+
+                            <Input
+                                label="Postal Code"
+                                name="postalCode"
+                                defaultValue={initialData?.address?.postalCode || ''}
+                                placeholder="00-001"
+                                className="bg-white font-mono"
                             />
                         </div>
-                    </div>
+                    </Section>
 
-                    {/* Website */}
-                    <div>
-                        <label className="font-bold text-slate-700 block mb-1">
-                            Supplier Website
-                        </label>
-                        <input
-                            type="text"
-                            value={website}
-                            onChange={(e) => setWebsite(e.target.value)}
-                            placeholder="e.g. https://www.supplier.com"
-                            className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 focus:bg-white"
-                        />
-                    </div>
+                    {/* Commercial Terms */}
+                    <Section title="Commercial Terms & Status">
+                        <div className="grid grid-cols-3 gap-3">
+                            <Select
+                                label="Payment Terms"
+                                name="paymentTerms"
+                                defaultValue={initialData?.paymentTerms || 'Net 30'}
+                                options={SUPPLIER_PAYMENT_TERMS_OPTIONS}
+                            />
 
-                    {/* Address Information */}
-                    <div className="p-3 bg-slate-50 border border-slate-300 rounded space-y-2">
-                        <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block">
-                            Address & Regional Details
-                        </span>
-
-                        <div className="grid grid-cols-3 gap-2">
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">Country</label>
-                                <input
-                                    type="text"
-                                    value={country}
-                                    onChange={(e) => setCountry(e.target.value)}
-                                    placeholder="Poland"
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 outline-none focus:border-slate-800"
-                                />
-                            </div>
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">City</label>
-                                <input
-                                    type="text"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    placeholder="Warsaw"
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 outline-none focus:border-slate-800"
-                                />
-                            </div>
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">Postal Code</label>
-                                <input
-                                    type="text"
-                                    value={postalCode}
-                                    onChange={(e) => setPostalCode(e.target.value)}
-                                    placeholder="00-001"
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 font-mono outline-none focus:border-slate-800"
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Commercial Terms & Status */}
-                    <div className="grid grid-cols-3 gap-2">
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Payment Terms
-                            </label>
-                            <select
-                                value={paymentTerms}
-                                onChange={(e) => setPaymentTerms(e.target.value)}
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 font-medium outline-none focus:border-slate-800 cursor-pointer"
-                            >
-                                <option value="Net 14">Net 14</option>
-                                <option value="Net 30">Net 30</option>
-                                <option value="Net 45">Net 45</option>
-                                <option value="Net 60">Net 60</option>
-                                <option value="Prepayment">Prepayment</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Lead Time (Days)
-                            </label>
-                            <input
+                            <Input
+                                label="Lead Time (Days)"
+                                name="leadTimeDays"
                                 type="number"
                                 min={1}
                                 max={90}
-                                value={leadTimeDays}
-                                onChange={(e) => setLeadTimeDays(Number(e.target.value))}
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 font-mono outline-none focus:border-slate-800 focus:bg-white"
+                                defaultValue={initialData?.leadTimeDays || 5}
+                                className="font-mono"
+                            />
+
+                            <Select
+                                label="Account Status"
+                                name="status"
+                                defaultValue={initialData?.status || 'Active'}
+                                options={SUPPLIER_STATUS_OPTIONS}
                             />
                         </div>
-
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">
-                                Status
-                            </label>
-                            <select
-                                value={status}
-                                onChange={(e) => setStatus(e.target.value as 'Active' | 'Under Review' | 'Inactive')}
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2 py-1.5 font-semibold outline-none focus:border-slate-800 cursor-pointer"
-                            >
-                                <option value="Active">Active</option>
-                                <option value="Under Review">Under Review</option>
-                                <option value="Inactive">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
+                    </Section>
                 </FormBody>
 
                 <FormFooter>
@@ -305,7 +207,7 @@ export const CreateSupplierModal = forwardRef<HTMLDialogElement, CreateSupplierM
                         Cancel
                     </Button>
                     <Button variant="primary" size="md" type="submit">
-                        {isEditMode ? 'Save Changes' : 'Create Supplier'}
+                        {isEditMode ? 'Save Changes' : 'Register Supplier'}
                     </Button>
                 </FormFooter>
             </form>

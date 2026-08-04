@@ -1,0 +1,47 @@
+.blue {
+    background-color: #f8fafc;
+    color: #2b6675;
+    border: 1px solid rgba(43, 102, 117, 0.4);
+}
+
+.purple {
+    background-color: #f8fafc;
+    color: #1e293b;
+    border: 1px solid #94a3b8;
+}
+
+.amber {
+    background-color: rgba(254, 243, 199, 0.6);
+    color: #8f7d49;
+    border: 1px solid rgba(170, 149, 89, 0.5);
+}
+
+.emerald {
+    background-color: rgba(236, 253, 245, 0.6);
+    color: #0e5f32;
+    border: 1px solid rgba(14, 95, 50, 0.4);
+}
+
+.orange {
+    background-color: rgba(254, 243, 199, 0.6);
+    color: #8f7d49;
+    border: 1px solid rgba(170, 149, 89, 0.5);
+}
+
+.indigo {
+    background-color: #f8fafc;
+    color: #1e293b;
+    border: 1px solid #94a3b8;
+}
+
+.rose {
+    background-color: rgba(254, 242, 242, 0.7);
+    color: #991b1b;
+    border: 1px solid #fca5a5;
+}
+
+.slate {
+    background-color: #f1f5f9;
+    color: #334155;
+    border: 1px solid #cbd5e1;
+}

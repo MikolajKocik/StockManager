@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Select } from '@/components/common';
+import { Header, Button, Select } from '@/components/common/core';
+import { KpiCard, Badge } from '@/components/common/custom'
 import type { OcrDocument } from '../models/ocrDocument';
 
 interface DocumentsHeaderProps {
@@ -21,78 +22,72 @@ export const DocumentsHeader: React.FC<DocumentsHeaderProps> = ({
     pendingCount,
     avgConfidence
 }) => {
+    const documentOptions = documents.map(d => ({
+        label: `${d.extractedData.docType}: ${d.extractedData.docNumber} (${d.fileName})`,
+        value: d.id
+    }));
+
     return (
         <div className="w-full space-y-4 mb-4">
-            {/* Top Dark Header */}
-            <div className="w-full bg-[#384155] text-white p-4 rounded-lg shadow-md border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <h1 className="bg-amber-400 text-slate-900 font-black text-2xl px-2 py-0.5 rounded tracking-wide font-mono uppercase">
-                            DOCUMENT OCR STUDIO
-                        </h1>
-                    </div>
-                </div>
+            <Header
+                title="Document OCR & Invoice Processing"
+                subtitle="Automated document text extraction, PO matching, and split-screen visual verification"
+                badge={
+                    <Badge variant="brand">
+                        OCR ENGINE
+                    </Badge>
+                }
+                actions={
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <div className="w-72">
+                            <Select
+                                value={activeDocId}
+                                onChange={(e) => onSelectDocument(e.target.value)}
+                                options={documentOptions}
+                            />
+                        </div>
 
-                <div className="flex items-center gap-2 flex-wrap">
-                    <div className="w-64">
-                        <Select
-                            value={activeDocId}
-                            onChange={(e) => onSelectDocument(e.target.value)}
-                            options={documents.map(d => ({
-                                label: `${d.extractedData.docType}: ${d.extractedData.docNumber} (${d.fileName})`,
-                                value: d.id
-                            }))}
-                        />
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            onClick={onUploadClick}
+                        >
+                            Upload Scan (PDF/PNG)
+                        </Button>
                     </div>
-
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={onUploadClick}
-                        className="text-xs font-semibold shadow-sm bg-emerald-600 hover:bg-emerald-700 border-emerald-700"
-                    >
-                        + Upload Scan (PDF/PNG)
-                    </Button>
-                </div>
-            </div>
+                }
+            />
 
             {/* Quick KPI Overview */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Loaded Scans
-                    </span>
-                    <span className="text-xl font-bold font-mono text-slate-900">
-                        {totalDocs} Documents
-                    </span>
-                </div>
+                <KpiCard
+                    title="Loaded Scans"
+                    value={`${totalDocs} Documents`}
+                    subtitle="Processed in current batch"
+                    variant="primary"
+                />
 
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Pending Verification
-                    </span>
-                    <span className={`text-xl font-bold font-mono ${pendingCount > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
-                        {pendingCount} Pending
-                    </span>
-                </div>
+                <KpiCard
+                    title="Pending Verification"
+                    value={`${pendingCount} Pending`}
+                    subtitle={pendingCount > 0 ? 'Requires human confirmation' : 'All invoices validated'}
+                    variant={pendingCount > 0 ? 'warning' : 'default'}
+                    badge={pendingCount > 0 ? <Badge variant="warning">Review</Badge> : undefined}
+                />
 
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        OCR Accuracy Score
-                    </span>
-                    <span className="text-xl font-bold font-mono text-emerald-600">
-                        {Math.round(avgConfidence * 100)}% Verified
-                    </span>
-                </div>
+                <KpiCard
+                    title="OCR Accuracy Score"
+                    value={`${Math.round(avgConfidence * 100)}%`}
+                    subtitle="Confidence threshold score"
+                    variant="success"
+                />
 
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Extraction Mode
-                    </span>
-                    <span className="text-xs font-bold font-mono text-blue-700 bg-blue-50 px-2 py-1 rounded inline-block mt-1">
-                        Split-Screen Visual Sync
-                    </span>
-                </div>
+                <KpiCard
+                    title="Extraction Mode"
+                    value="Split-Screen"
+                    subtitle="Interactive visual sync"
+                    variant="default"
+                />
             </div>
         </div>
     );

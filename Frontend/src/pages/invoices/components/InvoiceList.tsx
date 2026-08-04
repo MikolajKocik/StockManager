@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Button, Input } from '@/components/common';
+import { Button, Input, Select } from '@/components/common';
 import type { Invoice } from '@/models/invoice';
 
 interface InvoiceListProps {
@@ -8,6 +8,13 @@ interface InvoiceListProps {
     onSelectInvoice: (id: number | string) => void;
     onNewInvoice: () => void;
 }
+
+export const INVOICE_LIST_STATUS_OPTIONS = [
+    { label: 'All Statuses', value: 'ALL' },
+    { label: 'Issued', value: 'Issued' },
+    { label: 'Paid', value: 'Paid' },
+    { label: 'Draft', value: 'Draft' }
+] as const;
 
 export const InvoiceList: React.FC<InvoiceListProps> = ({
     invoices,
@@ -30,44 +37,47 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
     }, [invoices, searchTerm, statusFilter]);
 
     return (
-        <div className="card border border-slate-300">
-            <div className="flex flex-row justify-between items-center pb-2 mb-2 border-b border-slate-300">
-                <h2 className="card-header m-0 p-0 text-slate-900 font-bold">
-                    Invoice List
-                </h2>
-                <Button variant="accent" size="sm" onClick={onNewInvoice}>
-                    Issue a New Invoice
+        <div className="bg-white border border-slate-300 rounded-lg p-4 shadow-2xs space-y-4">
+            <div className="flex flex-row justify-between items-center pb-3 border-b border-slate-200">
+                <div>
+                    <h2 className="text-lg font-bold text-slate-800 leading-tight">
+                        Invoice Archive
+                    </h2>
+                    <p className="text-xs text-slate-500">
+                        History of issued sales, correction, and proforma invoices
+                    </p>
+                </div>
+                <Button variant="primary" size="md" onClick={onNewInvoice}>
+                    Issue New Invoice
                 </Button>
             </div>
 
-            <div className="card-body p-3 bg-white space-y-3">
+            <div className="space-y-3">
                 {/* Filters */}
                 <div className="flex flex-wrap items-center gap-3">
                     <div className="w-64">
                         <Input
-                            type="text"
                             placeholder="Search by invoice number, tax ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
+                            className="text-xs"
                         />
                     </div>
-                    <select
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value)}
-                        className="bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-700 font-medium outline-none"
-                    >
-                        <option value="ALL">All statuses</option>
-                        <option value="Issued">Exhibited</option>
-                        <option value="Paid">Paid</option>
-                        <option value="Draft">Sketches</option>
-                    </select>
+                    <div className="w-36">
+                        <Select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value)}
+                            options={INVOICE_LIST_STATUS_OPTIONS}
+                            className="text-xs"
+                        />
+                    </div>
                 </div>
 
                 {/* Table */}
                 <div className="overflow-x-auto border border-slate-300 rounded">
                     <table className="w-full text-xs text-left border-collapse">
                         <thead>
-                            <tr className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300 text-[11px] uppercase">
+                            <tr className="bg-[#2b6675] text-white font-bold border-b border-slate-300 text-[11px] uppercase">
                                 <th className="py-2.5 px-3">Invoice Number</th>
                                 <th className="py-2.5 px-3">Customer</th>
                                 <th className="py-2.5 px-3">Issue Date</th>
@@ -80,37 +90,37 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                         <tbody className="divide-y divide-slate-200 bg-white">
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={7} className="py-8 text-center text-slate-500">
+                                    <td colSpan={7} className="py-8 text-center text-slate-500 font-medium">
                                         Loading invoices...
                                     </td>
                                 </tr>
                             ) : filteredInvoices.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="py-8 text-center text-slate-500">
+                                    <td colSpan={7} className="py-8 text-center text-slate-500 font-medium">
                                         No invoices match your search criteria.
                                     </td>
                                 </tr>
                             ) : (
                                 filteredInvoices.map((inv) => (
                                     <tr key={inv.id} className="hover:bg-slate-50 transition-colors">
-                                        <td className="py-2.5 px-3 font-bold text-slate-900">
+                                        <td className="py-2.5 px-3 font-bold text-slate-900 font-mono">
                                             {inv.invoiceNumber || `FV/2026/08/${String(inv.id).padStart(3, '0')}`}
                                         </td>
                                         <td className="py-2.5 px-3">
                                             <span className="font-semibold text-slate-800 block">
-                                                {inv.buyerName || 'Brak danych'}
+                                                {inv.buyerName || 'Unknown Customer'}
                                             </span>
                                             {inv.buyerNip && (
                                                 <span className="text-[10px] text-slate-400 font-mono">
-                                                    NIP: {inv.buyerNip}
+                                                    VAT: {inv.buyerNip}
                                                 </span>
                                             )}
                                         </td>
-                                        <td className="py-2.5 px-3 text-slate-700">
-                                            {inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString('pl-PL') : '-'}
+                                        <td className="py-2.5 px-3 text-slate-700 font-mono">
+                                            {inv.invoiceDate ? new Date(inv.invoiceDate).toLocaleDateString('en-US') : '-'}
                                         </td>
-                                        <td className="py-2.5 px-3 text-slate-700">
-                                            {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('pl-PL') : '-'}
+                                        <td className="py-2.5 px-3 text-slate-700 font-mono">
+                                            {inv.dueDate ? new Date(inv.dueDate).toLocaleDateString('en-US') : '-'}
                                         </td>
                                         <td className="py-2.5 px-3 text-center">
                                             <span

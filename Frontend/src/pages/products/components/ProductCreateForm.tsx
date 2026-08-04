@@ -1,6 +1,6 @@
-import { forwardRef } from 'react';
+import { forwardRef, useMemo } from 'react';
 import type { ProductCreateForm as ProductCreateFormPayload } from "@/models/product";
-import { Button, FormBody, FormFooter, Modal } from '@/components/common';
+import { Button, FormBody, FormFooter, Modal, Input, Select, Section } from '@/components/common';
 import { useGenres } from "@/hooks/queries/useGenres";
 import { useWTypes } from "@/hooks/queries/useWTypes";
 import { useCreateProduct } from "../hooks";
@@ -31,6 +31,16 @@ export const ProductCreateForm = forwardRef<HTMLDialogElement, ProductCreateModa
         });
     };
 
+    const genreOptions = useMemo(() => [
+        { value: '', label: 'Select category', disabled: true },
+        ...genres.map(g => ({ value: g, label: g }))
+    ], [genres]);
+
+    const typeOptions = useMemo(() => [
+        { value: '', label: 'Select storage type', disabled: true },
+        ...types.map(t => ({ value: t, label: t }))
+    ], [types]);
+
     const isLoading = isGenresLoading || isTypesLoading;
 
     return (
@@ -46,122 +56,74 @@ export const ProductCreateForm = forwardRef<HTMLDialogElement, ProductCreateModa
                 <form onSubmit={handleSubmit}>
                     <FormBody className="max-h-[75vh] space-y-4">
                         {mutationError && (
-                            <div className="p-2 bg-red-50 border border-red-200 text-red-700 rounded text-xs">
+                            <div className="p-2 bg-red-50 border border-red-200 text-red-700 rounded text-xs font-medium">
                                 Error occurred while saving product data.
                             </div>
                         )}
 
-                        {/* General Information */}
-                        <div>
-                            <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block mb-2 font-mono">
-                                General Information
-                            </span>
+                        <Section title="General Information">
                             <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="font-bold text-slate-700 block mb-1">
-                                        Product Name <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        name="name"
-                                        type="text"
-                                        required
-                                        placeholder="e.g. Hydraulic Valve 24V"
-                                        className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 focus:bg-white text-xs"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="font-bold text-slate-700 block mb-1">
-                                        Category / Genre <span className="text-red-500">*</span>
-                                    </label>
-                                    <select
-                                        name="genre"
-                                        required
-                                        defaultValue=""
-                                        className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 cursor-pointer text-xs"
-                                    >
-                                        <option value="" disabled>Select category</option>
-                                        {genres.map(g => (
-                                            <option key={g} value={g}>{g}</option>
-                                        ))}
-                                    </select>
-                                </div>
+                                <Input
+                                    label="Product Name"
+                                    name="name"
+                                    type="text"
+                                    required
+                                    placeholder="e.g. Hydraulic Valve 24V"
+                                />
+                                <Select
+                                    label="Category / Genre"
+                                    name="genre"
+                                    required
+                                    defaultValue=""
+                                    options={genreOptions}
+                                />
                             </div>
-                        </div>
+                        </Section>
 
-                        {/* Units and Storage Type */}
-                        <div className="grid grid-cols-2 gap-3">
-                            <div>
-                                <label className="font-bold text-slate-700 block mb-1">
-                                    Unit of Measure <span className="text-red-500">*</span>
-                                </label>
-                                <input
+                        <Section title="Units & Storage Specification">
+                            <div className="grid grid-cols-2 gap-3">
+                                <Input
+                                    label="Unit of Measure"
                                     name="unit"
                                     type="text"
                                     required
                                     placeholder="e.g. pcs, kg, m, box"
-                                    className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 focus:bg-white text-xs"
                                 />
-                            </div>
-                            <div>
-                                <label className="font-bold text-slate-700 block mb-1">
-                                    Warehouse Zone Type <span className="text-red-500">*</span>
-                                </label>
-                                <select
+                                <Select
+                                    label="Warehouse Zone Type"
                                     name="type"
                                     required
                                     defaultValue=""
-                                    className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium outline-none focus:border-slate-800 cursor-pointer text-xs"
-                                >
-                                    <option value="" disabled>Select storage type</option>
-                                    {types.map(t => (
-                                        <option key={t} value={t}>{t}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        {/* Traceability & Supply */}
-                        <div className="p-3 bg-slate-50/80 border border-slate-300 rounded space-y-3">
-                            <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block font-mono">
-                                Supply & Traceability
-                            </span>
-
-                            <div className="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label className="font-semibold text-slate-700 block mb-1">
-                                        Batch / Lot Number
-                                    </label>
-                                    <input
-                                        name="batchNumber"
-                                        type="text"
-                                        placeholder="e.g. BATCH-2026-X"
-                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 font-mono outline-none focus:border-slate-800 text-xs"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="font-semibold text-slate-700 block mb-1">
-                                        Supplier Reference / ID
-                                    </label>
-                                    <input
-                                        name="supplierId"
-                                        type="text"
-                                        placeholder="e.g. SUP-0012"
-                                        className="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 font-mono outline-none focus:border-slate-800 text-xs"
-                                    />
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-slate-700 block mb-1">
-                                    Expiration Date
-                                </label>
-                                <input
-                                    name="expirationDate"
-                                    type="date"
-                                    className="w-full bg-white border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 text-xs font-mono"
+                                    options={typeOptions}
                                 />
                             </div>
-                        </div>
+                        </Section>
+
+                        <Section variant="subtle" title="Supply & Traceability">
+                            <div className="grid grid-cols-2 gap-3">
+                                <Input
+                                    label="Batch / Lot Number"
+                                    name="batchNumber"
+                                    type="text"
+                                    placeholder="e.g. BATCH-2026-X"
+                                    className="font-mono bg-white"
+                                />
+                                <Input
+                                    label="Supplier Reference / ID"
+                                    name="supplierId"
+                                    type="text"
+                                    placeholder="e.g. SUP-0012"
+                                    className="font-mono bg-white"
+                                />
+                            </div>
+
+                            <Input
+                                label="Expiration Date"
+                                name="expirationDate"
+                                type="date"
+                                className="font-mono bg-white"
+                            />
+                        </Section>
                     </FormBody>
 
                     <FormFooter>

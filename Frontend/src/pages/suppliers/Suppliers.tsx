@@ -1,11 +1,19 @@
 import { useState, useRef } from 'react';
 import type { Supplier } from '@/models/supplier';
-import ConfirmModal from '@/components/common/ConfirmModal';
+import { Button, Select } from '@/components/common';
+import ConfirmModal from '@/components/common/custom/ConfirmModal';
 import { useSuppliersManager } from './hooks/useSuppliersManager';
 import { SupplierKpiSummary } from './components/SupplierKpiSummary';
 import { SupplierTable } from './components/SupplierTable';
 import { SupplierDetailsModal } from './components/SupplierDetailsModal';
 import { CreateSupplierModal } from './components/CreateSupplierModal';
+
+export const SUPPLIER_STATUS_FILTER_OPTIONS = [
+    { label: 'All Statuses', value: '' },
+    { label: 'Active', value: 'Active' },
+    { label: 'Under Review', value: 'Under Review' },
+    { label: 'Inactive', value: 'Inactive' }
+] as const;
 
 export default function Suppliers() {
     const {
@@ -93,29 +101,27 @@ export default function Suppliers() {
                         {filteredSuppliers.length}
                     </span>
                     {(filterQuery || selectedCountry || selectedStatus) && (
-                        <button
-                            type="button"
+                        <Button
+                            variant="secondary"
+                            size="sm"
                             onClick={resetFilters}
-                            className="text-xs text-[#2b6675] hover:underline font-semibold ml-2 cursor-pointer"
+                            className="text-xs ml-2"
                         >
-                            Reset filters &#10005;
-                        </button>
+                            Reset filters
+                        </Button>
                     )}
                 </div>
 
                 <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-slate-600">Filter Status:</span>
-                    <select
-                        value={selectedStatus}
-                        onChange={(e) => setSelectedStatus(e.target.value)}
-                        aria-label="Filter suppliers by status"
-                        className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1 font-semibold text-slate-700 outline-none focus:border-slate-800 cursor-pointer"
-                    >
-                        <option value="">All Statuses</option>
-                        <option value="Active">Active</option>
-                        <option value="Under Review">Under Review</option>
-                        <option value="Inactive">Inactive</option>
-                    </select>
+                    <div className="w-36">
+                        <Select
+                            value={selectedStatus}
+                            onChange={(e) => setSelectedStatus(e.target.value)}
+                            options={SUPPLIER_STATUS_FILTER_OPTIONS}
+                            className="text-xs"
+                        />
+                    </div>
                 </div>
             </div>
 

@@ -24,10 +24,6 @@ interface ZoneConfig {
     title: string;
     subtitle: string;
     tag: string;
-    headerBg: string;
-    headerBorder: string;
-    badgeBg: string;
-    activeBorder: string;
 }
 
 const ZONES: ZoneConfig[] = [
@@ -35,31 +31,19 @@ const ZONES: ZoneConfig[] = [
         id: 'HALA_A',
         title: 'Hall A – High Bay & Receiving',
         subtitle: 'Counterbalance forklifts, reach trucks, and vertical lift modules',
-        tag: 'H-A',
-        headerBg: 'bg-slate-100/90',
-        headerBorder: 'border-slate-300',
-        badgeBg: 'bg-emerald-100 text-emerald-800 border-emerald-300',
-        activeBorder: 'border-emerald-500 bg-emerald-50/30'
+        tag: 'HALA-A'
     },
     {
         id: 'HALA_B',
         title: 'Hall B – Order Picking & Dispatch',
         subtitle: 'Order pickers, AMR robots, and automated sorting machines',
-        tag: 'H-B',
-        headerBg: 'bg-slate-100/90',
-        headerBorder: 'border-slate-300',
-        badgeBg: 'bg-blue-100 text-blue-800 border-blue-300',
-        activeBorder: 'border-blue-500 bg-blue-50/30'
+        tag: 'HALA-B'
     },
     {
         id: 'WORKSHOP_CHARGING',
         title: 'Workshop & Fast-Charging Bay',
         subtitle: 'Periodic inspections, rapid battery charging, and safety servicing',
-        tag: 'WAR',
-        headerBg: 'bg-slate-100/90',
-        headerBorder: 'border-slate-300',
-        badgeBg: 'bg-amber-100 text-amber-800 border-amber-300',
-        activeBorder: 'border-amber-500 bg-amber-50/30'
+        tag: 'WORKSHOP'
     }
 ];
 
@@ -87,22 +71,22 @@ export const FleetZoneContainer: React.FC<FleetZoneContainerProps> = ({
                         onDragOver={(e) => onDragOver(e, zone.id)}
                         onDragLeave={onDragLeave}
                         onDrop={(e) => onDrop(e, zone.id)}
-                        className={`bg-white border-2 rounded-lg transition-all duration-200 shadow-sm ${
+                        className={`bg-white border rounded-lg transition-all duration-150 shadow-xs ${
                             isDragOver 
-                                ? `${zone.activeBorder} ring-2 ring-blue-400 border-dashed scale-[1.005]` 
+                                ? 'border-[#2b6675] ring-2 ring-[#2b6675]/40 bg-[#f0f7f8]/30 border-dashed' 
                                 : 'border-slate-300'
                         }`}
                     >
                         {/* Zone Header */}
-                        <div className={`flex items-center justify-between px-3.5 py-2.5 rounded-t-md border-b ${zone.headerBg} ${zone.headerBorder}`}>
+                        <div className="flex items-center justify-between px-3.5 py-2.5 rounded-t-lg border-b border-slate-200 bg-slate-50">
                             <div className="flex items-center gap-2.5">
-                                <span className="font-mono text-[11px] font-bold bg-slate-800 text-white px-2 py-0.5 rounded">
+                                <span className="font-mono text-[10px] font-bold bg-[#2b6675] text-white px-2 py-0.5 rounded-xs">
                                     {zone.tag}
                                 </span>
                                 <div>
                                     <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2">
                                         {zone.title}
-                                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${zone.badgeBg}`}>
+                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-xs border border-slate-300 bg-white text-slate-700">
                                             {zoneMachines.length} {zoneMachines.length === 1 ? 'unit' : 'units'}
                                         </span>
                                     </h3>
@@ -114,7 +98,7 @@ export const FleetZoneContainer: React.FC<FleetZoneContainerProps> = ({
 
                             {/* Drop target hint when dragging */}
                             {draggedMachineId && (
-                                <span className="text-[11px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded border border-blue-300 animate-pulse">
+                                <span className="text-[11px] font-mono font-bold text-[#2b6675] bg-[#f0f7f8] px-2 py-0.5 rounded-xs border border-[#2b6675]/40 animate-pulse">
                                     Drop here to assign
                                 </span>
                             )}
@@ -137,11 +121,11 @@ export const FleetZoneContainer: React.FC<FleetZoneContainerProps> = ({
                                     ))}
                                 </div>
                             ) : (
-                                <div className="py-8 text-center border-2 border-dashed border-slate-200 rounded-lg bg-slate-50/50">
+                                <div className="py-8 text-center border border-dashed border-slate-300 rounded-md bg-slate-50/50">
                                     <p className="text-xs font-semibold text-slate-600">
                                         No active machines in this work zone
                                     </p>
-                                    <p className="text-[10px] text-slate-400 mt-0.5">
+                                    <p className="text-[11px] text-slate-400 mt-0.5 font-mono">
                                         Drag and drop a machine card here to reassign it
                                     </p>
                                 </div>

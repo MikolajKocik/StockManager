@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { KanbanOperation, KanbanColumn, OperationStatus } from '../models/operationKanban';
+import { Badge } from '@/components/common';
 import { OperationCard } from './OperationCard';
 
 interface WorkflowKanbanBoardProps {
@@ -82,17 +83,17 @@ export const WorkflowKanbanBoard: React.FC<WorkflowKanbanBoardProps> = ({
                                             {column.title}
                                         </h3>
                                     </div>
-                                    <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-xs bg-slate-100 text-slate-700 border border-slate-300">
+                                    <Badge variant="slate">
                                         {colOps.length}
-                                    </span>
+                                    </Badge>
                                 </div>
 
                                 <div className="flex items-center justify-between text-[10px]">
                                     <span className="text-slate-500 truncate">{column.description}</span>
                                     {isOverloaded && (
-                                        <span className="text-[#8f7d49] font-bold font-mono text-[9px] uppercase">
+                                        <Badge variant="warning">
                                             Overloaded
-                                        </span>
+                                        </Badge>
                                     )}
                                 </div>
                             </div>

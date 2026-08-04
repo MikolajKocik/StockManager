@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from '@/components/common';
+import { Button, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow, Badge } from '@/components/common';
 import { formatDate, formatNumber, formatValue } from '@/utils/format';
 import type { Product } from '@/models/product';
 
@@ -102,16 +102,17 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                                         </div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="font-mono text-[11px] font-medium text-slate-700 bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded-xs">
+                                        <Badge variant="slate">
                                             {formatValue(p.genre)}
-                                        </span>
+                                        </Badge>
                                     </TableCell>
                                     <TableCell variant="code">
                                         {p.unit}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <span className={`font-mono font-bold text-xs ${stock > 0 ? 'text-[#0e5f32]' : 'text-[#991b1b]'
-                                            }`}>
+                                        <span className={`font-mono font-bold text-xs ${
+                                            stock > 0 ? 'text-[#0e5f32]' : 'text-[#991b1b]'
+                                        }`}>
                                             {formatNumber(stock)} {p.unit}
                                         </span>
                                     </TableCell>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface MeterProps extends React.MeterHTMLAttributes<HTMLMeterElement> {
+export interface MeterProps extends React.MeterHTMLAttributes<HTMLMeterElement> {
     value: number;
     min?: number;
     max?: number;

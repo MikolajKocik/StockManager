@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/common';
+import { Button, KpiCard, Badge, Input, Header } from '@/components/common';
 
 export type ShipmentsViewMode = 'GANTT' | 'TABLE';
 
@@ -28,108 +28,94 @@ export const ShipmentsHeader: React.FC<ShipmentsHeaderProps> = ({
     selectedDate,
     onDateChange
 }) => {
-    return (
-        <div className="w-full space-y-4 mb-4">
-            {/* Top Bar with Dark Header */}
-            <div className="w-full bg-[#384155] text-white p-4 rounded-lg shadow-md border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <h1 className="bg-amber-400 text-slate-900 font-black text-2xl px-2 py-0.5 rounded tracking-wide font-mono uppercase">
-                            DOCK SCHEDULER & SHIPMENTS
-                        </h1>
-                    </div>
-                </div>
-
-                <div className="flex items-center gap-2 flex-wrap">
-                    <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => onDateChange(e.target.value)}
-                        className="bg-slate-800 border border-slate-600 text-white rounded px-2.5 py-1.5 text-xs font-mono outline-none focus:border-amber-400"
-                    />
-
-                    <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={onOpenCreateModal}
-                        className="text-xs font-semibold shadow-sm bg-emerald-600 hover:bg-emerald-700 border-emerald-700"
-                    >
-                        + Schedule Truck Delivery
-                    </Button>
-                </div>
+    const actions = (
+        <>
+            <div className="w-36">
+                <Input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => onDateChange(e.target.value)}
+                    className="font-mono text-xs py-1"
+                />
             </div>
+
+            <Button
+                variant="primary"
+                size="md"
+                onClick={onOpenCreateModal}
+            >
+                Schedule Truck Delivery
+            </Button>
+        </>
+    );
+
+    return (
+        <div className="w-full space-y-4">
+            {/* Top Bar using Common Header Component */}
+            <Header
+                title="Dock Scheduler & Shipments"
+                subtitle="Real-time ramp allocation, carrier waybill tracking and timeline scheduling."
+                badge={
+                    <Badge variant="brand" className="font-mono text-[10px]">
+                        LOGISTICS / FLEET
+                    </Badge>
+                }
+                actions={actions}
+            />
 
             {/* Quick KPI Metric Cards Row */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Today's Shipments
-                    </span>
-                    <span className="text-xl font-bold font-mono text-slate-900">
-                        {totalShipments}
-                    </span>
-                </div>
+                <KpiCard
+                    title="Today's Shipments"
+                    value={totalShipments}
+                    subtitle="Assigned waybills"
+                />
 
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Occupied Ramps
-                    </span>
-                    <span className="text-xl font-bold font-mono text-blue-600">
-                        {activeRampsCount} / 6
-                    </span>
-                </div>
+                <KpiCard
+                    title="Occupied Ramps"
+                    value={`${activeRampsCount} / 6`}
+                    variant="primary"
+                    subtitle="Active loading bays"
+                />
 
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Delayed Trucks
-                    </span>
-                    <span className={`text-xl font-bold font-mono ${delayedCount > 0 ? 'text-amber-600' : 'text-slate-900'}`}>
-                        {delayedCount}
-                    </span>
-                </div>
+                <KpiCard
+                    title="Delayed Trucks"
+                    value={delayedCount}
+                    variant={delayedCount > 0 ? 'warning' : 'default'}
+                    subtitle={delayedCount > 0 ? 'Exceeded time slot' : 'All on schedule'}
+                />
 
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Scheduled Pallets
-                    </span>
-                    <span className="text-xl font-bold font-mono text-slate-900">
-                        {totalPallets}
-                    </span>
-                </div>
+                <KpiCard
+                    title="Scheduled Pallets"
+                    value={totalPallets}
+                    subtitle="Total floor payload"
+                />
 
-                <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                        Dock Conflicts
-                    </span>
-                    <span className={`text-xl font-bold font-mono ${conflictsCount > 0 ? 'text-rose-600 animate-pulse' : 'text-emerald-600'}`}>
-                        {conflictsCount === 0 ? '0 None' : `${conflictsCount} Collision`}
-                    </span>
-                </div>
+                <KpiCard
+                    title="Dock Conflicts"
+                    value={conflictsCount === 0 ? '0 None' : `${conflictsCount} Collision`}
+                    variant={conflictsCount > 0 ? 'danger' : 'success'}
+                    subtitle={conflictsCount > 0 ? 'Scheduling overlap' : 'Zero ramp collisions'}
+                />
             </div>
 
             {/* View Switcher Tabs */}
-            <div className="bg-white border border-slate-300 rounded-lg p-2 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="bg-white border border-slate-300 rounded-lg p-2 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex gap-1.5">
-                    <button
+                    <Button
+                        variant={viewMode === 'GANTT' ? 'primary' : 'secondary'}
+                        size="sm"
                         onClick={() => onViewModeChange('GANTT')}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-                            viewMode === 'GANTT'
-                                ? 'bg-slate-800 text-white shadow-xs'
-                                : 'text-slate-600 hover:bg-slate-100'
-                        }`}
                     >
                         Interactive Gantt Timeline (Docks)
-                    </button>
-                    <button
+                    </Button>
+                    <Button
+                        variant={viewMode === 'TABLE' ? 'primary' : 'secondary'}
+                        size="sm"
                         onClick={() => onViewModeChange('TABLE')}
-                        className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer ${
-                            viewMode === 'TABLE'
-                                ? 'bg-slate-800 text-white shadow-xs'
-                                : 'text-slate-600 hover:bg-slate-100'
-                        }`}
                     >
                         Shipments Registry (List)
-                    </button>
+                    </Button>
                 </div>
             </div>
         </div>

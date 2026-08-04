@@ -1,7 +1,21 @@
-import React, { forwardRef, useState } from 'react';
+import React, { forwardRef } from 'react';
 import type { KanbanOperation, OperationType, OperationPriority } from '../models/operationKanban';
-import { Button, FormBody, FormFooter, Modal } from '@/components/common';
+import { Button, FormBody, FormFooter, Modal, Input, Select, Section } from '@/components/common';
 import toast from 'react-hot-toast';
+
+export const OPERATION_TYPE_OPTIONS = [
+    { value: 'PICKING', label: 'PICKING (Outbound Picking)' },
+    { value: 'PUTAWAY', label: 'PUTAWAY (Inbound Staging)' },
+    { value: 'REPLENISHMENT', label: 'REPLENISHMENT (Buffer to Pick)' },
+    { value: 'INTERNAL_TRANSFER', label: 'INTERNAL TRANSFER (Relocation)' },
+] as const;
+
+export const OPERATION_PRIORITY_OPTIONS = [
+    { value: 'CRITICAL', label: 'CRITICAL (Emergency Priority #1)' },
+    { value: 'HIGH', label: 'HIGH Priority' },
+    { value: 'NORMAL', label: 'NORMAL' },
+    { value: 'LOW', label: 'LOW' },
+] as const;
 
 interface CreateOperationModalProps {
     onClose: () => void;
@@ -12,28 +26,24 @@ export const CreateOperationModal = forwardRef<HTMLDialogElement, CreateOperatio
     onClose,
     onCreate
 }, ref) => {
-    const [type, setType] = useState<OperationType>('PICKING');
-    const [priority, setPriority] = useState<OperationPriority>('HIGH');
-    const [orderNumber, setOrderNumber] = useState('WZ/2026/08/1420');
-    const [zone, setZone] = useState('Aisle 04 (Zone High-Bay A)');
-    const [operatorName, setOperatorName] = useState('Karol Zieliński');
-    const [sku, setSku] = useState('HYD-PUMP-400X');
-    const [productName, setProductName] = useState('Hydraulic High-Pressure Pump 400 bar');
-    const [quantity, setQuantity] = useState(5);
-    const [sourceBin, setSourceBin] = useState('BIN-A-04-10');
-    const [targetBin, setTargetBin] = useState('RAMP-01-STAGE');
-
-    const handleSubmit = (e: React.SubmitEvent) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries()) as Record<string, string>;
+
+        const type = data.type as OperationType;
+        const priority = data.priority as OperationPriority;
+        const quantity = Number(data.quantity) || 1;
+
         const newOp: KanbanOperation = {
             id: `op-${Date.now()}`,
             operationNumber: `OP-${Math.floor(1000 + Math.random() * 9000)}-${type.substring(0, 4)}`,
             type,
             status: 'QUEUED',
             priority,
-            orderNumber,
-            zone,
-            assignedOperatorName: operatorName,
+            orderNumber: data.orderNumber || 'WZ/2026/08/1420',
+            zone: data.zone || 'Aisle 04 (Zone High-Bay A)',
+            assignedOperatorName: data.operatorName || 'Charles Zielinski',
             assignedEquipment: 'Handheld Mobile Terminal',
             totalItemsCount: 1,
             totalWeightKg: quantity * 25,
@@ -43,13 +53,13 @@ export const CreateOperationModal = forwardRef<HTMLDialogElement, CreateOperatio
             items: [
                 {
                     id: `item-${Date.now()}`,
-                    sku,
-                    productName,
+                    sku: data.sku || 'HYD-PUMP-400X',
+                    productName: data.productName || 'Hydraulic High-Pressure Pump 400 bar',
                     quantity,
                     pickedQuantity: 0,
                     unit: 'pcs',
-                    sourceBin,
-                    targetBin
+                    sourceBin: data.sourceBin || 'BIN-A-04-10',
+                    targetBin: data.targetBin || 'RAMP-01-STAGE'
                 }
             ]
         };
@@ -68,143 +78,101 @@ export const CreateOperationModal = forwardRef<HTMLDialogElement, CreateOperatio
         >
             <form onSubmit={handleSubmit}>
                 <FormBody className="max-h-[75vh] space-y-4">
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">Operation Type</label>
-                            <select
-                                value={type}
-                                onChange={(e) => setType(e.target.value as OperationType)}
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-semibold text-slate-800 outline-none focus:border-slate-800 cursor-pointer"
-                            >
-                                <option value="PICKING">PICKING (Kompletacja WZ)</option>
-                                <option value="PUTAWAY">PUTAWAY (Rozkładanie PZ)</option>
-                                <option value="REPLENISHMENT">REPLENISHMENT (MM Bufor)</option>
-                                <option value="INTERNAL_TRANSFER">INTERNAL TRANSFER (Przesunięcie)</option>
-                            </select>
+                    <Section title="Task Parameters">
+                        <div className="grid grid-cols-2 gap-3">
+                            <Select
+                                label="Operation Type"
+                                name="type"
+                                defaultValue="PICKING"
+                                options={OPERATION_TYPE_OPTIONS}
+                            />
+
+                            <Select
+                                label="Initial Priority"
+                                name="priority"
+                                defaultValue="HIGH"
+                                options={OPERATION_PRIORITY_OPTIONS}
+                            />
                         </div>
 
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">Initial Priority</label>
-                            <select
-                                value={priority}
-                                onChange={(e) => setPriority(e.target.value as OperationPriority)}
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-semibold text-slate-800 outline-none focus:border-slate-800 cursor-pointer"
-                            >
-                                <option value="CRITICAL">CRITICAL (Emergency Priority #1)</option>
-                                <option value="HIGH">HIGH Priority</option>
-                                <option value="NORMAL">NORMAL</option>
-                                <option value="LOW">LOW</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3">
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">Order / Registry Reference</label>
-                            <input
-                                type="text"
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                label="Order / Registry Reference"
+                                name="orderNumber"
                                 required
-                                value={orderNumber}
-                                onChange={(e) => setOrderNumber(e.target.value)}
+                                defaultValue="WZ/2026/08/1420"
                                 placeholder="WZ/2026/08/1420"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-mono outline-none focus:border-slate-800 focus:bg-white"
+                                className="font-mono"
                             />
-                        </div>
 
-                        <div>
-                            <label className="font-bold text-slate-700 block mb-1">Warehouse Zone / Aisle</label>
-                            <input
-                                type="text"
+                            <Input
+                                label="Warehouse Zone / Aisle"
+                                name="zone"
                                 required
-                                value={zone}
-                                onChange={(e) => setZone(e.target.value)}
+                                defaultValue="Aisle 04 (Zone High-Bay A)"
                                 placeholder="Aisle 04 (Zone High-Bay A)"
-                                className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 focus:bg-white"
                             />
                         </div>
-                    </div>
 
-                    <div>
-                        <label className="font-bold text-slate-700 block mb-1">Assigned Floor Operator</label>
-                        <input
-                            type="text"
-                            value={operatorName}
-                            onChange={(e) => setOperatorName(e.target.value)}
-                            placeholder="Karol Zieliński"
-                            className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 outline-none focus:border-slate-800 focus:bg-white"
+                        <Input
+                            label="Assigned Floor Operator"
+                            name="operatorName"
+                            defaultValue="Charles Zielinski"
+                            placeholder="Charles Zielinski"
                         />
-                    </div>
+                    </Section>
 
-                    {/* SKU Items section */}
-                    <div className="p-3 bg-slate-50 border border-slate-300 rounded space-y-3">
-                        <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block">
-                            Initial SKU Line Specification
-                        </span>
+                    <Section variant="subtle" title="Initial SKU Line Specification">
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                label="SKU Code"
+                                name="sku"
+                                required
+                                defaultValue="HYD-PUMP-400X"
+                                placeholder="HYD-PUMP-400X"
+                                className="font-mono bg-white"
+                            />
 
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">SKU Code</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={sku}
-                                    onChange={(e) => setSku(e.target.value)}
-                                    placeholder="HYD-PUMP-400X"
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 font-mono outline-none focus:border-slate-800"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">Product Name</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={productName}
-                                    onChange={(e) => setProductName(e.target.value)}
-                                    placeholder="Hydraulic Pump 400 bar"
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 outline-none focus:border-slate-800"
-                                />
-                            </div>
+                            <Input
+                                label="Product Name"
+                                name="productName"
+                                required
+                                defaultValue="Hydraulic High-Pressure Pump 400 bar"
+                                placeholder="Hydraulic Pump 400 bar"
+                                className="bg-white"
+                            />
                         </div>
 
-                        <div className="grid grid-cols-3 gap-2">
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">Quantity (pcs)</label>
-                                <input
-                                    type="number"
-                                    min="1"
-                                    required
-                                    value={quantity}
-                                    onChange={(e) => setQuantity(Number(e.target.value))}
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 font-mono outline-none focus:border-slate-800"
-                                />
-                            </div>
+                        <div className="grid grid-cols-3 gap-3">
+                            <Input
+                                label="Quantity (pcs)"
+                                name="quantity"
+                                type="number"
+                                min="1"
+                                required
+                                defaultValue="5"
+                                className="font-mono bg-white"
+                            />
 
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">Source Location</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={sourceBin}
-                                    onChange={(e) => setSourceBin(e.target.value)}
-                                    placeholder="BIN-A-04-10"
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 font-mono outline-none focus:border-slate-800"
-                                />
-                            </div>
+                            <Input
+                                label="Source Location"
+                                name="sourceBin"
+                                required
+                                defaultValue="BIN-A-04-10"
+                                placeholder="BIN-A-04-10"
+                                className="font-mono bg-white"
+                            />
 
-                            <div>
-                                <label className="font-semibold text-slate-600 block mb-0.5">Target Location</label>
-                                <input
-                                    type="text"
-                                    required
-                                    value={targetBin}
-                                    onChange={(e) => setTargetBin(e.target.value)}
-                                    placeholder="RAMP-01-STAGE"
-                                    className="w-full bg-white border border-slate-300 rounded px-2 py-1 font-mono outline-none focus:border-slate-800"
-                                />
-                            </div>
+                            <Input
+                                label="Target Location"
+                                name="targetBin"
+                                required
+                                defaultValue="RAMP-01-STAGE"
+                                placeholder="RAMP-01-STAGE"
+                                className="font-mono bg-white"
+                            />
                         </div>
-                    </div>
+                    </Section>
                 </FormBody>
 
                 <FormFooter>

@@ -2,6 +2,7 @@ import React from 'react';
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
     variant?:
+    | 'brand'
     | 'blue'
     | 'purple'
     | 'amber'
@@ -21,6 +22,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 export function Badge({ variant = 'neutral', className = '', children, ...props }: BadgeProps) {
     const variants: Record<string, string> = {
+        brand: 'bg-[#2b6675]/15 text-[#2b6675] border-[#2b6675]/40',
         blue: 'blue',
         purple: 'purple',
         amber: 'amber',
@@ -36,9 +38,11 @@ export function Badge({ variant = 'neutral', className = '', children, ...props 
         neutral: 'slate',
     };
 
+    const isCustomClass = variant === 'brand';
+
     return (
         <span 
-            className={`px-1.5 py-0.5 rounded-xs text-[10px] font-bold font-mono uppercase tracking-tight border ${variants[variant] || 'slate'} ${className}`}
+            className={`px-1.5 py-0.5 rounded-xs text-[10px] font-bold font-mono uppercase tracking-tight border ${isCustomClass ? variants[variant] : (variants[variant] || 'slate')} ${className}`}
             {...props}
         >
             {children}

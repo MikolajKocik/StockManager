@@ -1,5 +1,9 @@
 import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import type { DockRamp, DockShipment, DockCollision } from '../models/dockScheduler';
+import { Badge } from '@/components/common';
+import { DockGanttConflictBanner } from './DockGanttConflictBanner';
+import { DockGanttBlock } from './DockGanttBlock';
+import { DockGanttLegend } from './DockGanttLegend';
 
 interface DockSchedulerGanttProps {
     ramps: DockRamp[];
@@ -143,44 +147,33 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
     }
 
     return (
-        <div className="w-full bg-white border border-slate-300 rounded-lg shadow-sm overflow-hidden flex flex-col">
+        <div className="w-full bg-white border border-slate-300 rounded-lg shadow-2xs overflow-hidden flex flex-col">
             {/* Conflict Notification Banner */}
-            {collisions.length > 0 && (
-                <div className="bg-rose-50 border-b border-rose-300 px-4 py-2.5 flex items-center justify-between text-xs text-rose-900 animate-pulse-subtle">
-                    <div className="flex items-center gap-2">
-                        <span className="bg-rose-600 text-white font-black text-[10px] px-2 py-0.5 rounded font-mono uppercase">
-                            DOCK COLLISION DETECTED ({collisions.length})
-                        </span>
-                        <span className="font-semibold">
-                            Ramp scheduling conflict: {collisions[0].shipmentA.shipmentNumber} overlaps with {collisions[0].shipmentB.shipmentNumber} at {formatHour(collisions[0].overlapStartHour)} - {formatHour(collisions[0].overlapEndHour)}.
-                        </span>
-                    </div>
-                    <span className="text-[11px] text-rose-700 font-medium">
-                        Drag block to an empty time window or different ramp to resolve.
-                    </span>
-                </div>
-            )}
+            <DockGanttConflictBanner
+                collisions={collisions}
+                formatHour={formatHour}
+            />
 
             {/* Gantt Matrix Container */}
             <div className="w-full overflow-x-auto select-none">
                 <div className="min-w-262.5">
                     {/* Header Row: Ramp Info Column + Horizontal Time Axis */}
-                    <div className="flex border-b border-slate-300 bg-slate-100 text-slate-700 text-xs font-semibold">
-                        <div className="w-64 shrink-0 p-2.5 border-r border-slate-300 flex items-center justify-between">
-                            <span className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
-                                Loading Docks / Ramp (Y)
+                    <div className="flex border-b border-slate-300 bg-slate-100/80 text-slate-700 text-xs font-semibold">
+                        <div className="w-60 shrink-0 p-2.5 border-r border-slate-300 flex items-center justify-between">
+                            <span className="font-bold text-slate-700 uppercase tracking-wider text-[10px] font-mono">
+                                Loading Docks / Ramp
                             </span>
-                            <span className="text-[10px] text-slate-500 font-mono">
+                            <Badge variant="slate">
                                 {ramps.length} Ramps
-                            </span>
+                            </Badge>
                         </div>
 
                         {/* Time Grid Header */}
                         <div className="flex-1 flex relative">
-                            {timelineHours.map((h, idx) => (
+                            {timelineHours.map((h) => (
                                 <div
                                     key={h}
-                                    className={`flex-1 text-center py-2 text-[11px] font-mono border-r border-slate-200 ${h === Math.floor(CURRENT_SIMULATED_HOUR) ? 'bg-amber-100/60 font-bold text-amber-900' : ''
+                                    className={`flex-1 text-center py-2 text-[11px] font-mono border-r border-slate-200 ${h === Math.floor(CURRENT_SIMULATED_HOUR) ? 'bg-amber-50 font-bold text-amber-900' : ''
                                         }`}
                                 >
                                     <span>{String(h).padStart(2, '0')}:00</span>
@@ -191,18 +184,18 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
 
                     {/* Timeline Body Rows */}
                     <div ref={timelineRef} className="relative divide-y divide-slate-200">
-                        {/* Current Time Red Line Indicator */}
+                        {/* Current Time Indicator */}
                         {CURRENT_SIMULATED_HOUR >= TIMELINE_START_HOUR && CURRENT_SIMULATED_HOUR <= TIMELINE_END_HOUR && (
                             <div
                                 className="absolute top-0 bottom-0 z-20 pointer-events-none flex flex-col items-center"
                                 style={{
-                                    left: `calc(16rem + ${(CURRENT_SIMULATED_HOUR - TIMELINE_START_HOUR) / TOTAL_HOURS * 100}% - (16rem * ${(CURRENT_SIMULATED_HOUR - TIMELINE_START_HOUR) / TOTAL_HOURS}))`
+                                    left: `calc(15rem + ${(CURRENT_SIMULATED_HOUR - TIMELINE_START_HOUR) / TOTAL_HOURS * 100}% - (15rem * ${(CURRENT_SIMULATED_HOUR - TIMELINE_START_HOUR) / TOTAL_HOURS}))`
                                 }}
                             >
-                                <div className="bg-rose-600 text-white text-[9px] font-bold px-1.5 py-0.2 rounded shadow-sm font-mono -mt-2">
+                                <div className="bg-[#991b1b] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-xs shadow-xs font-mono -mt-2">
                                     NOW {formatHour(CURRENT_SIMULATED_HOUR)}
                                 </div>
-                                <div className="w-0.5 flex-1 bg-rose-500/80 border-l border-dashed border-rose-600 shadow-sm" />
+                                <div className="w-0.5 flex-1 bg-[#991b1b]/80 border-l border-dashed border-[#991b1b]" />
                             </div>
                         )}
 
@@ -211,34 +204,28 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
                             const rampShipments = shipments.filter(s => s.rampId === ramp.id);
 
                             return (
-                                <div key={ramp.id} className="flex min-h-18.5 hover:bg-slate-50/50 transition-colors">
+                                <div key={ramp.id} className="flex min-h-19 hover:bg-slate-50/50 transition-colors">
                                     {/* Left Column: Ramp Metadata */}
-                                    <div className="w-64 shrink-0 p-2.5 border-r border-slate-300 bg-slate-50/90 flex flex-col justify-between">
+                                    <div className="w-60 shrink-0 p-2.5 border-r border-slate-300 bg-slate-50/80 flex flex-col justify-between">
                                         <div className="flex items-center justify-between">
                                             <span className="font-bold text-xs text-slate-900 font-mono">
                                                 {ramp.code}
                                             </span>
-                                            <span className={`text-[9px] px-1.5 py-0.2 rounded font-bold uppercase font-mono ${ramp.type === 'INBOUND_HEAVY' ? 'bg-blue-100 text-blue-800' :
-                                                    ramp.type === 'INBOUND_FAST' ? 'bg-emerald-100 text-emerald-800' :
-                                                        ramp.type === 'OUTBOUND_DOMESTIC' ? 'bg-indigo-100 text-indigo-800' :
-                                                            ramp.type === 'OUTBOUND_INTERNATIONAL' ? 'bg-purple-100 text-purple-800' :
-                                                                ramp.type === 'COLD_HAZMAT' ? 'bg-cyan-100 text-cyan-800' :
-                                                                    'bg-amber-100 text-amber-800'
-                                                }`}>
+                                            <Badge variant="slate" className="text-[9px]">
                                                 {ramp.type.replace('_', ' ')}
-                                            </span>
+                                            </Badge>
                                         </div>
-                                        <div className="text-[10px] text-slate-600 truncate" title={ramp.name}>
+                                        <div className="text-[10px] text-slate-600 truncate font-medium" title={ramp.name}>
                                             {ramp.name}
                                         </div>
-                                        <div className="flex items-center justify-between text-[10px] text-slate-500 pt-0.5">
+                                        <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-0.5">
                                             <span>Max: {ramp.maxWeightTons}t</span>
                                             <span>Zone: {ramp.assignedZone}</span>
                                         </div>
                                     </div>
 
                                     {/* Right Gantt Canvas Area */}
-                                    <div className="flex-1 relative bg-white min-h-18.5 flex">
+                                    <div className="flex-1 relative bg-white min-h-19 flex">
                                         {/* Background Vertical Hour Grid Lines */}
                                         {timelineHours.map((h) => (
                                             <div
@@ -254,77 +241,25 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
                                             const displayStartHour = isBeingDragged && tempStartHour !== null ? tempStartHour : shipment.startHour;
                                             const displayRampId = isBeingDragged && tempRampId !== null ? tempRampId : shipment.rampId;
 
-                                            // If being dragged to another ramp, don't render on this row (unless it's target ramp)
                                             if (isBeingDragged && displayRampId !== ramp.id) {
                                                 return null;
                                             }
 
-                                            const leftPercent = ((displayStartHour - TIMELINE_START_HOUR) / TOTAL_HOURS) * 100;
-                                            const widthPercent = (shipment.durationHours / TOTAL_HOURS) * 100;
-                                            const hasConflict = isShipmentInCollision(shipment.id);
-                                            const isSelected = selectedShipmentId === shipment.id;
-
                                             return (
-                                                <div
+                                                <DockGanttBlock
                                                     key={shipment.id}
-                                                    onMouseDown={(e) => handleMouseDown(e, shipment, rampIndex)}
+                                                    shipment={shipment}
+                                                    displayStartHour={displayStartHour}
+                                                    timelineStartHour={TIMELINE_START_HOUR}
+                                                    totalHours={TOTAL_HOURS}
+                                                    hasConflict={isShipmentInCollision(shipment.id)}
+                                                    isSelected={selectedShipmentId === shipment.id}
+                                                    isBeingDragged={isBeingDragged}
+                                                    rampIndex={rampIndex}
+                                                    formatHour={formatHour}
+                                                    onMouseDown={handleMouseDown}
                                                     onClick={() => onSelectShipment(shipment)}
-                                                    className={`absolute top-1.5 bottom-1.5 rounded-md p-1.5 cursor-grab active:cursor-grabbing transition-all text-xs flex flex-col justify-between overflow-hidden shadow-xs ${hasConflict
-                                                            ? 'ring-2 ring-rose-500 bg-rose-100 border border-rose-400 text-rose-950 animate-shake-subtle z-30'
-                                                            : isSelected
-                                                                ? 'ring-2 ring-blue-600 shadow-md z-30'
-                                                                : isBeingDragged
-                                                                    ? 'opacity-90 ring-2 ring-amber-500 shadow-xl z-40'
-                                                                    : shipment.direction === 'INBOUND_PZ'
-                                                                        ? 'bg-emerald-50 border border-emerald-300 text-emerald-950 hover:border-emerald-500'
-                                                                        : 'bg-indigo-50 border border-indigo-300 text-indigo-950 hover:border-indigo-500'
-                                                        }`}
-                                                    style={{
-                                                        left: `${Math.max(0, leftPercent)}%`,
-                                                        width: `${Math.max(2, widthPercent)}%`
-                                                    }}
-                                                >
-                                                    {/* Block Top Header */}
-                                                    <div className="flex items-center justify-between gap-1 leading-none">
-                                                        <div className="flex items-center gap-1 min-w-0">
-                                                            <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${shipment.status === 'LOADING' ? 'bg-cyan-500 animate-pulse' :
-                                                                    shipment.status === 'DELAYED' ? 'bg-amber-500' :
-                                                                        shipment.status === 'COMPLETED' ? 'bg-slate-400' :
-                                                                            'bg-emerald-500'
-                                                                }`} />
-                                                            <span className="font-bold text-[10px] font-mono truncate">
-                                                                {shipment.shipmentNumber}
-                                                            </span>
-                                                        </div>
-                                                        <span className="font-mono text-[9px] font-semibold bg-white/70 px-1 py-0.2 rounded shrink-0 border border-slate-200">
-                                                            {formatHour(displayStartHour)} - {formatHour(displayStartHour + shipment.durationHours)}
-                                                        </span>
-                                                    </div>
-
-                                                    {/* Block Center: Carrier & Cargo */}
-                                                    <div className="min-w-0 py-0.5">
-                                                        <div className="text-[10px] font-semibold truncate leading-tight">
-                                                            {shipment.carrierName} ({shipment.truckPlateNumber})
-                                                        </div>
-                                                        <div className="text-[9px] text-slate-600 truncate leading-tight">
-                                                            {shipment.palletCount} pal. • {shipment.cargoDescription}
-                                                        </div>
-                                                    </div>
-
-                                                    {/* Block Footer Status Tag */}
-                                                    <div className="flex items-center justify-between text-[9px] leading-none pt-0.5 border-t border-slate-200/50">
-                                                        <span className="font-medium truncate text-slate-600">
-                                                            {shipment.direction === 'INBOUND_PZ' ? 'PZ Inbound' : 'WZ Outbound'}
-                                                        </span>
-                                                        <span className={`font-bold uppercase font-mono text-[8px] px-1 py-0.2 rounded ${shipment.status === 'LOADING' ? 'bg-cyan-600 text-white' :
-                                                                shipment.status === 'DELAYED' ? 'bg-amber-500 text-slate-950 font-black' :
-                                                                    shipment.status === 'COMPLETED' ? 'bg-slate-200 text-slate-700' :
-                                                                        'bg-emerald-600 text-white'
-                                                            }`}>
-                                                            {shipment.status}
-                                                        </span>
-                                                    </div>
-                                                </div>
+                                                />
                                             );
                                         })}
                                     </div>
@@ -336,31 +271,7 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
             </div>
 
             {/* Bottom Legend Bar */}
-            <div className="bg-slate-100 border-t border-slate-300 px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-700">
-                <div className="flex items-center gap-4">
-                    <span className="font-semibold text-slate-800 text-[11px]">Legend:</span>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-emerald-100 border border-emerald-400" />
-                        <span className="text-[11px]">Inbound (PZ)</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-indigo-100 border border-indigo-400" />
-                        <span className="text-[11px]">Outbound (WZ)</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-cyan-100 border border-cyan-500" />
-                        <span className="text-[11px]">Loading In Progress</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                        <span className="w-3 h-3 rounded bg-rose-100 border border-rose-500" />
-                        <span className="text-[11px] font-bold text-rose-700">Collision / Conflict</span>
-                    </div>
-                </div>
-
-                <div className="text-[11px] text-slate-500">
-                    💡 Tip: Click and drag any truck block horizontally to change time slot, or vertically between ramps.
-                </div>
-            </div>
+            <DockGanttLegend />
         </div>
     );
 };

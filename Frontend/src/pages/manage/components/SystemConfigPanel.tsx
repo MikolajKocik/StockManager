@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import toast from 'react-hot-toast';
+import { Button, Input, Select } from '@/components/common/core';
+
+const TASK_ALLOCATION_OPTIONS = [
+    { label: 'Shortest Travel Distance (Aisle Optimized)', value: 'SHORTEST_TRAVEL_DISTANCE' },
+    { label: 'Balanced Brigade Workload (Round Robin)', value: 'ROUND_ROBIN' },
+    { label: 'Strict FIFO Due-Time Expedite', value: 'FIFO_EXPEDITE' }
+] as const;
 
 export const SystemConfigPanel: React.FC = () => {
-    const [config, setConfig] = useState({
-        autoLockMinutes: 15,
-        enforceGs1Barcodes: true,
-        enableTwoManRuleForPz: true,
-        autoAssignAlgorithm: 'SHORTEST_TRAVEL_DISTANCE',
-        shiftRotationHours: 8,
-        logRetentionDays: 90
-    });
-
-    const handleSave = () => {
+    const handleSave = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries());
+        console.log('Saved system policies:', data);
         toast.success('System policies and security parameters updated successfully');
     };
 
     return (
-        <div className="w-full bg-white border border-slate-300 rounded-lg p-5 shadow-xs space-y-6 text-xs text-slate-800">
+        <form onSubmit={handleSave} className="w-full bg-white border border-slate-300 rounded-lg p-5 shadow-xs space-y-6 text-xs text-slate-800">
             <div>
                 <h3 className="text-sm font-bold text-slate-900 uppercase font-mono tracking-wide">
                     Warehouse Security & Operational Parameters
@@ -37,11 +39,10 @@ export const SystemConfigPanel: React.FC = () => {
                         <label className="font-semibold block text-slate-700">
                             Terminal Auto-Lock Timeout (Inactive Minutes)
                         </label>
-                        <input
+                        <Input
+                            name="autoLockMinutes"
                             type="number"
-                            value={config.autoLockMinutes}
-                            onChange={(e) => setConfig({ ...config, autoLockMinutes: parseInt(e.target.value) || 5 })}
-                            className="w-full px-3 py-1.5 border border-slate-300 rounded bg-white font-mono"
+                            defaultValue={15}
                         />
                     </div>
 
@@ -51,10 +52,10 @@ export const SystemConfigPanel: React.FC = () => {
                             <span className="text-[10px] text-slate-500">Block arbitrary free-text scans on inbound reception</span>
                         </div>
                         <input
+                            name="enforceGs1Barcodes"
                             type="checkbox"
-                            checked={config.enforceGs1Barcodes}
-                            onChange={(e) => setConfig({ ...config, enforceGs1Barcodes: e.target.checked })}
-                            className="w-4 h-4 accent-slate-800"
+                            defaultChecked={true}
+                            className="w-4 h-4 accent-[#2b6675]"
                         />
                     </div>
 
@@ -64,10 +65,10 @@ export const SystemConfigPanel: React.FC = () => {
                             <span className="text-[10px] text-slate-500">Requires shift foreman confirmation on receipt</span>
                         </div>
                         <input
+                            name="enableTwoManRuleForPz"
                             type="checkbox"
-                            checked={config.enableTwoManRuleForPz}
-                            onChange={(e) => setConfig({ ...config, enableTwoManRuleForPz: e.target.checked })}
-                            className="w-4 h-4 accent-slate-800"
+                            defaultChecked={true}
+                            className="w-4 h-4 accent-[#2b6675]"
                         />
                     </div>
                 </div>
@@ -82,26 +83,21 @@ export const SystemConfigPanel: React.FC = () => {
                         <label className="font-semibold block text-slate-700">
                             Automatic Task Allocation Strategy
                         </label>
-                        <select
-                            value={config.autoAssignAlgorithm}
-                            onChange={(e) => setConfig({ ...config, autoAssignAlgorithm: e.target.value })}
-                            className="w-full px-3 py-1.5 border border-slate-300 rounded bg-white font-semibold"
-                        >
-                            <option value="SHORTEST_TRAVEL_DISTANCE">Shortest Travel Distance (Aisle Optimized)</option>
-                            <option value="ROUND_ROBIN">Balanced Brigade Workload (Round Robin)</option>
-                            <option value="FIFO_EXPEDITE">Strict FIFO Due-Time Expedite</option>
-                        </select>
+                        <Select
+                            name="autoAssignAlgorithm"
+                            defaultValue="SHORTEST_TRAVEL_DISTANCE"
+                            options={TASK_ALLOCATION_OPTIONS}
+                        />
                     </div>
 
                     <div className="space-y-1">
                         <label className="font-semibold block text-slate-700">
                             Shift Duration & Handover Window (Hours)
                         </label>
-                        <input
+                        <Input
+                            name="shiftRotationHours"
                             type="number"
-                            value={config.shiftRotationHours}
-                            onChange={(e) => setConfig({ ...config, shiftRotationHours: parseInt(e.target.value) || 8 })}
-                            className="w-full px-3 py-1.5 border border-slate-300 rounded bg-white font-mono"
+                            defaultValue={8}
                         />
                     </div>
 
@@ -109,25 +105,24 @@ export const SystemConfigPanel: React.FC = () => {
                         <label className="font-semibold block text-slate-700">
                             Audit Trail Log Retention (Days)
                         </label>
-                        <input
+                        <Input
+                            name="logRetentionDays"
                             type="number"
-                            value={config.logRetentionDays}
-                            onChange={(e) => setConfig({ ...config, logRetentionDays: parseInt(e.target.value) || 90 })}
-                            className="w-full px-3 py-1.5 border border-slate-300 rounded bg-white font-mono"
+                            defaultValue={90}
                         />
                     </div>
                 </div>
             </div>
 
             <div className="flex justify-end pt-2 border-t border-slate-200">
-                <button
-                    type="button"
-                    onClick={handleSave}
-                    className="bg-[#384155] hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-lg cursor-pointer transition-all shadow-xs"
+                <Button
+                    variant="primary"
+                    size="md"
+                    type="submit"
                 >
                     Save Operational Policies
-                </button>
+                </Button>
             </div>
-        </div>
+        </form>
     );
 };

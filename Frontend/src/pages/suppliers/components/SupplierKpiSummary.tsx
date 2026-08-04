@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@/components/common';
+import React, { useMemo } from 'react';
+import { Button, Input, Select } from '@/components/common/core';
 
 interface SupplierKpiSummaryProps {
     totalSuppliers: number;
@@ -30,6 +30,11 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
         ? Math.round((activeSuppliers / totalSuppliers) * 100)
         : 100;
 
+    const countryOptions = useMemo(() => [
+        { label: `All Countries (${countries.length})`, value: '' },
+        ...countries.map(c => ({ label: c, value: c }))
+    ], [countries]);
+
     return (
         <div className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
             {/* Header row with Title, Search & Quick Action */}
@@ -45,37 +50,24 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Live Search input */}
-                    <div className="relative">
-                        <input
-                            type="text"
+                    <div className="w-64">
+                        <Input
                             value={filterQuery}
                             onChange={(e) => onFilterChange(e.target.value)}
-                            placeholder="Search supplier, contact, city, tax ID..."
-                            className="text-xs bg-slate-50 border border-slate-300 hover:border-slate-400 focus:border-slate-800 focus:bg-white px-3 py-1.5 rounded outline-none w-64 transition-colors shadow-inner font-medium text-slate-800 placeholder:text-slate-400"
+                            placeholder="Search supplier, contact, city..."
+                            className="text-xs"
                         />
-                        {filterQuery && (
-                            <button
-                                type="button"
-                                onClick={() => onFilterChange('')}
-                                className="absolute right-2 top-1.5 text-xs text-slate-400 hover:text-slate-700 cursor-pointer"
-                            >
-                                &#10005;
-                            </button>
-                        )}
                     </div>
 
                     {/* Country Filter Select */}
-                    <select
-                        value={selectedCountry}
-                        onChange={(e) => onCountryChange(e.target.value)}
-                        aria-label="Filter suppliers by country"
-                        className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 outline-none focus:border-slate-800 cursor-pointer"
-                    >
-                        <option value="">All Countries ({countries.length})</option>
-                        {countries.map(c => (
-                            <option key={c} value={c}>{c}</option>
-                        ))}
-                    </select>
+                    <div className="w-44">
+                        <Select
+                            value={selectedCountry}
+                            onChange={(e) => onCountryChange(e.target.value)}
+                            options={countryOptions}
+                            className="text-xs"
+                        />
+                    </div>
 
                     {/* Add Supplier button */}
                     <Button

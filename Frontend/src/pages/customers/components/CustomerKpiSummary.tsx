@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button } from '@/components/common';
+import React, { useMemo } from 'react';
+import { Button, Input, Select } from '@/components/common';
 
 interface CustomerKpiSummaryProps {
     totalCustomers: number;
@@ -36,6 +36,11 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
         ? Math.round((activeCustomers / totalCustomers) * 100)
         : 100;
 
+    const segmentOptions = useMemo(() => [
+        { label: `All Segments (${segments.length})`, value: '' },
+        ...segments.map(s => ({ label: s, value: s }))
+    ], [segments]);
+
     return (
         <div className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
             {/* Header row with Title, Search & Quick Action */}
@@ -51,37 +56,24 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
 
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Live Search input */}
-                    <div className="relative">
-                        <input
-                            type="text"
+                    <div className="w-64">
+                        <Input
                             value={filterQuery}
                             onChange={(e) => onFilterChange(e.target.value)}
                             placeholder="Search customer, tax ID, email, city..."
-                            className="text-xs bg-slate-50 border border-slate-300 hover:border-slate-400 focus:border-slate-800 focus:bg-white px-3 py-1.5 rounded outline-none w-64 transition-colors shadow-inner font-medium text-slate-800 placeholder:text-slate-400"
+                            className="text-xs"
                         />
-                        {filterQuery && (
-                            <button
-                                type="button"
-                                onClick={() => onFilterChange('')}
-                                className="absolute right-2 top-1.5 text-xs text-slate-400 hover:text-slate-700 cursor-pointer"
-                            >
-                                &#10005;
-                            </button>
-                        )}
                     </div>
 
                     {/* Segment Filter Select */}
-                    <select
-                        value={selectedSegment}
-                        onChange={(e) => onSegmentChange(e.target.value)}
-                        aria-label="Filter customers by segment"
-                        className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 outline-none focus:border-slate-800 cursor-pointer"
-                    >
-                        <option value="">All Segments ({segments.length})</option>
-                        {segments.map(s => (
-                            <option key={s} value={s}>{s}</option>
-                        ))}
-                    </select>
+                    <div className="w-44">
+                        <Select
+                            value={selectedSegment}
+                            onChange={(e) => onSegmentChange(e.target.value)}
+                            options={segmentOptions}
+                            className="text-xs"
+                        />
+                    </div>
 
                     {/* Add Customer button */}
                     <Button

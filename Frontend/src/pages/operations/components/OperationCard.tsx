@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/common';
+import { Button, Badge } from '@/components/common';
 import type { KanbanOperation } from '../models/operationKanban';
 
 interface OperationCardProps {
@@ -53,16 +53,16 @@ export const OperationCard: React.FC<OperationCardProps> = ({
                         {operation.operationNumber}
                     </span>
                     {index === 0 && operation.status === 'IN_PROGRESS' && (
-                        <span className="bg-slate-800 text-white font-mono text-[9px] px-1 py-0.2 rounded-xs font-bold uppercase tracking-tight shrink-0">
+                        <Badge variant="slate" className="bg-slate-800 text-white border-slate-700">
                             #1 PRIORITY
-                        </span>
+                        </Badge>
                     )}
                 </div>
 
-                {/* Operation Type Tag */}
-                <span className="text-[10px] px-1.5 py-0.5 rounded-xs font-mono font-bold shrink-0 uppercase bg-slate-100 text-slate-700 border border-slate-300">
+                {/* Operation Type Tag using Badge */}
+                <Badge variant="slate">
                     {operation.type}
-                </span>
+                </Badge>
             </div>
 
             {/* Target Order & Destination Zone */}
@@ -122,16 +122,17 @@ export const OperationCard: React.FC<OperationCardProps> = ({
 
             {/* Action Bar */}
             <div className="flex items-center justify-between pt-1 border-t border-slate-200 text-[10px]">
-                <button
-                    type="button"
+                <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={(e) => {
                         e.stopPropagation();
                         onSelect(operation);
                     }}
-                    className="text-[#2b6675] hover:underline font-semibold cursor-pointer"
+                    className="text-[10px] py-0.5 px-2"
                 >
-                    View Items &rarr;
-                </button>
+                    View Items
+                </Button>
 
                 {operation.status !== 'COMPLETED' && (
                     <Button
@@ -141,7 +142,7 @@ export const OperationCard: React.FC<OperationCardProps> = ({
                             e.stopPropagation();
                             onFastTrackPriority(operation.id);
                         }}
-                        title="Promote to Top Priority (Broadcasts UpdateOperationPriorityCommand)"
+                        title="Promote to Top Priority"
                         className="text-[9px] px-1.5 py-0.5 font-mono"
                     >
                         Fast-Track #1

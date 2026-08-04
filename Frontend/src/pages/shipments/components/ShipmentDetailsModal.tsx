@@ -1,10 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { Button, Input, Select } from '@/components/common';
+import React, { forwardRef } from 'react';
+import { Button, Input, Select, Modal, FormBody, FormFooter, Section, Badge } from '@/components/common';
 import type { DockRamp, DockShipment, ShipmentStatus } from '../models/dockScheduler';
 import toast from 'react-hot-toast';
 
+export const SHIPMENT_STATUS_OPTIONS = [
+    { label: 'Scheduled', value: 'SCHEDULED' },
+    { label: 'Arrived On Time', value: 'ARRIVED_ON_TIME' },
+    { label: 'Delayed', value: 'DELAYED' },
+    { label: 'Loading In Progress', value: 'LOADING' },
+    { label: 'Completed', value: 'COMPLETED' },
+    { label: 'Cancelled', value: 'CANCELLED' }
+] as const;
+
 interface ShipmentDetailsModalProps {
-    isOpen: boolean;
+    isOpen?: boolean;
     shipment: DockShipment | null;
     ramps: DockRamp[];
     onClose: () => void;
@@ -12,33 +21,44 @@ interface ShipmentDetailsModalProps {
     onDelete: (id: string) => void;
 }
 
-export const ShipmentDetailsModal: React.FC<ShipmentDetailsModalProps> = ({
+export const ShipmentDetailsModal = forwardRef<HTMLDialogElement, ShipmentDetailsModalProps>(({
     isOpen,
     shipment,
     ramps,
     onClose,
     onUpdate,
     onDelete
-}) => {
-    const [formData, setFormData] = useState<DockShipment | null>(null);
+}, ref) => {
+    if (!shipment) return null;
 
-    useEffect(() => {
-        if (shipment) {
-            setFormData({ ...shipment });
-        }
-    }, [shipment]);
+    const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        const data = Object.fromEntries(formData.entries()) as Record<string, string>;
 
-    if (!isOpen || !formData) return null;
+        const updates: Partial<DockShipment> = {
+            carrierName: data.carrierName,
+            truckPlateNumber: data.truckPlateNumber,
+            driverName: data.driverName,
+            driverPhone: data.driverPhone,
+            rampId: data.rampId,
+            status: data.status as ShipmentStatus,
+            startHour: Number(data.startHour) || shipment.startHour,
+            durationHours: Number(data.durationHours) || shipment.durationHours,
+            customerOrSupplier: data.customerOrSupplier,
+            palletCount: Number(data.palletCount) || shipment.palletCount,
+            cargoDescription: data.cargoDescription,
+            notes: data.notes
+        };
 
-    const handleSave = () => {
-        onUpdate(formData.id, formData);
-        toast.success(`Shipment ${formData.shipmentNumber} updated successfully`);
+        onUpdate(shipment.id, updates);
+        toast.success(`Shipment ${shipment.shipmentNumber} updated successfully`);
         onClose();
     };
 
     const handleDelete = () => {
-        onDelete(formData.id);
-        toast.success(`Shipment ${formData.shipmentNumber} cancelled and removed from dock schedule`);
+        onDelete(shipment.id);
+        toast.success(`Shipment ${shipment.shipmentNumber} cancelled and removed from dock schedule`);
         onClose();
     };
 
@@ -48,205 +68,172 @@ export const ShipmentDetailsModal: React.FC<ShipmentDetailsModalProps> = ({
         return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
     };
 
+    const rampOptions = ramps.map(r => ({
+        label: `${r.code} - ${r.name}`,
+        value: r.id
+    }));
+
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs p-4 animate-fade-in">
-            <div className="bg-white border border-slate-300 rounded-lg shadow-2xl max-w-xl w-full overflow-hidden text-slate-800 animate-scale-in">
-                {/* Dark Header */}
-                <div className="bg-[#384155] text-white px-4 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <span className={`text-[10px] font-black px-2 py-0.5 rounded font-mono uppercase ${
-                            formData.direction === 'INBOUND_PZ' ? 'bg-emerald-400 text-slate-950' : 'bg-indigo-400 text-slate-950'
-                        }`}>
-                            {formData.direction === 'INBOUND_PZ' ? 'PZ INBOUND TRUCK' : 'WZ OUTBOUND TRUCK'}
-                        </span>
-                        <h3 className="font-bold text-sm text-white font-mono">
-                            {formData.shipmentNumber}
-                        </h3>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="text-slate-300 hover:text-white text-lg leading-none p-1 cursor-pointer"
-                        title="Close"
-                    >
-                        &#10005;
-                    </button>
-                </div>
-
-                {/* Body Form */}
-                <div className="p-4 space-y-3 text-xs max-h-[75vh] overflow-y-auto">
-                    {/* Carrier & Vehicle Grid */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                            Carrier & Vehicle Information
-                        </span>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Carrier Company</label>
-                                <Input
-                                    type="text"
-                                    value={formData.carrierName}
-                                    onChange={(e) => setFormData({ ...formData, carrierName: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Driver Full Name</label>
-                                <Input
-                                    type="text"
-                                    value={formData.driverName}
-                                    onChange={(e) => setFormData({ ...formData, driverName: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Driver Contact Phone</label>
-                                <Input
-                                    type="text"
-                                    value={formData.driverPhone}
-                                    onChange={(e) => setFormData({ ...formData, driverPhone: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Truck Plate Number</label>
-                                <Input
-                                    type="text"
-                                    value={formData.truckPlateNumber}
-                                    onChange={(e) => setFormData({ ...formData, truckPlateNumber: e.target.value })}
-                                />
-                            </div>
+        <Modal
+            ref={ref}
+            isOpen={isOpen}
+            title={`Shipment Details: ${shipment.shipmentNumber}`}
+            size="lg"
+            onClose={onClose}
+        >
+            <form key={shipment.id} onSubmit={handleSubmit}>
+                <FormBody className="max-h-[75vh] space-y-4">
+                    {/* Header badge & direction row */}
+                    <div className="flex items-center justify-between bg-slate-50/80 p-3 rounded-md border border-slate-300">
+                        <div className="flex items-center gap-2">
+                            <span className="text-[11px] font-mono text-slate-500 uppercase">Direction:</span>
+                            <Badge variant={shipment.direction === 'INBOUND_PZ' ? 'success' : 'info'}>
+                                {shipment.direction === 'INBOUND_PZ' ? 'PZ INBOUND TRUCK' : 'WZ OUTBOUND TRUCK'}
+                            </Badge>
+                        </div>
+                        <div className="text-xs font-mono text-slate-700">
+                            Time Window: <span className="font-bold">{formatHour(shipment.startHour)} - {formatHour(shipment.startHour + shipment.durationHours)}</span>
                         </div>
                     </div>
 
-                    {/* Ramp & Time Window */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                            Dock Assignment & Window
-                        </span>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Assigned Ramp</label>
-                                <Select
-                                    value={formData.rampId}
-                                    onChange={(e) => setFormData({ ...formData, rampId: e.target.value })}
-                                    options={ramps.map(r => ({
-                                        label: `${r.code} - ${r.name}`,
-                                        value: r.id
-                                    }))}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Status</label>
-                                <Select
-                                    value={formData.status}
-                                    onChange={(e) => setFormData({ ...formData, status: e.target.value as ShipmentStatus })}
-                                    options={[
-                                        { label: 'Scheduled', value: 'SCHEDULED' },
-                                        { label: 'Arrived On Time', value: 'ARRIVED_ON_TIME' },
-                                        { label: 'Delayed', value: 'DELAYED' },
-                                        { label: 'Loading In Progress', value: 'LOADING' },
-                                        { label: 'Completed', value: 'COMPLETED' },
-                                        { label: 'Cancelled', value: 'CANCELLED' }
-                                    ]}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">
-                                    Start Time Slot ({formatHour(formData.startHour)})
-                                </label>
-                                <Input
-                                    type="number"
-                                    step="0.25"
-                                    min="6"
-                                    max="21.5"
-                                    value={formData.startHour}
-                                    onChange={(e) => setFormData({ ...formData, startHour: Number(e.target.value) })}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Duration (Hours)</label>
-                                <Input
-                                    type="number"
-                                    step="0.5"
-                                    min="0.5"
-                                    max="6"
-                                    value={formData.durationHours}
-                                    onChange={(e) => setFormData({ ...formData, durationHours: Number(e.target.value) })}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Cargo & Customer details */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block">
-                            Cargo & Party Details
-                        </span>
-                        <div className="grid grid-cols-2 gap-2">
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Customer / Supplier</label>
-                                <Input
-                                    type="text"
-                                    value={formData.customerOrSupplier}
-                                    onChange={(e) => setFormData({ ...formData, customerOrSupplier: e.target.value })}
-                                />
-                            </div>
-                            <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Pallet Count</label>
-                                <Input
-                                    type="number"
-                                    value={formData.palletCount}
-                                    onChange={(e) => setFormData({ ...formData, palletCount: Number(e.target.value) })}
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="text-[10px] text-slate-600 block mb-0.5">Cargo Description</label>
+                    <Section title="Carrier & Driver Information">
+                        <div className="grid grid-cols-2 gap-3">
                             <Input
-                                type="text"
-                                value={formData.cargoDescription}
-                                onChange={(e) => setFormData({ ...formData, cargoDescription: e.target.value })}
+                                label="Carrier Company"
+                                name="carrierName"
+                                defaultValue={shipment.carrierName}
+                                required
+                            />
+                            <Input
+                                label="Truck Plate Number"
+                                name="truckPlateNumber"
+                                defaultValue={shipment.truckPlateNumber}
+                                className="font-mono"
+                                required
+                            />
+                            <Input
+                                label="Driver Full Name"
+                                name="driverName"
+                                defaultValue={shipment.driverName}
+                                required
+                            />
+                            <Input
+                                label="Driver Contact Phone"
+                                name="driverPhone"
+                                defaultValue={shipment.driverPhone}
+                                className="font-mono"
+                                required
                             />
                         </div>
-                        <div>
-                            <label className="text-[10px] text-slate-600 block mb-0.5">Logistics Notes</label>
+                    </Section>
+
+                    <Section title="Dock Assignment & Status">
+                        <div className="grid grid-cols-2 gap-3">
+                            <Select
+                                label="Assigned Ramp"
+                                name="rampId"
+                                defaultValue={shipment.rampId}
+                                options={rampOptions}
+                            />
+                            <Select
+                                label="Workflow Status"
+                                name="status"
+                                defaultValue={shipment.status}
+                                options={SHIPMENT_STATUS_OPTIONS}
+                            />
                             <Input
-                                type="text"
-                                value={formData.notes || ''}
-                                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+                                label={`Start Time (${formatHour(shipment.startHour)})`}
+                                name="startHour"
+                                type="number"
+                                step="0.25"
+                                min="6"
+                                max="21.5"
+                                defaultValue={shipment.startHour}
+                                className="font-mono"
+                                required
+                            />
+                            <Input
+                                label="Duration (Hours)"
+                                name="durationHours"
+                                type="number"
+                                step="0.5"
+                                min="0.5"
+                                max="6"
+                                defaultValue={shipment.durationHours}
+                                className="font-mono"
+                                required
+                            />
+                        </div>
+                    </Section>
+
+                    <Section variant="subtle" title="Cargo & Party Details">
+                        <div className="grid grid-cols-2 gap-3">
+                            <Input
+                                label="Customer / Supplier"
+                                name="customerOrSupplier"
+                                defaultValue={shipment.customerOrSupplier}
+                                className="bg-white"
+                                required
+                            />
+                            <Input
+                                label="Pallet Count"
+                                name="palletCount"
+                                type="number"
+                                min="1"
+                                defaultValue={shipment.palletCount}
+                                className="bg-white font-mono"
+                                required
+                            />
+                        </div>
+                        <div className="space-y-3 pt-2">
+                            <Input
+                                label="Cargo Description"
+                                name="cargoDescription"
+                                defaultValue={shipment.cargoDescription}
+                                className="bg-white"
+                                required
+                            />
+                            <Input
+                                label="Logistics Notes"
+                                name="notes"
+                                defaultValue={shipment.notes || ''}
                                 placeholder="e.g. Needs forklift extension or special handling"
+                                className="bg-white"
                             />
                         </div>
-                    </div>
-                </div>
+                    </Section>
+                </FormBody>
 
-                {/* Footer */}
-                <div className="flex items-center justify-between p-3 bg-slate-50 border-t border-slate-200">
+                <FormFooter className="justify-between">
                     <Button
                         variant="danger"
-                        size="sm"
+                        size="md"
+                        type="button"
                         onClick={handleDelete}
-                        className="text-xs"
                     >
                         Delete Shipment
                     </Button>
                     <div className="flex gap-2">
                         <Button
                             variant="secondary"
-                            size="sm"
+                            size="md"
+                            type="button"
                             onClick={onClose}
-                            className="text-xs"
                         >
                             Cancel
                         </Button>
                         <Button
                             variant="primary"
-                            size="sm"
-                            onClick={handleSave}
-                            className="text-xs font-semibold bg-blue-600 hover:bg-blue-700 border-blue-700"
+                            size="md"
+                            type="submit"
                         >
                             Save Changes
                         </Button>
                     </div>
-                </div>
-            </div>
-        </div>
+                </FormFooter>
+            </form>
+        </Modal>
     );
-};
+});
+
+ShipmentDetailsModal.displayName = 'ShipmentDetailsModal';

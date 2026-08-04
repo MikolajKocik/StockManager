@@ -1,14 +1,31 @@
 import React from 'react';
 import type { SystemAuditLog } from '../models/rbac';
+import { Badge } from '@/components/common/custom';
+import {
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableHeaderCell,
+    TableCell
+} from '@/components/common/core';
 
 interface AuditTrailPanelProps {
     logs: SystemAuditLog[];
 }
 
+const ACTION_BADGE_MAP: Record<string, 'brand' | 'warning' | 'neutral' | 'success' | 'danger'> = {
+    'MATRIX_DEPLOY': 'brand',
+    'EMERGENCY_OVERRIDE': 'warning',
+    'TERMINAL_LOCK': 'danger',
+    'TERMINAL_UNLOCK': 'success',
+    'ROLE_MUTATION': 'neutral'
+};
+
 export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ logs }) => {
     return (
-        <div className="w-full bg-white border border-slate-300 rounded-lg shadow-sm overflow-hidden text-xs">
-            <div className="bg-slate-50 border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+        <div className="w-full space-y-2 text-xs">
+            <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-2xs flex items-center justify-between">
                 <div>
                     <h3 className="font-bold text-slate-900 uppercase font-mono text-[11px]">
                         Security & Access Mutation Audit Log
@@ -17,41 +34,37 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ logs }) => {
                         Immutable event record of permission delegations, emergency overrides, and terminal sync commands.
                     </p>
                 </div>
-                <span className="text-[10px] font-mono bg-slate-200 text-slate-800 px-2 py-0.5 rounded font-semibold">
+                <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
                     {logs.length} Recorded Events
                 </span>
             </div>
 
-            <table className="w-full text-left border-collapse">
-                <thead>
-                    <tr className="bg-[#384155] text-white font-mono text-[10px] uppercase">
-                        <th className="py-2.5 px-3">Timestamp</th>
-                        <th className="py-2.5 px-3">Actor / Authorizer</th>
-                        <th className="py-2.5 px-3">Action Type</th>
-                        <th className="py-2.5 px-3">Target Entity</th>
-                        <th className="py-2.5 px-3">Details & Changes</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-200 font-mono text-[11px]">
+            <Table>
+                <TableHead>
+                    <TableRow>
+                        <TableHeaderCell>Timestamp</TableHeaderCell>
+                        <TableHeaderCell>Actor / Authorizer</TableHeaderCell>
+                        <TableHeaderCell>Action Type</TableHeaderCell>
+                        <TableHeaderCell>Target Entity</TableHeaderCell>
+                        <TableHeaderCell>Details & Changes</TableHeaderCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
                     {logs.map(log => (
-                        <tr key={log.id} className="hover:bg-slate-50">
-                            <td className="py-2.5 px-3 text-slate-500 font-sans">{log.timestamp}</td>
-                            <td className="py-2.5 px-3 font-bold text-slate-900 font-sans">{log.actorName}</td>
-                            <td className="py-2.5 px-3">
-                                <span className={`px-2 py-0.5 rounded text-[9px] font-bold ${
-                                    log.action.includes('DEPLOY') ? 'bg-blue-100 text-blue-800' :
-                                    log.action.includes('EMERGENCY') ? 'bg-amber-100 text-amber-900' :
-                                    'bg-slate-100 text-slate-800'
-                                }`}>
+                        <TableRow key={log.id}>
+                            <TableCell variant="muted">{log.timestamp}</TableCell>
+                            <TableCell variant="strong">{log.actorName}</TableCell>
+                            <TableCell>
+                                <Badge variant={ACTION_BADGE_MAP[log.action] || 'neutral'}>
                                     {log.action}
-                                </span>
-                            </td>
-                            <td className="py-2.5 px-3 font-semibold text-slate-800">{log.targetRoleOrUser}</td>
-                            <td className="py-2.5 px-3 text-slate-600 font-sans">{log.changeSummary}</td>
-                        </tr>
+                                </Badge>
+                            </TableCell>
+                            <TableCell variant="code">{log.targetRoleOrUser}</TableCell>
+                            <TableCell>{log.changeSummary}</TableCell>
+                        </TableRow>
                     ))}
-                </tbody>
-            </table>
+                </TableBody>
+            </Table>
         </div>
     );
 };

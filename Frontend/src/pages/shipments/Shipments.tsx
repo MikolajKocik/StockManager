@@ -4,13 +4,14 @@ import { DockSchedulerGantt } from './components/DockSchedulerGantt';
 import { ShipmentsListTable } from './components/ShipmentsListTable';
 import { ShipmentDetailsModal } from './components/ShipmentDetailsModal';
 import { ShipmentCreateModal } from './components/ShipmentCreateModal';
+import { Card, CardHeader, CardBody } from '@/components/common';
 
 import { MOCK_RAMPS, MOCK_SHIPMENTS } from './mocks/shipments.mocks';
 import type { DockRamp, DockShipment } from './models/dockScheduler';
 
 export default function Shipments() {
     const [viewMode, setViewMode] = useState<ShipmentsViewMode>('GANTT');
-    const [ramps, setRamps] = useState<DockRamp[]>(MOCK_RAMPS);
+    const [ramps] = useState<DockRamp[]>(MOCK_RAMPS);
     const [shipments, setShipments] = useState<DockShipment[]>(MOCK_SHIPMENTS);
     const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0]);
 
@@ -93,21 +94,25 @@ export default function Shipments() {
                     />
 
                     {/* Secondary Quick List Table below Gantt */}
-                    <div className="pt-2">
-                        <div className="mb-2 flex items-center justify-between">
-                            <h3 className="font-bold text-sm text-slate-800">
-                                Active Fleet & Waybills Registry
-                            </h3>
-                            <span className="text-xs text-slate-500 font-mono">
-                                Showing all {shipments.length} assigned dock operations
-                            </span>
-                        </div>
-                        <ShipmentsListTable
-                            shipments={shipments}
-                            ramps={ramps}
-                            onSelectShipment={handleSelectShipment}
-                        />
-                    </div>
+                    <Card>
+                        <CardHeader>
+                            <div className="flex items-center justify-between w-full">
+                                <h3 className="font-bold text-sm text-slate-800">
+                                    Active Fleet & Waybills Registry
+                                </h3>
+                                <span className="text-xs text-slate-500 font-mono">
+                                    Showing all {shipments.length} assigned dock operations
+                                </span>
+                            </div>
+                        </CardHeader>
+                        <CardBody className="p-0">
+                            <ShipmentsListTable
+                                shipments={shipments}
+                                ramps={ramps}
+                                onSelectShipment={handleSelectShipment}
+                            />
+                        </CardBody>
+                    </Card>
                 </div>
             ) : (
                 <ShipmentsListTable

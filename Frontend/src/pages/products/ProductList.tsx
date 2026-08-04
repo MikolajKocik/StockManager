@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
-import { Button } from '@/components/common';
-import ConfirmModal from '@/components/common/ConfirmModal';
+import { Button, Header, Badge, Input, Select } from '@/components/common';
+import ConfirmModal from '@/components/common/custom/ConfirmModal';
 import { useProductsManager } from './hooks';
 import {
     ProductKpiSummary,
@@ -9,6 +9,12 @@ import {
     ProductEditForm,
     ProductDetailsForm
 } from './components';
+
+export const STOCK_FILTER_OPTIONS = [
+    { label: 'All Stock Levels', value: 'ALL' },
+    { label: 'In Stock Only', value: 'IN_STOCK' },
+    { label: 'Zero Stock (Out of Stock)', value: 'OUT_OF_STOCK' }
+] as const;
 
 export default function ProductList() {
     const {
@@ -96,118 +102,111 @@ export default function ProductList() {
         return <div className="p-8 text-center text-xs text-red-600 font-medium">Error loading products. Please try again.</div>;
     }
 
+    const headerActions = (
+        <>
+            <Button
+                variant="secondary"
+                size="md"
+                onClick={handleRefetch}
+                disabled={isFetching}
+            >
+                {isFetching ? 'Refreshing...' : 'Refresh'}
+            </Button>
+            <Button
+                variant="primary"
+                size="md"
+                onClick={handleOpenCreate}
+            >
+                Add Product
+            </Button>
+        </>
+    );
+
+    const categoryOptions = [
+        { label: 'All Categories', value: '' },
+        ...genres.map(g => ({ label: g, value: g }))
+    ];
+
+    const unitOptions = [
+        { label: 'All Units', value: '' },
+        ...units.map(u => ({ label: u, value: u }))
+    ];
+
     return (
         <div className="space-y-4 pb-10">
             {/* Top Header & Actions Bar */}
-            <div className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
-                    <div>
-                        <div className="flex items-center gap-2">
-                            <span className="font-mono font-bold text-[11px] text-[#2b6675] bg-slate-100 border border-slate-300 px-1.5 py-0.5 rounded-xs uppercase">
-                                Master Catalog
-                            </span>
-                            <h1 className="text-lg font-bold text-slate-800 leading-tight">
-                                Products & Item Registry
-                            </h1>
-                        </div>
-                        <p className="text-xs text-slate-500 mt-0.5">
-                            Warehouse master product index, batch trace numbers, shelf-life and stock allocations.
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <Button
-                            variant="secondary"
-                            size="md"
-                            onClick={handleRefetch}
-                            disabled={isFetching}
-                        >
-                            {isFetching ? 'Refreshing...' : 'Refresh'}
-                        </Button>
-                        <Button
-                            variant="primary"
-                            size="md"
-                            onClick={handleOpenCreate}
-                        >
-                            + Add Product
-                        </Button>
-                    </div>
+            <Header
+                title="Products & Item Registry"
+                subtitle="Warehouse master product index, batch trace numbers, shelf-life and stock allocations."
+                badge={
+                    <Badge variant="brand" className="font-mono text-[10px]">
+                        MASTER CATALOG
+                    </Badge>
+                }
+                actions={headerActions}
+            >
+                {/* KPI Metrics */}
+                <div className="pt-2 border-t border-slate-200">
+                    <ProductKpiSummary
+                        totalProducts={kpi.totalProducts}
+                        totalStockUnits={kpi.totalStockUnits}
+                        outOfStockCount={kpi.outOfStockCount}
+                        genresCount={kpi.genresCount}
+                    />
                 </div>
 
-                {/* KPI Metrics */}
-                <ProductKpiSummary
-                    totalProducts={kpi.totalProducts}
-                    totalStockUnits={kpi.totalStockUnits}
-                    outOfStockCount={kpi.outOfStockCount}
-                    genresCount={kpi.genresCount}
-                />
-
                 {/* Filter and Search Toolbar */}
-                <div className="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-200 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200 text-xs">
                     <div className="flex items-center gap-2 flex-wrap">
                         {/* Live Search */}
-                        <div className="relative">
-                            <input
-                                type="text"
+                        <div className="w-64">
+                            <Input
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder="Search by name, SKU, category, batch, supplier..."
-                                className="text-xs bg-slate-50 border border-slate-300 hover:border-slate-400 focus:border-slate-800 focus:bg-white px-3 py-1.5 rounded outline-none w-72 transition-colors shadow-inner font-medium text-slate-800 placeholder:text-slate-400"
+                                placeholder="Search by name, SKU, category..."
+                                className="text-xs"
                             />
-                            {searchQuery && (
-                                <button
-                                    type="button"
-                                    onClick={() => setSearchQuery('')}
-                                    className="absolute right-2 top-1.5 text-xs text-slate-400 hover:text-slate-700 cursor-pointer"
-                                >
-                                    &#10005;
-                                </button>
-                            )}
                         </div>
 
                         {/* Genre Filter */}
-                        <select
-                            value={selectedGenre}
-                            onChange={(e) => setSelectedGenre(e.target.value)}
-                            className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 outline-none focus:border-slate-800 cursor-pointer"
-                        >
-                            <option value="">All Categories</option>
-                            {genres.map(g => (
-                                <option key={g} value={g}>{g}</option>
-                            ))}
-                        </select>
+                        <div className="w-40">
+                            <Select
+                                value={selectedGenre}
+                                onChange={(e) => setSelectedGenre(e.target.value)}
+                                options={categoryOptions}
+                                className="text-xs"
+                            />
+                        </div>
 
                         {/* Unit Filter */}
-                        <select
-                            value={selectedUnit}
-                            onChange={(e) => setSelectedUnit(e.target.value)}
-                            className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 outline-none focus:border-slate-800 cursor-pointer"
-                        >
-                            <option value="">All Units</option>
-                            {units.map(u => (
-                                <option key={u} value={u}>{u}</option>
-                            ))}
-                        </select>
+                        <div className="w-32">
+                            <Select
+                                value={selectedUnit}
+                                onChange={(e) => setSelectedUnit(e.target.value)}
+                                options={unitOptions}
+                                className="text-xs"
+                            />
+                        </div>
 
                         {/* Stock Status Filter */}
-                        <select
-                            value={stockFilter}
-                            onChange={(e) => setStockFilter(e.target.value as any)}
-                            className="text-xs bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 font-medium text-slate-700 outline-none focus:border-slate-800 cursor-pointer"
-                        >
-                            <option value="ALL">All Stock Levels</option>
-                            <option value="IN_STOCK">In Stock Only</option>
-                            <option value="OUT_OF_STOCK">Zero Stock (Out of Stock)</option>
-                        </select>
+                        <div className="w-44">
+                            <Select
+                                value={stockFilter}
+                                onChange={(e) => setStockFilter(e.target.value as any)}
+                                options={STOCK_FILTER_OPTIONS}
+                                className="text-xs"
+                            />
+                        </div>
 
                         {(searchQuery || selectedGenre || selectedUnit || stockFilter !== 'ALL') && (
-                            <button
-                                type="button"
+                            <Button
+                                variant="secondary"
+                                size="sm"
                                 onClick={resetFilters}
-                                className="text-xs text-[#2b6675] hover:underline font-semibold cursor-pointer px-1"
+                                className="text-xs px-2"
                             >
                                 Reset Filters
-                            </button>
+                            </Button>
                         )}
                     </div>
 
@@ -215,7 +214,7 @@ export default function ProductList() {
                         Showing {displayedProducts.length} of {kpi.totalProducts} records
                     </span>
                 </div>
-            </div>
+            </Header>
 
             {/* Product Table */}
             <ProductTable

@@ -19,7 +19,6 @@ export default function Shipments() {
     const [isDetailsModalOpen, setIsDetailsModalOpen] = useState<boolean>(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
 
-    {/* Handlers */ }
     const handleUpdateShipment = (id: string, updates: Partial<DockShipment>) => {
         setShipments(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     };
@@ -41,14 +40,13 @@ export default function Shipments() {
         setIsDetailsModalOpen(true);
     };
 
-    {/* Metric Calculations */ }
     const totalShipments = shipments.length;
     const occupiedRampIds = new Set(shipments.filter(s => s.status === 'LOADING' || s.status === 'ARRIVED_ON_TIME').map(s => s.rampId));
     const activeRampsCount = occupiedRampIds.size;
     const delayedCount = shipments.filter(s => s.status === 'DELAYED').length;
     const totalPallets = shipments.reduce((acc, s) => acc + (s.palletCount || 0), 0);
 
-    // Check for collisions
+    {/** Complex logic: O(N^2) time interval overlap detection across active dock ramps */}
     let conflictsCount = 0;
     for (let i = 0; i < shipments.length; i++) {
         for (let j = i + 1; j < shipments.length; j++) {
@@ -68,7 +66,6 @@ export default function Shipments() {
 
     return (
         <div className="w-full space-y-4 pb-12">
-            {/* Header & Metrics */}
             <ShipmentsHeader
                 viewMode={viewMode}
                 onViewModeChange={setViewMode}
@@ -82,7 +79,6 @@ export default function Shipments() {
                 onDateChange={setSelectedDate}
             />
 
-            {/* Main Interactive Work Area */}
             {viewMode === 'GANTT' ? (
                 <div className="w-full space-y-4">
                     <DockSchedulerGantt
@@ -93,11 +89,10 @@ export default function Shipments() {
                         selectedShipmentId={selectedShipment?.id}
                     />
 
-                    {/* Secondary Quick List Table below Gantt */}
                     <Card>
                         <CardHeader>
                             <div className="flex items-center justify-between w-full">
-                                <h3 className="font-bold text-sm text-slate-800">
+                                <h3 className="font-bold text-xs uppercase font-mono text-slate-800">
                                     Active Fleet & Waybills Registry
                                 </h3>
                                 <span className="text-xs text-slate-500 font-mono">

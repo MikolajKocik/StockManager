@@ -8,6 +8,14 @@ const DIRECTION_FILTER_OPTIONS = [
     { label: 'Outbound (WZ Dispatches)', value: 'OUTBOUND_WZ' }
 ] as const;
 
+const STATUS_BADGE_VARIANT: Record<string, 'warning' | 'danger' | 'slate' | 'success' | 'info'> = {
+    'LOADING': 'warning',
+    'DELAYED': 'danger',
+    'COMPLETED': 'slate',
+    'SCHEDULED': 'success',
+    'CONFIRMED': 'success'
+};
+
 interface ShipmentsListTableProps {
     shipments: DockShipment[];
     ramps: DockRamp[];
@@ -100,6 +108,7 @@ export const ShipmentsListTable: React.FC<ShipmentsListTableProps> = ({
                         ) : (
                             filtered.map(s => {
                                 const ramp = ramps.find(r => r.id === s.rampId);
+                                const badgeVariant = STATUS_BADGE_VARIANT[s.status] || 'info';
                                 return (
                                     <TableRow key={s.id} className="hover:bg-slate-50/80 transition-colors">
                                         <TableCell className="font-mono font-bold text-slate-900">
@@ -112,7 +121,7 @@ export const ShipmentsListTable: React.FC<ShipmentsListTableProps> = ({
                                         </TableCell>
                                         <TableCell>
                                             <div className="font-semibold text-slate-800">{s.carrierName}</div>
-                                            <div className="text-[10px] text-slate-500 font-mono">{s.truckPlateNumber} • {s.driverName}</div>
+                                            <div className="text-[0.625rem] text-slate-500 font-mono">{s.truckPlateNumber} • {s.driverName}</div>
                                         </TableCell>
                                         <TableCell className="font-mono font-semibold text-slate-800">
                                             {ramp?.code || s.rampId}
@@ -122,7 +131,7 @@ export const ShipmentsListTable: React.FC<ShipmentsListTableProps> = ({
                                         </TableCell>
                                         <TableCell>
                                             <span className="font-bold text-slate-900">{s.palletCount} pal.</span>
-                                            <span className="text-[10px] text-slate-500 block truncate max-w-45">
+                                            <span className="text-[0.625rem] text-slate-500 block truncate max-w-45">
                                                 {s.cargoDescription}
                                             </span>
                                         </TableCell>
@@ -130,14 +139,7 @@ export const ShipmentsListTable: React.FC<ShipmentsListTableProps> = ({
                                             {s.customerOrSupplier}
                                         </TableCell>
                                         <TableCell>
-                                            <Badge
-                                                variant={
-                                                    s.status === 'LOADING' ? 'warning' :
-                                                        s.status === 'DELAYED' ? 'danger' :
-                                                            s.status === 'COMPLETED' ? 'slate' :
-                                                                'success'
-                                                }
-                                            >
+                                            <Badge variant={badgeVariant}>
                                                 {s.status.replace('_', ' ')}
                                             </Badge>
                                         </TableCell>

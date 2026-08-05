@@ -10,6 +10,12 @@ interface SupplierTableProps {
     onDelete: (supplier: Supplier) => void;
 }
 
+const STATUS_STYLE_MAP: Record<string, { textClass: string; dotClass: string }> = {
+    'Active': { textClass: 'text-[#0e5f32]', dotClass: 'bg-[#0e5f32]' },
+    'Under Review': { textClass: 'text-[#8f7d49]', dotClass: 'bg-[#AA9559]' },
+    'Inactive': { textClass: 'text-slate-500', dotClass: 'bg-slate-400' }
+};
+
 export const SupplierTable: React.FC<SupplierTableProps> = ({
     suppliers,
     onSort,
@@ -49,7 +55,9 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
             </TableHead>
             <TableBody>
                 {suppliers.length > 0 ? (
-                    suppliers.map((supplier) => (
+                    suppliers.map((supplier) => {
+                        const statusConfig = STATUS_STYLE_MAP[supplier.status || 'Active'] || STATUS_STYLE_MAP.Inactive;
+                        return (
                         <TableRow key={supplier.id}>
                             {/* Vendor Code */}
                             <TableCell>
@@ -57,7 +65,7 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
                                     <span className="font-mono font-bold text-xs text-slate-900">
                                         #{supplier.id}
                                     </span>
-                                    <span className="text-[10px] text-slate-500 font-mono">
+                                    <span className="text-[0.625rem] text-slate-500 font-mono">
                                         {supplier.slug}
                                     </span>
                                 </div>
@@ -74,7 +82,7 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
                                         {supplier.name}
                                     </button>
                                     {supplier.taxId && (
-                                        <span className="text-[10px] text-slate-500 font-mono">
+                                        <span className="text-[0.625rem] text-slate-500 font-mono">
                                             Tax: {supplier.taxId}
                                         </span>
                                     )}
@@ -87,7 +95,7 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
                                     <span className="font-semibold text-xs text-slate-800">
                                         {supplier.address?.city || 'N/A'}
                                     </span>
-                                    <span className="text-[10px] text-slate-500 font-medium">
+                                    <span className="text-[0.625rem] text-slate-500 font-medium">
                                         {supplier.address?.country || 'USA'}
                                     </span>
                                 </div>
@@ -99,7 +107,7 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
                                     <span className="font-semibold text-xs text-slate-800">
                                         {supplier.contactPerson || 'Procurement Office'}
                                     </span>
-                                    <span className="text-[10px] text-slate-500 truncate max-w-48">
+                                    <span className="text-[0.625rem] text-slate-500 truncate max-w-48">
                                         {supplier.email || supplier.phone || 'No direct contact'}
                                     </span>
                                 </div>
@@ -111,7 +119,7 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
                                     <span className="font-semibold text-xs text-slate-800">
                                         {supplier.paymentTerms || 'Net 30'}
                                     </span>
-                                    <span className="text-[10px] text-slate-600 font-medium">
+                                    <span className="text-[0.625rem] text-slate-600 font-medium">
                                         {supplier.leadTimeDays ? `${supplier.leadTimeDays}d lead time` : '5d lead time'}
                                     </span>
                                 </div>
@@ -123,7 +131,7 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
                                     <span className="font-bold text-xs text-slate-900">
                                         ★ {supplier.rating || 4.8}
                                     </span>
-                                    <span className="text-[11px] text-slate-500 font-sans font-medium">
+                                    <span className="text-[0.6875rem] text-slate-500 font-sans font-medium">
                                         ({supplier.activeItemsCount || 0} SKUs)
                                     </span>
                                 </div>
@@ -131,20 +139,8 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
 
                             {/* Status */}
                             <TableCell>
-                                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${
-                                    supplier.status === 'Active'
-                                        ? 'text-[#0e5f32]'
-                                        : supplier.status === 'Under Review'
-                                            ? 'text-[#8f7d49]'
-                                            : 'text-slate-500'
-                                }`}>
-                                    <span className={`w-1.5 h-1.5 rounded-full ${
-                                        supplier.status === 'Active'
-                                            ? 'bg-[#0e5f32]'
-                                            : supplier.status === 'Under Review'
-                                                ? 'bg-[#AA9559]'
-                                                : 'bg-slate-400'
-                                    }`} />
+                                <span className={`inline-flex items-center gap-1.5 text-xs font-semibold ${statusConfig.textClass}`}>
+                                    <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dotClass}`} />
                                     {supplier.status || 'Active'}
                                 </span>
                             </TableCell>
@@ -176,7 +172,8 @@ export const SupplierTable: React.FC<SupplierTableProps> = ({
                                 </div>
                             </TableCell>
                         </TableRow>
-                    ))
+                    );
+                })
                 ) : (
                     <TableRow>
                         <TableCell colSpan={8} className="text-center py-8 text-slate-500 font-medium">

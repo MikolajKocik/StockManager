@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import type { WorkflowNode, WorkflowConnection, WorkflowNodeType } from '../models/reorderNode';
+import type { WorkflowNode, WorkflowConnection, NodeType } from '../models/reorderNode';
 import { Badge } from '@/components/common/custom';
 
 interface NodeBuilderCanvasProps {
@@ -21,7 +21,7 @@ interface NodeTheme {
     cardBg: string;
 }
 
-const NODE_THEME_MAP: Record<WorkflowNodeType, NodeTheme> = {
+const NODE_THEME_MAP: Record<NodeType, NodeTheme> = {
     'TRIGGER': {
         border: 'border-amber-400',
         headerBg: 'bg-amber-100 text-amber-900 border-amber-300',
@@ -108,7 +108,7 @@ export const NodeBuilderCanvas: React.FC<NodeBuilderCanvasProps> = ({
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onClick={() => setConnectingFromId(null)}
-            className="relative w-full h-[640px] bg-[#f8fafc] border border-slate-300 rounded-lg overflow-hidden select-none shadow-xs"
+            className="relative w-full h-160 bg-[#f8fafc] border border-slate-300 rounded-lg overflow-hidden select-none shadow-xs"
         >
             {/* SVG Background Grid & Connectors */}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
@@ -173,7 +173,6 @@ export const NodeBuilderCanvas: React.FC<NodeBuilderCanvasProps> = ({
                                 stroke={isSimulating ? '#059669' : '#2b6675'}
                                 strokeWidth={isSimulating ? '3' : '2'}
                                 strokeDasharray={isSimulating ? '6,4' : undefined}
-                                className={isSimulating ? 'animate-pulse' : ''}
                                 markerEnd={isSimulating ? 'url(#arrow-anim)' : 'url(#arrow)'}
                             />
                             {/* Delete button midpoint indicator on hover */}
@@ -225,20 +224,17 @@ export const NodeBuilderCanvas: React.FC<NodeBuilderCanvasProps> = ({
                             width: `${NODE_WIDTH}px`,
                             height: `${NODE_HEIGHT}px`
                         }}
-                        className={`absolute rounded-lg border shadow-sm flex flex-col justify-between cursor-move transition-shadow duration-150 z-20 ${
-                            theme.cardBg
-                        } ${theme.border} ${
-                            isConnectingSource ? 'ring-2 ring-emerald-500 shadow-md' : 'hover:shadow-md'
-                        }`}
+                        className={`absolute rounded-lg border shadow-sm flex flex-col justify-between cursor-move transition-shadow duration-150 z-20 ${theme.cardBg
+                            } ${theme.border} ${isConnectingSource ? 'ring-2 ring-emerald-500 shadow-md' : 'hover:shadow-md'
+                            }`}
                     >
                         {/* Left Input Port */}
                         {node.type !== 'TRIGGER' && (
                             <div
                                 onClick={(e) => handleInputPortClick(e, node.id)}
                                 title="Click to connect as target"
-                                className={`port-handle absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center cursor-pointer shadow-xs z-30 transition-transform ${
-                                    connectingFromId ? 'bg-emerald-500 scale-125' : 'bg-slate-500 hover:bg-slate-700'
-                                }`}
+                                className={`port-handle absolute -left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center cursor-pointer shadow-xs z-30 transition-transform ${connectingFromId ? 'bg-emerald-500 scale-125' : 'bg-slate-500 hover:bg-slate-700'
+                                    }`}
                             >
                                 <span className="w-1.5 h-1.5 bg-white rounded-full" />
                             </div>
@@ -248,9 +244,8 @@ export const NodeBuilderCanvas: React.FC<NodeBuilderCanvasProps> = ({
                         <div
                             onClick={(e) => handleOutputPortClick(e, node.id)}
                             title="Click to draw connection arrow"
-                            className={`port-handle absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center cursor-pointer shadow-xs z-30 transition-transform ${
-                                isConnectingSource ? 'bg-emerald-600 scale-125' : 'bg-[#2b6675] hover:bg-[#204e5a]'
-                            }`}
+                            className={`port-handle absolute -right-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full border-2 border-white flex items-center justify-center cursor-pointer shadow-xs z-30 transition-transform ${isConnectingSource ? 'bg-emerald-600 scale-125' : 'bg-[#2b6675] hover:bg-[#204e5a]'
+                                }`}
                         >
                             <span className="w-1.5 h-1.5 bg-white rounded-full" />
                         </div>
@@ -260,14 +255,14 @@ export const NodeBuilderCanvas: React.FC<NodeBuilderCanvasProps> = ({
                             <span className="font-bold text-xs text-slate-900 truncate">
                                 {node.title}
                             </span>
-                            <Badge variant={theme.badge} className="text-[8px] px-1 py-0 uppercase">
+                            <Badge variant={theme.badge} className="text-[0.5rem] px-1 py-0 uppercase">
                                 {theme.badgeText}
                             </Badge>
                         </div>
 
                         {/* Node Body / Description */}
                         <div className="px-2.5 py-1 flex-1 flex flex-col justify-center">
-                            <p className="text-[11px] text-slate-600 leading-tight">
+                            <p className="text-[0.6875rem] text-slate-600 leading-tight">
                                 {node.description}
                             </p>
                         </div>
@@ -276,13 +271,13 @@ export const NodeBuilderCanvas: React.FC<NodeBuilderCanvasProps> = ({
                         <div className="px-2.5 py-1 bg-slate-100/80 border-t border-slate-200/80 rounded-b-lg flex items-center justify-between text-xs">
                             <button
                                 onClick={() => onEditNodeConfig(node)}
-                                className="node-action-btn text-[11px] font-semibold text-[#2b6675] hover:underline cursor-pointer"
+                                className="node-action-btn text-[0.6875rem] font-semibold text-[#2b6675] hover:underline cursor-pointer"
                             >
                                 Configure
                             </button>
                             <button
                                 onClick={() => onDeleteNode(node.id)}
-                                className="node-action-btn text-[11px] font-semibold text-red-600 hover:underline cursor-pointer"
+                                className="node-action-btn text-[0.6875rem] font-semibold text-red-600 hover:underline cursor-pointer"
                             >
                                 Delete
                             </button>

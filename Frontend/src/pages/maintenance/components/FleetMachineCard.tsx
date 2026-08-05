@@ -56,7 +56,7 @@ export const FleetMachineCard: React.FC<FleetMachineCardProps> = ({
                 <img
                     src={machine.image}
                     alt={machine.name}
-                    className="max-h-full max-w-full object-contain filter drop-shadow-2xs group-hover:scale-105 transition-transform"
+                    className="max-h-full max-w-full object-contain filter drop-shadow-2xs"
                 />
                 {machine.isCharging && (
                     <span className="absolute top-1 right-1 bg-[#2b6675] text-white text-xs font-mono font-bold px-1.5 py-0.5 rounded-xs shadow-2xs">

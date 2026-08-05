@@ -1,4 +1,6 @@
 import React from 'react';
+import { formatCurrency } from '@/utils/format';
+import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@/components/common';
 import type { InvoiceDocument, PaymentMethod } from '@/models/invoice';
 import { getInvoiceTranslations } from '../utils/invoiceTranslations';
 
@@ -21,7 +23,8 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
     ];
 
     return (
-        <div className="mt-4 pt-3 border-t-2 border-slate-700">
+        <section className="mt-4 pt-3 border-t-2 border-slate-700" aria-labelledby="invoice-summary-title">
+            <h3 id="invoice-summary-title" className="sr-only">Invoice Summary</h3>
             <div className="grid grid-cols-2 gap-4 items-start">
                 {/* Left: Payment Details, Bank Account, Notes */}
                 <div className="space-y-3 text-xs text-slate-700">
@@ -88,32 +91,32 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                 <div className="flex flex-col items-end gap-2.5">
                     {/* VAT Summary Table */}
                     <div className="w-full border border-slate-300 rounded overflow-hidden shadow-sm print:shadow-none print:border-slate-400">
-                        <table className="w-full text-xs text-right border-collapse">
-                            <thead>
-                                <tr className="bg-slate-200 text-slate-700 font-bold border-b border-slate-300 text-[0.625rem] uppercase print:bg-slate-100">
-                                    <th className="py-1 px-2 text-center">{t.vatTable.rate}</th>
-                                    <th className="py-1 px-2">{t.vatTable.net} ({invoice.currency})</th>
-                                    <th className="py-1 px-2">{t.vatTable.vat} ({invoice.currency})</th>
-                                    <th className="py-1 px-2">{t.vatTable.gross} ({invoice.currency})</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200 bg-white font-mono text-[0.6875rem]">
+                        <Table className="text-xs text-right">
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell className="py-1 px-2 text-center">{t.vatTable.rate}</TableHeaderCell>
+                                    <TableHeaderCell className="py-1 px-2">{t.vatTable.net} ({invoice.currency})</TableHeaderCell>
+                                    <TableHeaderCell className="py-1 px-2">{t.vatTable.vat} ({invoice.currency})</TableHeaderCell>
+                                    <TableHeaderCell className="py-1 px-2">{t.vatTable.gross} ({invoice.currency})</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody className="font-mono text-[0.6875rem]">
                                 {invoice.vatSummary.map((vs, idx) => (
-                                    <tr key={idx} className="hover:bg-slate-50">
-                                        <td className="py-1 px-2 text-center font-sans font-semibold text-slate-600">{vs.rateLabel}</td>
-                                        <td className="py-1 px-2 text-slate-800">{vs.netAmount.toFixed(2)}</td>
-                                        <td className="py-1 px-2 text-slate-600">{vs.vatAmount.toFixed(2)}</td>
-                                        <td className="py-1 px-2 font-bold text-slate-900">{vs.grossAmount.toFixed(2)}</td>
-                                    </tr>
+                                    <TableRow key={idx}>
+                                        <TableCell className="text-center font-sans font-semibold text-slate-600">{vs.rateLabel}</TableCell>
+                                        <TableCell className="text-slate-800">{formatCurrency(vs.netAmount, invoice.currency)}</TableCell>
+                                        <TableCell className="text-slate-600">{formatCurrency(vs.vatAmount, invoice.currency)}</TableCell>
+                                        <TableCell className="font-bold text-slate-900">{formatCurrency(vs.grossAmount, invoice.currency)}</TableCell>
+                                    </TableRow>
                                 ))}
-                                <tr className="bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-300 print:bg-slate-100">
-                                    <td className="py-1 px-2 text-center font-sans">{t.vatTable.total}</td>
-                                    <td className="py-1 px-2">{invoice.totalNet.toFixed(2)}</td>
-                                    <td className="py-1 px-2">{invoice.totalVat.toFixed(2)}</td>
-                                    <td className="py-1 px-2 text-slate-900">{invoice.totalGross.toFixed(2)}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                                <TableRow className="bg-slate-100 font-bold text-slate-900 border-t-2 border-slate-300 print:bg-slate-100">
+                                    <TableCell className="text-center font-sans">{t.vatTable.total}</TableCell>
+                                    <TableCell>{formatCurrency(invoice.totalNet, invoice.currency)}</TableCell>
+                                    <TableCell>{formatCurrency(invoice.totalVat, invoice.currency)}</TableCell>
+                                    <TableCell className="text-slate-900">{formatCurrency(invoice.totalGross, invoice.currency)}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
                     </div>
 
                     {/* Grand Total Box */}
@@ -127,7 +130,7 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                             </span>
                         </div>
                         <div className="text-lg font-black font-mono tracking-tight text-white">
-                            {invoice.totalGross.toFixed(2)} {invoice.currency}
+                            {formatCurrency(invoice.totalGross, invoice.currency)}
                         </div>
                     </div>
                 </div>
@@ -160,6 +163,6 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                     <span className="text-[0.625rem]">{t.signatures.recipient}</span>
                 </div>
             </div>
-        </div>
+        </section>
     );
 };

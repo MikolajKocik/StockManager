@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { formatCurrency } from '@/utils/format';
 import { Button, Input, Select } from '@/components/common';
 import type { Invoice } from '@/models/invoice';
 
@@ -136,7 +137,7 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                                             </span>
                                         </td>
                                         <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
-                                            {Number(inv.totalAmount || 0).toFixed(2)} PLN
+                                            {formatCurrency(Number(inv.totalAmount || 0))}
                                         </td>
                                         <td className="py-2.5 px-3 text-center">
                                             <Button

@@ -86,7 +86,7 @@ export const ShipmentDetailsModal = forwardRef<HTMLDialogElement, ShipmentDetail
                     {/* Header badge & direction row */}
                     <div className="flex items-center justify-between bg-slate-50/80 p-3 rounded-md border border-slate-300">
                         <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-mono text-slate-500 uppercase">Direction:</span>
+                            <span className="text-[0.6875rem] font-mono text-slate-500 uppercase">Direction:</span>
                             <Badge variant={shipment.direction === 'INBOUND_PZ' ? 'success' : 'info'}>
                                 {shipment.direction === 'INBOUND_PZ' ? 'PZ INBOUND TRUCK' : 'WZ OUTBOUND TRUCK'}
                             </Badge>

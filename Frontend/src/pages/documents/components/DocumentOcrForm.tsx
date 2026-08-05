@@ -116,12 +116,12 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
     return (
         <div className="w-full bg-white border border-slate-300 rounded-lg shadow-xs flex flex-col h-full text-xs">
             {/* Header */}
-            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <header className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div>
                     <span className="font-bold text-slate-800 text-xs uppercase tracking-wider block font-mono">
                         Extracted Data & Verification Form
                     </span>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[0.625rem] text-slate-500">
                         {focusedFieldKey ? (
                             <span className="text-[#2b6675] font-semibold">
                                 Active input: <code className="bg-[#f0f7f8] text-[#2b6675] px-1 py-0.2 rounded font-mono">{focusedFieldKey}</code> (click any scan snippet to paste)
@@ -133,22 +133,22 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
+                    <span className="text-[0.625rem] font-mono font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
                         Accuracy: {Math.round(document.overallConfidence * 100)}%
                     </span>
                 </div>
-            </div>
+            </header>
 
             {/* Scrollable Form Body */}
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
                 {/* Document Metadata Grid */}
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-mono">
+                <section className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
+                    <span className="text-[0.625rem] font-bold text-slate-500 uppercase block font-mono">
                         Document Classification & Details
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Type</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Type</label>
                             <Select
                                 value={extractedData.docType}
                                 onChange={(e) => handleFieldChange('docType', e.target.value as DocumentType)}
@@ -156,7 +156,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Document Number</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Document Number</label>
                             <Input
                                 type="text"
                                 value={extractedData.docNumber}
@@ -165,7 +165,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Issue Date</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Issue Date</label>
                             <Input
                                 type="date"
                                 value={extractedData.issueDate}
@@ -174,7 +174,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Delivery Date</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Delivery Date</label>
                             <Input
                                 type="date"
                                 value={extractedData.deliveryDate}
@@ -183,16 +183,16 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             />
                         </div>
                     </div>
-                </div>
+                </section>
 
                 {/* Counterparty / Contractor Grid */}
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-mono">
+                <section className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
+                    <span className="text-[0.625rem] font-bold text-slate-500 uppercase block font-mono">
                         Contractor / Supplier Information
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <div className="sm:col-span-2">
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Company / Counterparty Name</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Company / Counterparty Name</label>
                             <Input
                                 type="text"
                                 value={extractedData.contractorName}
@@ -201,7 +201,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">NIP / Tax ID</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">NIP / Tax ID</label>
                             <Input
                                 type="text"
                                 value={extractedData.contractorNip}
@@ -211,7 +211,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Target Destination Warehouse</label>
+                        <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Target Destination Warehouse</label>
                         <Input
                             type="text"
                             value={extractedData.destinationWarehouse}
@@ -219,12 +219,12 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             onChange={(e) => handleFieldChange('destinationWarehouse', e.target.value)}
                         />
                     </div>
-                </div>
+                </section>
 
                 {/* Line Items Table */}
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
+                <section className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block font-mono">
+                        <span className="text-[0.625rem] font-bold text-slate-500 uppercase block font-mono">
                             Document Positions & SKUs ({extractedData.items.length})
                         </span>
                         <Button
@@ -239,7 +239,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                     <div className="w-full overflow-x-auto">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="border-b border-slate-200 bg-slate-100 text-slate-700 text-[10px] font-bold uppercase font-mono">
+                                <tr className="border-b border-slate-200 bg-slate-100 text-slate-700 text-[0.625rem] font-bold uppercase font-mono">
                                     <th className="py-1.5 px-2">SKU Code</th>
                                     <th className="py-1.5 px-2">Product Description</th>
                                     <th className="py-1.5 px-2 w-20">Qty</th>
@@ -319,12 +319,12 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             </tbody>
                         </table>
                     </div>
-                </div>
+                </section>
 
                 {/* Totals & Notes Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Notes & Gate Reference</label>
+                        <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Notes & Gate Reference</label>
                         <textarea
                             rows={2}
                             value={extractedData.notes || ''}
@@ -343,11 +343,11 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                             <span className="text-[#2b6675]">{extractedData.totalGross.toFixed(2)} {extractedData.currency}</span>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
 
             {/* Footer Action Bar */}
-            <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+            <footer className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
                 <Button
                     variant="outline"
                     size="sm"
@@ -367,7 +367,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                         {isPosting ? 'Posting...' : 'Approve & Post to WMS Inventory'}
                     </Button>
                 </div>
-            </div>
+            </footer>
         </div>
     );
 };

@@ -31,7 +31,7 @@ export const SystemConfigPanel: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Handheld Terminal Policies */}
                 <div className="space-y-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <h4 className="font-bold text-slate-900 uppercase text-[11px] font-mono border-b border-slate-200 pb-2">
+                    <h4 className="font-bold text-slate-900 uppercase text-[0.6875rem] font-mono border-b border-slate-200 pb-2">
                         Mobile Terminal & Session Security
                     </h4>
 
@@ -49,7 +49,7 @@ export const SystemConfigPanel: React.FC = () => {
                     <div className="flex items-center justify-between pt-2">
                         <div>
                             <span className="font-semibold block text-slate-800">Enforce GS1 Standard Barcodes</span>
-                            <span className="text-[10px] text-slate-500">Block arbitrary free-text scans on inbound reception</span>
+                            <span className="text-[0.625rem] text-slate-500">Block arbitrary free-text scans on inbound reception</span>
                         </div>
                         <input
                             name="enforceGs1Barcodes"
@@ -62,7 +62,7 @@ export const SystemConfigPanel: React.FC = () => {
                     <div className="flex items-center justify-between pt-2">
                         <div>
                             <span className="font-semibold block text-slate-800">Two-Person Verification for High-Value Goods</span>
-                            <span className="text-[10px] text-slate-500">Requires shift foreman confirmation on receipt</span>
+                            <span className="text-[0.625rem] text-slate-500">Requires shift foreman confirmation on receipt</span>
                         </div>
                         <input
                             name="enableTwoManRuleForPz"
@@ -75,7 +75,7 @@ export const SystemConfigPanel: React.FC = () => {
 
                 {/* Dispatch & Operations Policies */}
                 <div className="space-y-4 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                    <h4 className="font-bold text-slate-900 uppercase text-[11px] font-mono border-b border-slate-200 pb-2">
+                    <h4 className="font-bold text-slate-900 uppercase text-[0.6875rem] font-mono border-b border-slate-200 pb-2">
                         Task Dispatching & Shifts
                     </h4>
 

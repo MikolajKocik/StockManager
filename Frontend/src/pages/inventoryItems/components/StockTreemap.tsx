@@ -97,7 +97,7 @@ export const StockTreemap: React.FC<StockTreemapProps> = ({
     };
 
     return (
-        <div className="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-3">
+        <section className="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-3">
             {/* Breadcrumb Navigation Bar */}
             <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-slate-200">
                 <nav className="flex items-center gap-1.5 text-xs font-mono">
@@ -130,7 +130,7 @@ export const StockTreemap: React.FC<StockTreemapProps> = ({
                             variant="outline"
                             size="sm"
                             onClick={() => handleBreadcrumbClick(path.length - 2)}
-                            className="text-[11px] py-0.5"
+                            className="text-[0.6875rem] py-0.5"
                         >
                             Up One Level
                         </Button>
@@ -145,7 +145,7 @@ export const StockTreemap: React.FC<StockTreemapProps> = ({
             <div className="relative w-full overflow-hidden bg-slate-100/60 rounded-md border border-slate-200 p-1">
                 <div
                     className="relative w-full"
-                    style={{ height: '540px' }}
+                    style={{ height: '33.75rem' }}
                 >
                     {layoutRects.map(({ node, x, y, width: w, height: h }) => {
                         const isSelected = selectedNodeId === node.id;
@@ -183,13 +183,13 @@ export const StockTreemap: React.FC<StockTreemapProps> = ({
                                                 {node.name}
                                             </span>
                                             {hasChildren && (
-                                                <span className="text-[10px] text-slate-500 font-mono shrink-0">
+                                                <span className="text-[0.625rem] text-slate-500 font-mono shrink-0">
                                                     ({node.children?.length} items)
                                                 </span>
                                             )}
                                         </div>
                                         {node.sku && (
-                                            <span className="text-[10px] font-mono text-slate-500 block truncate">
+                                            <span className="text-[0.625rem] font-mono text-slate-500 block truncate">
                                                 SKU: {node.sku} &bull; {node.binLocation || 'Rack A'}
                                             </span>
                                         )}
@@ -197,7 +197,7 @@ export const StockTreemap: React.FC<StockTreemapProps> = ({
 
                                     <Badge
                                         variant={theme.badge}
-                                        className="text-[9px] px-1 py-0 shrink-0 uppercase"
+                                        className="text-[0.5625rem] px-1 py-0 shrink-0 uppercase"
                                     >
                                         {theme.label}
                                     </Badge>
@@ -208,13 +208,13 @@ export const StockTreemap: React.FC<StockTreemapProps> = ({
                                     <div className="font-mono font-black text-sm sm:text-base text-slate-900 tracking-tight">
                                         {formatCurrency(node.value)}
                                     </div>
-                                    <div className="text-[11px] text-slate-600 font-mono">
+                                    <div className="text-[0.6875rem] text-slate-600 font-mono">
                                         {formatNumber(node.quantityOnHand)} units on hand
                                     </div>
                                 </div>
 
                                 {/* Bottom Metadata & Action hint */}
-                                <div className="flex items-center justify-between text-[10px] text-slate-500 border-t border-slate-300/40 pt-1">
+                                <div className="flex items-center justify-between text-[0.625rem] text-slate-500 border-t border-slate-300/40 pt-1">
                                     <span className="font-mono">
                                         Turnover: <strong className="text-slate-800">{node.turnoverDays}d</strong>
                                     </span>
@@ -233,10 +233,10 @@ export const StockTreemap: React.FC<StockTreemapProps> = ({
                 <span>
                     Click on any category box to drill down into subcategories and identify stagnant inventory.
                 </span>
-                <span className="font-mono text-[11px]">
+                <span className="font-mono text-[0.6875rem]">
                     Box Area = Capital Value (PLN) &bull; Color = Stock Rotation Speed
                 </span>
             </div>
-        </div>
+        </section>
     );
 };

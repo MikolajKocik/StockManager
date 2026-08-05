@@ -8,12 +8,20 @@ interface CustomerDetailsModalProps {
     onEdit: (customer: Customer) => void;
 }
 
+const STATUS_STYLE_MAP: Record<string, { textClass: string; dotClass: string }> = {
+    Active: { textClass: 'text-[#0e5f32]', dotClass: 'bg-[#0e5f32]' },
+    Pending: { textClass: 'text-[#8f7d49]', dotClass: 'bg-[#AA9559]' },
+    Suspended: { textClass: 'text-slate-500', dotClass: 'bg-slate-400' }
+};
+
 export const CustomerDetailsModal = forwardRef<HTMLDialogElement, CustomerDetailsModalProps>(({
     customer,
     onClose,
     onEdit
 }, ref) => {
     if (!customer) return null;
+
+    const statusConfig = STATUS_STYLE_MAP[customer.status || 'Active'] || STATUS_STYLE_MAP.Active;
 
     return (
         <Modal
@@ -26,27 +34,15 @@ export const CustomerDetailsModal = forwardRef<HTMLDialogElement, CustomerDetail
                 {/* Status & Commercial Terms */}
                 <div className="grid grid-cols-2 gap-3 bg-slate-50/80 border border-slate-300 rounded-md p-3">
                     <div>
-                        <span className="text-[11px] text-slate-500 block font-medium">Status</span>
-                        <span className={`inline-flex items-center gap-1.5 mt-1 text-xs font-semibold ${
-                            customer.status === 'Active' || !customer.status
-                                ? 'text-[#0e5f32]'
-                                : customer.status === 'Pending'
-                                    ? 'text-[#8f7d49]'
-                                    : 'text-slate-500'
-                        }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                                customer.status === 'Active' || !customer.status
-                                    ? 'bg-[#0e5f32]'
-                                    : customer.status === 'Pending'
-                                        ? 'bg-[#AA9559]'
-                                        : 'bg-slate-400'
-                            }`} />
+                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Status</span>
+                        <span className={`inline-flex items-center gap-1.5 mt-1 text-xs font-semibold ${statusConfig.textClass}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dotClass}`} />
                             {customer.status || 'Active'}
                         </span>
                     </div>
 
                     <div>
-                        <span className="text-[11px] text-slate-500 block font-medium">Segment</span>
+                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Segment</span>
                         <span className="font-semibold text-slate-800 block mt-1">
                             {customer.segment || 'Enterprise'}
                         </span>
@@ -55,23 +51,23 @@ export const CustomerDetailsModal = forwardRef<HTMLDialogElement, CustomerDetail
 
                 {/* Contact & Legal Info */}
                 <div className="space-y-3 border border-slate-300 rounded-md p-3 bg-white">
-                    <h4 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <h4 className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Company & Billing Contact
                     </h4>
 
                     <div className="grid grid-cols-2 gap-3 text-xs">
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Contact Person:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Contact Person:</span>
                             <span className="font-semibold text-slate-800">{customer.contactPerson || 'Procurement Contact'}</span>
                         </div>
 
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Tax / VAT / NIP ID:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Tax / VAT / NIP ID:</span>
                             <span className="font-mono font-semibold text-slate-800">{customer.taxId || 'N/A'}</span>
                         </div>
 
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Email Address:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Email Address:</span>
                             <a
                                 href={`mailto:${customer.email}`}
                                 className="text-[#2b6675] hover:underline font-medium break-all"
@@ -81,7 +77,7 @@ export const CustomerDetailsModal = forwardRef<HTMLDialogElement, CustomerDetail
                         </div>
 
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Phone Number:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Phone Number:</span>
                             <a
                                 href={`tel:${customer.phone}`}
                                 className="text-[#2b6675] hover:underline font-medium"
@@ -94,7 +90,7 @@ export const CustomerDetailsModal = forwardRef<HTMLDialogElement, CustomerDetail
 
                 {/* Location & Address */}
                 <div className="border border-slate-300 rounded-md p-3 bg-slate-50/80 space-y-1.5 text-xs">
-                    <h4 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+                    <h4 className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider mb-1">
                         Registered Billing Headquarters
                     </h4>
                     <div className="flex items-center justify-between text-slate-700">

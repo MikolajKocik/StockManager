@@ -92,7 +92,7 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
 
                     {/* Category Filter */}
                     <div className="flex items-center gap-1">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase font-mono mr-1">
+                        <span className="text-[0.625rem] font-bold text-slate-500 uppercase font-mono mr-1">
                             Domain:
                         </span>
                         {DOMAIN_CATEGORIES.map(cat => (
@@ -100,7 +100,7 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
                                 key={cat}
                                 type="button"
                                 onClick={() => setSelectedCategory(cat)}
-                                className={`px-2.5 py-1 rounded text-[11px] font-semibold cursor-pointer transition-colors ${
+                                className={`px-2.5 py-1 rounded text-[0.6875rem] font-semibold cursor-pointer transition-colors ${
                                     selectedCategory === cat
                                         ? 'bg-[#2b6675] text-white'
                                         : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
@@ -113,7 +113,7 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
                 </div>
 
                 {/* Legend */}
-                <div className="flex items-center gap-2 text-[11px] font-mono">
+                <div className="flex items-center gap-2 text-[0.6875rem] font-mono">
                     <span className="text-slate-500 font-sans">Cycle:</span>
                     <span className="px-1.5 py-0.2 rounded-xs bg-slate-100 text-slate-600 border border-slate-300">None</span>
                     <span className="text-slate-400">&rarr;</span>
@@ -128,16 +128,16 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
             {/* Interactive Grid Table */}
             <div className="w-full bg-white border border-slate-300 rounded-lg shadow-2xs overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse min-w-[950px]">
+                    <table className="w-full text-left border-collapse min-w-[59.375rem]">
                         <thead>
                             <tr className="bg-[#2b6675] text-white border-b border-[#204e5a]">
                                 {/* Roles Sticky Column */}
                                 <th className="py-2.5 px-3 text-xs font-bold w-72 shrink-0 border-r border-[#204e5a]">
                                     <div className="flex items-center justify-between">
-                                        <span className="uppercase tracking-wider font-mono text-[10px]">
+                                        <span className="uppercase tracking-wider font-mono text-[0.625rem]">
                                             WMS Role / Brigade Profile
                                         </span>
-                                        <span className="text-[10px] text-slate-200 font-normal">
+                                        <span className="text-[0.625rem] text-slate-200 font-normal">
                                             {filteredRoles.length} Roles
                                         </span>
                                     </div>
@@ -147,13 +147,13 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
                                 {filteredModules.map((mod) => (
                                     <th
                                         key={mod.key}
-                                        className="py-2 px-2 text-center text-xs font-semibold border-r border-[#204e5a]/80 min-w-[110px]"
+                                        className="py-2 px-2 text-center text-xs font-semibold border-r border-[#204e5a]/80 min-w-[6.875rem]"
                                     >
                                         <div className="flex flex-col items-center gap-1">
-                                            <span className="font-bold text-[11px] text-white leading-tight">
+                                            <span className="font-bold text-[0.6875rem] text-white leading-tight">
                                                 {mod.title}
                                             </span>
-                                            <span className="text-[9px] text-slate-200 font-mono uppercase bg-black/20 px-1 py-0.2 rounded-xs">
+                                            <span className="text-[0.5625rem] text-slate-200 font-mono uppercase bg-black/20 px-1 py-0.2 rounded-xs">
                                                 {mod.category.replace('_', ' ')}
                                             </span>
 
@@ -163,7 +163,7 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
                                                     type="button"
                                                     title={`Grant WRITE to all for ${mod.title}`}
                                                     onClick={() => onBulkUpdateModule(mod.key, 'WRITE')}
-                                                    className="px-1 py-0.2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xs text-[8px] font-mono font-bold cursor-pointer"
+                                                    className="px-1 py-0.2 bg-emerald-700 hover:bg-emerald-600 text-white rounded-xs text-[0.5rem] font-mono font-bold cursor-pointer"
                                                 >
                                                     All R/W
                                                 </button>
@@ -171,7 +171,7 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
                                                     type="button"
                                                     title={`Revoke all access for ${mod.title}`}
                                                     onClick={() => onBulkUpdateModule(mod.key, 'NONE')}
-                                                    className="px-1 py-0.2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xs text-[8px] font-mono cursor-pointer"
+                                                    className="px-1 py-0.2 bg-slate-700 hover:bg-slate-600 text-slate-200 rounded-xs text-[0.5rem] font-mono cursor-pointer"
                                                 >
                                                     Revoke
                                                 </button>
@@ -192,35 +192,35 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
                                                 <span className="font-bold text-slate-900 text-xs">
                                                     {role.roleName}
                                                 </span>
-                                                <span className="text-[10px] font-mono bg-white text-slate-700 px-1.5 py-0.5 rounded border border-slate-300 font-semibold">
+                                                <span className="text-[0.625rem] font-mono bg-white text-slate-700 px-1.5 py-0.5 rounded border border-slate-300 font-semibold">
                                                     {role.userCount} staff
                                                 </span>
                                             </div>
-                                            <p className="text-[10px] text-slate-600 leading-tight">
+                                            <p className="text-[0.625rem] text-slate-600 leading-tight">
                                                 {role.roleDescription}
                                             </p>
 
                                             {/* Row Fast-Action Presets */}
                                             <div className="flex items-center gap-1 pt-0.5">
-                                                <span className="text-[9px] text-slate-400 font-mono">Row:</span>
+                                                <span className="text-[0.5625rem] text-slate-400 font-mono">Row:</span>
                                                 <button
                                                     type="button"
                                                     onClick={() => onBulkUpdateRole(role.roleId, 'WRITE')}
-                                                    className="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-1 py-0.2 rounded-xs cursor-pointer transition-colors"
+                                                    className="text-[0.5625rem] bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-1 py-0.2 rounded-xs cursor-pointer transition-colors"
                                                 >
                                                     All R/W
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onBulkUpdateRole(role.roleId, 'READ')}
-                                                    className="text-[9px] bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-1 py-0.2 rounded-xs cursor-pointer transition-colors"
+                                                    className="text-[0.5625rem] bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold px-1 py-0.2 rounded-xs cursor-pointer transition-colors"
                                                 >
                                                     All View
                                                 </button>
                                                 <button
                                                     type="button"
                                                     onClick={() => onBulkUpdateRole(role.roleId, 'NONE')}
-                                                    className="text-[9px] bg-slate-200 hover:bg-red-100 hover:text-red-800 text-slate-700 font-medium px-1 py-0.2 rounded-xs cursor-pointer transition-colors"
+                                                    className="text-[0.5625rem] bg-slate-200 hover:bg-red-100 hover:text-red-800 text-slate-700 font-medium px-1 py-0.2 rounded-xs cursor-pointer transition-colors"
                                                 >
                                                     Lock All
                                                 </button>
@@ -242,7 +242,7 @@ export const RbacMatrixGrid: React.FC<RbacMatrixGridProps> = ({
                                                     type="button"
                                                     onClick={() => onTogglePermission(role.roleId, mod.key, NEXT_ACCESS_LEVEL[currentLevel])}
                                                     title={`${role.roleName} - ${mod.title}\nStatus: ${badge.label} (${badge.description})`}
-                                                    className={`w-full py-1.5 px-1 rounded-xs border transition-all cursor-pointer shadow-2xs font-mono text-[9px] font-bold flex flex-col items-center justify-center gap-0.5 ${badge.bgColor}`}
+                                                    className={`w-full py-1.5 px-1 rounded-xs border transition-all cursor-pointer shadow-2xs font-mono text-[0.5625rem] font-bold flex flex-col items-center justify-center gap-0.5 ${badge.bgColor}`}
                                                 >
                                                     <div className="flex items-center gap-1">
                                                         <span className={`w-1.5 h-1.5 rounded-full ${badge.dotColor}`} />

@@ -160,7 +160,7 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
                     {/* Header Row: Ramp Info Column + Horizontal Time Axis */}
                     <div className="flex border-b border-slate-300 bg-slate-100/80 text-slate-700 text-xs font-semibold">
                         <div className="w-60 shrink-0 p-2.5 border-r border-slate-300 flex items-center justify-between">
-                            <span className="font-bold text-slate-700 uppercase tracking-wider text-[10px] font-mono">
+                            <span className="font-bold text-slate-700 uppercase tracking-wider text-[0.625rem] font-mono">
                                 Loading Docks / Ramp
                             </span>
                             <Badge variant="slate">
@@ -173,7 +173,7 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
                             {timelineHours.map((h) => (
                                 <div
                                     key={h}
-                                    className={`flex-1 text-center py-2 text-[11px] font-mono border-r border-slate-200 ${h === Math.floor(CURRENT_SIMULATED_HOUR) ? 'bg-amber-50 font-bold text-amber-900' : ''
+                                    className={`flex-1 text-center py-2 text-[0.6875rem] font-mono border-r border-slate-200 ${h === Math.floor(CURRENT_SIMULATED_HOUR) ? 'bg-amber-50 font-bold text-amber-900' : ''
                                         }`}
                                 >
                                     <span>{String(h).padStart(2, '0')}:00</span>
@@ -192,7 +192,7 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
                                     left: `calc(15rem + ${(CURRENT_SIMULATED_HOUR - TIMELINE_START_HOUR) / TOTAL_HOURS * 100}% - (15rem * ${(CURRENT_SIMULATED_HOUR - TIMELINE_START_HOUR) / TOTAL_HOURS}))`
                                 }}
                             >
-                                <div className="bg-[#991b1b] text-white text-[9px] font-bold px-1.5 py-0.2 rounded-xs shadow-xs font-mono -mt-2">
+                                <div className="bg-[#991b1b] text-white text-[0.5625rem] font-bold px-1.5 py-0.2 rounded-xs shadow-xs font-mono -mt-2">
                                     NOW {formatHour(CURRENT_SIMULATED_HOUR)}
                                 </div>
                                 <div className="w-0.5 flex-1 bg-[#991b1b]/80 border-l border-dashed border-[#991b1b]" />
@@ -211,14 +211,14 @@ export const DockSchedulerGantt: React.FC<DockSchedulerGanttProps> = ({
                                             <span className="font-bold text-xs text-slate-900 font-mono">
                                                 {ramp.code}
                                             </span>
-                                            <Badge variant="slate" className="text-[9px]">
+                                            <Badge variant="slate" className="text-[0.5625rem]">
                                                 {ramp.type.replace('_', ' ')}
                                             </Badge>
                                         </div>
-                                        <div className="text-[10px] text-slate-600 truncate font-medium" title={ramp.name}>
+                                        <div className="text-[0.625rem] text-slate-600 truncate font-medium" title={ramp.name}>
                                             {ramp.name}
                                         </div>
-                                        <div className="flex items-center justify-between text-[10px] text-slate-500 font-mono pt-0.5">
+                                        <div className="flex items-center justify-between text-[0.625rem] text-slate-500 font-mono pt-0.5">
                                             <span>Max: {ramp.maxWeightTons}t</span>
                                             <span>Zone: {ramp.assignedZone}</span>
                                         </div>

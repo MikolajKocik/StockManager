@@ -95,7 +95,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                                                 {p.name}
                                             </span>
                                             {p.slug && (
-                                                <span className="text-[10px] text-slate-400 font-mono">
+                                                <span className="text-[0.625rem] text-slate-400 font-mono">
                                                     {p.slug}
                                                 </span>
                                             )}
@@ -131,7 +131,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                                                 {formatValue(p.supplierName)}
                                             </span>
                                             {p.supplierId && (
-                                                <span className="text-[10px] text-slate-400 font-mono">
+                                                <span className="text-[0.625rem] text-slate-400 font-mono">
                                                     ID: {p.supplierId}
                                                 </span>
                                             )}

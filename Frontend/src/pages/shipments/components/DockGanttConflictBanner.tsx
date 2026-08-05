@@ -25,7 +25,7 @@ export const DockGanttConflictBanner: React.FC<DockGanttConflictBannerProps> = (
                     Ramp conflict: {firstCollision.shipmentA.shipmentNumber} overlaps with {firstCollision.shipmentB.shipmentNumber} ({formatHour(firstCollision.overlapStartHour)} - {formatHour(firstCollision.overlapEndHour)}).
                 </span>
             </div>
-            <span className="text-[11px] text-red-700 font-medium hidden sm:inline">
+            <span className="text-[0.6875rem] text-red-700 font-medium hidden sm:inline">
                 Drag block to an empty time window or different ramp to resolve.
             </span>
         </div>

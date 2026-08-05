@@ -62,7 +62,7 @@ export const StockTableView: React.FC<StockTableViewProps> = ({ data, onSelectNo
                             <TableCell>
                                 <div className="space-y-0.5">
                                     <span className="font-bold text-slate-900 block text-xs">{item.name}</span>
-                                    <span className="font-mono text-[10px] text-slate-500">{item.sku}</span>
+                                    <span className="font-mono text-[0.625rem] text-slate-500">{item.sku}</span>
                                 </div>
                             </TableCell>
                             <TableCell className="text-xs font-mono">{item.category}</TableCell>

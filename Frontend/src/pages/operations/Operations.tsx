@@ -24,7 +24,6 @@ export default function Operations() {
     const createModalRef = useRef<HTMLDialogElement>(null);
     const detailsModalRef = useRef<HTMLDialogElement>(null);
 
-    {/* Metric Counts */}
     const inProgressCount = operations.filter(op => op.status === 'IN_PROGRESS').length;
     const blockedCount = operations.filter(op => op.status === 'BLOCKED').length;
     const activeFloorCount = operations.filter(op => op.status !== 'COMPLETED').length;
@@ -48,11 +47,9 @@ export default function Operations() {
         setSelectedOperation(null);
     };
 
-    {/* Move / Transition Operation Status via Drag & Drop */}
     const handleMoveOperation = (opId: string, newStatus: OperationStatus) => {
         const targetOp = operations.find(o => o.id === opId);
         if (!targetOp) return;
-
         if (targetOp.status === newStatus) return;
 
         setOperations(prev => prev.map(op => {
@@ -67,7 +64,7 @@ export default function Operations() {
         toast.success(`Moved ${targetOp.operationNumber} to ${newStatus.replace('_', ' ')}`);
     };
 
-    {/* Fast-Track / Reorder to Priority #1 and broadcast UpdateOperationPriorityCommand */}
+    {/** Elevates selected operation to Priority #1 and transitions state to IN_PROGRESS */ }
     const handleFastTrackPriority = (opId: string) => {
         const targetOp = operations.find(o => o.id === opId);
         if (!targetOp) return;
@@ -83,7 +80,7 @@ export default function Operations() {
         });
 
         toast.success(
-            `Dispatched UpdateOperationPriorityCommand: ${targetOp.operationNumber} promoted to Priority #1 on all handheld terminals!`,
+            `Dispatched Priority Update: ${targetOp.operationNumber} promoted to Priority #1 on all terminals.`,
             { duration: 4000 }
         );
     };
@@ -116,14 +113,13 @@ export default function Operations() {
         if (selectedOperation && selectedOperation.id === opId) {
             setSelectedOperation(prev => prev ? { ...prev, status: 'IN_PROGRESS', blockedReason: undefined } : null);
         }
-        toast.success('Hazard cleared! Task returned to In Progress queue');
+        toast.success('Hazard cleared. Task returned to In Progress queue.');
     };
 
     const handleCreateOperation = (newOp: KanbanOperation) => {
         setOperations(prev => [newOp, ...prev]);
     };
 
-    {/* Filtering */}
     const filteredOperations = operations.filter(op => {
         const matchesType = filterType === 'ALL' || op.type === filterType;
         const matchesPriority = filterPriority === 'ALL' || op.priority === filterPriority;
@@ -139,7 +135,6 @@ export default function Operations() {
 
     return (
         <div className="w-full space-y-4 pb-12">
-            {/* Header & KPI Summary */}
             <OperationsHeader
                 filterType={filterType}
                 onFilterTypeChange={setFilterType}
@@ -154,7 +149,6 @@ export default function Operations() {
                 isBottleneckActive={isBottleneckActive}
             />
 
-            {/* Interactive Workflow Kanban Board */}
             <WorkflowKanbanBoard
                 columns={KANBAN_COLUMNS}
                 operations={filteredOperations}
@@ -163,7 +157,6 @@ export default function Operations() {
                 onSelectOperation={handleSelectOperation}
             />
 
-            {/* Operation Details & SKUs Modal */}
             <OperationDetailsModal
                 ref={detailsModalRef}
                 operation={selectedOperation}
@@ -173,7 +166,6 @@ export default function Operations() {
                 onResolveBlocked={handleResolveBlocked}
             />
 
-            {/* Create & Dispatch Operation Modal */}
             <CreateOperationModal
                 ref={createModalRef}
                 onClose={handleCloseCreateModal}

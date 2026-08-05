@@ -71,33 +71,33 @@ export const DockGanttBlock: React.FC<DockGanttBlockProps> = ({
             <div className="flex items-center justify-between gap-1 leading-none">
                 <div className="flex items-center gap-1.5 min-w-0">
                     <span className={`w-2 h-2 rounded-full shrink-0 ${statusDotColors[shipment.status] || 'bg-[#0e5f32]'}`} />
-                    <span className="font-bold text-[11px] font-mono truncate text-slate-900">
+                    <span className="font-bold text-[0.6875rem] font-mono truncate text-slate-900">
                         {shipment.shipmentNumber}
                     </span>
                 </div>
-                <span className="font-mono text-[9px] font-semibold bg-white/90 px-1 py-0.2 rounded-xs shrink-0 border border-slate-200 text-slate-700">
+                <span className="font-mono text-[0.5625rem] font-semibold bg-white/90 px-1 py-0.2 rounded-xs shrink-0 border border-slate-200 text-slate-700">
                     {formatHour(displayStartHour)} - {formatHour(displayStartHour + shipment.durationHours)}
                 </span>
             </div>
 
             {/* Block Center: Carrier & Cargo */}
             <div className="min-w-0 py-0.5">
-                <div className="text-[10px] font-semibold text-slate-800 truncate leading-tight">
+                <div className="text-[0.625rem] font-semibold text-slate-800 truncate leading-tight">
                     {shipment.carrierName} ({shipment.truckPlateNumber})
                 </div>
-                <div className="text-[9px] text-slate-600 truncate leading-tight">
+                <div className="text-[0.5625rem] text-slate-600 truncate leading-tight">
                     {shipment.palletCount} pal. • {shipment.cargoDescription}
                 </div>
             </div>
 
             {/* Block Footer Status Tag */}
-            <div className="flex items-center justify-between text-[9px] leading-none pt-0.5 border-t border-slate-200/60">
+            <div className="flex items-center justify-between text-[0.5625rem] leading-none pt-0.5 border-t border-slate-200/60">
                 <span className="font-medium truncate text-slate-600">
                     {shipment.direction === 'INBOUND_PZ' ? 'PZ Inbound' : 'WZ Outbound'}
                 </span>
                 <Badge
                     variant={statusBadgeVariants[shipment.status] || 'success'}
-                    className="text-[8px] py-0 px-1"
+                    className="text-[0.5rem] py-0 px-1"
                 >
                     {shipment.status}
                 </Badge>

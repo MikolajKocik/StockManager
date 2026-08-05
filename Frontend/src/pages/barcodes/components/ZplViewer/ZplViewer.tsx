@@ -64,9 +64,9 @@ export const ZplViewer: React.FC<ZplViewerProps> = ({ template }) => {
                     >
                         <div className="flex items-center justify-between mb-1.5">
                             <span className="font-bold text-xs truncate">{p.name}</span>
-                            <span className={`w-2 h-2 rounded-full ${selectedPrinter === p.id ? 'bg-amber-400' : 'bg-emerald-500 animate-pulse'}`} />
+                            <span className={`w-2 h-2 rounded-full ${selectedPrinter === p.id ? 'bg-amber-400' : 'bg-emerald-500'}`} />
                         </div>
-                        <div className="flex justify-between text-[10px] opacity-80 font-mono">
+                        <div className="flex justify-between text-[0.625rem] opacity-80 font-mono">
                             <span>IP: {p.ip}</span>
                             <span>{p.dpi}</span>
                         </div>
@@ -78,7 +78,7 @@ export const ZplViewer: React.FC<ZplViewerProps> = ({ template }) => {
             <div className="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-3">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2">
                     <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                        <span className="text-[0.625rem] font-bold uppercase tracking-wider text-slate-500 block">
                             Raw Zebra Programming Language (ZPL-II)
                         </span>
                         <h3 className="font-bold text-sm text-slate-800">

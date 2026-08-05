@@ -28,7 +28,7 @@ export const KpiCard: React.FC<KpiCardProps> = ({
     return (
         <div className={`bg-white border border-slate-300 rounded-md p-3 shadow-2xs flex flex-col justify-between ${className}`}>
             <div className="flex items-center justify-between gap-1">
-                <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider font-mono">
+                <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider font-mono">
                     {title}
                 </span>
                 {badge}

@@ -55,7 +55,7 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
             <div className="overflow-x-auto print:overflow-visible border border-slate-300 rounded shadow-sm print:shadow-none print:border-slate-400">
                 <table className="w-full text-xs text-left border-collapse">
                     <thead>
-                        <tr className="bg-slate-200 text-slate-700 font-bold border-b border-slate-300 text-[10px] uppercase tracking-wider print:bg-slate-100">
+                        <tr className="bg-slate-200 text-slate-700 font-bold border-b border-slate-300 text-[0.625rem] uppercase tracking-wider print:bg-slate-100">
                             <th className="py-1.5 px-1 text-center w-8 no-print">{t.itemsTable.handle}</th>
                             <th className="py-1.5 px-1 text-center w-6">{t.itemsTable.lp}</th>
                             <th className="py-1.5 px-2">{t.itemsTable.name}</th>
@@ -117,10 +117,10 @@ export const InvoiceItemsTable: React.FC<InvoiceItemsTableProps> = ({
                                             title={item.sku || ''}
                                             onChange={(e) => onUpdateLineItem(item.id, 'sku', e.target.value)}
                                             placeholder="SKU Code (optional)..."
-                                            className="w-full text-[10px] text-slate-400 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.2 outline-none truncate print:hidden"
+                                            className="w-full text-[0.625rem] text-slate-400 bg-transparent border-b border-transparent hover:border-slate-300 focus:border-slate-800 focus:bg-amber-50/50 px-1 py-0.2 outline-none truncate print:hidden"
                                         />
                                         {item.sku && (
-                                            <div className="hidden print:block text-[9px] text-slate-500 font-mono leading-tight whitespace-normal break-words mt-0.5">
+                                            <div className="hidden print:block text-[0.5625rem] text-slate-500 font-mono leading-tight whitespace-normal break-words mt-0.5">
                                                 SKU: {item.sku}
                                             </div>
                                         )}

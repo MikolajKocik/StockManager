@@ -30,12 +30,10 @@ export default function Maintenance() {
         resolveIncident
     } = useFleetManager();
 
-    // Active (open) incidents
     const openIncidents = incidents.filter(i => i.status !== 'Resolved' && i.status !== 'Closed');
 
     return (
-        <div className="w-full flex flex-col gap-4 pb-8">
-            {/* Top KPI Bar and Controls */}
+        <main className="w-full flex flex-col gap-4 pb-8">
             <FleetKpiSummary
                 kpis={kpis}
                 filterQuery={filterQuery}
@@ -43,9 +41,8 @@ export default function Maintenance() {
                 onOpenReportModal={() => setIsReportModalOpen(true)}
             />
 
-            {/* Active Incidents Banner (if any) */}
             {openIncidents.length > 0 && (
-                <div className="bg-amber-50 border border-amber-300 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                <section className="bg-amber-50 border border-amber-300 rounded-lg p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
                     <div>
                         <h4 className="text-xs font-bold text-amber-900 uppercase font-mono tracking-wider">
                             Active Maintenance Incidents ({openIncidents.length})
@@ -61,12 +58,10 @@ export default function Maintenance() {
                     >
                         Resolve ticket #{openIncidents[0].id}
                     </Button>
-                </div>
+                </section>
             )}
 
-            {/* Main Interactive Grid: Inspector (Left) + 3 Drop Zones (Right) */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                {/* Left Column: Live Machine Telemetry & Inspector */}
+            <section className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
                 <div className="lg:col-span-4 xl:col-span-4 order-2 lg:order-1">
                     <MachineInspectorPanel
                         machine={selectedMachine}
@@ -75,7 +70,6 @@ export default function Maintenance() {
                     />
                 </div>
 
-                {/* Right Column: 3 Work Zones with Drag and Drop */}
                 <div className="lg:col-span-8 xl:col-span-8 order-1 lg:order-2">
                     <FleetZoneContainer
                         machinesByZone={machinesByZone}
@@ -90,9 +84,8 @@ export default function Maintenance() {
                         onDragEnd={handleDragEnd}
                     />
                 </div>
-            </div>
+            </section>
 
-            {/* Modal for reporting breakdown */}
             <ReportIncidentModal
                 isOpen={isReportModalOpen}
                 machines={machines}
@@ -100,6 +93,6 @@ export default function Maintenance() {
                 onClose={() => setIsReportModalOpen(false)}
                 onSubmit={reportIncident}
             />
-        </div>
+        </main>
     );
 }

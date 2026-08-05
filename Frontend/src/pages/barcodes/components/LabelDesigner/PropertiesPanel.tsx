@@ -37,26 +37,26 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 <div className="space-y-3">
                     <div className="flex items-center justify-between border-b border-slate-200 pb-2">
                         <div>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 block">
+                            <span className="text-[0.625rem] font-bold uppercase tracking-wider text-blue-600 block">
                                 Selected Element
                             </span>
                             <h4 className="font-bold text-slate-800 text-xs">
                                 {selectedElement.label || selectedElement.type}
                             </h4>
                         </div>
-                        <span className="text-[10px] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
+                        <span className="text-[0.625rem] font-mono bg-slate-100 px-1.5 py-0.5 rounded text-slate-600">
                             {selectedElement.type}
                         </span>
                     </div>
 
                     {/* Position & Size Grid */}
                     <div>
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                        <span className="text-[0.625rem] font-bold text-slate-500 uppercase block mb-1">
                             Coordinates (mm)
                         </span>
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">X Position</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">X Position</label>
                                 <Input
                                     type="number"
                                     value={Math.round(selectedElement.x)}
@@ -64,7 +64,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Y Position</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">Y Position</label>
                                 <Input
                                     type="number"
                                     value={Math.round(selectedElement.y)}
@@ -72,7 +72,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Width</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">Width</label>
                                 <Input
                                     type="number"
                                     value={Math.round(selectedElement.width)}
@@ -80,7 +80,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Height</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">Height</label>
                                 <Input
                                     type="number"
                                     value={Math.round(selectedElement.height)}
@@ -92,7 +92,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
                     {/* Content / Value */}
                     <div>
-                        <label className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                        <label className="text-[0.625rem] font-bold text-slate-500 uppercase block mb-1">
                             Content / Template String
                         </label>
                         <textarea
@@ -107,11 +107,11 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     {/* Barcode Specifics */}
                     {selectedElement.type === 'BARCODE' && (
                         <div className="space-y-2 pt-2 border-t border-slate-200">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase block">
+                            <span className="text-[0.625rem] font-bold text-slate-500 uppercase block">
                                 Barcode Specifications
                             </span>
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Symbology Standard</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">Symbology Standard</label>
                                 <Select
                                     value={selectedElement.symbology || 'CODE128'}
                                     onChange={(e) => onUpdateElement(selectedElement.id, { symbology: e.target.value as BarcodeSymbology })}
@@ -137,12 +137,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                     {/* Text Styling Specifics */}
                     {(selectedElement.type === 'TEXT' || selectedElement.type === 'DYNAMIC_FIELD') && (
                         <div className="space-y-2 pt-2 border-t border-slate-200">
-                            <span className="text-[10px] font-bold text-slate-500 uppercase block">
+                            <span className="text-[0.625rem] font-bold text-slate-500 uppercase block">
                                 Typography & Alignment
                             </span>
                             <div className="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label className="text-[10px] text-slate-600 block mb-0.5">Font Size (pt)</label>
+                                    <label className="text-[0.625rem] text-slate-600 block mb-0.5">Font Size (pt)</label>
                                     <Input
                                         type="number"
                                         value={selectedElement.fontSize || 12}
@@ -150,7 +150,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-[10px] text-slate-600 block mb-0.5">Weight</label>
+                                    <label className="text-[0.625rem] text-slate-600 block mb-0.5">Weight</label>
                                     <Select
                                         value={selectedElement.fontWeight || 'normal'}
                                         onChange={(e) => onUpdateElement(selectedElement.id, { fontWeight: e.target.value as 'normal' | 'bold' })}
@@ -162,7 +162,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 </div>
                             </div>
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Alignment</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">Alignment</label>
                                 <div className="grid grid-cols-3 gap-1">
                                     {(['left', 'center', 'right'] as const).map(align => (
                                         <button
@@ -190,7 +190,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 const newX = Math.round((template.dimensions.widthMm - selectedElement.width) / 2);
                                 onUpdateElement(selectedElement.id, { x: newX });
                             }}
-                            className="w-full py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 text-[11px] font-semibold cursor-pointer"
+                            className="w-full py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 text-[0.6875rem] font-semibold cursor-pointer"
                         >
                             Center Horizontally (X)
                         </button>
@@ -198,7 +198,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                             <button
                                 type="button"
                                 onClick={() => onDuplicateElement(selectedElement.id)}
-                                className="flex-1 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 text-[11px] font-semibold cursor-pointer"
+                                className="flex-1 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-slate-700 text-[0.6875rem] font-semibold cursor-pointer"
                             >
                                 Duplicate
                             </button>
@@ -206,7 +206,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 variant="danger"
                                 size="sm"
                                 onClick={() => onDeleteElement(selectedElement.id)}
-                                className="flex-1 text-[11px]"
+                                className="flex-1 text-[0.6875rem]"
                             >
                                 Delete
                             </Button>
@@ -217,7 +217,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                 /* Global Template Settings */
                 <div className="space-y-3">
                     <div className="border-b border-slate-200 pb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                        <span className="text-[0.625rem] font-bold uppercase tracking-wider text-slate-500 block">
                             Global Label Template
                         </span>
                         <h4 className="font-bold text-slate-800 text-xs">
@@ -227,7 +227,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
                     {/* Active Template Select */}
                     <div>
-                        <label className="text-[10px] font-semibold text-slate-700 block mb-1">
+                        <label className="text-[0.625rem] font-semibold text-slate-700 block mb-1">
                             Load Pre-configured Standard
                         </label>
                         <Select
@@ -242,7 +242,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
                     {/* Target Zone & Category */}
                     <div>
-                        <label className="text-[10px] font-semibold text-slate-700 block mb-1">
+                        <label className="text-[0.625rem] font-semibold text-slate-700 block mb-1">
                             Target WMS Zone Binding
                         </label>
                         <Select
@@ -259,12 +259,12 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
                     {/* Label Dimensions */}
                     <div>
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block mb-1">
+                        <span className="text-[0.625rem] font-bold text-slate-500 uppercase block mb-1">
                             Physical Label Size (mm)
                         </span>
                         <div className="grid grid-cols-2 gap-2">
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Width (mm)</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">Width (mm)</label>
                                 <Input
                                     type="number"
                                     value={template.dimensions.widthMm}
@@ -274,7 +274,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
                                 />
                             </div>
                             <div>
-                                <label className="text-[10px] text-slate-600 block mb-0.5">Height (mm)</label>
+                                <label className="text-[0.625rem] text-slate-600 block mb-0.5">Height (mm)</label>
                                 <Input
                                     type="number"
                                     value={template.dimensions.heightMm}
@@ -288,7 +288,7 @@ export const PropertiesPanel: React.FC<PropertiesPanelProps> = ({
 
                     {/* DPI Resolution */}
                     <div>
-                        <label className="text-[10px] font-semibold text-slate-700 block mb-1">
+                        <label className="text-[0.625rem] font-semibold text-slate-700 block mb-1">
                             Printer Head Resolution (DPI)
                         </label>
                         <Select

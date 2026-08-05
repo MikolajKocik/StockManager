@@ -38,9 +38,8 @@ export const MachineInspectorPanel: React.FC<MachineInspectorPanelProps> = ({
     }
 
     return (
-        <div className="bg-white border border-slate-300 rounded-lg shadow-xs overflow-hidden sticky top-4">
-            {/* Header */}
-            <div className="bg-[#2b6675] text-white p-3 flex items-center justify-between border-b border-[#204e5a]">
+        <aside className="bg-white border border-slate-300 rounded-lg shadow-xs overflow-hidden sticky top-4">
+            <header className="bg-[#2b6675] text-white p-3 flex items-center justify-between border-b border-[#204e5a]">
                 <div>
                     <div className="flex items-center gap-2">
                         <span className="bg-white/20 text-white font-mono font-bold text-xs px-1.5 py-0.5 rounded-xs">
@@ -54,11 +53,10 @@ export const MachineInspectorPanel: React.FC<MachineInspectorPanelProps> = ({
                         {machine.name}
                     </h2>
                 </div>
-            </div>
+            </header>
 
             <div className="p-3.5 space-y-3.5 text-slate-800 text-xs">
-                {/* Hero Machine Image Box */}
-                <div className="w-full h-40 bg-slate-50 border border-slate-200 rounded-md flex items-center justify-center p-3 relative overflow-hidden">
+                <figure className="w-full h-40 bg-slate-50 border border-slate-200 rounded-md flex items-center justify-center p-3 relative overflow-hidden">
                     <img
                         src={machine.image}
                         alt={machine.name}
@@ -69,96 +67,91 @@ export const MachineInspectorPanel: React.FC<MachineInspectorPanelProps> = ({
                             {machine.status}
                         </Badge>
                     </div>
-                </div>
+                </figure>
 
-                {/* Telemetry Indicators Grid */}
-                <div className="grid grid-cols-2 gap-2">
-                    {/* Battery */}
+                <section className="grid grid-cols-2 gap-2">
                     <div className="bg-slate-50 border border-slate-200 rounded p-2 space-y-1">
-                        <div className="flex justify-between items-center text-[10px] text-slate-500 font-mono uppercase font-bold">
+                        <div className="flex justify-between items-center text-xs text-slate-500 font-mono uppercase font-bold">
                             <span>Battery (SoC)</span>
                             <span className="text-slate-700">{machine.isCharging ? 'Charging' : 'Discharging'}</span>
                         </div>
                         <div className="flex items-baseline justify-between">
                             <span className="text-base font-bold font-mono text-slate-900">{machine.batteryLevel}%</span>
-                            <span className="text-[10px] text-slate-500 font-mono">24V / 400Ah</span>
+                            <span className="text-xs text-slate-500 font-mono">24V / 400Ah</span>
                         </div>
-                        <div className="w-full h-1.5 bg-slate-200 rounded overflow-hidden">
-                            <div
-                                className={`h-full transition-all duration-300 ${
-                                    machine.batteryLevel > 50 
-                                        ? 'bg-emerald-600' 
-                                        : machine.batteryLevel > 20 
-                                            ? 'bg-amber-600' 
-                                            : 'bg-red-600'
-                                }`}
-                                style={{ width: `${machine.batteryLevel}%` }}
-                            />
-                        </div>
+                        <progress
+                            value={machine.batteryLevel}
+                            max={100}
+                            className="w-full h-2 rounded accent-emerald-600"
+                        />
                     </div>
 
-                    {/* Operating Hours */}
                     <div className="bg-slate-50 border border-slate-200 rounded p-2 space-y-1">
-                        <span className="text-[10px] text-slate-500 font-mono uppercase font-bold block">Operating Hours</span>
+                        <span className="text-xs text-slate-500 font-mono uppercase font-bold block">Operating Hours</span>
                         <div className="flex items-baseline justify-between">
                             <span className="text-base font-bold font-mono text-slate-900">{machine.operatingHours}</span>
                             <span className="text-xs text-slate-500 font-mono">mth</span>
                         </div>
-                        <span className="text-[10px] text-slate-400 block font-mono">CAN Counter</span>
+                        <span className="text-xs text-slate-400 block font-mono">CAN Counter</span>
                     </div>
 
-                    {/* Temperature */}
                     <div className="bg-slate-50 border border-slate-200 rounded p-2 space-y-1">
-                        <span className="text-[10px] text-slate-500 font-mono uppercase font-bold block">Motor Temp</span>
+                        <span className="text-xs text-slate-500 font-mono uppercase font-bold block">Motor Temp</span>
                         <div className="flex items-baseline justify-between">
                             <span className={`text-base font-bold font-mono ${
                                 machine.temperature > 50 ? 'text-red-600' : 'text-slate-900'
                             }`}>
                                 {machine.temperature}°C
                             </span>
-                            <span className="text-[10px] font-semibold text-slate-600">
+                            <span className="text-xs font-semibold text-slate-600">
                                 {machine.temperature > 50 ? 'High' : 'Normal'}
                             </span>
                         </div>
+                        <meter
+                            min={0}
+                            max={100}
+                            low={45}
+                            high={60}
+                            optimum={30}
+                            value={machine.temperature}
+                            className="w-full h-2 rounded"
+                        />
                     </div>
 
-                    {/* Current Zone */}
                     <div className="bg-slate-50 border border-slate-200 rounded p-2 space-y-1">
-                        <span className="text-[10px] text-slate-500 font-mono uppercase font-bold block">Assigned Zone</span>
+                        <span className="text-xs text-slate-500 font-mono uppercase font-bold block">Assigned Zone</span>
                         <span className="text-xs font-bold text-slate-800 block truncate">
                             {ZONE_LABELS[machine.zone] || machine.zone}
                         </span>
-                        <span className="text-[10px] text-slate-500 block truncate font-mono">
+                        <span className="text-xs text-slate-500 block truncate font-mono">
                             Op: {machine.assignedOperator || 'Unassigned'}
                         </span>
                     </div>
-                </div>
+                </section>
 
-                {/* Technical / Safety Inspections Info */}
-                <div className="bg-slate-50 border border-slate-200 rounded p-2.5 space-y-1 text-xs">
-                    <div className="flex justify-between items-center text-slate-600 font-mono text-[11px]">
+                <section className="bg-slate-50 border border-slate-200 rounded p-2.5 space-y-1 text-xs">
+                    <div className="flex justify-between items-center text-slate-600 font-mono text-xs">
                         <span>Serial Number:</span>
                         <strong className="text-slate-900">{machine.serialNumber}</strong>
                     </div>
-                    <div className="flex justify-between items-center text-slate-600 font-mono text-[11px]">
+                    <div className="flex justify-between items-center text-slate-600 font-mono text-xs">
                         <span>Last Service:</span>
                         <span className="text-slate-800">{machine.lastServiceDate}</span>
                     </div>
-                    <div className="flex justify-between items-center text-slate-600 font-mono text-[11px]">
+                    <div className="flex justify-between items-center text-slate-600 font-mono text-xs">
                         <span>Next Inspection:</span>
                         <span className="text-slate-800">{machine.nextServiceDate}</span>
                     </div>
-                    <div className="flex justify-between items-center text-slate-600 border-t border-slate-200 pt-1 font-mono text-[11px]">
+                    <div className="flex justify-between items-center text-slate-600 border-t border-slate-200 pt-1 font-mono text-xs">
                         <span>Safety Expiry:</span>
                         <span className="font-bold text-amber-800 bg-amber-100 px-1 py-0.2 rounded-xs border border-amber-300">
                             {machine.udtExpiryDate}
                         </span>
                     </div>
-                </div>
+                </section>
 
-                {/* Quick Status Control Buttons */}
-                <div className="space-y-1.5 pt-1">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono block">
+                <section className="space-y-1.5 pt-1">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider font-mono block">
                         Quick Dispatch Actions
                     </span>
                     <div className="grid grid-cols-2 gap-1.5">
@@ -191,17 +184,16 @@ export const MachineInspectorPanel: React.FC<MachineInspectorPanelProps> = ({
                             Report Fault
                         </Button>
                     </div>
-                </div>
+                </section>
 
-                {/* Event Audit Log */}
-                <div className="space-y-1.5 pt-2 border-t border-slate-200">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider font-mono block">
+                <section className="space-y-1.5 pt-2 border-t border-slate-200">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider font-mono block">
                         Machine Event Audit Log
                     </span>
                     <div className="space-y-1 max-h-32 overflow-y-auto pr-1">
                         {machine.logs.map((log) => (
-                            <div key={log.id} className="text-[11px] bg-slate-50 border border-slate-200 rounded p-1.5 leading-snug">
-                                <div className="flex justify-between text-[10px] text-slate-400 font-mono mb-0.5">
+                            <div key={log.id} className="text-xs bg-slate-50 border border-slate-200 rounded p-1.5 leading-snug">
+                                <div className="flex justify-between text-xs text-slate-400 font-mono mb-0.5">
                                     <span>{log.timestamp}</span>
                                     <span className="font-semibold text-slate-600">{log.type}</span>
                                 </div>
@@ -209,8 +201,8 @@ export const MachineInspectorPanel: React.FC<MachineInspectorPanelProps> = ({
                             </div>
                         ))}
                     </div>
-                </div>
+                </section>
             </div>
-        </div>
+        </aside>
     );
 };

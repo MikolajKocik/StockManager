@@ -61,7 +61,7 @@ export default function Customers() {
 
     if (isLoading && !hasLocalData) {
         return (
-            <div className="p-8 text-center text-slate-500 font-medium">
+            <div className="p-8 text-center text-slate-500 font-medium font-mono text-xs">
                 Loading customers directory...
             </div>
         );
@@ -69,15 +69,14 @@ export default function Customers() {
 
     if (isError && !hasLocalData) {
         return (
-            <div className="p-8 text-center text-rose-700 font-medium">
+            <div className="p-8 text-center text-rose-700 font-medium font-mono text-xs">
                 Error loading customer directory. Please retry.
             </div>
         );
     }
 
     return (
-        <div className="w-full flex flex-col gap-4 pb-8">
-            {/* Top KPI Header */}
+        <main className="w-full flex flex-col gap-4 pb-8">
             <CustomerKpiSummary
                 totalCustomers={kpi.totalCustomers}
                 activeCustomers={kpi.activeCustomers}
@@ -91,10 +90,9 @@ export default function Customers() {
                 segments={segments}
             />
 
-            {/* Filters Bar & Results count */}
-            <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-300 rounded-lg px-4 py-2.5 shadow-2xs">
+            <section className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-300 rounded-lg px-4 py-2.5 shadow-2xs">
                 <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-700">
+                    <span className="text-xs font-bold text-slate-700 font-mono">
                         Clients Found:
                     </span>
                     <span className="text-xs font-mono font-bold bg-[#2b6675] text-white px-2 py-0.5 rounded">
@@ -123,9 +121,8 @@ export default function Customers() {
                         />
                     </div>
                 </div>
-            </div>
+            </section>
 
-            {/* Main Data Table */}
             <CustomerTable
                 customers={filteredCustomers}
                 onSort={handleSort}
@@ -134,7 +131,6 @@ export default function Customers() {
                 onDelete={(cust) => setCustomerToDelete(cust)}
             />
 
-            {/* Customer Details Modal */}
             <CustomerDetailsModal
                 ref={detailsModalRef}
                 customer={selectedCustomerForDetails}
@@ -148,7 +144,6 @@ export default function Customers() {
                 }}
             />
 
-            {/* Create / Edit Modal */}
             <CreateCustomerModal
                 ref={createModalRef}
                 initialData={customerToEdit}
@@ -159,7 +154,6 @@ export default function Customers() {
                 onSubmit={handleSaveCustomer}
             />
 
-            {/* Delete Confirmation Modal */}
             <ConfirmModal
                 isOpen={!!customerToDelete}
                 title="Confirm Customer Removal"
@@ -167,6 +161,6 @@ export default function Customers() {
                 onConfirm={confirmDelete}
                 onClose={() => setCustomerToDelete(null)}
             />
-        </div>
+        </main>
     );
 }

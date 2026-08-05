@@ -31,12 +31,12 @@ export const Section: React.FC<SectionProps> = ({
                 <div className="flex items-center justify-between mb-1.5">
                     <div>
                         {title && (
-                            <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block font-mono">
+                            <span className="font-bold text-[0.6875rem] text-slate-600 uppercase tracking-wider block font-mono">
                                 {title}
                             </span>
                         )}
                         {subtitle && (
-                            <span className="text-[11px] text-slate-500 block">
+                            <span className="text-[0.6875rem] text-slate-500 block">
                                 {subtitle}
                             </span>
                         )}

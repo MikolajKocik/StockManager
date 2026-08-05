@@ -43,7 +43,7 @@ export const CheckboxCard: React.FC<CheckboxCardProps> = ({
                     {label}
                 </span>
                 {description && (
-                    <span className="text-[11px] text-slate-500 block">
+                    <span className="text-[0.6875rem] text-slate-500 block">
                         {description}
                     </span>
                 )}

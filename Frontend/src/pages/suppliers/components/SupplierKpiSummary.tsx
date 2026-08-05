@@ -36,9 +36,9 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
     ], [countries]);
 
     return (
-        <div className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
+        <section className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
             {/* Header row with Title, Search & Quick Action */}
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
+            <header className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
                 <div>
                     <h1 className="text-lg font-bold text-slate-800 leading-tight">
                         Suppliers & Procurement Directory
@@ -79,13 +79,13 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
                         Add Supplier
                     </Button>
                 </div>
-            </div>
+            </header>
 
             {/* Technical Industrial KPI Cards Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {/* Total Suppliers */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Total Vendors
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -96,7 +96,7 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
 
                 {/* Active Contracts */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Active Contracts
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -109,7 +109,7 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
 
                 {/* Average Lead Time */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Avg Lead Time
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -120,7 +120,7 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
 
                 {/* Sourcing Reliability */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Reliability Score
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -129,6 +129,6 @@ export const SupplierKpiSummary: React.FC<SupplierKpiSummaryProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 };

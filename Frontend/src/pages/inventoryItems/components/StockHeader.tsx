@@ -48,7 +48,7 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
     const deadStockRatio = totalValue > 0 ? (deadStockValue / totalValue) * 100 : 0;
 
     return (
-        <div className="space-y-4">
+        <header className="space-y-4">
             <Header
                 title="Stock Capital & Value Treemap"
                 subtitle="Interactive inventory capital visualization, turnover analysis and stagnant stock identification"
@@ -135,22 +135,22 @@ export const StockHeader: React.FC<StockHeaderProps> = ({
                 <div className="flex items-center gap-3 text-xs text-slate-600 font-mono">
                     <div className="flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-xs bg-emerald-50 border border-emerald-500" />
-                        <span className="text-[11px]">Fast (&lt;25d)</span>
+                        <span className="text-[0.6875rem]">Fast (&lt;25d)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-xs bg-[#f0f7f8] border border-[#2b6675]" />
-                        <span className="text-[11px]">Optimal (25-60d)</span>
+                        <span className="text-[0.6875rem]">Optimal (25-60d)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-xs bg-amber-50 border border-amber-500" />
-                        <span className="text-[11px]">Slow (60-90d)</span>
+                        <span className="text-[0.6875rem]">Slow (60-90d)</span>
                     </div>
                     <div className="flex items-center gap-1.5">
                         <span className="w-3 h-3 rounded-xs bg-red-50 border border-red-500" />
-                        <span className="text-[11px] font-bold text-red-700">Dead Stock (&gt;90d)</span>
+                        <span className="text-[0.6875rem] font-bold text-red-700">Dead Stock (&gt;90d)</span>
                     </div>
                 </div>
             </div>
-        </div>
+        </header>
     );
 };

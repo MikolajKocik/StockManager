@@ -22,7 +22,7 @@ export function Table({ children, className = '' }: TableElementProps) {
 
 export function TableHead({ children, className = '' }: TableElementProps) {
     return (
-        <thead className={`bg-[#2b6675] text-white font-bold uppercase text-[11px] tracking-wider border-b border-slate-700 ${className}`}>
+        <thead className={`bg-[#2b6675] text-white font-bold uppercase text-[0.6875rem] tracking-wider border-b border-slate-700 ${className}`}>
             {children}
         </thead>
     );
@@ -51,7 +51,7 @@ export function TableHeaderCell({ children, className = '', isFiltered, colSpan,
     return (
         <th
             colSpan={colSpan}
-            className={`bg-[#2b6675] text-white py-2.5 px-3 font-bold uppercase text-[11px] tracking-wider select-none border-b border-slate-700 ${className}`}
+            className={`bg-[#2b6675] text-white py-2.5 px-3 font-bold uppercase text-[0.6875rem] tracking-wider select-none border-b border-slate-700 ${className}`}
         >
             <div className="inline-flex items-center gap-1.5 text-white">
                 <span className="text-white font-bold">{children}</span>

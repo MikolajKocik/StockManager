@@ -42,7 +42,7 @@ export function Badge({ variant = 'neutral', className = '', children, ...props 
 
     return (
         <span 
-            className={`px-1.5 py-0.5 rounded-xs text-[10px] font-bold font-mono uppercase tracking-tight border ${isCustomClass ? variants[variant] : (variants[variant] || 'slate')} ${className}`}
+            className={`px-1.5 py-0.5 rounded-xs text-[0.625rem] font-bold font-mono uppercase tracking-tight border ${isCustomClass ? variants[variant] : (variants[variant] || 'slate')} ${className}`}
             {...props}
         >
             {children}

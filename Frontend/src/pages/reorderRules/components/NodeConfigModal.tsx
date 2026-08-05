@@ -82,7 +82,7 @@ export const NodeConfigModal = forwardRef<HTMLDialogElement, NodeConfigModalProp
                                 defaultValue={node.config.thresholdValue ?? 10}
                                 required
                             />
-                            <span className="text-[11px] text-slate-500 block">
+                            <span className="text-[0.6875rem] text-slate-500 block">
                                 Rule fires when stock level drops below this count.
                             </span>
                         </div>
@@ -100,7 +100,7 @@ export const NodeConfigModal = forwardRef<HTMLDialogElement, NodeConfigModalProp
                                 defaultValue={node.config.salesDays ?? 7}
                                 required
                             />
-                            <span className="text-[11px] text-slate-500 block">
+                            <span className="text-[0.6875rem] text-slate-500 block">
                                 Calculates rolling average daily dispatches across this window.
                             </span>
                         </div>

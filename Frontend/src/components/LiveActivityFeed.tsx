@@ -23,14 +23,14 @@ export function LiveActivityFeed() {
     const { activities, isConnected } = useActivityFeed();
 
     return (
-        <div className="card h-full flex flex-col p-4 bg-[#D9D9D9] rounded shadow-md">
+        <section aria-labelledby="live-feed-heading" className="card h-full flex flex-col p-4 bg-[#D9D9D9] rounded shadow-md">
             {/* Header with status */}
             <div className="flex justify-between items-center mb-3">
-                <h2 className="text-lg font-semibold text-slate-700">Live Activity Feed</h2>
+                <h2 id="live-feed-heading" className="text-lg font-semibold text-slate-700">Live Activity Feed</h2>
             </div>
 
             {/* Activity list */}
-            <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 max-h-[350px]">
+            <div className="flex-1 overflow-y-auto space-y-2.5 pr-1 max-h-[21.875rem]">
                 {activities.length === 0 ? (
                     <div className="h-full flex items-center justify-center text-slate-400 text-sm italic py-8">
                         Awaiting system activities...
@@ -50,13 +50,13 @@ export function LiveActivityFeed() {
                             <div className="flex-1 min-w-0">
                                 <div className="flex justify-between items-baseline gap-2">
                                     <span className="font-semibold text-sm text-slate-800 truncate">{act.title}</span>
-                                    <span className="text-[10px] text-slate-400 font-mono whitespace-nowrap">
+                                    <span className="text-[0.625rem] text-slate-400 font-mono whitespace-nowrap">
                                         {new Date(act.timestamp).toLocaleTimeString()}
                                     </span>
                                 </div>
                                 <p className="text-xs text-slate-600 mt-0.5 wrap-break-word">{act.description}</p>
                                 {act.user && (
-                                    <span className="text-[10px] text-slate-400 font-medium mt-1 inline-block">
+                                    <span className="text-[0.625rem] text-slate-400 font-medium mt-1 inline-block">
                                         Triggered by: {act.user}
                                     </span>
                                 )}
@@ -65,6 +65,6 @@ export function LiveActivityFeed() {
                     ))
                 )}
             </div>
-        </div>
+        </section>
     );
 }

@@ -5,6 +5,7 @@ import { ReorderRulesHeader } from './components/ReorderRulesHeader';
 import { NodePalette } from './components/NodePalette';
 import { NodeBuilderCanvas } from './components/NodeBuilderCanvas';
 import { NodeConfigModal } from './components/NodeConfigModal';
+import toast from 'react-hot-toast';
 
 export default function ReorderRules() {
     const [rules, setRules] = useState<WorkflowRule[]>(initialWorkflowRules);
@@ -27,8 +28,8 @@ export default function ReorderRules() {
         }));
     };
 
+    {/** Complex logic: Validates graph connection acyclicity and avoids duplicate directional edges */}
     const handleConnectNodes = (fromId: string, toId: string) => {
-        // Prevent duplicate connection
         const exists = activeRule.connections.some(c => c.fromNodeId === fromId && c.toNodeId === toId);
         if (exists) return;
 
@@ -163,7 +164,7 @@ export default function ReorderRules() {
     };
 
     const handleSaveRule = () => {
-        alert(`Workflow "${activeRule.name}" saved to database successfully.`);
+        toast.success(`Workflow "${activeRule.name}" saved to database successfully.`);
     };
 
     return (
@@ -196,10 +197,9 @@ export default function ReorderRules() {
                         isSimulating={isSimulating}
                     />
 
-                    {/* Live Simulation Terminal Logs */}
                     {simulationLogs.length > 0 && (
                         <div className="bg-slate-900 text-emerald-400 p-3 rounded-lg font-mono text-xs space-y-1 shadow-xs border border-slate-800">
-                            <div className="flex items-center justify-between text-[11px] text-slate-400 pb-1 border-b border-slate-800">
+                            <div className="flex items-center justify-between text-xs text-slate-400 pb-1 border-b border-slate-800">
                                 <span>Automation Engine Test Execution Console</span>
                                 <button
                                     onClick={() => setSimulationLogs([])}

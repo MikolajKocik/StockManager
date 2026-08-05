@@ -16,25 +16,22 @@ export default function Documents() {
 
     const activeDoc = documents.find(d => d.id === activeDocId) || documents[0];
 
-    {/* OCR Handlers */ }
     const handleUpdateDocumentData = (updatedData: OcrExtractedData) => {
         setDocuments(prev => prev.map(d => d.id === activeDoc.id ? { ...d, extractedData: updatedData } : d));
     };
 
+    {/** Resolves clicked OCR bounding box snippet to either nested line-item index or top-level field */ }
     const handleSnippetClick = (snippet: OcrBoundingBox) => {
         const targetKey = focusedFieldKey || snippet.targetFieldKey;
 
         if (!targetKey) {
-            toast('Click on a form field on the right first, then click the scan text snippet to paste it.', {
-                icon: 'ℹ️'
-            });
+            toast('Select a form field on the right first, then click the scan text snippet to populate it.');
             return;
         }
 
-        // Check if target is a line item field (e.g. item_lot_0, item_sku_1)
         if (targetKey.startsWith('item_')) {
             const parts = targetKey.split('_');
-            const fieldName = parts[1]; // lot, sku, name
+            const fieldName = parts[1];
             const itemIdx = parseInt(parts[2], 10);
 
             if (!isNaN(itemIdx) && activeDoc.extractedData.items[itemIdx]) {
@@ -52,7 +49,6 @@ export default function Documents() {
             }
         }
 
-        // Standard Top-Level Document Field
         if (targetKey in activeDoc.extractedData) {
             handleUpdateDocumentData({
                 ...activeDoc.extractedData,
@@ -64,6 +60,7 @@ export default function Documents() {
 
     const handlePostToWms = () => {
         setDocuments(prev => prev.map(d => d.id === activeDoc.id ? { ...d, status: 'POSTED_TO_WMS' } : d));
+        toast.success('Document data committed to WMS goods receipt ledger.');
     };
 
     const handleReRunOcr = () => {
@@ -71,8 +68,8 @@ export default function Documents() {
             new Promise((resolve) => setTimeout(resolve, 800)),
             {
                 loading: 'Re-running optical character extraction model on scan...',
-                success: <b>OCR extraction refreshed with 98% confidence!</b>,
-                error: <b>OCR failed</b>
+                success: 'OCR extraction refreshed with 98% confidence.',
+                error: 'OCR model processing failed.'
             }
         );
     };
@@ -144,14 +141,12 @@ export default function Documents() {
         toast.success(`Uploaded and parsed ${file.name}`);
     };
 
-    {/* KPI Calculations */ }
     const totalDocs = documents.length;
     const pendingCount = documents.filter(d => d.status === 'PENDING_REVIEW').length;
     const avgConfidence = documents.reduce((acc, d) => acc + d.overallConfidence, 0) / (totalDocs || 1);
 
     return (
         <div className="w-full space-y-4 pb-12">
-            {/* Hidden File Input */}
             <input
                 ref={fileInputRef}
                 type="file"
@@ -160,7 +155,6 @@ export default function Documents() {
                 className="hidden"
             />
 
-            {/* Header & Metrics */}
             <DocumentsHeader
                 documents={documents}
                 activeDocId={activeDocId}
@@ -171,9 +165,7 @@ export default function Documents() {
                 avgConfidence={avgConfidence}
             />
 
-            {/* Wide Full-Width Split-Screen Workspace */}
             <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-                {/* Left Pane: Interactive Document PDF & Scan Viewer */}
                 <div className="lg:col-span-6 flex flex-col min-h-160">
                     <DocumentPdfViewer
                         document={activeDoc}
@@ -182,7 +174,6 @@ export default function Documents() {
                     />
                 </div>
 
-                {/* Right Pane: Extracted Data & WMS Verification Form */}
                 <div className="lg:col-span-6 flex flex-col min-h-160">
                     <DocumentOcrForm
                         document={activeDoc}

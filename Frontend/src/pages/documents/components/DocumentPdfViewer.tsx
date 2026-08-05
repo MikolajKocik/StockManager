@@ -64,7 +64,7 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
                 <span>{textValue || fallbackText || '—'}</span>
 
                 {/* Subtle accuracy pill on hover */}
-                <span className="hidden group-hover:inline-block absolute -top-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[9px] font-mono font-bold px-1.5 py-0.5 rounded shadow-md z-40 whitespace-nowrap pointer-events-none">
+                <span className="hidden group-hover:inline-block absolute -top-5 left-1/2 -translate-x-1/2 bg-slate-800 text-white text-[0.5625rem] font-mono font-bold px-1.5 py-0.5 rounded shadow-md z-40 whitespace-nowrap pointer-events-none">
                     {confidencePct}% OCR • Click to map
                 </span>
             </span>
@@ -79,7 +79,7 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
                     <span className="font-bold text-slate-800 text-xs">
                         Scanned Document Preview
                     </span>
-                    <span className="text-[10px] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
+                    <span className="text-[0.625rem] font-mono bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200">
                         {document.fileName}
                     </span>
                 </div>
@@ -94,7 +94,7 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
                         >
                             -
                         </button>
-                        <span className="font-mono text-[11px] text-slate-800 w-12 text-center">
+                        <span className="font-mono text-[0.6875rem] text-slate-800 w-12 text-center">
                             {Math.round(zoom * 100)}%
                         </span>
                         <button
@@ -132,7 +132,7 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
                     {/* Document Header Bar */}
                     <div className="flex items-center justify-between border-b-2 border-slate-800 pb-3 mb-4">
                         <div>
-                            <span className="text-[9px] font-bold text-slate-500 uppercase tracking-widest block font-mono">
+                            <span className="text-[0.5625rem] font-bold text-slate-500 uppercase tracking-widest block font-mono">
                                 DOCUMENT CLASSIFICATION
                             </span>
                             <h2 className="text-xl font-black font-mono tracking-tight text-slate-900">
@@ -141,42 +141,42 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
                             </h2>
                         </div>
                         <div className="text-right">
-                            <span className="text-[9px] text-slate-500 font-mono block">DOCUMENT NUMBER</span>
+                            <span className="text-[0.5625rem] text-slate-500 font-mono block">DOCUMENT NUMBER</span>
                             {renderOcrSnippet('docNumber', extractedData.docNumber, 'WZ/2026/08/1402', 'font-bold font-mono text-sm text-slate-900')}
                         </div>
                     </div>
 
                     {/* Metadata: Counterparty and Warehouse Dates */}
-                    <div className="grid grid-cols-2 gap-3 pb-3 mb-3 border-b border-slate-200 text-[11px]">
+                    <div className="grid grid-cols-2 gap-3 pb-3 mb-3 border-b border-slate-200 text-[0.6875rem]">
                         <div className="bg-slate-50/70 p-2.5 rounded border border-slate-200 space-y-1.5">
-                            <span className="font-bold text-[9px] text-slate-500 uppercase block font-mono">
+                            <span className="font-bold text-[0.5625rem] text-slate-500 uppercase block font-mono">
                                 SUPPLIER / CONTRACTOR
                             </span>
                             <div>
                                 {renderOcrSnippet('contractorName', extractedData.contractorName, 'Apex Machinery Sp. z o.o.', 'font-bold text-slate-900 block')}
                             </div>
-                            <div className="flex items-center gap-1 text-slate-600 font-mono text-[10px]">
+                            <div className="flex items-center gap-1 text-slate-600 font-mono text-[0.625rem]">
                                 <span>NIP:</span>
                                 {renderOcrSnippet('contractorNip', extractedData.contractorNip, 'PL5252849102', 'font-semibold text-slate-800')}
                             </div>
-                            <div className="text-slate-500 text-[10px] truncate">
+                            <div className="text-slate-500 text-[0.625rem] truncate">
                                 {extractedData.contractorAddress}
                             </div>
                         </div>
 
                         <div className="bg-slate-50/70 p-2.5 rounded border border-slate-200 space-y-1.5">
-                            <span className="font-bold text-[9px] text-slate-500 uppercase block font-mono">
+                            <span className="font-bold text-[0.5625rem] text-slate-500 uppercase block font-mono">
                                 DATES & DESTINATION
                             </span>
-                            <div className="flex justify-between items-center text-[10px]">
+                            <div className="flex justify-between items-center text-[0.625rem]">
                                 <span className="text-slate-500">Issue Date:</span>
                                 {renderOcrSnippet('issueDate', extractedData.issueDate, '2026-08-01', 'font-mono font-bold text-slate-800')}
                             </div>
-                            <div className="flex justify-between items-center text-[10px]">
+                            <div className="flex justify-between items-center text-[0.625rem]">
                                 <span className="text-slate-500">Delivery Date:</span>
                                 {renderOcrSnippet('deliveryDate', extractedData.deliveryDate, '2026-08-02', 'font-mono font-bold text-slate-800')}
                             </div>
-                            <div className="pt-0.5 text-[10px]">
+                            <div className="pt-0.5 text-[0.625rem]">
                                 <span className="text-slate-500 block">Warehouse:</span>
                                 {renderOcrSnippet('destinationWarehouse', extractedData.destinationWarehouse, 'Main Zone A', 'text-slate-700 font-medium truncate block')}
                             </div>
@@ -185,10 +185,10 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
 
                     {/* Specification of Goods Table */}
                     <div className="py-2">
-                        <span className="font-bold text-[9px] text-slate-500 uppercase block font-mono mb-1.5">
+                        <span className="font-bold text-[0.5625rem] text-slate-500 uppercase block font-mono mb-1.5">
                             SPECIFICATION OF GOODS / POSITIONS
                         </span>
-                        <table className="w-full text-left text-[10px] border-collapse">
+                        <table className="w-full text-left text-[0.625rem] border-collapse">
                             <thead>
                                 <tr className="border-b-2 border-slate-800 bg-slate-100 text-slate-800 font-bold font-mono">
                                     <th className="py-1.5 px-1.5">LP</th>
@@ -200,14 +200,14 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
                                     <th className="py-1.5 px-1.5">LOT / Batch</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 font-mono text-[10px]">
+                            <tbody className="divide-y divide-slate-200 font-mono text-[0.625rem]">
                                 {extractedData.items.map((item, idx) => (
                                     <tr key={item.id} className="hover:bg-slate-50/80">
                                         <td className="py-1.5 px-1.5 text-slate-500">{idx + 1}</td>
                                         <td className="py-1.5 px-1.5">
                                             {renderOcrSnippet(`item_sku_${idx}`, item.sku, 'SKU', 'font-bold text-blue-900')}
                                         </td>
-                                        <td className="py-1.5 px-1.5 font-sans font-medium text-slate-900 max-w-[150px] truncate">
+                                        <td className="py-1.5 px-1.5 font-sans font-medium text-slate-900 max-w-[9.375rem] truncate">
                                             {renderOcrSnippet(`item_name_${idx}`, item.name, 'Name', 'truncate')}
                                         </td>
                                         <td className="py-1.5 px-1.5 text-right font-bold">
@@ -237,17 +237,17 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
 
                     {/* Notes & Totals Summary */}
                     <div className="border-t-2 border-slate-800 pt-3 mt-4 flex justify-between items-end text-xs">
-                        <div className="text-[10px] text-slate-600 font-mono">
+                        <div className="text-[0.625rem] text-slate-600 font-mono">
                             {extractedData.notes && (
                                 <div className="space-y-0.5">
                                     <span className="text-slate-400 font-bold block">LOGISTICS NOTE:</span>
-                                    {renderOcrSnippet('notes', extractedData.notes, 'Note', 'bg-slate-50 border border-slate-200 max-w-[240px] block truncate')}
+                                    {renderOcrSnippet('notes', extractedData.notes, 'Note', 'bg-slate-50 border border-slate-200 max-w-[15rem] block truncate')}
                                 </div>
                             )}
                         </div>
 
                         <div className="space-y-1 text-right font-mono">
-                            <div className="text-slate-600 text-[11px]">
+                            <div className="text-slate-600 text-[0.6875rem]">
                                 Total Net: {renderOcrSnippet('totalNet', `${extractedData.totalNet.toFixed(2)} ${extractedData.currency}`, '0.00 PLN', 'font-bold text-slate-900')}
                             </div>
                             <div className="text-sm font-bold text-slate-900">
@@ -262,11 +262,11 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
             {unassignedBoxes.length > 0 && (
                 <div className="mt-3 bg-amber-50 border border-amber-300 rounded-md p-2.5 space-y-1.5">
                     <div className="flex items-center justify-between">
-                        <span className="font-bold text-[11px] text-amber-900 flex items-center gap-1.5">
-                            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                        <span className="font-bold text-[0.6875rem] text-amber-900 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-amber-500" />
                             Unassigned OCR Snippets ({unassignedBoxes.length})
                         </span>
-                        <span className="text-[10px] text-amber-700">
+                        <span className="text-[0.625rem] text-amber-700">
                             Click any snippet to insert into the active input field
                         </span>
                     </div>
@@ -276,10 +276,10 @@ export const DocumentPdfViewer: React.FC<DocumentPdfViewerProps> = ({
                                 key={box.id}
                                 type="button"
                                 onClick={() => onSnippetClick(box)}
-                                className="bg-white hover:bg-amber-100 border border-amber-300 rounded px-2 py-1 text-[11px] font-mono text-slate-800 font-semibold cursor-pointer shadow-xs transition-colors"
+                                className="bg-white hover:bg-amber-100 border border-amber-300 rounded px-2 py-1 text-[0.6875rem] font-mono text-slate-800 font-semibold cursor-pointer shadow-xs transition-colors"
                             >
                                 <span>{box.text}</span>
-                                <span className="ml-1 text-[9px] text-amber-700 font-bold">
+                                <span className="ml-1 text-[0.5625rem] text-amber-700 font-bold">
                                     ({Math.round(box.confidence * 100)}%)
                                 </span>
                             </button>

@@ -47,7 +47,7 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                                 type="text"
                                 value={invoice.bankName}
                                 onChange={(e) => onUpdateField('bankName', e.target.value)}
-                                className="font-semibold text-right text-slate-800 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-slate-800 px-1 py-0.5 outline-none flex-1 max-w-[200px] print:border-none print:p-0"
+                                className="font-semibold text-right text-slate-800 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-slate-800 px-1 py-0.5 outline-none flex-1 max-w-[12.5rem] print:border-none print:p-0"
                             />
                         </div>
 
@@ -57,14 +57,14 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                                 type="text"
                                 value={invoice.bankAccount}
                                 onChange={(e) => onUpdateField('bankAccount', e.target.value)}
-                                className="font-mono font-bold text-right text-slate-900 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-slate-800 px-1 py-0.5 outline-none flex-1 max-w-[220px] text-[11px] print:border-none print:p-0"
+                                className="font-mono font-bold text-right text-slate-900 bg-transparent border-b border-dashed border-slate-300 hover:border-slate-400 focus:border-slate-800 px-1 py-0.5 outline-none flex-1 max-w-[13.75rem] text-[0.6875rem] print:border-none print:p-0"
                             />
                         </div>
                     </div>
 
                     {/* Notes */}
                     <div>
-                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block mb-1">
+                        <span className="text-[0.6875rem] font-bold text-slate-500 uppercase tracking-wider block mb-1">
                             {t.notesTitle}
                         </span>
                         {/* Interactive screen textarea with no ugly resize handle */}
@@ -90,14 +90,14 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                     <div className="w-full border border-slate-300 rounded overflow-hidden shadow-sm print:shadow-none print:border-slate-400">
                         <table className="w-full text-xs text-right border-collapse">
                             <thead>
-                                <tr className="bg-slate-200 text-slate-700 font-bold border-b border-slate-300 text-[10px] uppercase print:bg-slate-100">
+                                <tr className="bg-slate-200 text-slate-700 font-bold border-b border-slate-300 text-[0.625rem] uppercase print:bg-slate-100">
                                     <th className="py-1 px-2 text-center">{t.vatTable.rate}</th>
                                     <th className="py-1 px-2">{t.vatTable.net} ({invoice.currency})</th>
                                     <th className="py-1 px-2">{t.vatTable.vat} ({invoice.currency})</th>
                                     <th className="py-1 px-2">{t.vatTable.gross} ({invoice.currency})</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 bg-white font-mono text-[11px]">
+                            <tbody className="divide-y divide-slate-200 bg-white font-mono text-[0.6875rem]">
                                 {invoice.vatSummary.map((vs, idx) => (
                                     <tr key={idx} className="hover:bg-slate-50">
                                         <td className="py-1 px-2 text-center font-sans font-semibold text-slate-600">{vs.rateLabel}</td>
@@ -119,10 +119,10 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                     {/* Grand Total Box */}
                     <div className="w-full bg-[#384155] text-white p-2.5 rounded shadow-md flex justify-between items-center print:bg-[#384155]">
                         <div className="flex flex-col">
-                            <span className="text-[11px] uppercase tracking-wider text-slate-300 font-semibold">
+                            <span className="text-[0.6875rem] uppercase tracking-wider text-slate-300 font-semibold">
                                 {t.grandTotal}
                             </span>
-                            <span className="text-[10px] text-slate-400">
+                            <span className="text-[0.625rem] text-slate-400">
                                 {t.dueTerm} {invoice.dueDate}
                             </span>
                         </div>
@@ -145,7 +145,7 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                             className="w-full text-center font-medium text-slate-700 bg-transparent outline-none text-xs"
                         />
                     </div>
-                    <span className="text-[10px]">{t.signatures.issuer}</span>
+                    <span className="text-[0.625rem]">{t.signatures.issuer}</span>
                 </div>
                 <div>
                     <div className="border-b border-slate-400 w-48 mx-auto mb-1">
@@ -157,7 +157,7 @@ export const InvoiceSummarySection: React.FC<InvoiceSummarySectionProps> = ({
                             className="w-full text-center font-medium text-slate-700 bg-transparent outline-none text-xs"
                         />
                     </div>
-                    <span className="text-[10px]">{t.signatures.recipient}</span>
+                    <span className="text-[0.625rem]">{t.signatures.recipient}</span>
                 </div>
             </div>
         </div>

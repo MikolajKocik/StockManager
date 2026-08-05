@@ -5,6 +5,7 @@ import { StockTableView } from './components/StockTableView';
 import { StockDetailsDrawer } from './components/StockDetailsDrawer';
 import { mockStockTreemapData } from './mocks/stockData';
 import type { StockTreemapNode } from './models/stockTreemap';
+import toast from 'react-hot-toast';
 
 export default function InventoryItems() {
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>('ALL');
@@ -19,7 +20,6 @@ export default function InventoryItems() {
                 return false;
             }
             if (selectedRotation !== 'ALL' && cat.rotationStatus !== selectedRotation) {
-                // check if any children have this rotation
                 const hasMatchingChild = cat.children?.some(c =>
                     c.rotationStatus === selectedRotation ||
                     c.children?.some(p => p.rotationStatus === selectedRotation)
@@ -39,7 +39,7 @@ export default function InventoryItems() {
         });
     }, [selectedWarehouse, selectedRotation, searchQuery]);
 
-    // Aggregate overall KPI metrics
+    {/** Recursively computes weighted turnover days and category valuations across tree hierarchy */ }
     const { totalValue, deadStockValue, fastStockValue, avgTurnoverDays } = useMemo(() => {
         let totalVal = 0;
         let deadVal = 0;
@@ -74,11 +74,11 @@ export default function InventoryItems() {
 
     const handleNodeAction = (actionType: string, node: StockTreemapNode) => {
         if (actionType === 'DISCOUNT_CLEARANCE') {
-            alert(`Initiated 25% Discount Clearance order for: ${node.name} (${node.sku || node.id})`);
+            toast.success(`Initiated 25% Discount Clearance order for: ${node.name} (${node.sku || node.id})`);
         } else if (actionType === 'REORDER') {
-            alert(`Scheduled automatic procurement refill for: ${node.name}`);
+            toast.success(`Scheduled automatic procurement refill for: ${node.name}`);
         } else if (actionType === 'TRANSFER_BIN') {
-            alert(`Relocation task created for SKU: ${node.sku} to secondary storage zone.`);
+            toast.success(`Relocation task created for SKU: ${node.sku} to secondary storage zone.`);
         }
     };
 

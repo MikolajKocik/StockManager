@@ -8,12 +8,20 @@ interface SupplierDetailsModalProps {
     onEdit: (supplier: Supplier) => void;
 }
 
+const STATUS_STYLE_MAP: Record<string, { textClass: string; dotClass: string }> = {
+    'Active': { textClass: 'text-[#0e5f32]', dotClass: 'bg-[#0e5f32]' },
+    'Under Review': { textClass: 'text-[#8f7d49]', dotClass: 'bg-[#AA9559]' },
+    'Inactive': { textClass: 'text-slate-500', dotClass: 'bg-slate-400' }
+};
+
 export const SupplierDetailsModal = forwardRef<HTMLDialogElement, SupplierDetailsModalProps>(({
     supplier,
     onClose,
     onEdit
 }, ref) => {
     if (!supplier) return null;
+
+    const statusConfig = STATUS_STYLE_MAP[supplier.status || 'Active'] || STATUS_STYLE_MAP.Inactive;
 
     return (
         <Modal
@@ -26,34 +34,22 @@ export const SupplierDetailsModal = forwardRef<HTMLDialogElement, SupplierDetail
                 {/* Status & Quick Stats */}
                 <div className="grid grid-cols-3 gap-3 bg-slate-50/80 border border-slate-300 rounded-md p-3">
                     <div>
-                        <span className="text-[11px] text-slate-500 block font-medium">Status</span>
-                        <span className={`inline-flex items-center gap-1.5 mt-1 text-xs font-semibold ${
-                            supplier.status === 'Active'
-                                ? 'text-[#0e5f32]'
-                                : supplier.status === 'Under Review'
-                                    ? 'text-[#8f7d49]'
-                                    : 'text-slate-500'
-                        }`}>
-                            <span className={`w-1.5 h-1.5 rounded-full ${
-                                supplier.status === 'Active'
-                                    ? 'bg-[#0e5f32]'
-                                    : supplier.status === 'Under Review'
-                                        ? 'bg-[#AA9559]'
-                                        : 'bg-slate-400'
-                            }`} />
+                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Status</span>
+                        <span className={`inline-flex items-center gap-1.5 mt-1 text-xs font-semibold ${statusConfig.textClass}`}>
+                            <span className={`w-1.5 h-1.5 rounded-full ${statusConfig.dotClass}`} />
                             {supplier.status || 'Active'}
                         </span>
                     </div>
 
                     <div>
-                        <span className="text-[11px] text-slate-500 block font-medium">Payment Terms</span>
+                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Payment Terms</span>
                         <span className="font-semibold text-slate-800 block mt-1">
                             {supplier.paymentTerms || 'Net 30'}
                         </span>
                     </div>
 
                     <div>
-                        <span className="text-[11px] text-slate-500 block font-medium">Lead Time</span>
+                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Lead Time</span>
                         <span className="font-semibold text-slate-800 block mt-1">
                             {supplier.leadTimeDays ? `${supplier.leadTimeDays} Days` : '5 Days'}
                         </span>
@@ -62,23 +58,23 @@ export const SupplierDetailsModal = forwardRef<HTMLDialogElement, SupplierDetail
 
                 {/* Contact & Company Details */}
                 <div className="space-y-3 border border-slate-300 rounded-md p-3 bg-white">
-                    <h4 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <h4 className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Contact Information
                     </h4>
 
                     <div className="grid grid-cols-2 gap-3 text-xs">
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Contact Person:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Contact Person:</span>
                             <span className="font-semibold text-slate-800">{supplier.contactPerson || 'Procurement Office'}</span>
                         </div>
 
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Tax / VAT ID:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Tax / VAT ID:</span>
                             <span className="font-mono font-semibold text-slate-800">{supplier.taxId || 'N/A'}</span>
                         </div>
 
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Email Address:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Email Address:</span>
                             <a
                                 href={`mailto:${supplier.email}`}
                                 className="text-blue-700 hover:underline font-medium break-all"
@@ -88,7 +84,7 @@ export const SupplierDetailsModal = forwardRef<HTMLDialogElement, SupplierDetail
                         </div>
 
                         <div>
-                            <span className="text-slate-500 block text-[11px]">Phone Number:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Phone Number:</span>
                             <a
                                 href={`tel:${supplier.phone}`}
                                 className="text-blue-700 hover:underline font-medium"
@@ -100,7 +96,7 @@ export const SupplierDetailsModal = forwardRef<HTMLDialogElement, SupplierDetail
 
                     {supplier.website && (
                         <div className="pt-1 text-xs">
-                            <span className="text-slate-500 block text-[11px]">Official Website:</span>
+                            <span className="text-slate-500 block text-[0.6875rem]">Official Website:</span>
                             <a
                                 href={supplier.website}
                                 target="_blank"
@@ -115,7 +111,7 @@ export const SupplierDetailsModal = forwardRef<HTMLDialogElement, SupplierDetail
 
                 {/* Location & Address */}
                 <div className="border border-slate-300 rounded-md p-3 bg-slate-50/80 space-y-1.5 text-xs">
-                    <h4 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-1">
+                    <h4 className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider mb-1">
                         Registered Warehouse / Sourcing Location
                     </h4>
                     <div className="flex items-center justify-between text-slate-700">
@@ -136,7 +132,7 @@ export const SupplierDetailsModal = forwardRef<HTMLDialogElement, SupplierDetail
                 <div className="flex items-center justify-between bg-slate-50/80 border border-slate-300 rounded-md p-3">
                     <div>
                         <span className="font-bold text-slate-800 block text-xs">Active Catalog SKUs</span>
-                        <span className="text-[11px] text-slate-500">
+                        <span className="text-[0.6875rem] text-slate-500">
                             This supplier provides {supplier.activeItemsCount || 24} warehouse inventory items
                         </span>
                     </div>

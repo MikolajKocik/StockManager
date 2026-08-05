@@ -27,14 +27,14 @@ export const AuditTrailPanel: React.FC<AuditTrailPanelProps> = ({ logs }) => {
         <div className="w-full space-y-2 text-xs">
             <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-2xs flex items-center justify-between">
                 <div>
-                    <h3 className="font-bold text-slate-900 uppercase font-mono text-[11px]">
+                    <h3 className="font-bold text-slate-900 uppercase font-mono text-[0.6875rem]">
                         Security & Access Mutation Audit Log
                     </h3>
-                    <p className="text-slate-500 text-[10px]">
+                    <p className="text-slate-500 text-[0.625rem]">
                         Immutable event record of permission delegations, emergency overrides, and terminal sync commands.
                     </p>
                 </div>
-                <span className="text-[10px] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
+                <span className="text-[0.625rem] font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded border border-slate-200 font-semibold">
                     {logs.length} Recorded Events
                 </span>
             </div>

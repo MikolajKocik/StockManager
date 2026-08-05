@@ -12,30 +12,16 @@ This guide provides instructions on how to set up and run the StockManager proje
 
 - `REST API/`: ASP.NET Core Backend
 - `Frontend/`: React Frontend
-- `init_ollama.sh`: Script to initialize Ollama models and vector database.
 
 ## Running the Project
 
 ### 1. Start Infrastructure
 
-The project uses several infrastructure services (SQL Server, Redis, RabbitMQ, Ollama, PostgreSQL with pgvector).
-
-You can start them easily using the provided Makefile command (which also starts the backend) or manually via script/Docker Compose:
-
+The project uses several infrastructure services (SQL Server, Redis, RabbitMQ). You can start them using the provided Makefile command or via Docker Compose:
 ```bash
 make backend
 ```
 
-### 2. Initialize AI Models & Vector DB
-
-Once the containers are running, you need to pull the AI models (DeepSeek-R1 and Nomic Embed) and initialize the vector extension:
-
-```bash
-make ai-init
-```
-
-> [!NOTE]
-> Pulling the models might take some time depending on your internet connection (DeepSeek-R1:1.5b is ~1.1GB).
 
 ### 3. Run Backend
 
@@ -85,11 +71,3 @@ RABBITMQ__USERNAME=guest
 RABBITMQ__PASSWORD=guest
 POSTGRES__PASSWORD=YourPostgresPassword
 ```
-
-## AI Features
-
-The project uses Ollama for:
-- **Chat/Reasoning**: `deepseek-r1:1.5b`
-- **Embeddings**: `nomic-embed-text`
-
-These are used for document retrieval and AI-powered search in the inventory.

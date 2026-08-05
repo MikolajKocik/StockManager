@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Button, Input, Select } from '@/components/common/core';
+import { formatCurrency } from '@/utils/format';
+import { Table, TableHead, TableBody, TableRow, TableHeaderCell, TableCell } from '@/components/common';
 import type { OcrDocument, OcrExtractedData, OcrLineItem, DocumentType } from '../models/ocrDocument';
 import toast from 'react-hot-toast';
 
@@ -114,14 +116,14 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
     };
 
     return (
-        <div className="w-full bg-white border border-slate-300 rounded-lg shadow-xs flex flex-col h-full text-xs">
+        <main className="w-full bg-white border border-slate-300 rounded-lg shadow-xs flex flex-col h-full text-xs" role="main">
             {/* Header */}
-            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+            <header className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                 <div>
                     <span className="font-bold text-slate-800 text-xs uppercase tracking-wider block font-mono">
                         Extracted Data & Verification Form
                     </span>
-                    <span className="text-[10px] text-slate-500">
+                    <span className="text-[0.625rem] text-slate-500">
                         {focusedFieldKey ? (
                             <span className="text-[#2b6675] font-semibold">
                                 Active input: <code className="bg-[#f0f7f8] text-[#2b6675] px-1 py-0.2 rounded font-mono">{focusedFieldKey}</code> (click any scan snippet to paste)
@@ -133,98 +135,98 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
+                    <span className="text-[0.625rem] font-mono font-bold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">
                         Accuracy: {Math.round(document.overallConfidence * 100)}%
                     </span>
                 </div>
-            </div>
+            </header>
 
             {/* Scrollable Form Body */}
             <div className="flex-1 p-4 space-y-4 overflow-y-auto">
                 {/* Document Metadata Grid */}
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-mono">
+                <section className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
+                    <span className="text-[0.625rem] font-bold text-slate-500 uppercase block font-mono">
                         Document Classification & Details
                     </span>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Type</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Type</label>
                             <Select
-                                value={extractedData.docType}
-                                onChange={(e) => handleFieldChange('docType', e.target.value as DocumentType)}
+                                defaultValue={extractedData.docType}
+                                onBlur={(e) => handleFieldChange('docType', (e.target as HTMLSelectElement).value as DocumentType)}
                                 options={DOCUMENT_TYPE_OPTIONS}
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Document Number</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Document Number</label>
                             <Input
                                 type="text"
-                                value={extractedData.docNumber}
+                                defaultValue={extractedData.docNumber}
                                 onFocus={() => onFieldFocus('docNumber')}
-                                onChange={(e) => handleFieldChange('docNumber', e.target.value)}
+                                onBlur={(e) => handleFieldChange('docNumber', (e.target as HTMLInputElement).value)}
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Issue Date</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Issue Date</label>
                             <Input
                                 type="date"
-                                value={extractedData.issueDate}
+                                defaultValue={extractedData.issueDate}
                                 onFocus={() => onFieldFocus('issueDate')}
-                                onChange={(e) => handleFieldChange('issueDate', e.target.value)}
+                                onBlur={(e) => handleFieldChange('issueDate', (e.target as HTMLInputElement).value)}
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Delivery Date</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Delivery Date</label>
                             <Input
                                 type="date"
-                                value={extractedData.deliveryDate}
+                                defaultValue={extractedData.deliveryDate}
                                 onFocus={() => onFieldFocus('deliveryDate')}
-                                onChange={(e) => handleFieldChange('deliveryDate', e.target.value)}
+                                onBlur={(e) => handleFieldChange('deliveryDate', (e.target as HTMLInputElement).value)}
                             />
                         </div>
                     </div>
-                </div>
+                </section>
 
                 {/* Counterparty / Contractor Grid */}
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase block font-mono">
+                <section className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
+                    <span className="text-[0.625rem] font-bold text-slate-500 uppercase block font-mono">
                         Contractor / Supplier Information
                     </span>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                         <div className="sm:col-span-2">
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Company / Counterparty Name</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Company / Counterparty Name</label>
                             <Input
                                 type="text"
-                                value={extractedData.contractorName}
+                                defaultValue={extractedData.contractorName}
                                 onFocus={() => onFieldFocus('contractorName')}
-                                onChange={(e) => handleFieldChange('contractorName', e.target.value)}
+                                onBlur={(e) => handleFieldChange('contractorName', (e.target as HTMLInputElement).value)}
                             />
                         </div>
                         <div>
-                            <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">NIP / Tax ID</label>
+                            <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">NIP / Tax ID</label>
                             <Input
                                 type="text"
-                                value={extractedData.contractorNip}
+                                defaultValue={extractedData.contractorNip}
                                 onFocus={() => onFieldFocus('contractorNip')}
-                                onChange={(e) => handleFieldChange('contractorNip', e.target.value)}
+                                onBlur={(e) => handleFieldChange('contractorNip', (e.target as HTMLInputElement).value)}
                             />
                         </div>
                     </div>
                     <div>
-                        <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Target Destination Warehouse</label>
+                        <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Target Destination Warehouse</label>
                         <Input
                             type="text"
-                            value={extractedData.destinationWarehouse}
+                            defaultValue={extractedData.destinationWarehouse}
                             onFocus={() => onFieldFocus('destinationWarehouse')}
-                            onChange={(e) => handleFieldChange('destinationWarehouse', e.target.value)}
+                            onBlur={(e) => handleFieldChange('destinationWarehouse', (e.target as HTMLInputElement).value)}
                         />
                     </div>
-                </div>
+                </section>
 
                 {/* Line Items Table */}
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
+                <section className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-2.5">
                     <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-bold text-slate-500 uppercase block font-mono">
+                        <span className="text-[0.625rem] font-bold text-slate-500 uppercase block font-mono">
                             Document Positions & SKUs ({extractedData.items.length})
                         </span>
                         <Button
@@ -237,94 +239,87 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                     </div>
 
                     <div className="w-full overflow-x-auto">
-                        <table className="w-full text-left border-collapse text-xs">
-                            <thead>
-                                <tr className="border-b border-slate-200 bg-slate-100 text-slate-700 text-[10px] font-bold uppercase font-mono">
-                                    <th className="py-1.5 px-2">SKU Code</th>
-                                    <th className="py-1.5 px-2">Product Description</th>
-                                    <th className="py-1.5 px-2 w-20">Qty</th>
-                                    <th className="py-1.5 px-2 w-16">Unit</th>
-                                    <th className="py-1.5 px-2 w-24">Price Net</th>
-                                    <th className="py-1.5 px-2">LOT / Batch #</th>
-                                    <th className="py-1.5 px-1 text-center w-8">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-200">
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableHeaderCell>SKU Code</TableHeaderCell>
+                                    <TableHeaderCell>Product Description</TableHeaderCell>
+                                    <TableHeaderCell className="w-20">Qty</TableHeaderCell>
+                                    <TableHeaderCell className="w-16">Unit</TableHeaderCell>
+                                    <TableHeaderCell className="w-24">Price Net</TableHeaderCell>
+                                    <TableHeaderCell>LOT / Batch #</TableHeaderCell>
+                                    <TableHeaderCell className="py-1 px-1 text-center w-8">Action</TableHeaderCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
                                 {extractedData.items.map((item, idx) => (
-                                    <tr key={item.id} className="hover:bg-white transition-colors">
-                                        <td className="py-1 px-1">
-                                            <input
+                                    <TableRow key={item.id} className="hover:bg-white transition-colors">
+                                        <TableCell>
+                                            <Input
                                                 type="text"
-                                                value={item.sku}
+                                                defaultValue={item.sku}
                                                 onFocus={() => onFieldFocus(`item_sku_${idx}`)}
-                                                onChange={(e) => handleLineItemChange(idx, 'sku', e.target.value)}
+                                                onBlur={(e) => handleLineItemChange(idx, 'sku', (e.target as HTMLInputElement).value)}
                                                 className="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-mono font-bold text-[#2b6675] outline-none focus:border-[#2b6675]"
                                             />
-                                        </td>
-                                        <td className="py-1 px-1">
-                                            <input
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
                                                 type="text"
-                                                value={item.name}
+                                                defaultValue={item.name}
                                                 onFocus={() => onFieldFocus(`item_name_${idx}`)}
-                                                onChange={(e) => handleLineItemChange(idx, 'name', e.target.value)}
+                                                onBlur={(e) => handleLineItemChange(idx, 'name', (e.target as HTMLInputElement).value)}
                                                 className="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs outline-none focus:border-[#2b6675]"
                                             />
-                                        </td>
-                                        <td className="py-1 px-1">
-                                            <input
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
                                                 type="number"
-                                                value={item.quantity}
-                                                onChange={(e) => handleLineItemChange(idx, 'quantity', Number(e.target.value))}
+                                                defaultValue={item.quantity}
+                                                onBlur={(e) => handleLineItemChange(idx, 'quantity', Number((e.target as HTMLInputElement).value))}
                                                 className="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-mono text-right outline-none focus:border-[#2b6675]"
                                             />
-                                        </td>
-                                        <td className="py-1 px-1">
-                                            <input
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
                                                 type="text"
-                                                value={item.unit}
-                                                onChange={(e) => handleLineItemChange(idx, 'unit', e.target.value)}
+                                                defaultValue={item.unit}
+                                                onBlur={(e) => handleLineItemChange(idx, 'unit', (e.target as HTMLInputElement).value)}
                                                 className="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs text-center outline-none focus:border-[#2b6675]"
                                             />
-                                        </td>
-                                        <td className="py-1 px-1">
-                                            <input
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
                                                 type="number"
-                                                value={item.unitPriceNet}
-                                                onChange={(e) => handleLineItemChange(idx, 'unitPriceNet', Number(e.target.value))}
+                                                defaultValue={item.unitPriceNet}
+                                                onBlur={(e) => handleLineItemChange(idx, 'unitPriceNet', Number((e.target as HTMLInputElement).value))}
                                                 className="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-mono text-right outline-none focus:border-[#2b6675]"
                                             />
-                                        </td>
-                                        <td className="py-1 px-1">
-                                            <input
+                                        </TableCell>
+                                        <TableCell>
+                                            <Input
                                                 type="text"
-                                                value={item.lotNumber || ''}
+                                                defaultValue={item.lotNumber || ''}
                                                 placeholder="LOT #"
                                                 onFocus={() => onFieldFocus(`item_lot_${idx}`)}
-                                                onChange={(e) => handleLineItemChange(idx, 'lotNumber', e.target.value)}
+                                                onBlur={(e) => handleLineItemChange(idx, 'lotNumber', (e.target as HTMLInputElement).value)}
                                                 className="w-full bg-amber-50 border border-amber-300 rounded px-1.5 py-1 text-xs font-mono text-amber-900 font-semibold outline-none focus:border-amber-500"
                                             />
-                                        </td>
-                                        <td className="py-1 px-1 text-center">
-                                            <button
-                                                type="button"
-                                                onClick={() => handleDeleteLineItem(idx)}
-                                                className="text-slate-400 hover:text-red-600 font-bold p-1 cursor-pointer"
-                                                title="Delete Position"
-                                            >
-                                                Del
-                                            </button>
-                                        </td>
-                                    </tr>
+                                        </TableCell>
+                                        <TableCell className="text-center">
+                                            <Button variant="danger" size="sm" onClick={() => handleDeleteLineItem(idx)} title="Delete Position" className="text-slate-400 hover:text-red-600 font-bold p-1">Del</Button>
+                                        </TableCell>
+                                    </TableRow>
                                 ))}
-                            </tbody>
-                        </table>
+                            </TableBody>
+                        </Table>
                     </div>
-                </div>
+                </section>
 
                 {/* Totals & Notes Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <section className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                        <label className="text-[10px] font-semibold text-slate-600 block mb-0.5">Notes & Gate Reference</label>
+                        <label className="text-[0.625rem] font-semibold text-slate-600 block mb-0.5">Notes & Gate Reference</label>
                         <textarea
                             rows={2}
                             value={extractedData.notes || ''}
@@ -335,19 +330,19 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                     </div>
                     <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 flex flex-col justify-between font-mono">
                         <div className="flex justify-between text-slate-600">
-                            <span>Total Net Amount:</span>
-                            <span className="font-bold text-slate-900">{extractedData.totalNet.toFixed(2)} {extractedData.currency}</span>
-                        </div>
-                        <div className="flex justify-between text-base font-bold text-slate-900 border-t border-slate-200 pt-1">
-                            <span>Total Gross:</span>
-                            <span className="text-[#2b6675]">{extractedData.totalGross.toFixed(2)} {extractedData.currency}</span>
-                        </div>
+                                <span>Total Net Amount:</span>
+                                <span className="font-bold text-slate-900">{formatCurrency(extractedData.totalNet, extractedData.currency)}</span>
+                            </div>
+                            <div className="flex justify-between text-base font-bold text-slate-900 border-t border-slate-200 pt-1">
+                                <span>Total Gross:</span>
+                                <span className="text-[#2b6675]">{formatCurrency(extractedData.totalGross, extractedData.currency)}</span>
+                            </div>
                     </div>
-                </div>
+                </section>
             </div>
 
             {/* Footer Action Bar */}
-            <div className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
+            <footer className="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between gap-3">
                 <Button
                     variant="outline"
                     size="sm"
@@ -367,7 +362,7 @@ export const DocumentOcrForm: React.FC<DocumentOcrFormProps> = ({
                         {isPosting ? 'Posting...' : 'Approve & Post to WMS Inventory'}
                     </Button>
                 </div>
-            </div>
-        </div>
+            </footer>
+        </main>
     );
 };

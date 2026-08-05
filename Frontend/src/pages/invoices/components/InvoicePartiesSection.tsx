@@ -35,7 +35,7 @@ export const InvoicePartiesSection: React.FC<InvoicePartiesSectionProps> = ({
             {/* Seller Box */}
             <div className="border border-slate-300 rounded p-3 bg-slate-50/50 flex flex-col justify-between print:bg-transparent print:p-2">
                 <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block mb-2 border-b border-slate-200 pb-1">
+                    <span className="text-[0.6875rem] font-bold uppercase tracking-wider text-slate-500 block mb-2 border-b border-slate-200 pb-1">
                         {t.sellerTitle}
                     </span>
                     <div className="space-y-1.5 text-xs text-slate-800">
@@ -90,10 +90,10 @@ export const InvoicePartiesSection: React.FC<InvoicePartiesSectionProps> = ({
             <div className="border border-slate-300 rounded p-3 bg-white relative shadow-sm print:shadow-none print:p-2">
                 <div>
                     <div className="flex justify-between items-center mb-2 border-b border-slate-200 pb-1">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-700">
+                        <span className="text-[0.6875rem] font-bold uppercase tracking-wider text-slate-700">
                             {t.buyerTitle}
                         </span>
-                        <span className="text-[10px] text-slate-400 no-print">
+                        <span className="text-[0.625rem] text-slate-400 no-print">
                             {language === 'ENG' ? 'Enter Tax ID &bull; Enter to fetch' : 'Wpisz NIP &bull; Enter aby pobrać dane'}
                         </span>
                     </div>
@@ -114,7 +114,7 @@ export const InvoicePartiesSection: React.FC<InvoicePartiesSectionProps> = ({
                                 type="button"
                                 onClick={() => onLookupNip()}
                                 disabled={isLookingUpNip}
-                                className="no-print bg-[#37393B] hover:bg-slate-800 text-white text-[11px] font-semibold px-2.5 py-1 rounded transition-colors disabled:opacity-50"
+                                className="no-print bg-[#37393B] hover:bg-slate-800 text-white text-[0.6875rem] font-semibold px-2.5 py-1 rounded transition-colors disabled:opacity-50"
                             >
                                 {isLookingUpNip ? t.fetchGusLoading : t.fetchGus}
                             </button>

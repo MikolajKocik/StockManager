@@ -28,8 +28,7 @@ export default function BinMap() {
     } = useBinMap();
 
     return (
-        <div className="w-full flex flex-col gap-3">
-            {/* Top Toolbar with Filters, Search, and Live Warehouse KPIs */}
+        <main className="w-full flex flex-col gap-3">
             <BinMapToolbar
                 selectedSector={selectedSector}
                 searchTerm={searchTerm}
@@ -41,8 +40,7 @@ export default function BinMap() {
                 onRefresh={() => refetch()}
             />
 
-            {/* Main Warehouse Layout and Live Details Panel */}
-            <div className="grid grid-cols-1 xl:grid-cols-[1fr_330px] gap-3 items-start">
+            <section className="grid grid-cols-1 xl:grid-cols-[1fr_21rem] gap-3 items-start">
                 <BinMapCanvas
                     zones={zones}
                     filteredZones={filteredZones}
@@ -60,7 +58,7 @@ export default function BinMap() {
                     onDispatch={handleDispatch}
                     onToggleMaintenance={handleToggleMaintenance}
                 />
-            </div>
-        </div>
+            </section>
+        </main>
     );
 }

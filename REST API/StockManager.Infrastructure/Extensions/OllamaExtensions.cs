@@ -10,6 +10,15 @@ public static class OllamaExtensions
     public static void RegisterOllamaInstance(this IServiceCollection services, IConfiguration cfg)
     {
         IConfigurationSection ollamaConfig = cfg.GetSection("Ollama");
+
+        if (!ollamaConfig.Exists()
+            || string.IsNullOrWhiteSpace(ollamaConfig["BaseUrl"])
+            || string.IsNullOrWhiteSpace(ollamaConfig["ChatModel"])
+            || string.IsNullOrWhiteSpace(ollamaConfig["EmbeddingModel"]))
+        {
+            return;
+        }
+
         var ollamaUri = new Uri(ollamaConfig["BaseUrl"]!);
         string chatModel = ollamaConfig["ChatModel"]!;
         string embeddingModel = ollamaConfig["EmbeddingModel"]!;

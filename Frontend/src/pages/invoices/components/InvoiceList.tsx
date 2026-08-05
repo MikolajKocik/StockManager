@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import { formatCurrency } from '@/utils/format';
 import { Button, Input, Select } from '@/components/common';
 import type { Invoice } from '@/models/invoice';
 
@@ -15,6 +16,12 @@ export const INVOICE_LIST_STATUS_OPTIONS = [
     { label: 'Paid', value: 'Paid' },
     { label: 'Draft', value: 'Draft' }
 ] as const;
+
+const INVOICE_STATUS_STYLE: Record<string, string> = {
+    'Paid': 'bg-emerald-100 text-emerald-800',
+    'Issued': 'bg-blue-100 text-blue-800',
+    'Draft': 'bg-amber-100 text-amber-800'
+};
 
 export const InvoiceList: React.FC<InvoiceListProps> = ({
     invoices,
@@ -77,7 +84,7 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                 <div className="overflow-x-auto border border-slate-300 rounded">
                     <table className="w-full text-xs text-left border-collapse">
                         <thead>
-                            <tr className="bg-[#2b6675] text-white font-bold border-b border-slate-300 text-[11px] uppercase">
+                            <tr className="bg-[#2b6675] text-white font-bold border-b border-slate-300 text-[0.6875rem] uppercase">
                                 <th className="py-2.5 px-3">Invoice Number</th>
                                 <th className="py-2.5 px-3">Customer</th>
                                 <th className="py-2.5 px-3">Issue Date</th>
@@ -111,7 +118,7 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                                                 {inv.buyerName || 'Unknown Customer'}
                                             </span>
                                             {inv.buyerNip && (
-                                                <span className="text-[10px] text-slate-400 font-mono">
+                                                <span className="text-[0.625rem] text-slate-400 font-mono">
                                                     VAT: {inv.buyerNip}
                                                 </span>
                                             )}
@@ -124,18 +131,13 @@ export const InvoiceList: React.FC<InvoiceListProps> = ({
                                         </td>
                                         <td className="py-2.5 px-3 text-center">
                                             <span
-                                                className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase ${inv.status === 'Paid'
-                                                    ? 'bg-emerald-100 text-emerald-800'
-                                                    : inv.status === 'Issued'
-                                                        ? 'bg-blue-100 text-blue-800'
-                                                        : 'bg-amber-100 text-amber-800'
-                                                    }`}
+                                                className={`text-[0.625rem] font-bold px-2 py-0.5 rounded uppercase ${INVOICE_STATUS_STYLE[inv.status] || 'bg-slate-100 text-slate-800'}`}
                                             >
                                                 {inv.status}
                                             </span>
                                         </td>
                                         <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
-                                            {Number(inv.totalAmount || 0).toFixed(2)} PLN
+                                            {formatCurrency(Number(inv.totalAmount || 0))}
                                         </td>
                                         <td className="py-2.5 px-3 text-center">
                                             <Button

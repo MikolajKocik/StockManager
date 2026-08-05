@@ -89,12 +89,12 @@ export const EmergencyGenerator: React.FC = () => {
                 <div className="lg:col-span-5 bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-4 text-xs">
                     <div className="border-b border-slate-200 pb-2">
                         <div className="flex items-center gap-2">
-                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping" />
+                            <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
                             <h3 className="font-bold text-sm text-slate-800">
                                 Emergency Barcode Parameter Form
                             </h3>
                         </div>
-                        <p className="text-[11px] text-slate-500 mt-1">
+                        <p className="text-[0.6875rem] text-slate-500 mt-1">
                             Type or paste damaged pallet serials with live vector validation before dispatching to thermal printer.
                         </p>
                     </div>
@@ -125,7 +125,7 @@ export const EmergencyGenerator: React.FC = () => {
                             <label className="font-semibold text-slate-700">
                                 Barcode Payload / Serial Code <span className="text-red-500">*</span>
                             </label>
-                            <span className="text-[10px] text-slate-400 font-mono">
+                            <span className="text-[0.625rem] text-slate-400 font-mono">
                                 Length: {payload.length} chars
                             </span>
                         </div>
@@ -141,7 +141,7 @@ export const EmergencyGenerator: React.FC = () => {
 
                     {/* Quick-Test Presets for User Experimentation */}
                     <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-1.5">
+                        <span className="text-[0.625rem] font-bold uppercase tracking-wider text-slate-500 block mb-1.5">
                             Quick-Fill Validation Presets
                         </span>
                         <div className="flex flex-wrap gap-1.5">
@@ -151,7 +151,7 @@ export const EmergencyGenerator: React.FC = () => {
                                     setSymbology('EAN13');
                                     setPayload('5901234123457');
                                 }}
-                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-[10px] font-mono text-slate-700 cursor-pointer"
+                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-[0.625rem] font-mono text-slate-700 cursor-pointer"
                             >
                                 Valid EAN-13
                             </button>
@@ -161,7 +161,7 @@ export const EmergencyGenerator: React.FC = () => {
                                     setSymbology('EAN13');
                                     setPayload('5901234ABC45'); // Invalid letters
                                 }}
-                                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded text-[10px] font-mono text-rose-700 cursor-pointer"
+                                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded text-[0.625rem] font-mono text-rose-700 cursor-pointer"
                             >
                                 Invalid EAN-13 (Letters)
                             </button>
@@ -171,7 +171,7 @@ export const EmergencyGenerator: React.FC = () => {
                                     setSymbology('EAN13');
                                     setPayload('590123456'); // Invalid length
                                 }}
-                                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded text-[10px] font-mono text-rose-700 cursor-pointer"
+                                className="px-2 py-1 bg-rose-50 hover:bg-rose-100 border border-rose-300 rounded text-[0.625rem] font-mono text-rose-700 cursor-pointer"
                             >
                                 Invalid EAN-13 (9 digits)
                             </button>
@@ -181,7 +181,7 @@ export const EmergencyGenerator: React.FC = () => {
                                     setSymbology('CODE128');
                                     setPayload('003590123450000018');
                                 }}
-                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-[10px] font-mono text-slate-700 cursor-pointer"
+                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-[0.625rem] font-mono text-slate-700 cursor-pointer"
                             >
                                 Valid SSCC-18
                             </button>
@@ -191,7 +191,7 @@ export const EmergencyGenerator: React.FC = () => {
                                     setSymbology('QR');
                                     setPayload('VLV-HYDR-24V-01|LOT-2026-08-01X|003590123450000018');
                                 }}
-                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-[10px] font-mono text-slate-700 cursor-pointer"
+                                className="px-2 py-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 rounded text-[0.625rem] font-mono text-slate-700 cursor-pointer"
                             >
                                 Valid QR Matrix
                             </button>
@@ -261,7 +261,7 @@ export const EmergencyGenerator: React.FC = () => {
                     <div>
                         <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-4">
                             <div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                                <span className="text-[0.625rem] font-bold uppercase tracking-wider text-slate-500 block">
                                     Vector WYSIWYG Output
                                 </span>
                                 <h3 className="font-bold text-sm text-slate-800">
@@ -269,12 +269,12 @@ export const EmergencyGenerator: React.FC = () => {
                                 </h3>
                             </div>
                             {validation.isValid ? (
-                                <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-emerald-300 font-mono">
+                                <span className="inline-flex items-center gap-1.5 bg-emerald-100 text-emerald-800 text-[0.6875rem] font-bold px-2.5 py-0.5 rounded-full border border-emerald-300 font-mono">
                                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                     VALID: {symbology}
                                 </span>
                             ) : (
-                                <span className="inline-flex items-center gap-1.5 bg-rose-100 text-rose-800 text-[11px] font-bold px-2.5 py-0.5 rounded-full border border-rose-300 font-mono animate-pulse">
+                                <span className="inline-flex items-center gap-1.5 bg-rose-100 text-rose-800 text-[0.6875rem] font-bold px-2.5 py-0.5 rounded-full border border-rose-300 font-mono">
                                     <span className="w-1.5 h-1.5 rounded-full bg-rose-600" />
                                     VALIDATION ERROR
                                 </span>
@@ -285,25 +285,25 @@ export const EmergencyGenerator: React.FC = () => {
                         <div className="min-h-64 flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200 rounded-lg shadow-inner">
                             {validation.isValid ? (
                                 /* Valid State Crisp Vector Display */
-                                <div className="bg-white p-6 rounded-md border border-slate-300 shadow-lg flex flex-col items-center justify-center max-w-full overflow-hidden transition-all animate-scale-in">
+                                <div className="bg-white p-6 rounded-md border border-slate-300 shadow-lg flex flex-col items-center justify-center max-w-full overflow-hidden transition-all">
                                     <div 
                                         className="flex items-center justify-center"
                                         dangerouslySetInnerHTML={{ __html: barcodeSvgResult.svgXml }} 
                                     />
                                     {referenceNote && (
-                                        <span className="text-[11px] text-slate-500 mt-2 font-mono text-center">
+                                        <span className="text-[0.6875rem] text-slate-500 mt-2 font-mono text-center">
                                             Ref: {referenceNote}
                                         </span>
                                     )}
                                     {validation.checkDigit && (
-                                        <div className="mt-2 text-[10px] bg-slate-100 text-slate-700 font-mono px-2 py-0.5 rounded border border-slate-200">
+                                        <div className="mt-2 text-[0.625rem] bg-slate-100 text-slate-700 font-mono px-2 py-0.5 rounded border border-slate-200">
                                             Modulo-10 Check Digit Verified: <b>{validation.checkDigit}</b>
                                         </div>
                                     )}
                                 </div>
                             ) : (
-                                /* Invalid State - Animated Red Error Frame */
-                                <div className="w-full bg-rose-50 border-2 border-dashed border-rose-500 rounded-lg p-6 text-center space-y-3 animate-fade-in shadow-md">
+                                /* Invalid State - Clean Red Error Frame */
+                                <div className="w-full bg-rose-50 border-2 border-dashed border-rose-500 rounded-lg p-6 text-center space-y-3 shadow-md">
                                     <div className="w-12 h-12 rounded-full bg-rose-100 text-rose-600 text-2xl flex items-center justify-center mx-auto font-black shadow-xs">
                                         &#9888;
                                     </div>
@@ -316,11 +316,11 @@ export const EmergencyGenerator: React.FC = () => {
                                         </p>
                                     </div>
                                     {validation.warning && (
-                                        <div className="text-[11px] text-amber-800 bg-amber-50 border border-amber-300 rounded p-2 max-w-md mx-auto font-mono">
+                                        <div className="text-[0.6875rem] text-amber-800 bg-amber-50 border border-amber-300 rounded p-2 max-w-md mx-auto font-mono">
                                             {validation.warning}
                                         </div>
                                     )}
-                                    <p className="text-[11px] text-slate-500 italic">
+                                    <p className="text-[0.6875rem] text-slate-500 italic">
                                         Printing disabled to prevent unreadable or out-of-spec barcodes from entering the warehouse aisle.
                                     </p>
                                 </div>
@@ -362,7 +362,7 @@ export const EmergencyGenerator: React.FC = () => {
                         <h4 className="font-bold text-slate-800 text-xs uppercase tracking-wider">
                             Recent Emergency Pallet Reprints Log
                         </h4>
-                        <p className="text-[11px] text-slate-500">
+                        <p className="text-[0.6875rem] text-slate-500">
                             Audit trail of damaged barcode replacements dispatched to mobile forklift thermal printers.
                         </p>
                     </div>
@@ -389,10 +389,10 @@ export const EmergencyGenerator: React.FC = () => {
                                 <TableRow key={rec.id}>
                                     <TableCell className="font-mono text-slate-700">
                                         <div className="font-bold text-slate-900">{rec.id}</div>
-                                        <div className="text-[10px] text-slate-500">{rec.timestamp}</div>
+                                        <div className="text-[0.625rem] text-slate-500">{rec.timestamp}</div>
                                     </TableCell>
                                     <TableCell>
-                                        <span className="bg-slate-100 text-slate-800 font-mono text-[10px] px-2 py-0.5 rounded font-bold border border-slate-200">
+                                        <span className="bg-slate-100 text-slate-800 font-mono text-[0.625rem] px-2 py-0.5 rounded font-bold border border-slate-200">
                                             {rec.symbology}
                                         </span>
                                     </TableCell>
@@ -409,7 +409,7 @@ export const EmergencyGenerator: React.FC = () => {
                                         {rec.operator}
                                     </TableCell>
                                     <TableCell className="text-right">
-                                        <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 font-mono text-[10px] px-2 py-0.5 rounded-full font-bold border border-emerald-200">
+                                        <span className="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 font-mono text-[0.625rem] px-2 py-0.5 rounded-full font-bold border border-emerald-200">
                                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                             {rec.status}
                                         </span>

@@ -69,7 +69,7 @@ export const StaffTerminalsPanel: React.FC<StaffTerminalsPanelProps> = ({
                     </div>
 
                     <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-bold text-slate-600 uppercase font-mono">
+                        <span className="text-[0.6875rem] font-bold text-slate-600 uppercase font-mono">
                             Brigade:
                         </span>
                         <div className="w-56">
@@ -82,7 +82,7 @@ export const StaffTerminalsPanel: React.FC<StaffTerminalsPanelProps> = ({
                     </div>
                 </div>
 
-                <div className="text-[11px] font-mono text-slate-500">
+                <div className="text-[0.6875rem] font-mono text-slate-500">
                     Showing <strong className="text-slate-900">{filtered.length}</strong> active operators
                 </div>
             </div>
@@ -104,7 +104,7 @@ export const StaffTerminalsPanel: React.FC<StaffTerminalsPanelProps> = ({
                         <TableRow key={op.id}>
                             <TableCell>
                                 <div className="font-bold text-slate-900 text-xs">{op.fullName}</div>
-                                <div className="text-[10px] font-mono text-slate-500">
+                                <div className="text-[0.625rem] font-mono text-slate-500">
                                     {op.employeeCode} &bull; {op.email}
                                 </div>
                             </TableCell>
@@ -134,7 +134,7 @@ export const StaffTerminalsPanel: React.FC<StaffTerminalsPanelProps> = ({
                                     <Badge variant={op.isActive ? 'success' : 'danger'}>
                                         {op.isActive ? 'Online' : 'Disabled'}
                                     </Badge>
-                                    <span className="text-[10px] text-slate-400 font-mono">
+                                    <span className="text-[0.625rem] text-slate-400 font-mono">
                                         ({op.lastActive})
                                     </span>
                                 </div>

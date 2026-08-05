@@ -124,7 +124,6 @@ export default function BarCodes() {
 
     return (
         <div className="w-full space-y-4 pb-12">
-            {/* Header & Mode Switcher */}
             <BarcodesHeader
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
@@ -134,16 +133,13 @@ export default function BarCodes() {
                 isDirty={isDirty}
             />
 
-            {/* TAB 1: Visual Drag & Drop Label Studio */}
             {activeTab === 'DESIGNER' && (
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-4">
-                    {/* Left Column: Palette */}
                     <div className="lg:col-span-3">
                         <ComponentPalette onAddElement={handleAddElement} />
                     </div>
 
-                    {/* Middle Column: Interactive Canvas */}
-                    <div className="lg:col-span-6 flex flex-col min-h-[560px]">
+                    <div className="lg:col-span-6 flex flex-col min-h-140">
                         <Canvas
                             template={activeTemplate}
                             selectedElementId={selectedElementId}
@@ -156,7 +152,6 @@ export default function BarCodes() {
                         />
                     </div>
 
-                    {/* Right Column: Properties Panel */}
                     <div className="lg:col-span-3">
                         <PropertiesPanel
                             template={activeTemplate}
@@ -175,22 +170,18 @@ export default function BarCodes() {
                 </div>
             )}
 
-            {/* TAB 2: Emergency WYSIWYG Barcode Generator with Live Validation */}
             {activeTab === 'EMERGENCY' && (
                 <EmergencyGenerator />
             )}
 
-            {/* TAB 3: Inbound Reception PZ Terminal Printing */}
             {activeTab === 'INBOUND_PRINT' && (
                 <InboundReceptionPrinter template={activeTemplate} />
             )}
 
-            {/* TAB 4: Zebra ZPL-II Engine & Telemetry */}
             {activeTab === 'ZPL_ENGINE' && (
                 <ZplViewer template={activeTemplate} />
             )}
 
-            {/* Publish & Enforce Label Standard Modal */}
             <PublishTemplateModal
                 isOpen={isPublishModalOpen}
                 template={activeTemplate}

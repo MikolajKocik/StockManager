@@ -86,17 +86,17 @@ const PALETTE_ITEMS: PaletteItem[] = [
 
 export const NodePalette: React.FC<NodePaletteProps> = ({ onAddNode }) => {
     return (
-        <div className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs space-y-3">
-            <div className="border-b border-slate-200 pb-2">
-                <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-slate-500 block">
+        <aside className="bg-white border border-slate-300 rounded-lg p-3 shadow-xs space-y-3">
+            <header className="border-b border-slate-200 pb-2">
+                <span className="text-[0.625rem] font-mono font-bold uppercase tracking-wider text-slate-500 block">
                     BLOCK PALETTE (TOOLBOX)
                 </span>
                 <p className="text-xs text-slate-600">
                     Click any block to add it to your logic canvas.
                 </p>
-            </div>
+            </header>
 
-            <div className="space-y-2 max-h-[580px] overflow-y-auto pr-1">
+            <div className="space-y-2 max-h-[36.25rem] overflow-y-auto pr-1">
                 {PALETTE_ITEMS.map((item) => (
                     <div
                         key={item.subtype}
@@ -107,16 +107,16 @@ export const NodePalette: React.FC<NodePaletteProps> = ({ onAddNode }) => {
                             <span className="font-bold text-xs text-slate-900 truncate">
                                 {item.title}
                             </span>
-                            <span className="text-[9px] font-mono font-bold px-1 py-0.5 rounded-xs bg-white/80 border border-slate-300 text-slate-700">
+                            <span className="text-[0.5625rem] font-mono font-bold px-1 py-0.5 rounded-xs bg-white/80 border border-slate-300 text-slate-700">
                                 {item.badgeText}
                             </span>
                         </div>
-                        <p className="text-[11px] text-slate-600 leading-tight">
+                        <p className="text-[0.6875rem] text-slate-600 leading-tight">
                             {item.description}
                         </p>
                     </div>
                 ))}
             </div>
-        </div>
+        </aside>
     );
 };

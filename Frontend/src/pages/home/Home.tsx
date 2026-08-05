@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Card } from '@/components/common';
 import { LiveActivityFeed } from '@/components/LiveActivityFeed';
 import { type DashboardWidgets } from './components/CustomizeViewForm';
 import {
@@ -28,9 +29,9 @@ export default function Home() {
             {widgets.pendingOrders && <PendingOrdersWidget />}
 
             {widgets.liveActivityFeed && (
-                <div className="col-span-2 card">
+                <Card className="col-span-2 overflow-hidden">
                     <LiveActivityFeed />
-                </div>
+                </Card>
             )}
         </div>
     );

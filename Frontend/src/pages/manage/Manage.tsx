@@ -21,7 +21,6 @@ export default function Manage() {
     const [staff, setStaff] = useState<StaffOperator[]>(INITIAL_STAFF_OPERATORS);
     const [auditLogs, setAuditLogs] = useState<SystemAuditLog[]>(INITIAL_AUDIT_LOGS);
 
-    {/* Count unsaved differences */}
     let unsavedCount = 0;
     roles.forEach(r => {
         const orig = originalRoles.find(o => o.roleId === r.roleId);
@@ -83,12 +82,12 @@ export default function Manage() {
             changeSummary: `Synchronized ${unsavedCount} RBAC policy changes across all handheld devices and web sessions`
         };
         setAuditLogs(prev => [newLog, ...prev]);
-        toast.success('Successfully deployed RBAC permissions to all warehouse terminals!');
+        toast.success('Successfully deployed RBAC permissions to all warehouse terminals.');
     };
 
     const handleResetChanges = () => {
         setRoles(originalRoles);
-        toast('Discarded unsaved matrix edits', { icon: 'ℹ️' });
+        toast('Discarded unsaved matrix edits.');
     };
 
     const handleUpdateUserRole = (userId: string, newRoleId: string) => {
@@ -108,16 +107,13 @@ export default function Manage() {
         setStaff(prev => prev.map(s => {
             if (s.id !== userId) return s;
             const nextStatus = !s.isActive;
-            toast(nextStatus ? 'Terminal unlocked for operator' : 'Terminal locked for operator', {
-                icon: nextStatus ? '🟢' : '🔒'
-            });
+            toast(nextStatus ? 'Terminal unlocked for operator.' : 'Terminal locked for operator.');
             return { ...s, isActive: nextStatus };
         }));
     };
 
     return (
         <div className="w-full space-y-4 pb-12">
-            {/* Header & Status Ribbon */}
             <ManageHeader
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
@@ -127,7 +123,6 @@ export default function Manage() {
                 unsavedChangesCount={unsavedCount}
             />
 
-            {/* TAB 1: Role Permissions Matrix Grid */}
             {activeTab === 'RBAC_ROLES_MATRIX' && (
                 <RbacMatrixGrid
                     modules={WMS_MODULES}
@@ -138,7 +133,6 @@ export default function Manage() {
                 />
             )}
 
-            {/* TAB 2: Staff & Handheld Terminals */}
             {activeTab === 'STAFF_OPERATORS' && (
                 <StaffTerminalsPanel
                     staff={staff}
@@ -148,12 +142,10 @@ export default function Manage() {
                 />
             )}
 
-            {/* TAB 3: Global System Policies */}
             {activeTab === 'SYSTEM_POLICIES' && (
                 <SystemConfigPanel />
             )}
 
-            {/* TAB 4: Audit Trail */}
             {activeTab === 'AUDIT_TRAIL' && (
                 <AuditTrailPanel logs={auditLogs} />
             )}

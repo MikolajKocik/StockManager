@@ -11,7 +11,6 @@ import {
   InventoryItems,
   Maintenance,
   BarCodes,
-  Analyze,
   BinMap,
   Manage,
   ReorderRules,
@@ -61,7 +60,6 @@ export default function App() {
             <Route path="/inventory-items" element={<InventoryItems />} />
             <Route path="/barcodes" element={<BarCodes />} />
             <Route path="/maintenance" element={<Maintenance />} />
-            <Route path="/analyze" element={<Analyze />} />
             <Route path="/bin-map" element={<BinMap />} />
             <Route path="/manage" element={<Manage />} />
             <Route path="/reorder-rules" element={<ReorderRules />} />

@@ -31,7 +31,7 @@ export const OperationDetailsModal = forwardRef<HTMLDialogElement, OperationDeta
                 {operation.status === 'BLOCKED' && (
                     <div className="bg-red-50/80 border border-red-300 rounded-md p-3 space-y-2 text-red-900">
                         <div className="flex items-center justify-between">
-                            <span className="font-bold uppercase font-mono text-[11px]">
+                            <span className="font-bold uppercase font-mono text-[0.6875rem]">
                                 Hazard / Obstruction Details:
                             </span>
                             <Button
@@ -51,22 +51,22 @@ export const OperationDetailsModal = forwardRef<HTMLDialogElement, OperationDeta
                 {/* Metadata Overview Grid */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 bg-slate-50/80 p-3 rounded-md border border-slate-300">
                     <div>
-                        <span className="text-[10px] text-slate-500 font-mono uppercase block">Order Reference</span>
+                        <span className="text-[0.625rem] text-slate-500 font-mono uppercase block">Order Reference</span>
                         <span className="font-bold text-slate-900 font-mono">{operation.orderNumber}</span>
                     </div>
 
                     <div>
-                        <span className="text-[10px] text-slate-500 font-mono uppercase block">Zone / Aisle</span>
+                        <span className="text-[0.625rem] text-slate-500 font-mono uppercase block">Zone / Aisle</span>
                         <span className="font-semibold text-slate-800">{operation.zone}</span>
                     </div>
 
                     <div>
-                        <span className="text-[10px] text-slate-500 font-mono uppercase block">Assigned Staff</span>
+                        <span className="text-[0.625rem] text-slate-500 font-mono uppercase block">Assigned Staff</span>
                         <span className="font-bold text-slate-900">{operation.assignedOperatorName || 'Unassigned Queue'}</span>
                     </div>
 
                     <div>
-                        <span className="text-[10px] text-slate-500 font-mono uppercase block">Elapsed Time</span>
+                        <span className="text-[0.625rem] text-slate-500 font-mono uppercase block">Elapsed Time</span>
                         <span className="font-mono text-slate-700 font-semibold">{operation.elapsedMinutes}m / {operation.estimatedMinutes}m</span>
                     </div>
                 </div>
@@ -102,10 +102,10 @@ export const OperationDetailsModal = forwardRef<HTMLDialogElement, OperationDeta
                 {/* SKU Item Specification Table */}
                 <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                        <span className="font-bold text-[11px] text-slate-700 uppercase font-mono">
+                        <span className="font-bold text-[0.6875rem] text-slate-700 uppercase font-mono">
                             Operation Line Items ({operation.items.length})
                         </span>
-                        <span className="text-[11px] font-mono text-slate-500">
+                        <span className="text-[0.6875rem] font-mono text-slate-500">
                             Total Weight: {operation.totalWeightKg} kg
                         </span>
                     </div>
@@ -113,7 +113,7 @@ export const OperationDetailsModal = forwardRef<HTMLDialogElement, OperationDeta
                     <div className="border border-slate-300 rounded-md overflow-hidden shadow-2xs">
                         <table className="w-full text-left border-collapse text-xs">
                             <thead>
-                                <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-mono text-[10px]">
+                                <tr className="bg-slate-100 border-b border-slate-300 text-slate-700 font-mono text-[0.625rem]">
                                     <th className="py-2 px-2.5">SKU</th>
                                     <th className="py-2 px-2.5">Product Name</th>
                                     <th className="py-2 px-2.5">Source &rarr; Target</th>
@@ -121,14 +121,14 @@ export const OperationDetailsModal = forwardRef<HTMLDialogElement, OperationDeta
                                     <th className="py-2 px-2.5 text-center">Status</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-200 font-mono text-[11px]">
+                            <tbody className="divide-y divide-slate-200 font-mono text-[0.6875rem]">
                                 {operation.items.map(item => {
                                     const isDone = item.pickedQuantity >= item.quantity;
                                     return (
                                         <tr key={item.id} className="hover:bg-slate-50">
                                             <td className="py-2 px-2.5 font-bold text-slate-900">{item.sku}</td>
                                             <td className="py-2 px-2.5 font-sans font-medium text-slate-900">{item.productName}</td>
-                                            <td className="py-2 px-2.5 text-[10px] text-slate-600">
+                                            <td className="py-2 px-2.5 text-[0.625rem] text-slate-600">
                                                 <Badge variant="slate" className="mr-1">{item.sourceBin}</Badge>
                                                 &rarr;
                                                 <Badge variant="slate" className="ml-1 font-bold text-slate-800">{item.targetBin}</Badge>

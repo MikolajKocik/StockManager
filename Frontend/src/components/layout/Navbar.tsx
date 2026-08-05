@@ -10,7 +10,6 @@ import suppliersIcon from '@/assets/suppliers-person.svg';
 import arrowIcon from '@/assets/arrow-right.svg';
 import productsIcon from '@/assets/warehouse-outline.svg';
 import technicalIcon from '@/assets/forklift.svg';
-import analyzeIcon from '@/assets/network-intelligence.svg';
 import binMap from '@/assets/zoom-out-map.svg';
 import mngIcon from '@/assets/engineering.svg';
 import customerIcon from '@/assets/person.svg';
@@ -88,12 +87,7 @@ export default function Navbar() {
                         {!isCollapsed && <span>Maintenance</span>}
                     </NavLink>
                 </li>
-                <li className="nav-box">
-                    <NavLink to="/analyze" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
-                        <img src={analyzeIcon} className="nav-icon" alt="Analyze" />
-                        {!isCollapsed && <span>Analyze</span>}
-                    </NavLink>
-                </li>
+                {/* Analyze removed */}
                 <li className="nav-box">
                     <NavLink to="/bin-map" className={({ isActive }) => `nav-text ${isActive ? 'active' : ''}`}>
                         <img src={binMap} className="nav-icon" alt="Bin Map" />

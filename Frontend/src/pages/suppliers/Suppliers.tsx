@@ -61,7 +61,7 @@ export default function Suppliers() {
 
     if (isLoading && !hasLocalData) {
         return (
-            <div className="p-8 text-center text-slate-500 font-medium">
+            <div className="p-8 text-center text-slate-500 font-medium font-mono text-xs">
                 Loading suppliers directory...
             </div>
         );
@@ -69,7 +69,7 @@ export default function Suppliers() {
 
     if (isError && !hasLocalData) {
         return (
-            <div className="p-8 text-center text-rose-700 font-medium">
+            <div className="p-8 text-center text-rose-700 font-medium font-mono text-xs">
                 Error loading supplier directory. Please retry.
             </div>
         );
@@ -77,7 +77,6 @@ export default function Suppliers() {
 
     return (
         <div className="w-full flex flex-col gap-4 pb-8">
-            {/* Top KPI Header */}
             <SupplierKpiSummary
                 totalSuppliers={kpi.totalSuppliers}
                 activeSuppliers={kpi.activeSuppliers}
@@ -91,10 +90,9 @@ export default function Suppliers() {
                 countries={countries}
             />
 
-            {/* Filters Bar & Results count */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white border border-slate-300 rounded-lg px-4 py-2.5 shadow-2xs">
                 <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold text-slate-700">
+                    <span className="text-xs font-bold text-slate-700 font-mono">
                         Suppliers Found:
                     </span>
                     <span className="text-xs font-mono font-bold bg-[#2b6675] text-white px-2 py-0.5 rounded">
@@ -125,7 +123,6 @@ export default function Suppliers() {
                 </div>
             </div>
 
-            {/* Main Data Table */}
             <SupplierTable
                 suppliers={filteredSuppliers}
                 onSort={handleSort}
@@ -134,7 +131,6 @@ export default function Suppliers() {
                 onDelete={(sup) => setSupplierToDelete(sup)}
             />
 
-            {/* Supplier Details Modal */}
             <SupplierDetailsModal
                 ref={detailsModalRef}
                 supplier={selectedSupplierForDetails}
@@ -148,7 +144,6 @@ export default function Suppliers() {
                 }}
             />
 
-            {/* Create / Edit Modal */}
             <CreateSupplierModal
                 ref={createModalRef}
                 initialData={supplierToEdit}
@@ -159,7 +154,6 @@ export default function Suppliers() {
                 onSubmit={handleSaveSupplier}
             />
 
-            {/* Delete Confirmation Modal */}
             <ConfirmModal
                 isOpen={!!supplierToDelete}
                 title="Confirm Supplier Removal"

@@ -15,7 +15,7 @@ export function MaintenanceTasksWidget() {
     const { activeIncidents } = useMaintenanceTasks();
 
     return (
-        <div className="col-span-2 card">
+        <section className="col-span-2 card">
             <h2 className="card-header">Maintenance Tasks</h2>
             <div className="card-body">
                 <Table>
@@ -43,7 +43,7 @@ export function MaintenanceTasksWidget() {
                                         <div className="font-semibold text-slate-900 leading-tight">
                                             {formatValue(incident.title)}
                                         </div>
-                                        <div className="text-[11px] text-slate-500 mt-0.5">
+                                        <div className="text-[0.6875rem] text-slate-500 mt-0.5">
                                             {formatValue(incident.assetName)}
                                         </div>
                                     </TableCell>
@@ -65,6 +65,6 @@ export function MaintenanceTasksWidget() {
                     </TableBody>
                 </Table>
             </div>
-        </div>
+        </section>
     );
 }

@@ -30,7 +30,7 @@ export const OperationsHeader: React.FC<OperationsHeaderProps> = ({
     isBottleneckActive
 }) => {
     return (
-        <div className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
+        <header className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
             {/* Title & Quick Action */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
                 <div>
@@ -68,7 +68,7 @@ export const OperationsHeader: React.FC<OperationsHeaderProps> = ({
                             Floor capacity high ({inProgressCount} active picking/putaway tasks). Reorder priority to prevent ramp staging delays.
                         </span>
                     </div>
-                    <span className="text-[11px] font-mono text-slate-600 shrink-0">
+                    <span className="text-[0.6875rem] font-mono text-slate-600 shrink-0">
                         High throughput load
                     </span>
                 </div>
@@ -126,7 +126,7 @@ export const OperationsHeader: React.FC<OperationsHeaderProps> = ({
 
                     {/* Type Filter Buttons */}
                     <div className="flex items-center gap-1">
-                        <span className="text-[11px] font-bold text-slate-600 uppercase font-mono mr-1">
+                        <span className="text-[0.6875rem] font-bold text-slate-600 uppercase font-mono mr-1">
                             Type:
                         </span>
                         {(['ALL', 'PICKING', 'PUTAWAY', 'REPLENISHMENT', 'INTERNAL_TRANSFER'] as const).map(t => (
@@ -135,7 +135,7 @@ export const OperationsHeader: React.FC<OperationsHeaderProps> = ({
                                 variant={filterType === t ? 'primary' : 'secondary'}
                                 size="sm"
                                 onClick={() => onFilterTypeChange(t)}
-                                className="text-[11px]"
+                                className="text-[0.6875rem]"
                             >
                                 {t === 'ALL' ? 'All' : t.replace('_', ' ')}
                             </Button>
@@ -160,6 +160,6 @@ export const OperationsHeader: React.FC<OperationsHeaderProps> = ({
                     />
                 </div>
             </div>
-        </div>
+        </header>
     );
 };

@@ -66,6 +66,13 @@ const ZPL_ELEMENT_FORMATTERS: Record<LabelElement['type'], ZplElementFormatter> 
         const yDots = Math.round(el.y * dotsPerMm);
         const fontH = Math.round((el.fontSize || 14) * 3);
         return `^FO${xDots},${yDots}^A0N,${fontH},${fontH}^FD[WMS LOGO] ${resolvedContent}^FS\n`;
+    },
+
+    HAZMAT_ICON: (el, resolvedContent, dotsPerMm) => {
+        const xDots = Math.round(el.x * dotsPerMm);
+        const yDots = Math.round(el.y * dotsPerMm);
+        const fontH = Math.round((el.fontSize || 12) * 2.8);
+        return `^FO${xDots},${yDots}^A0N,${fontH},${fontH}^FD[HAZMAT: ${resolvedContent || 'ADR'}]^FS\n`;
     }
 };
 

@@ -11,6 +11,14 @@ interface WorkflowKanbanBoardProps {
     onSelectOperation: (op: KanbanOperation) => void;
 }
 
+const STATUS_DOT_COLOR: Record<string, string> = {
+    'IN_PROGRESS': 'bg-[#AA9559]',
+    'BLOCKED': 'bg-[#991b1b]',
+    'COMPLETED': 'bg-[#0e5f32]',
+    'QUEUED': 'bg-slate-400',
+    'ASSIGNED': 'bg-slate-400'
+};
+
 export const WorkflowKanbanBoard: React.FC<WorkflowKanbanBoardProps> = ({
     columns,
     operations,
@@ -47,11 +55,12 @@ export const WorkflowKanbanBoard: React.FC<WorkflowKanbanBoardProps> = ({
 
     return (
         <div className="w-full overflow-x-auto pb-4 select-none">
-            <div className="flex gap-3.5 min-w-[1100px] items-start">
+            <div className="flex gap-3.5 min-w-[68.75rem] items-start">
                 {columns.map((column) => {
                     const colOps = operations.filter(op => op.status === column.id);
                     const isOverloaded = colOps.length > column.maxCapacityThreshold;
                     const isDragOver = dragOverColumnId === column.id;
+                    const dotClass = STATUS_DOT_COLOR[column.id] || 'bg-slate-400';
 
                     return (
                         <div
@@ -59,7 +68,7 @@ export const WorkflowKanbanBoard: React.FC<WorkflowKanbanBoardProps> = ({
                             onDragOver={(e) => handleDragOver(e, column.id)}
                             onDragLeave={handleDragLeave}
                             onDrop={(e) => handleDrop(e, column.id)}
-                            className={`flex-1 min-w-[220px] bg-slate-100/70 rounded-lg border flex flex-col max-h-[calc(100vh-250px)] shadow-2xs transition-colors ${
+                            className={`flex-1 min-w-[13.75rem] bg-slate-100/70 rounded-lg border flex flex-col max-h-[calc(100vh-15.625rem)] shadow-2xs transition-colors ${
                                 isDragOver
                                     ? 'bg-slate-200/90 border-[#2b6675] ring-2 ring-[#2b6675]/30'
                                     : isOverloaded && column.id === 'IN_PROGRESS'
@@ -73,12 +82,7 @@ export const WorkflowKanbanBoard: React.FC<WorkflowKanbanBoardProps> = ({
                             <div className="p-3 border-b border-slate-200 bg-white rounded-t-lg space-y-1">
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-1.5 min-w-0">
-                                        <span className={`w-2 h-2 rounded-full ${
-                                            column.id === 'IN_PROGRESS' ? 'bg-[#AA9559]' :
-                                            column.id === 'BLOCKED' ? 'bg-[#991b1b]' :
-                                            column.id === 'COMPLETED' ? 'bg-[#0e5f32]' :
-                                            'bg-slate-400'
-                                        }`} />
+                                        <span className={`w-2 h-2 rounded-full ${dotClass}`} />
                                         <h3 className="font-bold text-slate-800 text-xs truncate">
                                             {column.title}
                                         </h3>
@@ -88,7 +92,7 @@ export const WorkflowKanbanBoard: React.FC<WorkflowKanbanBoardProps> = ({
                                     </Badge>
                                 </div>
 
-                                <div className="flex items-center justify-between text-[10px]">
+                                <div className="flex items-center justify-between text-[0.625rem]">
                                     <span className="text-slate-500 truncate">{column.description}</span>
                                     {isOverloaded && (
                                         <Badge variant="warning">
@@ -99,11 +103,11 @@ export const WorkflowKanbanBoard: React.FC<WorkflowKanbanBoardProps> = ({
                             </div>
 
                             {/* Cards Container with Scroll */}
-                            <div className="p-2 space-y-2.5 overflow-y-auto flex-1 min-h-[300px]">
+                            <div className="p-2 space-y-2.5 overflow-y-auto flex-1 min-h-[18.75rem]">
                                 {colOps.length === 0 ? (
                                     <div className="h-40 border-2 border-dashed border-slate-300 rounded-md flex flex-col items-center justify-center p-3 text-center text-slate-400">
                                         <span className="text-xs font-semibold">No active tasks</span>
-                                        <span className="text-[10px] text-slate-400 mt-0.5">
+                                        <span className="text-[0.625rem] text-slate-400 mt-0.5">
                                             Drag orders here to transition status
                                         </span>
                                     </div>

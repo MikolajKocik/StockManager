@@ -186,7 +186,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                     >
                         -
                     </button>
-                    <span className="font-mono text-slate-800 text-[11px] w-12 text-center">
+                    <span className="font-mono text-slate-800 text-[0.6875rem] w-12 text-center">
                         {Math.round(zoom * 100)}%
                     </span>
                     <button
@@ -219,7 +219,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                         <span>Snap (2mm)</span>
                     </label>
 
-                    <span className="text-[11px] text-slate-500 font-mono">
+                    <span className="text-[0.6875rem] text-slate-500 font-mono">
                         {template.dimensions.widthMm} x {template.dimensions.heightMm} mm
                     </span>
                 </div>
@@ -273,7 +273,7 @@ export const Canvas: React.FC<CanvasProps> = ({
                             {/* Floating Toolbar right on the selected element for immediate action */}
                             {isSelected && !isPreviewMode && (
                                 <div
-                                    className="absolute -top-7 left-0 bg-slate-900 text-white rounded px-1.5 py-0.5 text-[10px] flex items-center gap-1.5 shadow-lg z-50 pointer-events-auto"
+                                    className="absolute -top-7 left-0 bg-slate-900 text-white rounded px-1.5 py-0.5 text-[0.625rem] flex items-center gap-1.5 shadow-lg z-50 pointer-events-auto"
                                     onClick={(e) => e.stopPropagation()}
                                     onMouseDown={(e) => e.stopPropagation()}
                                 >
@@ -318,7 +318,7 @@ export const Canvas: React.FC<CanvasProps> = ({
 
                                         if (!validation.isValid) {
                                             return (
-                                                <div className="w-full h-full border border-rose-300 bg-rose-50 text-[10px] text-rose-700 flex items-center justify-center p-1 text-center font-mono">
+                                                <div className="w-full h-full border border-rose-300 bg-rose-50 text-[0.625rem] text-rose-700 flex items-center justify-center p-1 text-center font-mono">
                                                     Barcode Invalid: {validation.error}
                                                 </div>
                                             );

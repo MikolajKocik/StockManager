@@ -95,12 +95,22 @@ export default function ProductList() {
     };
 
     if (isLoading) {
-        return <div className="p-8 text-center text-xs text-slate-500 font-medium">Loading warehouse product catalog...</div>;
+        return <div className="p-8 text-center text-xs text-slate-500 font-medium font-mono">Loading warehouse product catalog...</div>;
     }
 
     if (isError) {
-        return <div className="p-8 text-center text-xs text-red-600 font-medium">Error loading products. Please try again.</div>;
+        return <div className="p-8 text-center text-xs text-red-600 font-medium font-mono">Error loading products. Please try again.</div>;
     }
+
+    const categoryOptions = [
+        { label: 'All Categories', value: '' },
+        ...genres.map(g => ({ label: g, value: g }))
+    ];
+
+    const unitOptions = [
+        { label: 'All Units', value: '' },
+        ...units.map(u => ({ label: u, value: u }))
+    ];
 
     const headerActions = (
         <>
@@ -122,30 +132,18 @@ export default function ProductList() {
         </>
     );
 
-    const categoryOptions = [
-        { label: 'All Categories', value: '' },
-        ...genres.map(g => ({ label: g, value: g }))
-    ];
-
-    const unitOptions = [
-        { label: 'All Units', value: '' },
-        ...units.map(u => ({ label: u, value: u }))
-    ];
-
     return (
         <div className="space-y-4 pb-10">
-            {/* Top Header & Actions Bar */}
             <Header
                 title="Products & Item Registry"
                 subtitle="Warehouse master product index, batch trace numbers, shelf-life and stock allocations."
                 badge={
-                    <Badge variant="brand" className="font-mono text-[10px]">
+                    <Badge variant="brand" className="font-mono text-xs">
                         MASTER CATALOG
                     </Badge>
                 }
                 actions={headerActions}
             >
-                {/* KPI Metrics */}
                 <div className="pt-2 border-t border-slate-200">
                     <ProductKpiSummary
                         totalProducts={kpi.totalProducts}
@@ -155,10 +153,8 @@ export default function ProductList() {
                     />
                 </div>
 
-                {/* Filter and Search Toolbar */}
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200 text-xs">
                     <div className="flex items-center gap-2 flex-wrap">
-                        {/* Live Search */}
                         <div className="w-64">
                             <Input
                                 value={searchQuery}
@@ -168,7 +164,6 @@ export default function ProductList() {
                             />
                         </div>
 
-                        {/* Genre Filter */}
                         <div className="w-40">
                             <Select
                                 value={selectedGenre}
@@ -178,7 +173,6 @@ export default function ProductList() {
                             />
                         </div>
 
-                        {/* Unit Filter */}
                         <div className="w-32">
                             <Select
                                 value={selectedUnit}
@@ -188,7 +182,6 @@ export default function ProductList() {
                             />
                         </div>
 
-                        {/* Stock Status Filter */}
                         <div className="w-44">
                             <Select
                                 value={stockFilter}
@@ -210,13 +203,12 @@ export default function ProductList() {
                         )}
                     </div>
 
-                    <span className="text-[11px] font-mono text-slate-500">
+                    <span className="text-xs font-mono text-slate-500">
                         Showing {displayedProducts.length} of {kpi.totalProducts} records
                     </span>
                 </div>
             </Header>
 
-            {/* Product Table */}
             <ProductTable
                 products={displayedProducts}
                 getProductStock={getProductStock}
@@ -229,7 +221,6 @@ export default function ProductList() {
                 isDeleting={isDeleting}
             />
 
-            {/* Product Details Modal */}
             <ProductDetailsForm
                 ref={detailsModalRef}
                 productId={selectedProductId}
@@ -237,20 +228,17 @@ export default function ProductList() {
                 onEdit={handleOpenEdit}
             />
 
-            {/* Product Create Modal */}
             <ProductCreateForm
                 ref={createModalRef}
                 onClose={handleCloseCreate}
             />
 
-            {/* Product Edit Modal */}
             <ProductEditForm
                 ref={editModalRef}
                 productId={selectedProductId}
                 onClose={handleCloseEdit}
             />
 
-            {/* Confirm Delete Modal */}
             {isConfirmOpen && selectedProductId && (
                 <ConfirmModal
                     isOpen={isConfirmOpen}

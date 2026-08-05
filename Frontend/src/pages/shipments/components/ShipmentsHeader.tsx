@@ -50,13 +50,13 @@ export const ShipmentsHeader: React.FC<ShipmentsHeaderProps> = ({
     );
 
     return (
-        <div className="w-full space-y-4">
+        <header className="w-full space-y-4">
             {/* Top Bar using Common Header Component */}
             <Header
                 title="Dock Scheduler & Shipments"
                 subtitle="Real-time ramp allocation, carrier waybill tracking and timeline scheduling."
                 badge={
-                    <Badge variant="brand" className="font-mono text-[10px]">
+                    <Badge variant="brand" className="font-mono text-[0.625rem]">
                         LOGISTICS / FLEET
                     </Badge>
                 }
@@ -118,6 +118,6 @@ export const ShipmentsHeader: React.FC<ShipmentsHeaderProps> = ({
                     </Button>
                 </div>
             </div>
-        </div>
+        </header>
     );
 };

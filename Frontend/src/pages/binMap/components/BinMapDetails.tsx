@@ -19,8 +19,8 @@ export const BinMapDetails: React.FC<BinMapDetailsProps> = ({
     onToggleMaintenance
 }) => {
     return (
-        <div className="bg-white border border-slate-300 rounded-lg shadow-xs overflow-hidden">
-            <div className="flex flex-row justify-between items-center px-4 py-2.5 border-b border-slate-200 bg-slate-50">
+        <aside className="bg-white border border-slate-300 rounded-lg shadow-xs overflow-hidden">
+            <header className="flex flex-row justify-between items-center px-4 py-2.5 border-b border-slate-200 bg-slate-50">
                 <h2 className="text-sm text-slate-900 font-bold font-mono uppercase tracking-tight">
                     {selectedZone ? `Bin Location ${selectedZone.id}` : 'Bin Details'}
                 </h2>
@@ -31,15 +31,15 @@ export const BinMapDetails: React.FC<BinMapDetailsProps> = ({
                         {selectedZone.status === 'active' ? 'Active' : 'Maintenance'}
                     </Badge>
                 )}
-            </div>
+            </header>
 
             <div className="p-4 flex flex-col justify-between gap-4">
                 {selectedZone ? (
                     <div className="flex flex-col gap-3">
                         {/* Occupancy Gauge */}
-                        <div className="bg-slate-50 p-3 rounded-md border border-slate-200">
+                        <section className="bg-slate-50 p-3 rounded-md border border-slate-200">
                             <div className="flex justify-between items-center mb-1 text-xs text-slate-700 font-medium">
-                                <span className="font-mono text-[10px] uppercase font-bold text-slate-500">Occupancy Level</span>
+                                <span className="font-mono text-[0.625rem] uppercase font-bold text-slate-500">Occupancy Level</span>
                                 <span className="font-mono font-bold text-slate-900">{selectedZone.fillPercentage}%</span>
                             </div>
                             <Meter
@@ -50,32 +50,32 @@ export const BinMapDetails: React.FC<BinMapDetailsProps> = ({
                                 high={90}
                                 optimum={20}
                             />
-                            <div className="flex justify-between text-[11px] text-slate-500 font-mono mt-1.5">
+                            <div className="flex justify-between text-[0.6875rem] text-slate-500 font-mono mt-1.5">
                                 <span>{selectedZone.items} units stored</span>
                                 <span>Capacity: {selectedZone.maxCapacity || 500} pcs</span>
                             </div>
-                        </div>
+                        </section>
 
                         {/* Information Matrix */}
                         <div className="grid grid-cols-2 gap-2 text-xs">
                             <div className="bg-slate-50 p-2 rounded border border-slate-200">
-                                <span className="text-slate-500 text-[10px] font-mono uppercase block">Category</span>
+                                <span className="text-slate-500 text-[0.625rem] font-mono uppercase block">Category</span>
                                 <span className="font-semibold text-slate-800 truncate block" title={selectedZone.category}>
                                     {selectedZone.category}
                                 </span>
                             </div>
                             <div className="bg-slate-50 p-2 rounded border border-slate-200">
-                                <span className="text-slate-500 text-[10px] font-mono uppercase block">Sector / Code</span>
+                                <span className="text-slate-500 text-[0.625rem] font-mono uppercase block">Sector / Code</span>
                                 <span className="font-semibold text-slate-800 font-mono">
                                     Sec {selectedZone.sector} ({selectedZone.code})
                                 </span>
                             </div>
                             <div className="bg-slate-50 p-2 rounded border border-slate-200">
-                                <span className="text-slate-500 text-[10px] font-mono uppercase block">Storage Temp</span>
+                                <span className="text-slate-500 text-[0.625rem] font-mono uppercase block">Storage Temp</span>
                                 <span className="font-semibold text-slate-800 font-mono">{selectedZone.temperature || '20°C'}</span>
                             </div>
                             <div className="bg-slate-50 p-2 rounded border border-slate-200">
-                                <span className="text-slate-500 text-[10px] font-mono uppercase block">Supervisor</span>
+                                <span className="text-slate-500 text-[0.625rem] font-mono uppercase block">Supervisor</span>
                                 <span className="font-semibold text-slate-800 truncate block" title={selectedZone.supervisor}>
                                     {selectedZone.supervisor || 'Shift Lead'}
                                 </span>
@@ -84,19 +84,19 @@ export const BinMapDetails: React.FC<BinMapDetailsProps> = ({
 
                         {/* Stored inventory items list if available */}
                         {selectedZone.inventoryItems && selectedZone.inventoryItems.length > 0 && (
-                            <div className="bg-slate-50 p-2.5 rounded border border-slate-200 text-xs">
-                                <span className="text-slate-600 font-semibold block mb-1 font-mono text-[10px] uppercase">
+                            <section className="bg-slate-50 p-2.5 rounded border border-slate-200 text-xs">
+                                <span className="text-slate-600 font-semibold block mb-1 font-mono text-[0.625rem] uppercase">
                                     Stored SKUs:
                                 </span>
                                 <div className="max-h-24 overflow-y-auto space-y-1">
                                     {selectedZone.inventoryItems.map((item, idx) => (
-                                        <div key={item.id || idx} className="flex justify-between text-[11px] bg-white p-1.5 rounded border border-slate-200">
+                                        <div key={item.id || idx} className="flex justify-between text-[0.6875rem] bg-white p-1.5 rounded border border-slate-200">
                                             <span className="font-medium text-slate-700 truncate">{item.productName || `Product #${item.productId}`}</span>
                                             <span className="text-slate-600 font-mono font-bold">{item.quantityOnHand} pcs</span>
                                         </div>
                                     ))}
                                 </div>
-                            </div>
+                            </section>
                         )}
 
                         {/* Action buttons */}
@@ -129,6 +129,6 @@ export const BinMapDetails: React.FC<BinMapDetailsProps> = ({
                     </div>
                 )}
             </div>
-        </div>
+        </aside>
     );
 };

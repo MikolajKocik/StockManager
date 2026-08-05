@@ -77,15 +77,6 @@ services:
     volumes:
       - pgvector_data:/var/lib/postgresql_data 
 
-  ollama:
-    container_name: stockmanager-ollama
-    image: ollama/ollama:latest
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    restart: unless-stopped
-
   sqlserver:
     container_name: stockmanager-sql
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -126,7 +117,5 @@ services:
      - sqlserver
 
 volumes:
-    mssql_data: {}
-    rabbitmq_data: {}
-    pgvector_data: {}
-    ollama_data: {}
+  mssql_data: {}
+  rabbitmq_data: {}

@@ -1,224 +1,124 @@
 # StockManager
 
-**StockManager** – backend (ASP.NET Core/.NET 8) for warehouse inventory management, built with **Clean Architecture + CQRS (MediatR)**, logging (**Serilog**), and observability (**OpenTelemetry**).  
-Project runs locally via **Docker Compose** (API + MS SQL Server + Redis). In the cloud, it operates as **Azure Container Apps** with supporting resources (SQL Database, Storage – Azure Files, Container Registry, Key Vault, Application Insights, etc.).
+StockManager is a full-stack warehouse, inventory, and supplier management system implemented with a React frontend and an ASP.NET Core backend.
 
-  ![ERD](docs/stockmanager-erd.png)
+## Key Features
 
-## Table of Contents
-- [Architecture & Layers](#architecture--layers)
-- [Prerequisites](#prerequisites)
-- [Quickstart – Local (Docker Compose)](#quickstart--local-docker-compose)
-- [Configuration - local connection string](#configuration--local-connection-string)
-- [Tests](#tests)
-- [NuGet Packages](#nuget-packages)
-- [Setup & AI Services (Local)](#setup--ai-services-local)
-- [Azure Deployment](#azure-deployment)
-- [Screenshots](#screenshots)
-- [Known Limitations / Tips](#known-limitations--tips)
-- [License](#license)
+- Full REST API backend built with ASP.NET Core 8
+- React + Vite frontend with inventory, product, supplier, maintenance, and document workflows
+- Entity Framework Core with SQL Server persistence
+- Redis caching and RabbitMQ messaging support
+- API versioning and Swagger documentation
+- Health checks and telemetry-ready middleware
+- In-memory test support for automated integration tests
 
----
+## Repository Structure
 
-## Architecture & Layers
+- `REST API/` — ASP.NET Core backend solution and related projects
+  - `StockManager/` — main API application
+  - `StockManager.Application/` — application services, CQRS handlers, DTOs, validation, and mappings
+  - `StockManager.Core.Domain/` — domain entities, enums, interfaces, and business logic
+  - `StockManager.Infrastructure/` — persistence, repositories, and infrastructure services
+  - `StockManager.Tests/` — integration and unit tests for the backend
+  - `StockManager.Application.Tests/` — application-layer unit tests
+- `Frontend/` — React frontend application
+- `Makefile` — quick local run commands
 
-The repository (`REST API/`) is divided into projects:
+## Tech Stack
 
-- **StockManager.Core.Domain** – domain models/entities.
-- **StockManager.Application** – application logic, **CQRS** (commands/queries), **MediatR**, validation, etc.
-- **StockManager.Infrastructure** – data access (**EF Core** for Azure SQL), integrations (**RabbitMQ**, **Azure Blob Storage**, Redis), interface implementations.
-- **StockManager** – **ASP.NET Core Web API** app (endpoints, DI config, Background Workers for document generation, Serilog, OTEL).
-- Files: `docker-compose.yml`, `docker-compose.override.yml`, `.env_template`, `Directory.Packages.props` (central NuGet versions), etc.
+- Backend: ASP.NET Core 8, Entity Framework Core, Serilog, OpenTelemetry, Swagger
+- Frontend: React, Vite, Tailwind CSS, React Router, React Query, Axios
+- Infrastructure: SQL Server, Redis, RabbitMQ
 
----
+## Local Setup
 
-## Prerequisites
+### Prerequisites
 
-- **Docker Desktop** 4.x+
-- **Docker Compose v2** (bundled with Docker Desktop)
-- (Optional) **.NET 8 SDK** if you want to run the API outside Docker
+- [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- [Node.js](https://nodejs.org/)
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
 
----
+### Recommended Local Run
 
-## Quickstart – Local (Docker Compose)
-
-1. Clone the repo and go to the `REST API/` directory.
-
-2. Create a `.env` file from `.env_template` and fill in required variables.
-
-3. Build and run the stack:
-
-   ```bash
-   docker compose up --build -d
-   ```
-   This command will:
-
-   - Pull images for mssql/server:2022-latest, redis:7-alpine, and **rabbitmq:3-management**,
-   - Build the stockmanager:latest image (your API),
-   - Start 4 containers: stockmanager-sql (1433), redis (6379), **rabbitmq (5672/15672)**, stockmanager (API – mapped to e.g., http://localhost:5000 / http://localhost:8080 as per compose).
-
-   Check containers:
-   ```bash
-   docker ps
-   # Or use Docker Desktop UI
-   ```
-
-   API:
-   - Swagger/HTTP: http://localhost:5000 (or the port you set in compose – use "Show all ports" in Docker Desktop).
-   - If using HTTPS – the relevant port is visible in Docker Desktop/compose.
-
-   Note: First SQL Server startup may take up to a minute. If API starts before SQL is ready, compose includes `depends_on`, but sometimes it's best to give SQL a moment before API migrations.
-
----
-
-## Configuration – local connection string
+From the repository root, use the provided Makefile commands:
 
 ```bash
-  Server=stockmanager-sql,1433;Database=StockManagerDb;
-  User Id=sa;Password=<YourSAPassword>;
-  TrustServerCertificate=True;Encrypt=False;
+make backend
 ```
 
----
+This command will:
 
-## Asynchronous Logistics Flow
-
-The project implements a modern, asynchronous architecture for warehouse operations:
-
-1.  **Operation Creation**: When a user creates a warehouse operation (PZ, WZ, RW, MM), the API updates the inventory and publishes a "Light Message" to **RabbitMQ**.
-2.  **Background Processing**: A `DocumentGenerationWorker` (HostedService) listens for these messages.
-3.  **PDF Generation**: The worker fetches operation details, generates a professional PDF receipt using **QuestPDF**.
-4.  **Cloud Storage**: The PDF is uploaded to **Azure Blob Storage**.
-5.  **Audit & Retrieval**: Metadata is saved to the database, allowing users to download generated documents via the React UI.
-
----
-
-## Tests
-
-The repository contains xUnit tests. In Visual Studio or CLI:
+- start required Docker containers for SQL Server, RabbitMQ, and Redis
+- wait for the infrastructure to become available
+- apply Entity Framework migrations
+- launch the ASP.NET Core backend
 
 ```bash
+make frontend
+```
+
+This starts the frontend development server in `Frontend/` using Vite.
+
+### Frontend Manual Start
+
+```bash
+cd Frontend
+npm install
+npm run dev
+```
+
+### Backend Manual Start
+
+```bash
+cd "REST API/StockManager"
+dotnet run
+```
+
+## Environment Variables
+
+The backend expects configuration values via environment variables or `REST API/.env`.
+
+Typical values include:
+
+```env
+MSSQL_SA_PASSWORD=YourStrong!Passw0rd
+JWT__KEY=YourSuperSecretKeyHere...
+JWT__ISSUER=StockManager
+JWT__AUDIENCE=StockManager
+REDIS__HOST=localhost
+RABBITMQ__HOST=localhost
+RABBITMQ__USERNAME=guest
+RABBITMQ__PASSWORD=guest
+```
+
+## Testing
+
+Run backend tests from `REST API/StockManager.Tests`:
+
+```bash
+cd "REST API/StockManager.Tests"
 dotnet test
 ```
 
+The project includes both integration tests and application-level unit tests.
 
-The Dockerfile (test stage) also builds and runs tests – you can see statuses in build logs.
+## API Documentation
 
----
+When the backend is running in development, Swagger is available at:
 
-## NuGet Packages
-
-Main dependencies used in the project (based on structure/config):
-
-**Runtime / Infrastructure**
-- Microsoft.EntityFrameworkCore
-- Microsoft.EntityFrameworkCore.SqlServer
-- Microsoft.EntityFrameworkCore.Tools
-- StackExchange.Redis or Microsoft.Extensions.Caching.StackExchangeRedis
-- MediatR / MediatR.Extensions.Microsoft.DependencyInjection
-- Serilog / Serilog.Extensions.Hosting / Serilog.Sinks.Console
-- OpenTelemetry.Extensions.Hosting
-- OpenTelemetry.Instrumentation.AspNetCore
-- OpenTelemetry.Instrumentation.Http
-- OpenTelemetry.Instrumentation.Runtime
-- OpenTelemetry.Exporter.OpenTelemetryProtocol
-- Azure.Identity, Azure.Monitor.OpenTelemetry.Exporter
-- Azure.Storage.Blobs (Cloud file storage)
-- RabbitMQ.Client (Messaging)
-- QuestPDF (PDF generation engine)
-- Microsoft.AspNetCore.Authentication.JwtBearer
-
-**Validation / Mapping**
-- FluentValidation / FluentValidation.DependencyInjectionExtensions
-- AutoMapper / AutoMapper.Extensions.Microsoft.DependencyInjection
-
-**Testing**
-- xunit
-- xunit.runner.visualstudio
-- FluentAssertions
-- Moq
-
----
-
-## Setup & AI Services (Local)
-
-The project now includes integrated AI features for document processing and smart inventory search.
-
-### Quick Run Scripts (Makefile)
-The easiest way to run tasks is using the provided `Makefile`:
-- `make backend` – Starts infrastructure and the .NET Backend.
-- `make frontend` – Starts the React development server.
-- `make ai-init` – Pulls required AI models and initializes the vector database.
-- `make seed-db` – Populates the database with test data.
-- `make help` – Lists all available commands.
-
-### AI Infrastructure (Ollama)
-The system uses **Ollama** for:
-- **Embeddings**: `nomic-embed-text` (for vector search).
-- **Reasoning**: `deepseek-r1:1.5b` (for conversational analysis - lightweight).
-
-For detailed setup instructions, including Docker configurations and model requirements, see the [MANUAL.md](MANUAL.md).
-
----
-
-## Azure Deployment & CI/CD
-
-The backend runs on **Azure Container Apps (ACA)**, while the application image is built and pushed to **GitHub Container Registry (GHCR)** automatically via GitHub Actions pipelines.
-
-The automated process utilizes **Microsoft Entra ID (OIDC) Federated Credentials**, completely eliminating the need for storing explicit passwords/secrets in Azure connection strings.
-
-Environment consists of:
-
-- **GitHub Actions** – Continuous Integration / Continuous Deployment pipeline
-- **GitHub Container Registry (GHCR)** – Docker image registry
-- **Azure Container Apps** – API container host
-- **Azure SQL Server + Azure SQL Database** – database
-- **Azure Storage – Azure Blob Storage** – document storage
-- **Azure Service Bus or RabbitMQ** – messaging backbone
-- **Azure Key Vault** – secrets handling
-- **Application Insights (+ Log Analytics Workspace)** – telemetry & logs
-- **Managed Environment** – ACA environment
-
----
+```text
+http://localhost:5000/swagger/index.html
+```
 
 ## Screenshots
 
-- **Local (Docker Desktop):**  
-  ![docker](docs/docker-desktop.PNG)
-  ![build-dashboard](docs/build.PNG)
+![Barcode Planner](docs/screenshots/barcodes-planner.png)
 
-- **ACA:**
-  ![aca](docs/aca.PNG)
-  ![aca-connection](docs/ACA-connected.jpg)
-  ![aca-working](docs/container-working.jpg)
+![Dock Scheduler](docs/screenshots/dock-scheduler.png)
 
-- **Resource Group – all services:**  
-  ![rg](docs/stockmanager-group-resources.png)
+![Maintenance Dashboard](docs/screenshots/maintenance.png)
 
-- **CI/CD via GitHub Actions & Entra ID (OIDC):**  
-  ![App Registrations](docs/azure-app-registrations.png)
-  ![Certificates & Secrets](docs/azure-certificates-secrets.png)
-  ![Federated Credential](docs/azure-federated-credential.png)
-  ![GitHub Actions Secrets](docs/github-actions-secrets.png)
-  ![Role Assignment](docs/azure-role-assignment.png)
+## Notes
 
-- **xUnit tests – passing:**  
-  ![xunit](docs/xunit.PNG)
-
-- Also repository has a **lockage** to push commits to main branch.
-  ![lockage](docs/main-push-locage.PNG)
----
-
-## Known Limitations / Tips
-
-- Azure SQL (free/serverless) can quickly exhaust free quota if the app keeps connections alive.
-- For demo: resume the database briefly (Compute + Storage → Continue using database with additional charges), and stop after demo (or set autopause).
-- In the app, separate readiness/liveness checks from DB tests and add exponential backoff for SQL errors.
-- Store secrets in Key Vault (+ Managed Identity in ACA).
-- For monitoring, send OTEL data to Application Insights.
-
----
-
-## License
-
-MIT 
+- The React frontend uses mock and internal APIs for several demo screens and data workflows.

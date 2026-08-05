@@ -75,44 +75,44 @@ export const ProductDetailsForm = forwardRef<HTMLDialogElement, ProductDetailsFo
                             <div className="space-y-3">
                                 <div className="grid grid-cols-3 gap-3 bg-slate-50/80 border border-slate-300 rounded-md p-3">
                                     <div>
-                                        <span className="text-[11px] text-slate-500 block font-medium">Category</span>
+                                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Category</span>
                                         <span className="font-semibold text-slate-800">{formatValue(product.genre)}</span>
                                     </div>
                                     <div>
-                                        <span className="text-[11px] text-slate-500 block font-medium">Storage Type</span>
+                                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Storage Type</span>
                                         <span className="font-semibold text-slate-800">{formatValue(product.type)}</span>
                                     </div>
                                     <div>
-                                        <span className="text-[11px] text-slate-500 block font-medium">Unit Measurement</span>
+                                        <span className="text-[0.6875rem] text-slate-500 block font-medium">Unit Measurement</span>
                                         <span className="font-mono font-semibold text-slate-800">{product.unit}</span>
                                     </div>
                                 </div>
 
                                 <div className="border border-slate-300 rounded-md p-3 space-y-2 bg-white">
-                                    <span className="font-bold text-[11px] text-slate-600 uppercase tracking-wider block font-mono">
+                                    <span className="font-bold text-[0.6875rem] text-slate-600 uppercase tracking-wider block font-mono">
                                         Supply & Traceability
                                     </span>
                                     <div className="grid grid-cols-2 gap-3 text-xs">
                                         <div>
-                                            <span className="text-slate-500 block text-[11px]">Supplier Reference:</span>
+                                            <span className="text-slate-500 block text-[0.6875rem]">Supplier Reference:</span>
                                             <span className="font-semibold text-slate-800">
                                                 {product.supplierName ? `${product.supplierName} (${product.supplierId})` : formatValue(product.supplierId)}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-slate-500 block text-[11px]">Batch Number:</span>
+                                            <span className="text-slate-500 block text-[0.6875rem]">Batch Number:</span>
                                             <span className="font-mono font-semibold text-slate-800">
                                                 {formatValue(product.batchNumber)}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-slate-500 block text-[11px]">Expiration Date:</span>
+                                            <span className="text-slate-500 block text-[0.6875rem]">Expiration Date:</span>
                                             <span className="font-medium text-slate-700">
                                                 {formatDate(product.expirationDate)}
                                             </span>
                                         </div>
                                         <div>
-                                            <span className="text-slate-500 block text-[11px]">Delivered Date:</span>
+                                            <span className="text-slate-500 block text-[0.6875rem]">Delivered Date:</span>
                                             <span className="font-medium text-slate-700">
                                                 {formatDate(product.deliveredAt)}
                                             </span>
@@ -131,7 +131,7 @@ export const ProductDetailsForm = forwardRef<HTMLDialogElement, ProductDetailsFo
                                 ) : (
                                     <div className="rounded-md border border-slate-300 overflow-hidden shadow-2xs">
                                         <table className="w-full text-xs text-left border-collapse">
-                                            <thead className="bg-slate-100 text-slate-700 font-bold uppercase text-[10px] tracking-wider border-b border-slate-300 font-mono">
+                                            <thead className="bg-slate-100 text-slate-700 font-bold uppercase text-[0.625rem] tracking-wider border-b border-slate-300 font-mono">
                                                 <tr>
                                                     <th className="py-2 px-3">Bin Location Reference</th>
                                                     <th className="py-2 px-3 text-right">Quantity on Hand</th>

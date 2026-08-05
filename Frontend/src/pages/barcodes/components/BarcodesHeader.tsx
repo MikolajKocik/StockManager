@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/common';
+import { Badge, Button, Header } from '@/components/common';
 
 export type BarcodeModuleTab = 'DESIGNER' | 'EMERGENCY' | 'INBOUND_PRINT' | 'ZPL_ENGINE';
 
@@ -23,15 +23,14 @@ export const BarcodesHeader: React.FC<BarcodesHeaderProps> = ({
     return (
         <div className="space-y-4 mb-4">
             {/* Top Bar with Title and Actions */}
-            <div className="bg-[#384155] text-white p-4 rounded-lg shadow-md border border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-3">
-                <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                        <h1 className="bg-amber-400 text-slate-900 font-black text-2xl px-2 py-0.5 rounded tracking-wide font-mono uppercase">
-                            WMS ZEBRA ENGINE
-                        </h1>
-                    </div>
-                </div>
-
+            <Header
+                title="Barcodes Warehouse Planner"
+                subtitle="Visual editor for managing and planning different barcodes templates"
+                badge={
+                    <Badge variant="brand">
+                        OCR ENGINE
+                    </Badge>
+                }>
                 {activeTab === 'DESIGNER' && (
                     <div className="flex items-center gap-2">
                         {onResetTemplate && (
@@ -56,7 +55,7 @@ export const BarcodesHeader: React.FC<BarcodesHeaderProps> = ({
                         )}
                     </div>
                 )}
-            </div>
+            </Header>
 
             {/* Sub-Navigation Tabs & KPI Overview */}
             <div className="bg-white border border-slate-300 rounded-lg p-2 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
@@ -70,7 +69,7 @@ export const BarcodesHeader: React.FC<BarcodesHeaderProps> = ({
                     >
                         <span className="border p-2">Visual Label Designer</span>
                         {templateName && activeTab === 'DESIGNER' && (
-                            <span className="text-[10px] bg-slate-700 text-slate-200 px-1.5 py-0.2 rounded font-mono">
+                            <span className="text-[0.625rem] bg-slate-700 text-slate-200 px-1.5 py-0.2 rounded font-mono">
                                 {templateName}
                             </span>
                         )}

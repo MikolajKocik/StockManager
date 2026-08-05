@@ -42,7 +42,7 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
     ], [segments]);
 
     return (
-        <div className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
+        <section className="bg-white border border-slate-300 rounded-lg shadow-2xs p-4 space-y-4">
             {/* Header row with Title, Search & Quick Action */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-3 border-b border-slate-200">
                 <div>
@@ -91,7 +91,7 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {/* 1. Total Customers */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         B2B Accounts
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -102,7 +102,7 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
 
                 {/* 2. Active Ratio */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Active Clients
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -115,7 +115,7 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
 
                 {/* 3. Cumulative Lifetime Revenue */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Total Volume
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -126,7 +126,7 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
 
                 {/* 4. Total Credit Limit Extended */}
                 <div className="bg-slate-50/70 border border-slate-300 rounded-md p-3 flex flex-col justify-between">
-                    <span className="text-[11px] font-bold text-slate-600 uppercase tracking-wider">
+                    <span className="text-[0.6875rem] font-bold text-slate-600 uppercase tracking-wider">
                         Total Credit Limit
                     </span>
                     <div className="flex items-baseline justify-between mt-2">
@@ -135,6 +135,6 @@ export const CustomerKpiSummary: React.FC<CustomerKpiSummaryProps> = ({
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
     );
 };

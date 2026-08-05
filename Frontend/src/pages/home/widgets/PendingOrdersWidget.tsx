@@ -15,7 +15,7 @@ export function PendingOrdersWidget() {
     const { items, activeSort, toggleSort } = usePendingOrders();
 
     return (
-        <div className="col-span-4 card">
+        <section className="col-span-4 card">
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2 mb-3">
                 <h2 className="card-header border-none p-0 m-0">Pending Orders</h2>
 
@@ -24,25 +24,25 @@ export function PendingOrdersWidget() {
                     aria-label="Pending orders legend"
                     className="flex items-center gap-1.5 text-xs text-slate-600 font-medium"
                 >
-                    <span className="text-slate-400 text-[11px] mr-1" aria-hidden="true">
+                    <span className="text-slate-400 text-[0.6875rem] mr-1" aria-hidden="true">
                         Rejestr:
                     </span>
                     <div className="flex items-center gap-1">
                         <Badge variant="blue" title="Przyjęcie Zewnętrzne (Inbound Delivery)">
                             PZ
                         </Badge>
-                        <span className="text-slate-500 text-[11px] mr-1.5">Inbound</span>
+                        <span className="text-slate-500 text-[0.6875rem] mr-1.5">Inbound</span>
                         <Badge variant="purple" title="Wydanie Zewnętrzne (Outbound Dispatch)">
                             WZ
                         </Badge>
-                        <span className="text-slate-500 text-[11px] mr-1.5">Outbound</span>
+                        <span className="text-slate-500 text-[0.6875rem] mr-1.5">Outbound</span>
                         <Badge
                             variant="amber"
                             title="Przesunięcie Międzymagazynowe (Internal Transfer)"
                         >
                             MM
                         </Badge>
-                        <span className="text-slate-500 text-[11px]">Transfer</span>
+                        <span className="text-slate-500 text-[0.6875rem]">Transfer</span>
                     </div>
                 </div>
             </div>
@@ -132,6 +132,6 @@ export function PendingOrdersWidget() {
                     </TableBody>
                 </Table>
             </div>
-        </div>
+        </section>
     );
 }

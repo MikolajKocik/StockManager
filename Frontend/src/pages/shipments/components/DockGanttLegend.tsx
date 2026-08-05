@@ -11,16 +11,16 @@ export const DockGanttLegend: React.FC = () => {
     return (
         <div className="bg-white border-t border-slate-300 px-4 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-700">
             <div className="flex items-center gap-4 flex-wrap">
-                <span className="font-bold text-slate-700 text-[10px] font-mono uppercase">Legend:</span>
+                <span className="font-bold text-slate-700 text-[0.625rem] font-mono uppercase">Legend:</span>
                 {LEGEND_ITEMS.map(item => (
                     <div key={item.label} className="flex items-center gap-1.5">
                         <span className={`w-3.5 h-3.5 rounded-xs border ${item.colorClass}`} />
-                        <span className={`text-[11px] ${item.textClass}`}>{item.label}</span>
+                        <span className={`text-[0.6875rem] ${item.textClass}`}>{item.label}</span>
                     </div>
                 ))}
             </div>
 
-            <div className="text-[11px] text-slate-500 font-mono">
+            <div className="text-[0.6875rem] text-slate-500 font-mono">
                 Drag blocks horizontally to reschedule or vertically to reallocate ramps
             </div>
         </div>

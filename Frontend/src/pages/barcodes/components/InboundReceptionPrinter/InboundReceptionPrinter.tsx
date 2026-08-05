@@ -60,7 +60,7 @@ export const InboundReceptionPrinter: React.FC<InboundReceptionPrinterProps> = (
                     <h4 className="font-bold text-xs text-amber-900">
                         Delegated Warehouse Operator Terminal (Zero-Error Layout Enforcement)
                     </h4>
-                    <p className="text-[11px] text-amber-800 leading-relaxed">
+                    <p className="text-[0.6875rem] text-amber-800 leading-relaxed">
                         The label layout and barcode standard are strictly locked by the logistics manager. The terminal operator simply selects the inbound delivery (PZ) and enters batch parameters. The backend automatically produces millimeter-perfect labels conforming to the corporate GS1 standard.
                     </p>
                 </div>
@@ -71,7 +71,7 @@ export const InboundReceptionPrinter: React.FC<InboundReceptionPrinterProps> = (
                 {/* Left Column: Inbound PZ Delivery Form */}
                 <div className="lg:col-span-5 bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-4 text-xs">
                     <div className="border-b border-slate-200 pb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                        <span className="text-[0.625rem] font-bold uppercase tracking-wider text-slate-500 block">
                             Inbound Reception (PZ) Data
                         </span>
                         <h3 className="font-bold text-sm text-slate-800">
@@ -110,10 +110,10 @@ export const InboundReceptionPrinter: React.FC<InboundReceptionPrinterProps> = (
                     {/* Product Details (Read-only / verified) */}
                     <div className="bg-slate-50 p-3 rounded border border-slate-200 space-y-2">
                         <div>
-                            <span className="text-[10px] font-semibold text-slate-500 block">Material:</span>
+                            <span className="text-[0.625rem] font-semibold text-slate-500 block">Material:</span>
                             <span className="font-bold text-slate-900 text-xs">{productName}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-[11px]">
+                        <div className="grid grid-cols-2 gap-2 text-[0.6875rem]">
                             <div>
                                 <span className="text-slate-500 block">SKU Code:</span>
                                 <span className="font-mono font-semibold text-slate-800">{productSku}</span>
@@ -197,14 +197,14 @@ export const InboundReceptionPrinter: React.FC<InboundReceptionPrinterProps> = (
                     <div>
                         <div className="flex items-center justify-between border-b border-slate-200 pb-2 mb-3">
                             <div>
-                                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                                <span className="text-[0.625rem] font-bold uppercase tracking-wider text-slate-500 block">
                                     Enforced Master Template Preview
                                 </span>
                                 <h3 className="font-bold text-sm text-slate-800">
                                     {template.name}
                                 </h3>
                             </div>
-                            <span className="text-[10px] bg-slate-100 text-slate-600 font-mono px-2 py-0.5 rounded border border-slate-200">
+                            <span className="text-[0.625rem] bg-slate-100 text-slate-600 font-mono px-2 py-0.5 rounded border border-slate-200">
                                 Locked by Manager
                             </span>
                         </div>

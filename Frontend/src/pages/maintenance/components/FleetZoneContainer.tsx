@@ -66,7 +66,7 @@ export const FleetZoneContainer: React.FC<FleetZoneContainerProps> = ({
                 const isDragOver = dragOverZone === zone.id;
 
                 return (
-                    <div
+                    <section
                         key={zone.id}
                         onDragOver={(e) => onDragOver(e, zone.id)}
                         onDragLeave={onDragLeave}
@@ -78,19 +78,19 @@ export const FleetZoneContainer: React.FC<FleetZoneContainerProps> = ({
                         }`}
                     >
                         {/* Zone Header */}
-                        <div className="flex items-center justify-between px-3.5 py-2.5 rounded-t-lg border-b border-slate-200 bg-slate-50">
+                        <header className="flex items-center justify-between px-3.5 py-2.5 rounded-t-lg border-b border-slate-200 bg-slate-50">
                             <div className="flex items-center gap-2.5">
-                                <span className="font-mono text-[10px] font-bold bg-[#2b6675] text-white px-2 py-0.5 rounded-xs">
+                                <span className="font-mono text-[0.625rem] font-bold bg-[#2b6675] text-white px-2 py-0.5 rounded-xs">
                                     {zone.tag}
                                 </span>
                                 <div>
                                     <h3 className="text-xs font-bold text-slate-800 flex items-center gap-2">
                                         {zone.title}
-                                        <span className="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-xs border border-slate-300 bg-white text-slate-700">
+                                        <span className="text-[0.625rem] font-mono font-bold px-1.5 py-0.5 rounded-xs border border-slate-300 bg-white text-slate-700">
                                             {zoneMachines.length} {zoneMachines.length === 1 ? 'unit' : 'units'}
                                         </span>
                                     </h3>
-                                    <p className="text-[11px] text-slate-500 hidden sm:block">
+                                    <p className="text-[0.6875rem] text-slate-500 hidden sm:block">
                                         {zone.subtitle}
                                     </p>
                                 </div>
@@ -98,11 +98,11 @@ export const FleetZoneContainer: React.FC<FleetZoneContainerProps> = ({
 
                             {/* Drop target hint when dragging */}
                             {draggedMachineId && (
-                                <span className="text-[11px] font-mono font-bold text-[#2b6675] bg-[#f0f7f8] px-2 py-0.5 rounded-xs border border-[#2b6675]/40 animate-pulse">
+                                <span className="text-[0.6875rem] font-mono font-bold text-[#2b6675] bg-[#f0f7f8] px-2 py-0.5 rounded-xs border border-[#2b6675]/40">
                                     Drop here to assign
                                 </span>
                             )}
-                        </div>
+                        </header>
 
                         {/* Zone Grid Cards */}
                         <div className="p-3">
@@ -125,13 +125,13 @@ export const FleetZoneContainer: React.FC<FleetZoneContainerProps> = ({
                                     <p className="text-xs font-semibold text-slate-600">
                                         No active machines in this work zone
                                     </p>
-                                    <p className="text-[11px] text-slate-400 mt-0.5 font-mono">
+                                    <p className="text-[0.6875rem] text-slate-400 mt-0.5 font-mono">
                                         Drag and drop a machine card here to reassign it
                                     </p>
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </section>
                 );
             })}
         </div>

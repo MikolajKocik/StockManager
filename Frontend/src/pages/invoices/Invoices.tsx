@@ -33,14 +33,14 @@ export default function Invoices() {
 
     return (
         <div className="w-full flex flex-col gap-3">
-            {/* Global Print Stylesheet for flawless A4 printing without URL headers/footers */}
+            {/** Injected global print CSS overrides ensuring standard A4 page fitting */}
             <style>{`
                 @page {
                     size: A4 portrait;
                     margin: 0;
                 }
                 @media print {
-                    /* 1. Reset all application layout wrappers */
+                    /* Reset all application layout wrappers */
                     html, body, #root, #root > div, .h-screen, main, .overflow-y-auto, .overflow-hidden {
                         display: block !important;
                         position: static !important;
@@ -59,12 +59,12 @@ export default function Invoices() {
                         print-color-adjust: exact !important;
                     }
 
-                    /* 2. Hide all non-printable UI elements */
+                    /* Hide all non-printable UI elements */
                     header, nav, aside, .sidebar, .no-print, [class*="Navbar"] {
                         display: none !important;
                     }
 
-                    /* 3. A4 Printable Sheet Container */
+                    /* A4 Printable Sheet Container */
                     .invoice-a4-sheet {
                         display: block !important;
                         box-shadow: none !important;
@@ -77,7 +77,7 @@ export default function Invoices() {
                         background: white !important;
                     }
 
-                    /* 4. Restore grid and flex inside the invoice sheet */
+                    /* Restore grid and flex inside the invoice sheet */
                     .invoice-a4-sheet .grid {
                         display: grid !important;
                     }
@@ -115,14 +115,13 @@ export default function Invoices() {
                         width: 100% !important;
                     }
 
-                    /* 5. Hide ALL non-printable items with ultimate specificity */
+                    /* Hide ALL non-printable items with ultimate specificity */
                     .no-print, .invoice-a4-sheet .no-print, [class*="no-print"] {
                         display: none !important;
                     }
                 }
             `}</style>
 
-            {/* Top Toolbar */}
             <InvoiceToolbar
                 viewMode={viewMode}
                 invoicesCount={invoicesList.length}
@@ -141,7 +140,6 @@ export default function Invoices() {
                 onTypeChange={(type) => updateDocumentField('type', type)}
             />
 
-            {/* Main Area: WYSIWYG Document or Archive Table */}
             {viewMode === 'editor' ? (
                 <InvoiceDocument
                     invoice={invoice}

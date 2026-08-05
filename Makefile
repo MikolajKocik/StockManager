@@ -1,4 +1,4 @@
-.PHONY: help backend frontend ai-init seed-db
+.PHONY: help backend frontend seed-db
 
 help: ## Show this help message
 	@echo "StockManager - Available commands:"
@@ -12,9 +12,6 @@ frontend: ## Run the React frontend development server
 	@chmod +x ./frontend.sh
 	./frontend.sh
 
-ai-init: ## Initialize Ollama and vector DB (make sure 'backend' containers are running first)
-	@chmod +x ./init_ollama.sh
-	./init_ollama.sh
 
 seed-db: ## Wipe existing data and seed the WMS database with dummy data
 	@echo "Seeding database..."

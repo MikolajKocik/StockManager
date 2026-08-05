@@ -7,7 +7,6 @@ export { default as Documents } from './documents/Documents';
 export { default as InventoryItems } from './inventoryItems/InventoryItems';
 export { default as Maintenance } from './maintenance/Maintenance';
 export { default as BarCodes } from './barcodes/BarCodes';
-export { default as Analyze } from './analyze/Analyze';
 export { default as BinMap } from './binMap/BinMap';
 export { default as Manage } from './manage/Manage';
 export { default as ReorderRules } from './reorderRules/ReorderRules';

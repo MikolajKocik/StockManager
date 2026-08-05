@@ -7,7 +7,7 @@
 
 param (
     [Parameter(Mandatory=$false, Position=0)]
-    [ValidateSet("help", "backend", "frontend", "ai-init", "seed-db", "all")]
+    [ValidateSet("help", "backend", "frontend", "seed-db", "all")]
     [string]$Action = "help",
 
     [Parameter(Mandatory=$false)]
@@ -52,7 +52,6 @@ function Show-Help {
     Write-Host "  .\run.ps1 all       - Run backend and frontend together (opens in separate windows)"
     Write-Host "  .\run.ps1 backend   - Run the backend API and database infrastructure"
     Write-Host "  .\run.ps1 frontend  - Run the React frontend development server"
-    Write-Host "  .\run.ps1 ai-init   - Initialize Ollama and vector DB (make sure 'backend' containers are running first)"
     Write-Host "  .\run.ps1 seed-db   - Wipe existing data and seed the WMS database with dummy data"
     Write-Host "  .\run.ps1 help      - Show this help message"
 }
@@ -83,7 +82,7 @@ function Run-Backend {
         Write-Host "Running in LIGHT mode (starting SQL Server, RabbitMQ, and Redis only)..." -ForegroundColor Yellow
         docker compose up -d sqlserver rabbitmq redis
     } else {
-        docker compose up -d sqlserver rabbitmq redis ollama vector_db
+        docker compose up -d sqlserver rabbitmq redis
     }
     
     Write-Host "`n2. Waiting for SQL Server to be ready..." -ForegroundColor Blue
@@ -140,26 +139,6 @@ function Run-Frontend {
     npm run dev
 }
 
-function Run-AiInit {
-    Check-Docker
-    Load-Env
-    Write-Host "`nEnsuring Ollama and Vector DB containers are running..." -ForegroundColor Blue
-    Set-Location (Join-Path $RootDir "REST API")
-    docker compose up -d ollama vector_db
-
-    Write-Host "`nPulling the embedding model (nomic-embed-text)..." -ForegroundColor Blue
-    docker exec stockmanager-ollama ollama pull nomic-embed-text
-
-    Write-Host "`nPulling the chat/thinking model (deepseek-r1:1.5b)..." -ForegroundColor Blue
-    docker exec stockmanager-ollama ollama pull deepseek-r1:1.5b
-
-    Write-Host "`nInitializing pgvector extension in the vector database..." -ForegroundColor Blue
-    $postgresPwd = $env:POSTGRES__PASSWORD
-    if (-not $postgresPwd) { $postgresPwd = "YourStrong!Passw0rd" }
-    docker exec -e PGPASSWORD=$postgresPwd stockmanager-embeddings psql -U admin -d stockmanager-embeddings -c "CREATE EXTENSION IF NOT EXISTS vector;"
-    Write-Host "`nAI Models and Vector DB initialized successfully!" -ForegroundColor Green
-}
-
 function Run-SeedDb {
     Check-Docker
     Load-Env
@@ -207,7 +186,6 @@ try {
         "help" { Show-Help }
         "backend" { Run-Backend }
         "frontend" { Run-Frontend }
-        "ai-init" { Run-AiInit }
         "seed-db" { Run-SeedDb }
         "all" { Run-All }
     }

@@ -122,7 +122,3 @@ http://localhost:5000/swagger/index.html
 ## Notes
 
 - The React frontend uses mock and internal APIs for several demo screens and data workflows.
-
-## License
-
-This repository does not contain explicit license metadata. Review project files for any license details before using or distributing.
